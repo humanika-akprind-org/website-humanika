@@ -1,5 +1,5 @@
 import React from "react";
-import oauth2Client from "../lib/google-oauth";
+import oauth2Client from "@/app/lib/google-oauth";
 import { google } from "googleapis";
 import { cookies } from "next/headers";
 

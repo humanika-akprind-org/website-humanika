@@ -1,14 +1,16 @@
 import crypto from "crypto";
 import Link from "next/link";
-import oauth2Client from "./lib/google-oauth";
+import oauth2Client from "@/app/lib/google-oauth";
 import { Button } from "@/components/ui/button";
+
 export default function Home() {
   const SCOPE = [
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/documents",
-    "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/drive.appdata",
-    "https://www.googleapis.com/auth/drive.photos.readonly",
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
+    // "https://www.googleapis.com/auth/drive",
+    // "https://www.googleapis.com/auth/documents",
+    // "https://www.googleapis.com/auth/drive.file",
+    // "https://www.googleapis.com/auth/drive.appdata",
+    // "https://www.googleapis.com/auth/drive.photos.readonly",
   ];
 
   //where do i store this state

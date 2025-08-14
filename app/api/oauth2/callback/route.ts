@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import  oauth2Client  from '../../../lib/google-oauth';
+import oauth2Client from "@/app/lib/google-oauth";
 import { cookies } from 'next/headers';
 
 export async function GET(req: Request) {
