@@ -1,28 +1,28 @@
+// page.tsx
 import React from "react";
-import oauth2Client from "@/app/lib/google-oauth";
-import { google } from "googleapis";
 import { cookies } from "next/headers";
+import { getGoogleDriveFiles } from "@/app/dashboard/server"; // Import the server-side function
 
-export default async function page() {
+export default async function Page() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("google_access_token")?.value;
-  oauth2Client.setCredentials({ access_token: accessToken });
+
+  if (!accessToken) {
+    return (
+      <div className="justify-center w-full flex text-center pt-10 flex-col items-center">
+        <h1>Please log in to access your Google Drive files.</h1>
+      </div>
+    );
+  }
+
   let files;
-
-  const drive = google.drive("v3");
-
   try {
-    const result = await drive.files.list({
-      auth: oauth2Client,
-      pageSize: 15,
-      fields: "nextPageToken, files(id, name)",
-    });
-    files = result.data.files;
+    files = await getGoogleDriveFiles(accessToken);
   } catch (error) {
     console.log(error);
     return (
       <div className="justify-center w-full flex text-center pt-10 flex-col items-center">
-        Something went wrong! Please login again!
+        <h1>Something went wrong! Please login again!</h1>
       </div>
     );
   }
