@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { getGoogleDriveFiles } from "@/app/dashboard/server";
-import DriveManager from "@/app/dashboard/DriveManager";
+import DriveManager from "@/app/dashboard/drive-manager";
 
 export default async function Page() {
   const cookieStore = cookies();
