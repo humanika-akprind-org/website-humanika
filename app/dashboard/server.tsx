@@ -3,6 +3,11 @@ import oauth2Client from "@/app/lib/google-oauth";
 import { google } from "googleapis";
 
 export async function getGoogleDriveFiles(accessToken: string) {
+
+  if (!accessToken) {
+    throw new Error("Missing access token");
+  }
+
   oauth2Client.setCredentials({ access_token: accessToken });
 
   const drive = google.drive("v3");
