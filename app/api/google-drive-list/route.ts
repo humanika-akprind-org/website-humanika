@@ -2,12 +2,11 @@ import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const accessToken = searchParams.get("accessToken");
+  const accessToken = req.nextUrl.searchParams.get("accessToken");
 
   if (!accessToken) {
     return NextResponse.json(
-      { success: false, message: "Missing access token" },
+      { success: false, message: "Access token is required" },
       { status: 400 }
     );
   }
@@ -18,19 +17,21 @@ export async function GET(req: NextRequest) {
   });
 
   try {
-    const result = await drive.files.list({
-      pageSize: 15,
-      fields: "nextPageToken, files(id, name)",
+    const { data } = await drive.files.list({
+      q: "trashed=false",
+      fields: "files(id, name, size, mimeType, createdTime, webViewLink)",
+      orderBy: "createdTime desc",
+      pageSize: 50,
     });
 
     return NextResponse.json({
       success: true,
-      files: result.data.files || [],
+      files: data.files || [],
     });
   } catch (error: unknown) {
-    console.error(error);
+    console.error("Error fetching files:", error);
     const errorMessage =
-      error instanceof Error ? error.message : "An error occurred";
+      error instanceof Error ? error.message : "Failed to fetch files";
     return NextResponse.json(
       { success: false, message: errorMessage },
       { status: 500 }
