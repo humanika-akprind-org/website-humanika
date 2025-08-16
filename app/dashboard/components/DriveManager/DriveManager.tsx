@@ -30,6 +30,7 @@ const DriveManager: React.FC<DriveManagerProps> = ({
     operations: false,
   });
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const fetchFiles = async () => {
     setIsLoading((prev) => ({ ...prev, files: true }));
@@ -151,6 +152,7 @@ const DriveManager: React.FC<DriveManagerProps> = ({
 
     setIsLoading((prev) => ({ ...prev, upload: true }));
     setError(null);
+    setMessage(null);
 
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -159,13 +161,15 @@ const DriveManager: React.FC<DriveManagerProps> = ({
     formData.append("folderId", selectedFolderId);
 
     try {
-      // For upload, we use FormData instead of JSON body
-      const result = await callApi({
-        action: "upload",
-        accessToken,
-      }, formData);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (result.success) {
+      const result = await response.json();
+
+      if (response.ok) {
+        setMessage("File uploaded successfully!");
         await fetchFiles();
         setSelectedFile(null);
         // Clear file input
@@ -202,6 +206,12 @@ const DriveManager: React.FC<DriveManagerProps> = ({
       {error && (
         <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md border border-red-200">
           {error}
+        </div>
+      )}
+
+      {message && (
+        <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-md border border-green-200">
+          {message}
         </div>
       )}
 
