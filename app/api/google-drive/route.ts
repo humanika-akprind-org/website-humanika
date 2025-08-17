@@ -108,21 +108,21 @@ export async function POST(request: NextRequest) {
     }
   } catch (error: unknown) {
     console.error("[DRIVE_API_ERROR]", error);
-    
+
     let message = "Operation failed";
     let details = null;
     let statusCode = 500;
-    
+
     if (error instanceof Error) {
       message = error.message;
     }
-    
-    if (typeof error === 'object' && error !== null && 'response' in error) {
+
+    if (typeof error === "object" && error !== null && "response" in error) {
       const err = error as { response?: { status?: number; data?: unknown } };
       statusCode = err.response?.status || 500;
       details = err.response?.data || null;
     }
-    
+
     return NextResponse.json(
       {
         success: false,
