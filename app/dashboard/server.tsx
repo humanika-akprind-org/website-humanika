@@ -1,5 +1,5 @@
 // server.tsx
-import oauth2Client from "@/app/lib/google-oauth";
+import { oauth2Client } from "@/lib/google-oauth";
 import { google } from "googleapis";
 
 export async function getGoogleDriveFiles(accessToken: string) {

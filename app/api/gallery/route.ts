@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { uploadToGoogleDrive } from "@/lib/googleDrive";
+import { uploadToGoogleDrive } from "@/lib/google-drive";
 
 interface GalleryData {
   id: string;

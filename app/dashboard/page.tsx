@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { getGoogleDriveFiles } from "@/app/dashboard/server";
 import DriveManager from "@/app/dashboard/components/DriveManager";
-import GoogleLoginButton from "@/components/GoogleLoginButton";
 
 export default async function Home() {
   const cookieStore = cookies();
@@ -11,7 +10,6 @@ export default async function Home() {
     return (
       <div className="justify-center w-full flex text-center pt-10 flex-col items-center">
         <h1>Please log in to access your Google Drive files.</h1>
-        <GoogleLoginButton />
       </div>
     );
   }
