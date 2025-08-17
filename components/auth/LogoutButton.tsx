@@ -1,29 +1,25 @@
-// components/auth/LogoutButton.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button, ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
-interface LogoutButtonProps extends ButtonProps {
-  onLogout?: () => void;
-}
-
-export function LogoutButton({ onLogout, ...props }: LogoutButtonProps) {
+export function LogoutButton() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      onLogout?.();
-      router.refresh();
-      router.push("/auth/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.refresh();
+    router.push("/auth/login");
   };
 
   return (
-    <Button onClick={handleLogout} {...props}>
+    <Button
+      onClick={handleLogout}
+      variant="ghost"
+      className="text-red-500 hover:bg-red-50 w-full justify-start"
+    >
+      <LogOut className="h-4 w-4 mr-2" />
       Logout
     </Button>
   );

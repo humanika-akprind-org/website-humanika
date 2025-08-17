@@ -1,66 +1,80 @@
-import GoogleDriveConnect from "@/components/google-drive/GoogleDriveConnect";
-import { getCurrentUser } from "@/lib/auth";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { cookies } from "next/headers";
+import { getGoogleDriveFiles } from "@/app/dashboard/server";
+import DriveManager from "@/app/dashboard/components/DriveManager";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import GoogleDriveConnect from "@/components/google-drive/GoogleDriveConnect";
 
 export default async function Home() {
-  const user = await getCurrentUser();
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("google_access_token")?.value || "";
 
-  return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-blue-50 to-white">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8 text-center">
-        <div className="mb-8 flex justify-center">
-          <Image
-            src="https://drive.google.com/uc?export=view&id=1sRLxNW0acJyOJdflhEF30QiqNkuSaw03"
-            alt="HUMANIKA Logo"
-            width={200}
-            height={100}
-            className="rounded-full border-4 border-blue-100 object-cover"
-          />
-        </div>
-
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          Selamat Datang di DriveSync
+  if (!accessToken) {
+    return (
+      <div className="justify-center w-full flex text-center pt-10 flex-col items-center">
+        <h1 className="mb-4">
+          Please log in to access your Google Drive files.
         </h1>
-        <p className="text-gray-600 mb-8">
-          Kelola file Google Drive Anda dengan mudah
-        </p>
+        <GoogleDriveConnect />
+      </div>
+    );
+  }
 
-        {user ? (
-          <div className="space-y-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="font-medium">Halo, {user.name || user.username}!</p>
-              <p className="text-sm text-gray-600">{user.email}</p>
-            </div>
-
-            <div className="flex flex-col space-y-3">
-              <GoogleDriveConnect />
-              <LogoutButton />
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex space-x-4">
-              <Link href="/auth/login" className="w-full">
-                <Button variant="outline" className="w-full">
-                  Masuk
-                </Button>
-              </Link>
-              <Link href="/auth/register" className="w-full">
-                <Button className="w-full">Daftar</Button>
-              </Link>
-            </div>
-          </div>
-        )}
-
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} DriveSync. All rights reserved.
-          </p>
+  let files;
+  try {
+    files = await getGoogleDriveFiles(accessToken);
+  } catch (error) {
+    console.error("Failed to fetch Google Drive files:", error);
+    return (
+      <div className="justify-center w-full flex text-center pt-10 flex-col items-center">
+        <h1 className="mb-4 text-red-500">Failed to load Google Drive files</h1>
+        <div className="flex gap-4">
+          <a
+            href="/auth/login"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Re-login
+          </a>
+          <a
+            href="/"
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Refresh
+          </a>
         </div>
       </div>
-    </main>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="flex justify-end mb-4">
+        <LogoutButton />
+      </div>
+      <DriveManager files={files} accessToken={accessToken} />
+    </div>
   );
 }

@@ -23,3 +23,15 @@ export interface FolderOption {
   id: string;
   name: string;
 }
+
+export interface UploadSectionProps {
+  selectedFile: File | null;
+  selectedFolderId: string;
+  folderOptions: FolderOption[];
+  isLoading: LoadingState;
+  fileNameInput: string; // Add this line
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFolderChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onUpload: () => Promise<void>;
+}
