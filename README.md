@@ -208,7 +208,7 @@ npm run lint
 # Database
 
 npx prisma studio
-npx prisma db push
+npx prisma db p
 \`\`\`
 
 ## 🤝 Contributing

@@ -24,7 +24,7 @@ const FileList: React.FC<FileListProps> = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-3">
-        <h2 className="text-lg font-semibold text-gray-700">Your Files</h2>
+        <h2 className="text-lg font-semibold text-gray-700">Drive Files</h2>
         <button
           onClick={onRefresh}
           disabled={isLoading.files}

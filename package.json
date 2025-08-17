@@ -19,8 +19,10 @@
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cookie": "^1.0.2",
     "crypto": "^1.0.1",
     "googleapis": "^144.0.0",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.447.0",
     "mongodb": "^6.18.0",
     "next": "14.2.14",
@@ -36,6 +38,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/mongodb": "^4.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
