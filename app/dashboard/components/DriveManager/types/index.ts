@@ -28,10 +28,13 @@ export interface UploadSectionProps {
   selectedFile: File | null;
   selectedFolderId: string;
   folderOptions: FolderOption[];
-  isLoading: LoadingState;
-  fileNameInput: string; // Add this line
+  isLoading: {
+    folders: boolean;
+    upload: boolean;
+  };
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFileNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFolderChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onUpload: () => Promise<void>;
+  onUpload: (file: File) => Promise<string>; // Kembalian fileId dari Google Drive
+  onRename: (fileId?: string | null) => void; // Callback setelah rename
 }

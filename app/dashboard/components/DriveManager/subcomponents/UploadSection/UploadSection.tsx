@@ -1,26 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-
-interface FolderOption {
-  id: string;
-  name: string;
-}
-
-interface UploadSectionProps {
-  selectedFile: File | null;
-  selectedFolderId: string;
-  folderOptions: FolderOption[];
-  isLoading: {
-    folders: boolean;
-    upload: boolean;
-  };
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onFileNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onFolderChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onUpload: (file: File) => Promise<string>; // Kembalian fileId dari Google Drive
-  onRename: (fileId?: string | null) => void; // Callback setelah rename
-}
+import { UploadSectionProps } from "../../types";
 
 const UploadSection: React.FC<UploadSectionProps> = ({
   selectedFile,
@@ -58,6 +39,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({
       setFileExtension("");
     }
   }, [selectedFile]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

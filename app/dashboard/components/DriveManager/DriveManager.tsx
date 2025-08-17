@@ -170,51 +170,55 @@ const DriveManager: React.FC<DriveManagerProps> = ({
     }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      setError("Please select a file to upload");
-      return;
+const handleUpload = async (file: File): Promise<string> => {
+  if (!file) {
+    setError("Please select a file to upload");
+    return ""; // Return empty string on error
+  }
+
+  setLoadingState("upload", true);
+  setError(null);
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("action", "upload");
+  formData.append("accessToken", accessToken);
+  formData.append("folderId", selectedFolderId);
+  formData.append("fileName", fileNameInput.trim() || file.name);
+
+  try {
+    const result = await callApi(
+      {
+        action: "upload",
+        accessToken,
+      },
+      formData
+    );
+
+    if (result.success) {
+      await fetchFiles();
+      setSelectedFile(null);
+      setFileNameInput("");
+      const fileInput = document.getElementById(
+        "file-upload"
+      ) as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
+
+      // Return the file ID (make sure your API returns this)
+      return result.fileId || "";
+    } else {
+      throw new Error(result.message || "Upload failed");
     }
-
-    setLoadingState("upload", true);
-    setError(null);
-
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("action", "upload");
-    formData.append("accessToken", accessToken);
-    formData.append("folderId", selectedFolderId);
-    formData.append("fileName", fileNameInput.trim() || selectedFile.name);
-
-    try {
-      const result = await callApi(
-        {
-          action: "upload",
-          accessToken,
-        },
-        formData
-      );
-
-      if (result.success) {
-        await fetchFiles();
-        setSelectedFile(null);
-        setFileNameInput("");
-        const fileInput = document.getElementById(
-          "file-upload"
-        ) as HTMLInputElement;
-        if (fileInput) fileInput.value = "";
-      } else {
-        throw new Error(result.message || "Upload failed");
-      }
-    } catch (err) {
-      console.error("Upload error:", err);
-      setError(
-        err instanceof Error ? err.message : "Upload failed. Please try again."
-      );
-    } finally {
-      setLoadingState("upload", false);
-    }
-  };
+  } catch (err) {
+    console.error("Upload error:", err);
+    setError(
+      err instanceof Error ? err.message : "Upload failed. Please try again."
+    );
+    return ""; // Return empty string on error
+  } finally {
+    setLoadingState("upload", false);
+  }
+};
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(e.target.files?.[0] ?? null);
@@ -292,15 +296,15 @@ const DriveManager: React.FC<DriveManagerProps> = ({
 
       <div className="mb-8">
         <UploadSection
-          selectedFile={selectedFile}
+          selectedFile={selectedFile} // Keep this for UI display
           selectedFolderId={selectedFolderId}
           folderOptions={folderOptions}
           isLoading={isLoading}
           onFileChange={handleFileChange}
           onFileNameChange={handleFileNameChange}
           onFolderChange={handleFolderChange}
-          onUpload={handleUpload}
-          onRename={handleRename} // Tambahkan prop onRename
+          onUpload={(file) => handleUpload(file)} // Pass the file here
+          onRename={handleRename}
         />
       </div>
 
