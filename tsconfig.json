@@ -1,43 +1,51 @@
 {
   "compilerOptions": {
-    "baseUrl": ".", // Wajib ditambahkan!
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node", // Ubah dari "bundler" ke "node" untuk stabilitas
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "types": [
-      "node"
-    ], // Tambahkan untuk modul Node.js
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ] // Simplifikasi, hapus yang redundan
+      "@/*": ["./*"],
+      "@/components/*": ["components/*"],
+      "@/lib/*": ["lib/*"],
+      "@/types/*": ["types/*"]
     },
+    "typeRoots": ["node_modules/@types", "types"],
     "plugins": [
       {
-        "name": "next"
+        "name": "next",
+        "pageExtensions": ["page.tsx", "page.ts", "page.jsx", "page.js"]
       }
-    ]
+    ],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**"
   ]
 }
