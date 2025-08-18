@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { UploadSectionProps } from "../../types";
 
 const UploadSection: React.FC<UploadSectionProps> = ({
@@ -21,25 +21,40 @@ const UploadSection: React.FC<UploadSectionProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileNameInputRef = useRef<HTMLInputElement>(null);
 
-  // Effect untuk mengatur nama file awal saat file dipilih
+  // Extract file name and extension
+  const extractFileInfo = useCallback((file: File) => {
+    const fileNameParts = file.name.split(".");
+    const extension = fileNameParts.length > 1 ? fileNameParts.pop() : "";
+    return {
+      name: fileNameParts.join("."),
+      extension: extension || "",
+    };
+  }, []);
+
+  // Set initial file name when file is selected
   useEffect(() => {
     if (selectedFile) {
-      const fileNameParts = selectedFile.name.split(".");
-      const extension = fileNameParts.length > 1 ? fileNameParts.pop() : "";
-      setFileExtension(extension || "");
+      const { name, extension } = extractFileInfo(selectedFile);
+      setFileExtension(extension);
 
-      if (
-        fileName === "" ||
-        fileName === selectedFile.name.replace(/\.[^/.]+$/, "")
-      ) {
-        setFileName(fileNameParts.join("."));
+      if (fileName === "" || fileName === name) {
+        setFileName(name);
       }
     } else {
       setFileName("");
       setFileExtension("");
     }
-  }, [selectedFile]);
+  }, [selectedFile, fileName, extractFileInfo]);
 
+  const resetFileInput = useCallback(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    setFileName("");
+    setFileExtension("");
+    setUploadedFileId(null);
+    setIsModalOpen(false);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,11 +75,9 @@ const UploadSection: React.FC<UploadSectionProps> = ({
     });
 
     try {
-      // Upload file dan dapatkan fileId
       const fileId = await onUpload(renamedFile);
       setUploadedFileId(fileId);
 
-      // Panggil callback rename setelah upload selesai
       if (onRename) {
         onRename(fileId);
       }
@@ -77,42 +90,32 @@ const UploadSection: React.FC<UploadSectionProps> = ({
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       onFileChange(e);
       setFileName("");
-      setUploadedFileId(null); // Reset fileId saat file baru dipilih
+      setUploadedFileId(null);
     }
   };
 
   const handleFileNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     setFileName(newName);
+
     if (onFileNameChange) {
       onFileNameChange(e);
     }
 
-    // Jika file sudah diupload, panggil onRename saat nama diubah
     if (uploadedFileId && onRename) {
       onRename(uploadedFileId);
     }
   };
 
-  const resetFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    setFileName("");
-    setFileExtension("");
-    setUploadedFileId(null);
-    setIsModalOpen(false);
-  };
-
   return (
     <>
-      {/* Tombol Add File */}
       <button
         onClick={() => setIsModalOpen(true)}
         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+        aria-label="Tambah File"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +132,6 @@ const UploadSection: React.FC<UploadSectionProps> = ({
         Tambah File
       </button>
 
-      {/* Modal Upload */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
@@ -141,6 +143,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({
                 <button
                   onClick={resetFileInput}
                   className="text-gray-400 hover:text-gray-500"
+                  aria-label="Tutup modal"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -162,11 +165,15 @@ const UploadSection: React.FC<UploadSectionProps> = ({
               <form onSubmit={handleSubmit}>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="file-name"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
                       Nama File
                     </label>
                     <div className="flex">
                       <input
+                        id="file-name"
                         type="text"
                         ref={fileNameInputRef}
                         value={fileName}
@@ -192,7 +199,10 @@ const UploadSection: React.FC<UploadSectionProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="file-upload"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
                       Pilih File
                     </label>
                     <input
@@ -219,10 +229,14 @@ const UploadSection: React.FC<UploadSectionProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label
+                      htmlFor="folder-select"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
                       Folder Tujuan
                     </label>
                     <select
+                      id="folder-select"
                       value={selectedFolderId}
                       onChange={onFolderChange}
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
