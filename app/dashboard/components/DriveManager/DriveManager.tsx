@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { drive_v3 } from "googleapis/build/src/apis/drive/v3";
-import { DriveManagerProps, LoadingState } from "./types";
+import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
+import { type DriveManagerProps, type LoadingState } from "./types";
 import { callApi, fetchDriveFiles, fetchDriveFolders } from "./api";
 import {
   getFolderOptions,
@@ -131,7 +131,7 @@ const DriveManager: React.FC<DriveManagerProps> = ({
 
   const handleDelete = async (fileId?: string | null) => {
     if (!fileId || !confirm("Are you sure you want to delete this file?"))
-      return;
+      {return;}
 
     await handleApiOperation(async () => {
       await callApi({ action: "delete", fileId, accessToken });
@@ -329,7 +329,7 @@ const handleUpload = async (file: File): Promise<string> => {
             <div
               className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"
               aria-hidden="true"
-            ></div>
+             />
             <p className="text-gray-700">Processing your request...</p>
           </div>
         </div>

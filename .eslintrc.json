@@ -36,7 +36,13 @@
         "fixStyle": "inline-type-imports"
       }
     ],
-    "react/self-closing-comp": ["error", { "component": true, "html": true }],
+      "react/self-closing-comp": [
+    "error",
+    {
+      "component": true,
+      "html": true
+    }
+  ],
 
     // ========== Unused Imports/Vars ==========
     "unused-imports/no-unused-imports": "error",
@@ -88,14 +94,7 @@
     "curly": ["error", "multi-line", "consistent"],
     "arrow-body-style": ["error", "as-needed"]
   },
-  "react/self-closing-comp": [
-    "error",
-    {
-      "component": true,
-      "html": true
-    }
-  ],
-  "unused-imports/no-unused-imports": "error",
+  // "unused-imports/no-unused-imports": "error",
   "overrides": [
     {
       "files": ["**/*.test.ts", "**/*.test.tsx"],

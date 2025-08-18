@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic"; // Required for Next.js API routes
 

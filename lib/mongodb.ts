@@ -1,4 +1,4 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
+import { MongoClient, type MongoClientOptions } from "mongodb";
 
 // Type for our global mongo client promise in development
 declare global {

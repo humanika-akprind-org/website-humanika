@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { drive_v3 } from "googleapis/build/src/apis/drive/v3";
-import { LoadingState } from "../../types";
+import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
+import { type LoadingState } from "../../types";
 
 interface FileListProps {
   files: drive_v3.Schema$File[];
@@ -66,7 +66,7 @@ const FileList: React.FC<FileListProps> = ({
 
       {isLoading.files ? (
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
         </div>
       ) : filteredFiles.length === 0 ? (
         <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">

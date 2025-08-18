@@ -1,4 +1,4 @@
-import { drive_v3 } from "googleapis/build/src/apis/drive/v3";
+import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
 
 export interface DriveManagerProps {
   files: drive_v3.Schema$File[] | undefined;

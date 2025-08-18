@@ -1,4 +1,4 @@
-import { ApiRequestBody } from "../types";
+import { type ApiRequestBody } from "../types";
 
 export const callApi = async (body: ApiRequestBody, formData?: FormData) => {
   try {

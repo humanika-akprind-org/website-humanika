@@ -5,7 +5,6 @@ import {
   FileText,
   Calendar,
   Settings,
-  LogOut as _LogOut,
 } from "lucide-react";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 
