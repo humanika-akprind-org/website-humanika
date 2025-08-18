@@ -41,13 +41,15 @@ export async function POST(request: Request) {
       },
     });
 
-    // Generate token and set cookie
+    // Generate token
     const token = generateToken(user.id);
-    setAuthCookie(token);
 
-    // Return user data (excluding password)
+    // Create response
     const { password: _, ...userWithoutPassword } = user;
-    return NextResponse.json(userWithoutPassword, { status: 201 });
+    const response = NextResponse.json(userWithoutPassword, { status: 201 });
+
+    // Set cookie and return response
+    return setAuthCookie(response, token);
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(

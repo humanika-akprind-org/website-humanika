@@ -15,58 +15,63 @@ const COOKIE_OPTIONS = {
   path: "/",
 };
 
-// Type for the decoded token
 interface DecodedToken {
   userId: string;
+  iat?: number;
+  exp?: number;
 }
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10);
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
 }
 
 export async function comparePasswords(
-  password: string,
+  plainTextPassword: string,
   hashedPassword: string
 ): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
+  return bcrypt.compare(plainTextPassword, hashedPassword);
 }
 
 export function generateToken(userId: string): string {
+  if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined");
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
 }
 
 export function verifyToken(token: string): DecodedToken | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined");
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload & DecodedToken;
     return { userId: decoded.userId };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Token verification failed:", error.message);
-    }
+  } catch (error) {
+    console.error(
+      "Token verification failed:",
+      error instanceof Error ? error.message : error
+    );
     return null;
   }
 }
 
-export function setAuthCookie(token: string): void {
-  cookies().set(COOKIE_NAME, token, COOKIE_OPTIONS);
+// Add this version of setAuthCookie
+export function setAuthCookie(
+  response: NextResponse,
+  token: string
+): NextResponse {
+  response.cookies.set({
+    name: "auth-token",
+    value: token,
+    ...COOKIE_OPTIONS, // Spread existing options
+  });
+  return response;
 }
 
-export function getAuthCookie(): string | undefined {
+export function getAuthToken(): string | undefined {
   return cookies().get(COOKIE_NAME)?.value;
 }
 
-export function clearAllAuthCookies(): void {
-  // Hapus semua cookie autentikasi
-  const cookieNames = [
-    COOKIE_NAME,
-    "google_access_token",
-    "next-auth.session-token",
-    "auth-token",
-  ];
-
-  cookieNames.forEach((name) => {
-    cookies().delete(name);
-  });
+export function clearAuthCookies(): void {
+  cookies().delete(COOKIE_NAME);
+  // Additional cookies can be cleared here if needed
 }
 
 export async function invalidateToken(token: string): Promise<void> {
@@ -74,68 +79,93 @@ export async function invalidateToken(token: string): Promise<void> {
     const decoded = verifyToken(token);
     if (!decoded) return;
 
-    // Jika Anda menyimpan token di database, tambahkan logika untuk menghapus/memvalidasi token di sini
-    // Contoh:
-    // await prisma.tokenBlacklist.create({
-    //   data: {
-    //     token,
-    //     expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) // 1 week
-    //   }
+    // Implement token invalidation logic here if using a blacklist
+    // await prisma.invalidatedToken.create({
+    //   data: { token, expiresAt: new Date(decoded.exp * 1000) }
     // });
   } catch (error) {
-    console.error("Failed to invalidate token:", error);
+    console.error(
+      "Token invalidation failed:",
+      error instanceof Error ? error.message : error
+    );
   }
 }
 
 export async function logoutUser(): Promise<void> {
-  const token = getAuthCookie();
+  const token = getAuthToken();
   if (token) {
     await invalidateToken(token);
   }
-  clearAllAuthCookies();
+  clearAuthCookies();
 }
 
 export async function getCurrentUser() {
-  const token = getAuthCookie();
+  const token = getAuthToken();
   if (!token) return null;
 
   const decoded = verifyToken(token);
   if (!decoded) return null;
 
-  return await prisma.user.findUnique({
-    where: { id: decoded.userId },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      name: true,
-      role: true,
-    },
-  });
+  try {
+    return await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Failed to fetch user:",
+      error instanceof Error ? error.message : error
+    );
+    return null;
+  }
 }
 
 export async function requireAuth(
   request: NextRequest,
-  roles: string[] = ["user"]
+  allowedRoles: string[] = ["user"]
 ): Promise<NextResponse | null> {
   const token = request.cookies.get(COOKIE_NAME)?.value;
+
   if (!token) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    return NextResponse.redirect(
+      new URL("/auth/login?error=unauthorized", request.url)
+    );
   }
 
   const decoded = verifyToken(token);
   if (!decoded) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    clearAuthCookies();
+    return NextResponse.redirect(
+      new URL("/auth/login?error=invalid_token", request.url)
+    );
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: decoded.userId },
-    select: { role: true },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { role: true }, // Removed isActive from selection
+    });
 
-  if (!user || !roles.includes(user.role)) {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
+    if (!user || !allowedRoles.includes(user.role)) {
+      return NextResponse.redirect(new URL("/unauthorized", request.url));
+    }
+
+    return null;
+  } catch (error) {
+    console.error(
+      "Auth check failed:",
+      error instanceof Error ? error.message : error
+    );
+    return NextResponse.redirect(
+      new URL("/auth/login?error=server_error", request.url)
+    );
   }
-
-  return null;
 }
