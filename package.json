@@ -2,11 +2,13 @@
   "name": "nextjs-oauth-google",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
@@ -20,7 +22,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cookie": "^1.0.2",
-    "crypto": "^1.0.1",
+    "crypto-browserify": "^3.12.0",
     "googleapis": "^144.0.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.447.0",
@@ -33,8 +35,10 @@
     "react-dom": "^18",
     "react-icons": "^5.5.0",
     "sonner": "^2.0.7",
+    "stream-browserify": "^3.0.0",
     "tailwind-merge": "^2.5.3",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "querystring-es3": "^2.1.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -48,5 +52,8 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "browser": {
+    "crypto": false
   }
 }
