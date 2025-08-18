@@ -6,13 +6,16 @@ import type { ToastActionElement } from "@/components/ui/toast";
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
-type ToastVariant = "default" | "destructive";
+type ToastVariant = "default" | "destructive" | "success";
 
 interface ToastProps {
+  id?: string;
   variant?: ToastVariant;
   duration?: number;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
 }
 
 const actionTypes = {
@@ -27,7 +30,6 @@ type ToasterToast = ToastProps & {
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: ToastActionElement;
-  appearance?: "success" | "error" | "warning" | "info"; // Your custom appearance types
 };
 
 let count = 0;
@@ -123,37 +125,41 @@ function dispatch(action: Action) {
   listeners.forEach((listener) => listener(memoryState));
 }
 
-type ToastOptions = Omit<ToasterToast, "id">;
+function toast(options: ToastProps) {
+  const id = options.id || genId();
 
-function toast(options: ToastOptions) {
-  const id = genId();
+  const toastData: ToasterToast = {
+    id,
+    variant: options.variant || "default",
+    duration: options.duration || 5000,
+    open: true,
+    title: options.title,
+    description: options.description,
+    onOpenChange: (open) => {
+      if (!open) {
+        dismiss();
+      }
+      options.onOpenChange?.(open);
+    },
+  };
 
-  // Map appearance to Radix variant
-  const variant = options.appearance === "error" ? "destructive" : "default";
+  dispatch({
+    type: "ADD_TOAST",
+    toast: toastData,
+  });
 
-  const update = (props: ToasterToast) =>
+  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
+  const update = (props: ToastProps) =>
     dispatch({
-      type: actionTypes.UPDATE_TOAST,
+      type: "UPDATE_TOAST",
       toast: { ...props, id },
     });
 
-  const dismiss = () =>
-    dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
-
-  dispatch({
-    type: actionTypes.ADD_TOAST,
-    toast: {
-      ...options,
-      variant,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
-      },
-    },
-  });
-
-  return { id, dismiss, update };
+  return {
+    id,
+    dismiss,
+    update,
+  };
 }
 
 function useToast() {

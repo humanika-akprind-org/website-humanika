@@ -11,6 +11,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        blue: {
+          800: "#1E40AF",
+          900: "#1E3A8A",
+        },
+        red: {
+          600: "#DC2626",
+        },
+        yellow: {
+          400: "#FACC15",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -45,11 +55,11 @@ const config: Config = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
         },
       },
       borderRadius: {
@@ -57,8 +67,28 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      animation: {
+        blob: "blob 7s infinite",
+      },
+      keyframes: {
+        blob: {
+          "0%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)",
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)",
+          },
+          "100%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+        },
+      },
     },
   },
   plugins: [animate],
 };
+
 export default config;
