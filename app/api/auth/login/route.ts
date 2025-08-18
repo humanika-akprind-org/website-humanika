@@ -6,47 +6,56 @@ export async function POST(request: Request) {
   try {
     const { usernameOrEmail, password } = await request.json();
 
-    if (!usernameOrEmail || !password) {
+    // Input validation
+    if (!usernameOrEmail?.trim() || !password?.trim()) {
       return NextResponse.json(
-        { error: "Username/email and password are required" },
+        { success: false, error: "Username/email and password are required" },
         { status: 400 }
       );
     }
 
-    // Find user by username or email
+    // Find user
     const user = await prisma.user.findFirst({
       where: {
-        OR: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+        OR: [
+          { username: usernameOrEmail.trim() },
+          { email: usernameOrEmail.trim() },
+        ],
       },
     });
 
     if (!user) {
       return NextResponse.json(
-        { error: "Invalid credentials" },
+        { success: false, error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    // Compare passwords
+    // Verify password
     const isPasswordValid = await comparePasswords(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: "Invalid credentials" },
+        { success: false, error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    // Generate token and set cookie
+    // Generate token
     const token = generateToken(user.id);
-    setAuthCookie(token);
 
-    // Return user data (excluding password)
+    // Create response without password
     const { password: _, ...userWithoutPassword } = user;
-    return NextResponse.json(userWithoutPassword);
+    const response = NextResponse.json({
+      success: true,
+      user: userWithoutPassword,
+    });
+
+    // Set cookie using updated function
+    return setAuthCookie(response, token);
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
