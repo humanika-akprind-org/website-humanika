@@ -66,10 +66,10 @@ export default async function DashboardPage() {
 
   // Data dummy untuk komponen dashboard
   const statsData = [
-    { title: "Total Files", value: files.length, change: "+12%", trend: "up" },
-    { title: "Active Users", value: 1243, change: "+5%", trend: "up" },
-    { title: "Storage Used", value: "78%", change: "-3%", trend: "down" },
-    { title: "Tasks Completed", value: 89, change: "+24%", trend: "up" },
+    { title: "Total Files", value: 100, change: "+12%", trend: "up" as const },
+    { title: "Active Users", value: 1243, change: "+5%", trend: "up" as const },
+    { title: "Storage Used", value: "78%", change: "-3%", trend: "down" as const },
+    { title: "Tasks Completed", value: 89, change: "+24%", trend: "up" as const },
   ];
 
   const recentActivities = [
@@ -96,7 +96,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
       <main className="p-6 space-y-6">
         {/* Stats Overview */}
         <StatsOverview stats={statsData} />
