@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import AuthProvider from "@/components/auth/AuthProvider";
 import Sidebar from "@/components/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
+import localFont from "next/font/local";
+import "./../../globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const geistSans = localFont({
+  src: "./../../ui/fonts/GeistVF.woff",
+  variable: "--font-geist-sans",
+  weight: "100 900",
+});
+const geistMono = localFont({
+  src: "./../../ui/fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+});
+
+// const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Organizational Management System",
@@ -22,7 +35,9 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-gray-50`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+      >
         <AuthProvider>
           <div className="flex h-screen overflow-hidden">
             <Sidebar accessToken={accessToken} />

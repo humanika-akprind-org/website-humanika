@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
-import { getGoogleDriveFiles } from "@/app/dashboard/server";
-import DriveManager from "@/app/dashboard/components/DriveManager";
+import { getGoogleDriveFiles } from "@/app/(admin)/admin/server";
+import DriveManager from "@/app/(admin)/admin/dashboard/components/DriveManager";
 import GoogleDriveConnect from "@/components/google-drive/GoogleDriveConnect";
 
 export default async function DashboardPage() {
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-        <DriveManager files={files} accessToken={accessToken} />
-      </div>
+      <DriveManager files={files} accessToken={accessToken} />
+    </div>
   );
 }
