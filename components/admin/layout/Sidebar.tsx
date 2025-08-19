@@ -1,12 +1,6 @@
 import Link from "next/link";
-import {
-  Home,
-  Users,
-  FileText,
-  Calendar,
-  Settings,
-} from "lucide-react";
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { Home, Users, FileText, Calendar, Settings } from "lucide-react";
+import { LogoutButton } from "@/components/admin/auth/LogoutButton";
 
 export default function Sidebar({ accessToken }: { accessToken: string }) {
   return (
@@ -19,7 +13,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
 
       <nav className="flex-1 p-4 space-y-1">
         <Link
-          href="/dashboard"
+          href="/admin/dashboard"
           className="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 text-blue-600 font-medium"
         >
           <Home className="h-5 w-5" />
@@ -27,7 +21,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
         </Link>
 
         <Link
-          href="/dashboard/members"
+          href="/admin/dashboard/members"
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Users className="h-5 w-5" />
@@ -35,7 +29,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
         </Link>
 
         <Link
-          href="/dashboard/documents"
+          href="/admin/dashboard/documents"
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <FileText className="h-5 w-5" />
@@ -43,7 +37,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
         </Link>
 
         <Link
-          href="/dashboard/calendar"
+          href="/admin/dashboard/calendar"
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Calendar className="h-5 w-5" />
@@ -51,7 +45,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
         </Link>
 
         <Link
-          href="/dashboard/settings"
+          href="/admin/dashboard/settings"
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Settings className="h-5 w-5" />
