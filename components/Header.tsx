@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { NavLink } from "./NavLink";
+import Image from "next/image";
 
 export default function Header() {
   return (
@@ -7,36 +8,38 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-4">
-            <div className="bg-white p-2 rounded-full shadow-md">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-10 w-10 text-blue-800"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
+            <div className="bg-white rounded-full shadow-md">
+              <Image
+                src="https://drive.google.com/uc?export=view&id=1gb5FoF_-uUJ6LnVH6ZJr2OAdwbZxl-tg"
+                alt="HUMANIKA Logo"
+                width={75}
+                height={75}
+                className="rounded-full"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-bold">HUMANIKA</h1>
-              <p className="text-blue-200 text-sm">
+              <h6 className="text-blue-200 font-semibold text-md">
                 Himpunan Mahasiswa Informatika
+              </h6>
+              <p className="text-blue-200 text-sm">
+                Universitas AKPRIND Indonesia
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <Link
+              href="/auth/register"
+              className="px-5 py-2.5 bg-transparent border-2 border-white text-white rounded-full hover:bg-white hover:text-blue-800 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+            >
+              Daftar
+            </Link>
             <Link
               href="/auth/login"
-              className="px-4 py-2 bg-yellow-400 text-blue-900 rounded-md hover:bg-yellow-300 transition-colors flex items-center gap-2 font-medium shadow-md"
+              className="px-5 py-2.5 bg-yellow-400 text-blue-900 rounded-full hover:bg-yellow-300 hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
             >
-              Login
+              Masuk
             </Link>
           </div>
         </div>

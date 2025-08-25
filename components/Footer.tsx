@@ -2,12 +2,13 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white pt-12 pb-6">
-      <div className="container mx-auto px-4">
+    <footer className="bg-gray-900 text-white relative overflow-hidden">
+      {/* Konten utama footer */}
+      <div className="container mx-auto px-4 pt-16 pb-24 relative z-10">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 className="text-xl font-bold mb-4 flex items-center">
-              <div className="bg-blue-600 p-2 rounded-full mr-3">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-2 rounded-full mr-3">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -25,102 +26,114 @@ export default function Footer() {
               </div>
               HUMANIKA
             </h3>
-            <p className="text-gray-400">
+            <p className="text-gray-400 leading-relaxed">
               Himpunan Mahasiswa Informatika yang berdedikasi untuk
               mengembangkan potensi mahasiswa di bidang teknologi informasi.
             </p>
           </div>
+
           <div>
             <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2">
               Menu
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               <li>
                 <Link
                   href="/"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   Home
                 </Link>
               </li>
               <li>
                 <Link
                   href="/article"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   Article
                 </Link>
               </li>
               <li>
                 <Link
                   href="/about"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   About
                 </Link>
               </li>
               <li>
                 <Link
                   href="/gallery"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   Gallery
                 </Link>
               </li>
               <li>
                 <Link
                   href="/contact"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   Contact
                 </Link>
               </li>
             </ul>
           </div>
+
           <div>
             <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2">
               Tautan Cepat
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               <li>
                 <Link
                   href="/events"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   Events
                 </Link>
               </li>
               <li>
                 <Link
                   href="/members"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   Members
                 </Link>
               </li>
               <li>
                 <Link
                   href="/projects"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   Projects
                 </Link>
               </li>
               <li>
                 <Link
                   href="/faq"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
                   FAQ
                 </Link>
               </li>
             </ul>
           </div>
+
           <div>
             <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2">
               Sosial Media
             </h3>
-            <div className="flex space-x-4 mb-4">
+            <div className="flex space-x-3 mb-6">
               {[
                 {
                   name: "Facebook",
@@ -147,7 +160,8 @@ export default function Footer() {
                 <a
                   key={social.name}
                   href="#"
-                  className={`${social.color} text-white p-3 rounded-full transition-colors`}
+                  className={`${social.color} text-white p-3 rounded-lg transition-all transform hover:-translate-y-1`}
+                  aria-label={social.name}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -160,33 +174,46 @@ export default function Footer() {
                 </a>
               ))}
             </div>
-            <p className="text-gray-400 mb-2">
+            <p className="text-gray-400 mb-3 text-sm">
               Subscribe untuk newsletter kami
             </p>
             <div className="flex">
               <input
                 type="email"
                 placeholder="Email Anda"
-                className="px-4 py-2 bg-gray-800 text-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-yellow-400 w-full"
+                className="px-4 py-3 bg-gray-800 text-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full placeholder-gray-500"
               />
-              <button className="bg-yellow-500 text-gray-900 px-4 py-2 rounded-r-md hover:bg-yellow-400 transition-colors font-medium">
+              <button className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 py-3 rounded-r-md hover:from-blue-700 hover:to-indigo-800 transition-all font-medium flex items-center">
+                Subscribe
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-4 w-4 ml-1"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </button>
             </div>
           </div>
         </div>
+
         <div className="border-t border-gray-800 pt-6 text-center text-gray-500 text-sm">
           <p>
             © {new Date().getFullYear()} HIMPUNAN MAHASISWA INFORMATIKA
             (HUMANIKA). All rights reserved.
           </p>
+        </div>
+      </div>
+
+      {/* HUMANIKA besar di bagian bawah yang terpotong */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden">
+        <div className="text-[180px] lg:text-[240px] font-black tracking-wide text-gray-800 opacity-50 text-center -mb-16 lg:-mb-20 leading-none">
+          HUMANIKA
         </div>
       </div>
     </footer>
