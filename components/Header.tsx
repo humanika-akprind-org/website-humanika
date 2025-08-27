@@ -31,13 +31,13 @@ export default function Header() {
           <div className="flex items-center space-x-3">
             <Link
               href="/auth/register"
-              className="px-5 py-2.5 bg-transparent border-2 border-white text-white rounded-full hover:bg-white hover:text-blue-800 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+              className="px-5 py-2.5 bg-transparent border-2 border-yellow-500 text-white rounded-full hover:border-white hover:bg-white hover:text-blue-800 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
             >
               Daftar
             </Link>
             <Link
               href="/auth/login"
-              className="px-5 py-2.5 bg-yellow-400 text-blue-900 rounded-full hover:bg-yellow-300 hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+              className="px-5 py-2.5 bg-red-500 text-white rounded-full hover:bg-red-300 hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
             >
               Masuk
             </Link>

@@ -23,7 +23,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("/admin/dashboard");
+        router.push("/");
       } else {
         setError(data.error || "Login failed");
       }

@@ -108,7 +108,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/join"
-                className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-primary-700 transition-all duration-300 font-semibold"
+                className="px-8 py-4 bg-transparent border-2 border-red-500 text-white rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300 font-semibold"
               >
                 Bergabung Sekarang
               </Link>
@@ -434,7 +434,7 @@ export default function Home() {
             </Link>
             <Link
               href="/join"
-              className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-primary-700 transition-all duration-300 font-semibold"
+              className="px-8 py-4 bg-transparent border-2 border-red-500 text-white rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300 font-semibold"
             >
               Daftar Menjadi Anggota
             </Link>
