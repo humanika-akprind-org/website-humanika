@@ -15,317 +15,459 @@ enum UserRole {
   ANGGOTA
 }
 
+// Enum Finance Type
+enum FinanceType {
+  INCOME
+  EXPENSE
+}
+
+// Enum Document Type
+enum DocumentType {
+  PROPOSAL
+  BUDGET_PLAN
+  TIMELINE
+  WORKPLAN
+  LPJ
+  FINANCIAL_REPORT
+  ATTENDANCE_LIST
+  ACTIVITY_REPORT
+  EVALUATION_REPORT
+  INVOICE
+  RECEIPT
+  CONTRACT
+  OFFICIAL_LETTER
+  MEMORANDUM
+  POSTER
+  BROCHURE
+  PRESENTATION
+  CERTIFICATE
+  NEWSLETTER
+  PRESS_RELEASE
+  DECREE
+  REGULATION
+  GUIDELINE
+  POLICY
+  PHOTO_DOCUMENTATION
+  VIDEO_DOCUMENTATION
+  OTHER
+}
+
+// Enum Status untuk berbagai entitas
+enum Status {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  REVISION
+  ARCHIVED
+  ONGOING
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
+
+// Enum Letter Type
+enum LetterType {
+  OUTGOING
+  INCOMING
+  MEMORANDUM
+  AGREEMENT
+  OFFICIAL_STATEMENT
+  INVITATION
+}
+
+// Enum Letter Priority
+enum LetterPriority {
+  NORMAL
+  IMPORTANT
+  URGENT
+}
+
 model User {
-  id              String           @id @default(auto()) @map("_id") @db.ObjectId
-  name            String
-  email           String           @unique
-  username        String           @unique
-  password        String
-  role            UserRole         @default(ANGGOTA)
-  division        String?          // Divisi/Departemen (khusus untuk PENGURUS)
-  position        String?          // Jabatan dalam organisasi
-  isActive        Boolean          @default(true)
-  verifiedEmail   Boolean          @default(false)
-  attemptLogin    Int              @default(0)
-  blockExpires    DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String     @unique
+  username      String     @unique
+  password      String
+  role          UserRole   @default(ANGGOTA)
+  division      String?
+  position      String?
+  isActive      Boolean    @default(true)
+  verifiedEmail Boolean    @default(false)
+  attemptLogin  Int        @default(0)
+  blockExpires  DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   // Relations
-  linkHubs        LinkHub[]
-  approvalEvents  ApprovalEvent[]
+  linkHubs         LinkHub[]
+  approvalEvents   ApprovalEvent[]
   approvalPrograms ApprovalProgram[]
-  managements     Management[]
-  linkHubThemes   LinkHubTheme[]
-  shortLinks      ShortLink[]
-  articles        Article[]
+  managements      Management[]
+  linkHubThemes    LinkHubTheme[]
+  shortLinks       ShortLink[]
+  articles         Article[]
+  finances         Finance[]
+  documents        Document[]
+  createdLetters   Letter[]       @relation("LetterCreator")
+  approvedLetters  Letter[]       @relation("LetterApprover")
+  workPrograms     WorkProgram[]  @relation("WorkProgramResponsible")
+  events           Event[]        @relation("EventResponsible")
 
   @@map("users")
 }
 
 model Period {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  namePeriod      String
-  startYearPeriod DateTime
-  finishYearPeriod DateTime
-  isActive        Boolean     @default(false)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  startYear   DateTime
+  endYear     DateTime
+  isActive    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  managements     Management[]
+  managements Management[]
+  finances    Finance[]
+  letters     Letter[]
+  workPrograms WorkProgram[]
+  events      Event[]
 
   @@map("periods")
 }
 
 model Management {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String   @db.ObjectId
-  position         String   // Jabatan: Ketua, Wakil, Sekretaris, Bendahara, dll.
-  namePhoto        String?
-  department       String
-  managementPeriod String   @db.ObjectId
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  periodId   String   @db.ObjectId
+  position   String
+  photo      String?
+  department String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   // Relations
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  period           Period?  @relation(fields: [managementPeriod], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  period Period @relation(fields: [periodId], references: [id], onDelete: Cascade)
 
   @@map("managements")
 }
 
 model WorkProgram {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  nameProgram      String
-  department       String
-  scheduleProgram  String
-  statusProgram    String   @default("draft") // draft, pending, approved, rejected
-  fundsProgram     Float
-  goalProgram      String
-  periodProgram    String
-  personResponsible String
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  department  String
+  schedule    String
+  status      Status   @default(DRAFT)
+  funds       Float
+  goal        String
+  periodId    String   @db.ObjectId
+  responsibleId String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
+  period          Period           @relation(fields: [periodId], references: [id], onDelete: Cascade)
   approvalPrograms ApprovalProgram[]
-  events           Event[]
+  events          Event[]
+  responsible     User             @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible")
 
   @@map("workPrograms")
 }
 
 model ApprovalProgram {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  nameFile       String
-  userId         String   @db.ObjectId
-  workProgramId  String   @db.ObjectId
-  status         String   @default("pending") // pending, approved, rejected
-  note           String?
-  googleDriveFileId String?
-  mimeType        String?
-  fileSize        Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  userId        String   @db.ObjectId
+  workProgramId String   @db.ObjectId
+  status        Status   @default(PENDING)
+  note          String?
+  fileUrl       String?
+  mimeType      String?
+  fileSize      Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
-  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workProgram    WorkProgram @relation(fields: [workProgramId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workProgram WorkProgram @relation(fields: [workProgramId], references: [id], onDelete: Cascade)
 
   @@map("approvalPrograms")
 }
 
 model Event {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
-  nameEvent         String
-  descriptionEvent  String
-  personResponsible String
-  goalEvent         String
-  department        String
-  periodEvent       String
-  startDateEvent    DateTime
-  finishDateEvent   DateTime
-  fundsEvent        Float
-  thumbnailEvent    String?
-  statusEvent       String   @default("draft") // draft, pending, approved, ongoing, completed
-  workProgramId     String?  @db.ObjectId
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  description  String
+  responsibleId String   @db.ObjectId
+  goal         String
+  department   String
+  periodId     String   @db.ObjectId
+  startDate    DateTime
+  endDate      DateTime
+  funds        Float
+  thumbnail    String?
+  status       Status   @default(DRAFT)
+  workProgramId String?  @db.ObjectId
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Relations
-  workProgram       WorkProgram?    @relation(fields: [workProgramId], references: [id])
-  proposalEvents    ProposalEvent[]
-  lpjEvents         LPJEvent[]
-  approvalEvents    ApprovalEvent[]
-  galleries         Gallery[]
+  period        Period          @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  workProgram   WorkProgram?    @relation(fields: [workProgramId], references: [id], onDelete: SetNull)
+  documents     Document[]
+  approvalEvents ApprovalEvent[]
+  galleries     Gallery[]
+  finances      Finance[]
+  letters       Letter[]
+  responsible   User            @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "EventResponsible")
 
   @@map("events")
 }
 
-model ProposalEvent {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  nameFile        String
-  eventId         String   @db.ObjectId
-  statusProposal  String   @default("pending") // pending, approved, rejected
-  googleDriveFileId String?
-  mimeType        String?
-  fileSize        Int?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+model Document {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  eventId   String?        @db.ObjectId
+  letterId  String?        @db.ObjectId
+  type      DocumentType
+  status    Status         @default(PENDING)
+  fileUrl   String?
+  mimeType  String?
+  fileSize  Int?
+  userId    String         @db.ObjectId
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   // Relations
-  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event  Event?  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  letter Letter? @relation(fields: [letterId], references: [id], onDelete: Cascade)
 
-  @@map("proposalEvents")
+  @@map("documents")
 }
 
-model LPJEvent {
+model ApprovalEvent {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  note      String?
+  userId    String   @db.ObjectId
+  eventId   String   @db.ObjectId
+  status    Status   @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("approvalEvents")
+}
+
+model Gallery {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  image    String
+  eventId  String   @db.ObjectId
+  fileUrl  String?
+  mimeType String?
+  fileSize Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("galleries")
+}
+
+model Article {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  nameFile     String
-  eventId      String   @db.ObjectId
-  statusLPJ    String   @default("pending") // pending, approved, rejected
-  googleDriveFileId String?
+  title        String
+  content      String
+  thumbnail    String?
+  authorId     String   @db.ObjectId
+  categoryId   String   @db.ObjectId
+  isPublished  Boolean  @default(false)
+  publishedAt  DateTime?
+  fileUrl      String?
   mimeType     String?
   fileSize     Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   // Relations
-  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-
-  @@map("lpjEvents")
-}
-
-model ApprovalEvent {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  noteEvent       String?
-  userId          String   @db.ObjectId
-  eventId         String   @db.ObjectId
-  status          String   @default("pending") // pending, approved, rejected
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  // Relations
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-
-  @@map("approvalEvents")
-}
-
-model Gallery {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  titleGallery       String
-  fileImageGallery   String
-  eventId            String?  @db.ObjectId
-  googleDriveFileId  String?
-  mimeType           String?
-  fileSize           Int?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  // Relations
-  event             Event?   @relation(fields: [eventId], references: [id])
-
-  @@map("galleries")
-}
-
-model Article {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  titleArticle       String
-  contentArticle     String
-  thumbnailArticle   String?
-  authorId           String   @db.ObjectId
-  categoryArticleId  String   @db.ObjectId
-  statusPublished    Boolean  @default(false)
-  datePublished      DateTime?
-  googleDriveFileId  String?
-  mimeType           String?
-  fileSize           Int?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  // Relations
-  author            User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  categoryArticle   CategoryArticle @relation(fields: [categoryArticleId], references: [id], onDelete: Cascade)
+  author   User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category CategoryArticle @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@map("articles")
 }
 
 model CategoryArticle {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  nameCategory    String    @unique
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // Relations
-  articles        Article[]
+  articles Article[]
 
   @@map("categoryArticles")
 }
 
+model FinanceCategory {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String      @unique
+  description String?
+  type        FinanceType
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  finances Finance[]
+
+  @@map("financeCategories")
+}
+
+model Finance {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount      Float
+  description String
+  date        DateTime
+  categoryId  String   @db.ObjectId
+  type        FinanceType
+  periodId    String   @db.ObjectId
+  eventId     String?  @db.ObjectId
+  userId      String   @db.ObjectId
+  proofFile   String?
+  fileUrl     String?
+  mimeType    String?
+  fileSize    Int?
+  status      Status   @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category FinanceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  period   Period          @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  event    Event?          @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finances")
+}
+
 model OrganizationalStructure {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  nameStructure    String
-  statusStructure  String   @default("active") // active, inactive
-  orderStructure   Int
-  googleDriveFileId String?
-  mimeType         String?
-  fileSize         Int?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  status   String   @default("active")
+  order    Int
+  fileUrl  String?
+  mimeType String?
+  fileSize Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("organizationalStructures")
 }
 
 model DepartmentTask {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  noteTask     String
-  department   String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  note       String
+  department String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("departmentTasks")
 }
 
 model LinkHub {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  username    String?
-  themeId     String?  @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  username  String?
+  themeId   String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  theme       LinkHubTheme? @relation(fields: [themeId], references: [id])
-  details     LinkHubDetail[]
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme     LinkHubTheme? @relation(fields: [themeId], references: [id], onDelete: SetNull)
+  details   LinkHubDetail[]
 
   @@map("linkHubs")
 }
 
 model LinkHubDetail {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  linkHubId       String   @db.ObjectId
-  title           String
-  shortLink       String?
-  url             String
-  thumbnail       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  linkHubId String   @db.ObjectId
+  title     String
+  shortLink String?
+  url       String
+  thumbnail String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  linkHub         LinkHub  @relation(fields: [linkHubId], references: [id], onDelete: Cascade)
+  linkHub   LinkHub @relation(fields: [linkHubId], references: [id], onDelete: Cascade)
 
   @@map("linkHubDetails")
 }
 
 model LinkHubTheme {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  nameTheme       String
-  userId          String   @db.ObjectId
-  dataTheme       String?
-  isActive        Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  userId    String   @db.ObjectId
+  data      String?
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  linkHubs        LinkHub[]
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkHubs LinkHub[]
 
   @@map("linkHubThemes")
 }
 
 model ShortLink {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  titleShortLink  String
-  shortName       String   @unique
-  url             String
-  userId          String   @db.ObjectId
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  shortName String   @unique
+  url       String
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("shortLinks")
+}
+
+model Letter {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  number       String?        @unique
+  regarding    String
+  origin       String
+  destination  String
+  date         DateTime
+  type         LetterType
+  priority     LetterPriority @default(NORMAL)
+  body         String?
+  notes        String?
+  status       Status         @default(PENDING)
+  createdById  String         @db.ObjectId
+  approvedById String?        @db.ObjectId
+  periodId     String?        @db.ObjectId
+  eventId      String?        @db.ObjectId
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  // Relations
+  createdBy    User           @relation(fields: [createdById], references: [id], onDelete: Cascade, name: "LetterCreator")
+  approvedBy   User?          @relation(fields: [approvedById], references: [id], onDelete: SetNull, name: "LetterApprover")
+  period       Period?        @relation(fields: [periodId], references: [id], onDelete: SetNull)
+  event        Event?         @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  attachments  Document[]
+
+  @@map("letters")
 }

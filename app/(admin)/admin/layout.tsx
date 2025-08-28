@@ -68,7 +68,7 @@ export default function RootLayout({
                   </div>
                 </div>
               </header>
-              <main className="p-6">{children}</main>
+              <main className="p-6 bg-white">{children}</main>
             </div>
           </div>
           <Toaster />
