@@ -15,6 +15,24 @@ enum UserRole {
   ANGGOTA
 }
 
+// Enum Department
+enum Department {
+  INFOKOM
+  PSDM
+  LITBANG
+  KWU
+}
+
+// Enum Position
+enum Position {
+  KETUA_UMUM
+  WAKIL_KETUA_UMUM
+  SEKRETARIS
+  BENDAHARA
+  KEPALA_DEPARTEMEN
+  STAFF_DEPARTEMEN
+}
+
 // Enum Finance Type
 enum FinanceType {
   INCOME
@@ -24,31 +42,23 @@ enum FinanceType {
 // Enum Document Type
 enum DocumentType {
   PROPOSAL
+  LPJ
   BUDGET_PLAN
   TIMELINE
   WORKPLAN
-  LPJ
   FINANCIAL_REPORT
   ATTENDANCE_LIST
   ACTIVITY_REPORT
   EVALUATION_REPORT
   INVOICE
   RECEIPT
-  CONTRACT
   OFFICIAL_LETTER
   MEMORANDUM
   POSTER
   BROCHURE
   PRESENTATION
   CERTIFICATE
-  NEWSLETTER
-  PRESS_RELEASE
   DECREE
-  REGULATION
-  GUIDELINE
-  POLICY
-  PHOTO_DOCUMENTATION
-  VIDEO_DOCUMENTATION
   OTHER
 }
 
@@ -70,10 +80,6 @@ enum Status {
 enum LetterType {
   OUTGOING
   INCOMING
-  MEMORANDUM
-  AGREEMENT
-  OFFICIAL_STATEMENT
-  INVITATION
 }
 
 // Enum Letter Priority
@@ -85,13 +91,13 @@ enum LetterPriority {
 
 model User {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
+  name          String     
   email         String     @unique
   username      String     @unique
   password      String
   role          UserRole   @default(ANGGOTA)
-  division      String?
-  position      String?
+  department    Department?
+  position      Position?
   isActive      Boolean    @default(true)
   verifiedEmail Boolean    @default(false)
   attemptLogin  Int        @default(0)
@@ -113,15 +119,17 @@ model User {
   approvedLetters  Letter[]       @relation("LetterApprover")
   workPrograms     WorkProgram[]  @relation("WorkProgramResponsible")
   events           Event[]        @relation("EventResponsible")
+  departmentTasks  DepartmentTask[]
 
+  @@index([email, role, isActive, department, position])
   @@map("users")
 }
 
 model Period {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  startYear   DateTime
-  endYear     DateTime
+  startYear   Int
+  endYear     Int
   isActive    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -132,39 +140,46 @@ model Period {
   letters     Letter[]
   workPrograms WorkProgram[]
   events      Event[]
+  articles    Article[]
 
+  @@index([isActive, startYear, endYear])
   @@map("periods")
 }
 
 model Management {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String   @db.ObjectId
-  periodId   String   @db.ObjectId
-  position   String
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String     @db.ObjectId
+  periodId   String     @db.ObjectId
+  position   Position
   photo      String?
-  department String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  department Department
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   // Relations
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   period Period @relation(fields: [periodId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, periodId])
+  @@unique([periodId, position, department])
+  @@index([department, position])
   @@map("managements")
 }
 
 model WorkProgram {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  department  String
+  department  Department
   schedule    String
-  status      Status   @default(DRAFT)
+  status      Status     @default(DRAFT)
   funds       Float
+  usedFunds   Float      @default(0)
+  remainingFunds Float   @default(0)
   goal        String
-  periodId    String   @db.ObjectId
+  periodId    String     @db.ObjectId
   responsibleId String   @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   // Relations
   period          Period           @relation(fields: [periodId], references: [id], onDelete: Cascade)
@@ -172,14 +187,15 @@ model WorkProgram {
   events          Event[]
   responsible     User             @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible")
 
+  @@index([department, status, periodId])
   @@map("workPrograms")
 }
 
 model ApprovalProgram {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   name          String
-  userId        String   @db.ObjectId
-  workProgramId String   @db.ObjectId
+  userId        String     @db.ObjectId
+  workProgramId String     @db.ObjectId
   status        Status   @default(PENDING)
   note          String?
   fileUrl       String?
@@ -192,25 +208,28 @@ model ApprovalProgram {
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   workProgram WorkProgram @relation(fields: [workProgramId], references: [id], onDelete: Cascade)
 
+  @@index([status, userId, workProgramId])
   @@map("approvalPrograms")
 }
 
 model Event {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   description  String
-  responsibleId String   @db.ObjectId
+  responsibleId String     @db.ObjectId
   goal         String
-  department   String
-  periodId     String   @db.ObjectId
+  department   Department
+  periodId     String     @db.ObjectId
   startDate    DateTime
   endDate      DateTime
   funds        Float
+  usedFunds    Float      @default(0)
+  remainingFunds Float    @default(0)
   thumbnail    String?
-  status       Status   @default(DRAFT)
-  workProgramId String?  @db.ObjectId
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  status       Status     @default(DRAFT)
+  workProgramId String?    @db.ObjectId
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   // Relations
   period        Period          @relation(fields: [periodId], references: [id], onDelete: Cascade)
@@ -222,6 +241,7 @@ model Event {
   letters       Letter[]
   responsible   User            @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "EventResponsible")
 
+  @@index([startDate, status, periodId, department])
   @@map("events")
 }
 
@@ -236,22 +256,28 @@ model Document {
   mimeType  String?
   fileSize  Int?
   userId    String         @db.ObjectId
+  version   Int            @default(1)
+  parentId  String?        @db.ObjectId
+  isCurrent Boolean        @default(true)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 
   // Relations
-  event  Event?  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  letter Letter? @relation(fields: [letterId], references: [id], onDelete: Cascade)
+  event           Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  letter          Letter?   @relation(fields: [letterId], references: [id], onDelete: Cascade)
+  previousVersion Document?  @relation("DocumentVersions", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  nextVersions    Document[] @relation("DocumentVersions")
 
+  @@index([type, status, userId])
   @@map("documents")
 }
 
 model ApprovalEvent {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   note      String?
-  userId    String   @db.ObjectId
-  eventId   String   @db.ObjectId
+  userId    String     @db.ObjectId
+  eventId   String     @db.ObjectId
   status    Status   @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -260,6 +286,7 @@ model ApprovalEvent {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
+  @@index([status, userId, eventId])
   @@map("approvalEvents")
 }
 
@@ -267,7 +294,7 @@ model Gallery {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   title    String
   image    String
-  eventId  String   @db.ObjectId
+  eventId  String     @db.ObjectId
   fileUrl  String?
   mimeType String?
   fileSize Int?
@@ -277,6 +304,7 @@ model Gallery {
   // Relations
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
+  @@index([eventId])
   @@map("galleries")
 }
 
@@ -285,8 +313,9 @@ model Article {
   title        String
   content      String
   thumbnail    String?
-  authorId     String   @db.ObjectId
-  categoryId   String   @db.ObjectId
+  authorId     String     @db.ObjectId
+  categoryId   String     @db.ObjectId
+  periodId     String?    @db.ObjectId
   isPublished  Boolean  @default(false)
   publishedAt  DateTime?
   fileUrl      String?
@@ -298,7 +327,9 @@ model Article {
   // Relations
   author   User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
   category CategoryArticle @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  period   Period?        @relation(fields: [periodId], references: [id], onDelete: SetNull)
 
+  @@index([isPublished, authorId, categoryId])
   @@map("articles")
 }
 
@@ -326,6 +357,7 @@ model FinanceCategory {
   // Relations
   finances Finance[]
 
+  @@index([type, isActive])
   @@map("financeCategories")
 }
 
@@ -334,11 +366,11 @@ model Finance {
   amount      Float
   description String
   date        DateTime
-  categoryId  String   @db.ObjectId
+  categoryId  String     @db.ObjectId
   type        FinanceType
-  periodId    String   @db.ObjectId
-  eventId     String?  @db.ObjectId
-  userId      String   @db.ObjectId
+  periodId    String     @db.ObjectId
+  eventId     String?    @db.ObjectId
+  userId      String     @db.ObjectId
   proofFile   String?
   fileUrl     String?
   mimeType    String?
@@ -353,6 +385,7 @@ model Finance {
   event    Event?          @relation(fields: [eventId], references: [id], onDelete: SetNull)
   user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([date, type, categoryId, status, periodId])
   @@map("finances")
 }
 
@@ -367,24 +400,30 @@ model OrganizationalStructure {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([status, order])
   @@map("organizationalStructures")
 }
 
 model DepartmentTask {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
   note       String
-  department String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  department Department
+  userId     String?    @db.ObjectId
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([department, userId])
   @@map("departmentTasks")
 }
 
 model LinkHub {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
+  userId    String     @db.ObjectId
   username  String?
-  themeId   String?  @db.ObjectId
+  themeId   String?    @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -393,12 +432,13 @@ model LinkHub {
   theme     LinkHubTheme? @relation(fields: [themeId], references: [id], onDelete: SetNull)
   details   LinkHubDetail[]
 
+  @@index([userId])
   @@map("linkHubs")
 }
 
 model LinkHubDetail {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  linkHubId String   @db.ObjectId
+  linkHubId String     @db.ObjectId
   title     String
   shortLink String?
   url       String
@@ -409,13 +449,14 @@ model LinkHubDetail {
   // Relations
   linkHub   LinkHub @relation(fields: [linkHubId], references: [id], onDelete: Cascade)
 
+  @@index([linkHubId])
   @@map("linkHubDetails")
 }
 
 model LinkHubTheme {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
-  userId    String   @db.ObjectId
+  userId    String     @db.ObjectId
   data      String?
   isActive  Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -425,6 +466,7 @@ model LinkHubTheme {
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   linkHubs LinkHub[]
 
+  @@index([isActive, userId])
   @@map("linkHubThemes")
 }
 
@@ -433,13 +475,14 @@ model ShortLink {
   title     String
   shortName String   @unique
   url       String
-  userId    String   @db.ObjectId
+  userId    String     @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("shortLinks")
 }
 
@@ -469,5 +512,6 @@ model Letter {
   event        Event?         @relation(fields: [eventId], references: [id], onDelete: SetNull)
   attachments  Document[]
 
+  @@index([type, priority, status, createdById, periodId])
   @@map("letters")
 }
