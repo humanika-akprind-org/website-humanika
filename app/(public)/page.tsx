@@ -1,6 +1,4 @@
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import ArticleCard from "@/components/ArticleCard";
 import EventCard from "@/components/EventCard";
 import GalleryGrid from "@/components/GalleryGrid";
@@ -78,8 +76,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-grey-50">
-      <Header />
-
       {/* 1. Hero Section */}
       <section className="relative bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 text-white py-24 overflow-hidden">
         <div className="absolute inset-0">
@@ -441,8 +437,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

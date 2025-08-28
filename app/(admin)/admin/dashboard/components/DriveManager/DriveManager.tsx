@@ -130,8 +130,9 @@ const DriveManager: React.FC<DriveManagerProps> = ({
   };
 
   const handleDelete = async (fileId?: string | null) => {
-    if (!fileId || !confirm("Are you sure you want to delete this file?"))
-      {return;}
+    if (!fileId || !confirm("Are you sure you want to delete this file?")) {
+      return;
+    }
 
     await handleApiOperation(async () => {
       await callApi({ action: "delete", fileId, accessToken });
@@ -170,55 +171,55 @@ const DriveManager: React.FC<DriveManagerProps> = ({
     }
   };
 
-const handleUpload = async (file: File): Promise<string> => {
-  if (!file) {
-    setError("Please select a file to upload");
-    return ""; // Return empty string on error
-  }
-
-  setLoadingState("upload", true);
-  setError(null);
-
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("action", "upload");
-  formData.append("accessToken", accessToken);
-  formData.append("folderId", selectedFolderId);
-  formData.append("fileName", fileNameInput.trim() || file.name);
-
-  try {
-    const result = await callApi(
-      {
-        action: "upload",
-        accessToken,
-      },
-      formData
-    );
-
-    if (result.success) {
-      await fetchFiles();
-      setSelectedFile(null);
-      setFileNameInput("");
-      const fileInput = document.getElementById(
-        "file-upload"
-      ) as HTMLInputElement;
-      if (fileInput) fileInput.value = "";
-
-      // Return the file ID (make sure your API returns this)
-      return result.fileId || "";
-    } else {
-      throw new Error(result.message || "Upload failed");
+  const handleUpload = async (file: File): Promise<string> => {
+    if (!file) {
+      setError("Please select a file to upload");
+      return ""; // Return empty string on error
     }
-  } catch (err) {
-    console.error("Upload error:", err);
-    setError(
-      err instanceof Error ? err.message : "Upload failed. Please try again."
-    );
-    return ""; // Return empty string on error
-  } finally {
-    setLoadingState("upload", false);
-  }
-};
+
+    setLoadingState("upload", true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("action", "upload");
+    formData.append("accessToken", accessToken);
+    formData.append("folderId", selectedFolderId);
+    formData.append("fileName", fileNameInput.trim() || file.name);
+
+    try {
+      const result = await callApi(
+        {
+          action: "upload",
+          accessToken,
+        },
+        formData
+      );
+
+      if (result.success) {
+        await fetchFiles();
+        setSelectedFile(null);
+        setFileNameInput("");
+        const fileInput = document.getElementById(
+          "file-upload"
+        ) as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
+
+        // Return the file ID (make sure your API returns this)
+        return result.fileId || "";
+      } else {
+        throw new Error(result.message || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError(
+        err instanceof Error ? err.message : "Upload failed. Please try again."
+      );
+      return ""; // Return empty string on error
+    } finally {
+      setLoadingState("upload", false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(e.target.files?.[0] ?? null);
@@ -329,7 +330,7 @@ const handleUpload = async (file: File): Promise<string> => {
             <div
               className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"
               aria-hidden="true"
-             />
+            />
             <p className="text-gray-700">Processing your request...</p>
           </div>
         </div>

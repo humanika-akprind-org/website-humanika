@@ -1,6 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
 export default function GalleryDetail({ params }: { params: { id: string } }) {
   // In a real app, you would fetch this data based on params.id
   const album = {
@@ -18,8 +15,6 @@ export default function GalleryDetail({ params }: { params: { id: string } }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
       <main className="container mx-auto px-4 py-12">
         {/* Album Header */}
         <section className="max-w-4xl mx-auto mb-12">
@@ -154,8 +149,6 @@ export default function GalleryDetail({ params }: { params: { id: string } }) {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

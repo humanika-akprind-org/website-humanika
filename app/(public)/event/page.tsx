@@ -1,5 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 
 export default function EventPage() {
@@ -36,8 +34,6 @@ export default function EventPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
       <main className="container mx-auto px-4 py-12">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-blue-700 to-red-700 text-white rounded-xl p-8 mb-12 relative overflow-hidden">
@@ -135,8 +131,6 @@ export default function EventPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

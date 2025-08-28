@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { NavLink } from "./NavLink";
 import Image from "next/image";
+import { LogoutButton } from "@/components/LogoutButton";
+import { getCurrentUser } from "@/lib/auth";
 
-export default function Header() {
+export default async function Header() {
+  const currentUser = await getCurrentUser();
+
   return (
     <header className="bg-gradient-to-r from-blue-800 to-blue-900 text-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -29,18 +33,37 @@ export default function Header() {
           </div>
 
           <div className="flex items-center space-x-3">
-            <Link
-              href="/auth/register"
-              className="px-5 py-2.5 bg-transparent border-2 border-yellow-500 text-white rounded-full hover:border-white hover:bg-white hover:text-blue-800 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
-            >
-              Daftar
-            </Link>
-            <Link
-              href="/auth/login"
-              className="px-5 py-2.5 bg-red-500 text-white rounded-full hover:bg-red-300 hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
-            >
-              Masuk
-            </Link>
+            {!currentUser ? (
+              // Tampilkan tombol Daftar dan Masuk jika user belum login
+              <>
+                <Link
+                  href="/auth/register"
+                  className="px-5 py-2.5 bg-transparent border-2 border-yellow-500 text-white rounded-full hover:border-white hover:bg-white hover:text-blue-800 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+                >
+                  Daftar
+                </Link>
+                <Link
+                  href="/auth/login"
+                  className="px-5 py-2.5 bg-red-500 text-white rounded-full hover:bg-red-300 hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+                >
+                  Masuk
+                </Link>
+              </>
+            ) : (
+              // Tampilkan informasi user dan tombol Logout jika user sudah login
+              <div className="flex items-center space-x-6 bg-blue-700/30 py-2 px-4 rounded-full border border-blue-500/50">
+                <div className="text-right min-w-[120px] max-w-[200px]">
+                  <p className="font-medium truncate" title={currentUser.name}>
+                    {currentUser.name}
+                  </p>
+                  <p className="text-blue-200 text-xs bg-blue-900/40 px-2 py-1 rounded-full mt-1 inline-block">
+                    {currentUser.role}
+                  </p>
+                </div>
+                <div className="h-8 w-px bg-blue-500/50" />
+                <LogoutButton />
+              </div>
+            )}
           </div>
         </div>
 

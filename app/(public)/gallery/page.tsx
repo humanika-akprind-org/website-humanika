@@ -1,5 +1,3 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import GalleryGrid from "@/components/GalleryGrid";
 import AlbumGrid from "@/components/AlbumGrid";
 
@@ -45,8 +43,6 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
       <main className="container mx-auto px-4 py-12">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-blue-700 to-red-700 text-white rounded-xl p-8 mb-12 relative overflow-hidden">
@@ -86,7 +82,6 @@ export default function GalleryPage() {
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 }
