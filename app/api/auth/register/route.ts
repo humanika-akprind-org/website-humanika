@@ -5,7 +5,7 @@ import { UserRole } from "@prisma/client";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, username, password, division, position } =
+    const { name, email, username, password } =
       await request.json();
 
     // Input validation
@@ -59,8 +59,6 @@ export async function POST(request: Request) {
         username: username.trim().toLowerCase(),
         password: hashedPassword,
         role: UserRole.ANGGOTA,
-        division: division?.trim() || null,
-        position: position?.trim() || null,
         isActive: true,
         verifiedEmail: false,
         attemptLogin: 0,

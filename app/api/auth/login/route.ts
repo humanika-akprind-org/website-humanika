@@ -19,7 +19,7 @@ export async function POST(request: Request) {
           { username: usernameOrEmail.trim() },
           { email: usernameOrEmail.trim() },
         ],
-        role: "ANGGOTA", // Only ANGGOTA role can login
+        role: "ANGGOTA",
       },
     });
 
