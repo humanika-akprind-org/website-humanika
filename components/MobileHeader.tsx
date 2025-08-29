@@ -37,28 +37,12 @@ export function MobileHeaderClient({ currentUser }: MobileHeaderClientProps) {
           </div>
           <div>
             <h1 className="text-xl font-bold">HUMANIKA</h1>
-            <p className="text-blue-200 text-xs">HMIF AKPRIND</p>
+            <p className="text-blue-200 text-xs">Universitas AKPRIND Indonesia</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
-          {!currentUser ? (
-            // Tampilkan tombol Daftar dan Masuk jika user belum login
-            <>
-              <Link
-                href="/auth/register"
-                className="px-3 py-1.5 text-sm bg-transparent border border-yellow-500 text-white rounded-full hover:border-white hover:bg-white hover:text-blue-800 transition-all duration-300"
-              >
-                Daftar
-              </Link>
-              <Link
-                href="/auth/login"
-                className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-full hover:bg-red-300 transition-all duration-300"
-              >
-                Masuk
-              </Link>
-            </>
-          ) : (
+          {currentUser ? (
             // Tampilkan informasi user dan tombol Logout jika user sudah login (versi ringkas)
             <div className="flex items-center space-x-2">
               <div className="hidden xs:flex items-center space-x-2 bg-blue-700/30 py-1 px-3 rounded-full border border-blue-500/50">
@@ -82,7 +66,7 @@ export function MobileHeaderClient({ currentUser }: MobileHeaderClientProps) {
                 <LogoutButton />
               </div> */}
             </div>
-          )}
+          ) : null}
 
           {/* Hamburger Menu Button */}
           <button
