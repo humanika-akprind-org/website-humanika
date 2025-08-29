@@ -115,6 +115,8 @@ export async function getCurrentUser() {
         email: true,
         name: true,
         role: true,
+        department: true,
+        position: true,
         createdAt: true,
         updatedAt: true,
       },

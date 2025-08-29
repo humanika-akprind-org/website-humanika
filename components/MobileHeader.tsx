@@ -37,7 +37,12 @@ export function MobileHeaderClient({ currentUser }: MobileHeaderClientProps) {
           </div>
           <div>
             <h1 className="text-xl font-bold">HUMANIKA</h1>
-            <p className="text-blue-200 text-xs">Universitas AKPRIND Indonesia</p>
+            <h6 className="text-blue-200 font-semibold text-sm">
+              Himpunan Mahasiswa Informatika
+            </h6>
+            <p className="text-blue-200 text-xs">
+              Universitas AKPRIND Indonesia
+            </p>
           </div>
         </div>
 

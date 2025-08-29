@@ -1,83 +1,299 @@
-import Link from "next/link";
-import { Home, Users, FileText, Calendar, Settings } from "lucide-react";
-import { LogoutButton } from "@/components/admin/auth/LogoutButton";
+'use client';
 
-export default function Sidebar({ accessToken }: { accessToken: string }) {
+import {
+  Home,
+  Users,
+  FileText,
+  Calendar,
+  Settings,
+  Building,
+  Target,
+  BookOpen,
+  FileCheck,
+  DollarSign,
+  Camera,
+  LinkIcon,
+  BarChart3,
+  Activity,
+  User,
+} from "lucide-react";
+import { LogoutButton } from "@/components/admin/auth/LogoutButton";
+import Image from "next/image";
+import NavLink from "@/components/admin/NavLink";
+import NavDropdown from "@/components/admin/NavDropdown";
+import NavDropdownItem from "@/components/admin/NavDropdownItem";
+
+export default function Sidebar() {
   return (
-    <div className="hidden md:flex md:w-64 lg:w-72 flex-col border-r border-gray-200 bg-white h-full">
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-800">
-          Organization Manager
-        </h2>
+    <div className="hidden md:flex md:w-64 lg:w-72 flex-col border-r border-gray-200 bg-white h-full overflow-hidden">
+      {/* Header dengan Logo */}
+      <div className="p-5 border-b border-gray-200">
+        <div className="flex items-center space-x-3">
+          <div className="bg-white rounded-full shadow-sm p-1 border border-gray-100">
+            <Image
+              src="https://drive.google.com/uc?export=view&id=1gb5FoF_-uUJ6LnVH6ZJr2OAdwbZxl-tg"
+              alt="HUMANIKA Logo"
+              width={60}
+              height={60}
+              className="rounded-full"
+            />
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-bold text-gray-800">HUMANIKA</h1>
+            <p className="text-blue-600 font-medium text-sm">
+              Himpunan Mahasiswa Informatika
+            </p>
+            <p className="text-gray-500 text-xs">
+              Universitas AKPRIND Indonesia
+            </p>
+          </div>
+        </div>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
-        <Link
-          href="/admin/drive"
-          className="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 text-blue-600 font-medium"
-        >
-          <Home className="h-5 w-5" />
-          <span>Dashboard</span>
-        </Link>
+      {/* Navigation Menu */}
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {/* Dashboard Section */}
+        <div className="mt-2 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            Dashboard
+          </h3>
+        </div>
+        <NavLink href="/admin/dashboard/overview" icon={BarChart3}>
+          Overview
+        </NavLink>
+        <NavLink href="/admin/dashboard/activity" icon={Activity}>
+          Recent Activity
+        </NavLink>
+        <NavLink href="/admin/dashboard/stats" icon={Home}>
+          Quick Stats
+        </NavLink>
 
-        <Link
-          href="/admin/drive/members"
-          className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-        >
-          <Users className="h-5 w-5" />
-          <span>Members</span>
-        </Link>
+        {/* Governance Section */}
+        <div className="mt-6 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            Governance
+          </h3>
+        </div>
 
-        <Link
-          href="/admin/drive/documents"
-          className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-        >
-          <FileText className="h-5 w-5" />
-          <span>Documents</span>
-        </Link>
+        <NavDropdown icon={Calendar} title="Period">
+          <NavDropdownItem href="/admin/governance/period/all">
+            All Period
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/governance/period/new">
+            Add New
+          </NavDropdownItem>
+        </NavDropdown>
 
-        <Link
-          href="/admin/drive/calendar"
-          className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-        >
-          <Calendar className="h-5 w-5" />
-          <span>Calendar</span>
-        </Link>
+        <NavDropdown icon={Building} title="Organizational Structure">
+          <NavDropdownItem href="/admin/governance/structure/all">
+            All Structure
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/governance/structure/manage">
+            Add Manage
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/governance/structure/structure">
+            Structure
+          </NavDropdownItem>
+        </NavDropdown>
 
-        <Link
-          href="/admin/drive/settings"
-          className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-        >
-          <Settings className="h-5 w-5" />
-          <span>Settings</span>
-        </Link>
+        {/* People & Access Section */}
+        <div className="mt-6 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            People & Access
+          </h3>
+        </div>
+
+        <NavDropdown icon={Users} title="Users">
+          <NavDropdownItem href="/admin/people/users/all">
+            All Users
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/people/users/new">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/people/users/approval">
+            Approval
+          </NavDropdownItem>
+        </NavDropdown>
+
+        {/* Programs & Events Section */}
+        <div className="mt-6 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            Programs & Events
+          </h3>
+        </div>
+
+        <NavDropdown icon={Target} title="Work Programs">
+          <NavDropdownItem href="/admin/programs/work/all">
+            All Programs
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/programs/work/new">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/programs/work/approval">
+            Approval
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/programs/work/reports">
+            Reports
+          </NavDropdownItem>
+        </NavDropdown>
+
+        <NavDropdown icon={Calendar} title="Events">
+          <NavDropdownItem href="/admin/programs/events/all">
+            All Events
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/programs/events/new">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/programs/events/approval">
+            Approval
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/programs/events/reports">
+            Reports
+          </NavDropdownItem>
+        </NavDropdown>
+
+        {/* Administration Section */}
+        <div className="mt-6 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            Administration
+          </h3>
+        </div>
+
+        <NavDropdown icon={FileText} title="Documents">
+          <NavDropdownItem href="/admin/administration/documents/all">
+            All Documents
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/documents/new">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/documents/approval">
+            Approval
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/documents/templates">
+            Templates
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/documents/reports">
+            Reports
+          </NavDropdownItem>
+        </NavDropdown>
+
+        <NavDropdown icon={FileCheck} title="Letter">
+          <NavDropdownItem href="/admin/administration/letter/all">
+            All Letter
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/letter/new">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/letter/approval">
+            Approval
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/letter/templates">
+            Templates
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/letter/reports">
+            Reports
+          </NavDropdownItem>
+        </NavDropdown>
+
+        {/* Content & Media Section */}
+        <div className="mt-6 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            Content & Media
+          </h3>
+        </div>
+
+        <NavDropdown icon={BookOpen} title="Article">
+          <NavDropdownItem href="/admin/content/article/all">
+            All Article
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/article/new">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/article/approval">
+            Approval
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/article/categories">
+            Categories
+          </NavDropdownItem>
+        </NavDropdown>
+
+        <NavDropdown icon={Camera} title="Gallery">
+          <NavDropdownItem href="/admin/content/gallery/all">
+            All Gallery
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/gallery/new">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/gallery/approval">
+            Approval
+          </NavDropdownItem>
+        </NavDropdown>
+
+        <NavDropdown icon={LinkIcon} title="Links">
+          <NavDropdownItem href="/admin/content/links/all">
+            All Links
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/links/new">
+            Add New
+          </NavDropdownItem>
+        </NavDropdown>
+
+        {/* Finance Section */}
+        <div className="mt-6 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            Finance
+          </h3>
+        </div>
+
+        <NavDropdown icon={DollarSign} title="Transaction">
+          <NavDropdownItem href="/admin/finance/transaction/all">
+            All Transaction
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/finance/transaction/new">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/finance/transaction/approval">
+            Approval
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/finance/transaction/categories">
+            Categories
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/finance/transaction/reports">
+            Reports
+          </NavDropdownItem>
+        </NavDropdown>
+
+        {/* System Section */}
+        <div className="mt-6 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            System
+          </h3>
+        </div>
+
+        <NavLink href="/admin/system/activity" icon={Activity}>
+          Activity
+        </NavLink>
+
+        {/* Settings Section */}
+        <div className="mt-6 mb-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+            Settings
+          </h3>
+        </div>
+
+        <NavLink href="/admin/settings/profile" icon={User}>
+          Profile
+        </NavLink>
+        <NavLink href="/admin/settings/account" icon={Settings}>
+          Account
+        </NavLink>
       </nav>
 
-      <div className="mt-auto p-4 border-t border-gray-200 space-y-4">
-        {accessToken && (
-          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-blue-600"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium text-gray-800">Admin User</p>
-              <p className="text-sm text-gray-500">Organization Admin</p>
-            </div>
-          </div>
-        )}
-
-        <LogoutButton />
+      {/* Footer dengan Info Pengguna dan Logout */}
+      <div className="mt-auto p-4 border-t border-gray-200 space-y-4 bg-gray-50">
+        <div className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer border border-transparent hover:border-red-100">
+          <LogoutButton />
+        </div>
       </div>
     </div>
   );
