@@ -229,3 +229,124 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Google Drive API](https://developers.google.com/drive)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Prisma](https://www.prisma.io/)
+
+```
+src/
+├── app/
+│   ├── admin/
+│   │   ├── dashboard/
+│   │   │   ├── overview/
+│   │   │   │   └── page.tsx
+│   │   │   ├── activity/
+│   │   │   │   └── page.tsx
+│   │   │   └── stats/
+│   │   │       └── page.tsx
+│   │   ├── governance/
+│   │   │   ├── period/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   └── organizational-structure/
+│   │   │       ├── all/
+│   │   │       │   └── page.tsx
+│   │   │       ├── add/
+│   │   │       │   └── page.tsx
+│   │   │       ├── structure/
+│   │   │       │   └── page.tsx
+│   │   ├── people-access/
+│   │   │   ├── users/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── approval/
+│   │   │   │   │   └── page.tsx
+│   │   ├── programs/
+│   │   │   ├── work/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── approval/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── reports/
+│   │   │   │   │   └── page.tsx
+│   │   │   ├── events/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── approval/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── reports/
+│   │   │   │   │   └── page.tsx
+│   │   ├── administration/
+│   │   │   ├── documents/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── approval/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── templates/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── reports/
+│   │   │   │   │   └── page.tsx
+│   │   │   ├── letter/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── approval/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── templates/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── reports/
+│   │   │   │   │   └── page.tsx
+│   │   ├── content/
+│   │   │   ├── article/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── approval/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── categories/
+│   │   │   │   │   └── page.tsx
+│   │   │   ├── gallery/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── approval/
+│   │   │   │   │   └── page.tsx
+│   │   │   ├── links/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   ├── finance/
+│   │   │   ├── transaction/
+│   │   │   │   ├── all/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── add/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── approval/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── categories/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── reports/
+│   │   │   │   │   └── page.tsx
+│   │   ├── system/
+│   │   │   └── activity/
+│   │   │       └── page.tsx
+│   │   ├── settings/
+│   │   │   ├── profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── account/
+│   │   │   │   └── page.tsx
+```
+
+
+

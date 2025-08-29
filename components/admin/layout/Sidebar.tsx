@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Home,
@@ -79,19 +79,19 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/governance/period/all">
             All Period
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/governance/period/new">
+          <NavDropdownItem href="/admin/governance/period/add">
             Add New
           </NavDropdownItem>
         </NavDropdown>
 
         <NavDropdown icon={Building} title="Organizational Structure">
-          <NavDropdownItem href="/admin/governance/structure/all">
+          <NavDropdownItem href="/admin/governance/organizational/all">
             All Structure
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/governance/structure/manage">
+          <NavDropdownItem href="/admin/governance/organizational/manage">
             Add Manage
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/governance/structure/structure">
+          <NavDropdownItem href="/admin/governance/organizational/structure">
             Structure
           </NavDropdownItem>
         </NavDropdown>
@@ -107,7 +107,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/people/users/all">
             All Users
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/people/users/new">
+          <NavDropdownItem href="/admin/people/users/add">
             Add New
           </NavDropdownItem>
           <NavDropdownItem href="/admin/people/users/approval">
@@ -126,7 +126,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/programs/work/all">
             All Programs
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/work/new">
+          <NavDropdownItem href="/admin/programs/work/add">
             Add New
           </NavDropdownItem>
           <NavDropdownItem href="/admin/programs/work/approval">
@@ -141,7 +141,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/programs/events/all">
             All Events
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/events/new">
+          <NavDropdownItem href="/admin/programs/events/add">
             Add New
           </NavDropdownItem>
           <NavDropdownItem href="/admin/programs/events/approval">
@@ -163,7 +163,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/administration/documents/all">
             All Documents
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/documents/new">
+          <NavDropdownItem href="/admin/administration/documents/add">
             Add New
           </NavDropdownItem>
           <NavDropdownItem href="/admin/administration/documents/approval">
@@ -181,7 +181,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/administration/letter/all">
             All Letter
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/letter/new">
+          <NavDropdownItem href="/admin/administration/letter/add">
             Add New
           </NavDropdownItem>
           <NavDropdownItem href="/admin/administration/letter/approval">
@@ -206,7 +206,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/content/article/all">
             All Article
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/article/new">
+          <NavDropdownItem href="/admin/content/article/add">
             Add New
           </NavDropdownItem>
           <NavDropdownItem href="/admin/content/article/approval">
@@ -221,7 +221,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/content/gallery/all">
             All Gallery
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/gallery/new">
+          <NavDropdownItem href="/admin/content/gallery/add">
             Add New
           </NavDropdownItem>
           <NavDropdownItem href="/admin/content/gallery/approval">
@@ -233,7 +233,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/content/links/all">
             All Links
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/links/new">
+          <NavDropdownItem href="/admin/content/links/add">
             Add New
           </NavDropdownItem>
         </NavDropdown>
@@ -249,7 +249,7 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/finance/transaction/all">
             All Transaction
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/finance/transaction/new">
+          <NavDropdownItem href="/admin/finance/transaction/add">
             Add New
           </NavDropdownItem>
           <NavDropdownItem href="/admin/finance/transaction/approval">
