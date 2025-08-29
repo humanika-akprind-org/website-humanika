@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   try {
     const { usernameOrEmail, password } = await request.json();
 
-    // Input validation
     if (!usernameOrEmail?.trim() || !password?.trim()) {
       return NextResponse.json(
         { success: false, error: "Username/email and password are required" },
@@ -14,19 +13,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // Find user
     const user = await prisma.user.findFirst({
       where: {
         OR: [
           { username: usernameOrEmail.trim() },
           { email: usernameOrEmail.trim() },
         ],
+        role: "ANGGOTA", // Only ANGGOTA role can login
       },
     });
 
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "Invalid credentials" },
+        { success: false, error: "Access denied. ANGGOTA only." },
         { status: 401 }
       );
     }
@@ -39,15 +38,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify password
     const isPasswordValid = await comparePasswords(password, user.password);
     if (!isPasswordValid) {
-      // Increment login attempts
       const attemptLogin = user.attemptLogin + 1;
       let blockExpires = null;
 
       if (attemptLogin >= 5) {
-        blockExpires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+        blockExpires = new Date(Date.now() + 30 * 60 * 1000);
       }
 
       await prisma.user.update({
@@ -61,23 +58,18 @@ export async function POST(request: Request) {
       );
     }
 
-    // Reset login attempts on successful login
     await prisma.user.update({
       where: { id: user.id },
       data: { attemptLogin: 0, blockExpires: null },
     });
 
-    // Generate token
     const token = generateToken(user.id);
-
-    // Create response without password
     const { password: _, ...userWithoutPassword } = user;
     const response = NextResponse.json({
       success: true,
       user: userWithoutPassword,
     });
 
-    // Set cookie
     return setAuthCookie(response, token);
   } catch (error) {
     console.error("Login error:", error);

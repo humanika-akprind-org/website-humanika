@@ -3,12 +3,31 @@ import { NavLink } from "./NavLink";
 import Image from "next/image";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getCurrentUser } from "@/lib/auth";
+import { MobileHeaderClient } from "./MobileHeader";
+
+interface User {
+  name: string;
+  role: string;
+}
+
+interface HeaderProps {
+  currentUser: User | null;
+}
 
 export default async function Header() {
   const currentUser = await getCurrentUser();
 
   return (
-    <header className="bg-gradient-to-r from-blue-800 to-blue-900 text-white shadow-lg sticky top-0 z-50">
+    <>
+      <DesktopHeader currentUser={currentUser} />
+      <MobileHeader currentUser={currentUser} />
+    </>
+  );
+}
+
+function DesktopHeader({ currentUser }: HeaderProps) {
+  return (
+    <header className="hidden md:block bg-gradient-to-r from-blue-800 to-blue-900 text-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-4">
@@ -102,6 +121,14 @@ export default async function Header() {
           </ul>
         </nav>
       </div>
+    </header>
+  );
+}
+
+function MobileHeader({ currentUser }: HeaderProps) {
+  return (
+    <header className="md:hidden bg-gradient-to-r from-blue-800 to-blue-900 text-white shadow-lg sticky top-0 z-50">
+      <MobileHeaderClient currentUser={currentUser} />
     </header>
   );
 }

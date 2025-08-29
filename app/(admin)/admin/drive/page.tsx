@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
 import { getGoogleDriveFiles } from "@/app/(admin)/admin/server";
-import DriveManager from "@/app/(admin)/admin/dashboard/components/DriveManager";
+import DriveManager from "@/app/(admin)/admin/drive/components/DriveManager";
 import GoogleDriveConnect from "@/components/admin/google-drive/GoogleDriveConnect";
-import StatsOverview from "@/app/(admin)/admin/dashboard/components/StatsOverview";
-import RecentActivity from "@/app/(admin)/admin/dashboard/components/RecentActivity";
-import QuickActions from "@/app/(admin)/admin/dashboard/components/QuickActions";
+import StatsOverview from "@/app/(admin)/admin/drive/components/StatsOverview";
+import RecentActivity from "@/app/(admin)/admin/drive/components/RecentActivity";
+import QuickActions from "@/app/(admin)/admin/drive/components/QuickActions";
 
 export default async function DashboardPage() {
   const cookieStore = cookies();
@@ -68,8 +68,18 @@ export default async function DashboardPage() {
   const statsData = [
     { title: "Total Files", value: 100, change: "+12%", trend: "up" as const },
     { title: "Active Users", value: 1243, change: "+5%", trend: "up" as const },
-    { title: "Storage Used", value: "78%", change: "-3%", trend: "down" as const },
-    { title: "Tasks Completed", value: 89, change: "+24%", trend: "up" as const },
+    {
+      title: "Storage Used",
+      value: "78%",
+      change: "-3%",
+      trend: "down" as const,
+    },
+    {
+      title: "Tasks Completed",
+      value: 89,
+      change: "+24%",
+      trend: "up" as const,
+    },
   ];
 
   const recentActivities = [

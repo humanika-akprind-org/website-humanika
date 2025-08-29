@@ -13,7 +13,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
 
       <nav className="flex-1 p-4 space-y-1">
         <Link
-          href="/admin/dashboard"
+          href="/admin/drive"
           className="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 text-blue-600 font-medium"
         >
           <Home className="h-5 w-5" />
@@ -21,7 +21,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
         </Link>
 
         <Link
-          href="/admin/dashboard/members"
+          href="/admin/drive/members"
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Users className="h-5 w-5" />
@@ -29,7 +29,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
         </Link>
 
         <Link
-          href="/admin/dashboard/documents"
+          href="/admin/drive/documents"
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <FileText className="h-5 w-5" />
@@ -37,7 +37,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
         </Link>
 
         <Link
-          href="/admin/dashboard/calendar"
+          href="/admin/drive/calendar"
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Calendar className="h-5 w-5" />
@@ -45,7 +45,7 @@ export default function Sidebar({ accessToken }: { accessToken: string }) {
         </Link>
 
         <Link
-          href="/admin/dashboard/settings"
+          href="/admin/drive/settings"
           className="flex items-center space-x-3 p-3 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Settings className="h-5 w-5" />
