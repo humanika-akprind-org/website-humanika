@@ -69,7 +69,7 @@ export default function AddUserPage() {
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     // After successful submission, redirect to user list
-    router.push("/dashboard/user/all");
+    router.push("/dashboard/user");
   };
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FiUser,
   FiMail,
@@ -35,6 +35,50 @@ interface Role {
   name: string;
 }
 
+// Sample user data moved outside component to make it stable
+const sampleUsers: User[] = [
+  {
+    id: 1,
+    name: "John Doe",
+    email: "john.doe@organization.org",
+    role: "Administrator",
+    status: "active",
+    lastLogin: "2023-10-15 09:32:45",
+    department: "IT",
+    avatarColor: "bg-blue-500",
+  },
+  {
+    id: 2,
+    name: "Alice Smith",
+    email: "alice.smith@organization.org",
+    role: "Editor",
+    status: "active",
+    lastLogin: "2023-10-18 14:20:12",
+    department: "Marketing",
+    avatarColor: "bg-pink-500",
+  },
+  {
+    id: 3,
+    name: "Robert Johnson",
+    email: "robert.j@organization.org",
+    role: "Viewer",
+    status: "locked",
+    lastLogin: "2023-10-05 11:45:23",
+    department: "Finance",
+    avatarColor: "bg-purple-500",
+  },
+  {
+    id: 4,
+    name: "Emily Wilson",
+    email: "emily.wilson@organization.org",
+    role: "Manager",
+    status: "inactive",
+    lastLogin: "2023-09-28 16:30:55",
+    department: "HR",
+    avatarColor: "bg-green-500",
+  },
+];
+
 export default function EditUserPage() {
   const router = useRouter();
   const params = useParams();
@@ -53,64 +97,27 @@ export default function EditUserPage() {
     password: "",
   });
 
-  // Sample user data - in a real app, you would fetch this from an API
-  const sampleUsers: User[] = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@organization.org",
-      role: "Administrator",
-      status: "active",
-      lastLogin: "2023-10-15 09:32:45",
-      department: "IT",
-      avatarColor: "bg-blue-500",
-    },
-    {
-      id: 2,
-      name: "Alice Smith",
-      email: "alice.smith@organization.org",
-      role: "Editor",
-      status: "active",
-      lastLogin: "2023-10-18 14:20:12",
-      department: "Marketing",
-      avatarColor: "bg-pink-500",
-    },
-    {
-      id: 3,
-      name: "Robert Johnson",
-      email: "robert.j@organization.org",
-      role: "Viewer",
-      status: "locked",
-      lastLogin: "2023-10-05 11:45:23",
-      department: "Finance",
-      avatarColor: "bg-purple-500",
-    },
-    {
-      id: 4,
-      name: "Emily Wilson",
-      email: "emily.wilson@organization.org",
-      role: "Manager",
-      status: "inactive",
-      lastLogin: "2023-09-28 16:30:55",
-      department: "HR",
-      avatarColor: "bg-green-500",
-    },
-  ];
+  // Using useMemo for arrays that are defined inside component
+  const departments = useMemo<Department[]>(
+    () => [
+      { id: 1, name: "IT" },
+      { id: 2, name: "Marketing" },
+      { id: 3, name: "Finance" },
+      { id: 4, name: "HR" },
+      { id: 5, name: "Operations" },
+    ],
+    []
+  );
 
-  const departments: Department[] = [
-    { id: 1, name: "IT" },
-    { id: 2, name: "Marketing" },
-    { id: 3, name: "Finance" },
-    { id: 4, name: "HR" },
-    { id: 5, name: "Operations" },
-  ];
-
-  const roles: Role[] = [
-    { id: 1, name: "Administrator" },
-    { id: 2, name: "Editor" },
-    { id: 3, name: "Viewer" },
-    { id: 4, name: "Manager" },
-  ];
+  const roles = useMemo<Role[]>(
+    () => [
+      { id: 1, name: "Administrator" },
+      { id: 2, name: "Editor" },
+      { id: 3, name: "Viewer" },
+      { id: 4, name: "Manager" },
+    ],
+    []
+  );
 
   useEffect(() => {
     // Simulate fetching user data
@@ -131,7 +138,7 @@ export default function EditUserPage() {
     };
 
     fetchUser();
-  }, [userId]);
+  }, [userId]); // Now sampleUsers is stable and doesn't need to be in dependencies
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -151,7 +158,7 @@ export default function EditUserPage() {
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     // After successful update, redirect to user list
-    router.push("/dashboard/user/all");
+    router.push("/dashboard/user");
   };
 
   const handleDelete = async () => {
@@ -161,7 +168,7 @@ export default function EditUserPage() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // After successful deletion, redirect to user list
-    router.push("/dashboard/user/all");
+    router.push("/dashboard/user");
   };
 
   if (!user) {
