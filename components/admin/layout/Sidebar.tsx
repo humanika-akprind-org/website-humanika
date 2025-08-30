@@ -3,19 +3,22 @@
 import {
   Home,
   Users,
-  FileText,
   Calendar,
   Settings,
   Building,
   Target,
   BookOpen,
-  FileCheck,
   DollarSign,
   Camera,
   LinkIcon,
   BarChart3,
   Activity,
   User,
+  ClipboardList,
+  Shield,
+  FolderOpen,
+  Mail,
+  PieChart,
 } from "lucide-react";
 import { LogoutButton } from "@/components/admin/auth/LogoutButton";
 import Image from "next/image";
@@ -75,24 +78,42 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={Calendar} title="Period">
-          <NavDropdownItem href="/admin/governance/period/all">
+        <NavDropdown icon={Calendar} title="Periods">
+          <NavDropdownItem href="/admin/governance/periods">
             All Period
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/governance/period/add">
+          <NavDropdownItem href="/admin/governance/periods/add">
             Add New
           </NavDropdownItem>
         </NavDropdown>
 
-        <NavDropdown icon={Building} title="Organizational Structure">
-          <NavDropdownItem href="/admin/governance/organizational/all">
-            All Structure
+        <NavDropdown icon={Shield} title="Managements">
+          <NavDropdownItem href="/admin/governance/managements">
+            All Manage
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/governance/organizational/manage">
+          <NavDropdownItem href="/admin/governance/managements/add">
             Add Manage
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/governance/organizational/structure">
-            Structure
+        </NavDropdown>
+
+        <NavDropdown icon={Building} title="Organizational Structure">
+          <NavDropdownItem href="/admin/governance/structure">
+            All Structure
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/governance/structure/add">
+            Add Structure
+          </NavDropdownItem>
+        </NavDropdown>
+
+        <NavDropdown icon={ClipboardList} title="Department Tasks">
+          <NavDropdownItem href="/admin/governance/tasks">
+            All Tasks
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/governance/tasks/add">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/governance/tasks/approval">
+            Approval
           </NavDropdownItem>
         </NavDropdown>
 
@@ -104,14 +125,14 @@ export default function Sidebar() {
         </div>
 
         <NavDropdown icon={Users} title="Users">
-          <NavDropdownItem href="/admin/people/users/all">
+          <NavDropdownItem href="/admin/people/users">
             All Users
           </NavDropdownItem>
           <NavDropdownItem href="/admin/people/users/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/people/users/approval">
-            Approval
+          <NavDropdownItem href="/admin/people/users/roles">
+            Roles & Permissions
           </NavDropdownItem>
         </NavDropdown>
 
@@ -123,22 +144,22 @@ export default function Sidebar() {
         </div>
 
         <NavDropdown icon={Target} title="Work Programs">
-          <NavDropdownItem href="/admin/programs/work/all">
+          <NavDropdownItem href="/admin/programs/works">
             All Programs
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/work/add">
+          <NavDropdownItem href="/admin/programs/works/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/work/approval">
+          <NavDropdownItem href="/admin/programs/works/approval">
             Approval
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/work/reports">
+          <NavDropdownItem href="/admin/programs/works/reports">
             Reports
           </NavDropdownItem>
         </NavDropdown>
 
         <NavDropdown icon={Calendar} title="Events">
-          <NavDropdownItem href="/admin/programs/events/all">
+          <NavDropdownItem href="/admin/programs/events">
             All Events
           </NavDropdownItem>
           <NavDropdownItem href="/admin/programs/events/add">
@@ -159,8 +180,8 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={FileText} title="Documents">
-          <NavDropdownItem href="/admin/administration/documents/all">
+        <NavDropdown icon={FolderOpen} title="Documents">
+          <NavDropdownItem href="/admin/administration/documents">
             All Documents
           </NavDropdownItem>
           <NavDropdownItem href="/admin/administration/documents/add">
@@ -177,20 +198,20 @@ export default function Sidebar() {
           </NavDropdownItem>
         </NavDropdown>
 
-        <NavDropdown icon={FileCheck} title="Letter">
-          <NavDropdownItem href="/admin/administration/letter/all">
+        <NavDropdown icon={Mail} title="Letter">
+          <NavDropdownItem href="/admin/administration/letters">
             All Letter
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/letter/add">
+          <NavDropdownItem href="/admin/administration/letters/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/letter/approval">
+          <NavDropdownItem href="/admin/administration/letters/approval">
             Approval
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/letter/templates">
+          <NavDropdownItem href="/admin/administration/letters/templates">
             Templates
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/letter/reports">
+          <NavDropdownItem href="/admin/administration/letters/reports">
             Reports
           </NavDropdownItem>
         </NavDropdown>
@@ -202,39 +223,42 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={BookOpen} title="Article">
-          <NavDropdownItem href="/admin/content/article/all">
+        <NavDropdown icon={BookOpen} title="Articles">
+          <NavDropdownItem href="/admin/content/articles">
             All Article
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/article/add">
+          <NavDropdownItem href="/admin/content/articles/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/article/approval">
+          <NavDropdownItem href="/admin/content/articles/approval">
             Approval
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/article/categories">
+          <NavDropdownItem href="/admin/content/articles/categories">
             Categories
           </NavDropdownItem>
         </NavDropdown>
 
-        <NavDropdown icon={Camera} title="Gallery">
-          <NavDropdownItem href="/admin/content/gallery/all">
+        <NavDropdown icon={Camera} title="Galleries">
+          <NavDropdownItem href="/admin/content/galleries">
             All Gallery
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/gallery/add">
+          <NavDropdownItem href="/admin/content/galleries/add">
             Add New
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/gallery/approval">
-            Approval
           </NavDropdownItem>
         </NavDropdown>
 
         <NavDropdown icon={LinkIcon} title="Links">
-          <NavDropdownItem href="/admin/content/links/all">
-            All Links
+          <NavDropdownItem href="/admin/content/links/short">
+            Short Links
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/links/add">
-            Add New
+          <NavDropdownItem href="/admin/content/links/hubs">
+            Link Hubs
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/links/themes">
+            Hub Themes
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/links/approval">
+            Approval
           </NavDropdownItem>
         </NavDropdown>
 
@@ -245,20 +269,20 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={DollarSign} title="Transaction">
-          <NavDropdownItem href="/admin/finance/transaction/all">
+        <NavDropdown icon={DollarSign} title="Transactions">
+          <NavDropdownItem href="/admin/finance/transactions">
             All Transaction
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/finance/transaction/add">
+          <NavDropdownItem href="/admin/finance/transactions/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/finance/transaction/approval">
+          <NavDropdownItem href="/admin/finance/transactions/approval">
             Approval
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/finance/transaction/categories">
+          <NavDropdownItem href="/admin/finance/transactions/categories">
             Categories
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/finance/transaction/reports">
+          <NavDropdownItem href="/admin/finance/transactions/reports">
             Reports
           </NavDropdownItem>
         </NavDropdown>
@@ -271,7 +295,10 @@ export default function Sidebar() {
         </div>
 
         <NavLink href="/admin/system/activity" icon={Activity}>
-          Activity
+          Activity Log
+        </NavLink>
+        <NavLink href="/admin/system/settings" icon={Settings}>
+          System Settings
         </NavLink>
 
         {/* Settings Section */}
@@ -286,6 +313,9 @@ export default function Sidebar() {
         </NavLink>
         <NavLink href="/admin/settings/account" icon={Settings}>
           Account
+        </NavLink>
+        <NavLink href="/admin/settings/preferences" icon={PieChart}>
+          Preferences
         </NavLink>
       </nav>
 
