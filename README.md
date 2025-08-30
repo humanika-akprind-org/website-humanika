@@ -92,44 +92,6 @@ GOOGLE_DRIVE_API_KEY="your-google-drive-api-key"
    - Authorized redirect URIs: \`http://localhost:3000/api/auth/callback/google\`
 5. Copy credentials to your \`.env.local\`
 
-## �� Project Structure
-
-\`\`\`
-├── app/
-│   ├── api/
-│   │   ├── google-drive/          # Main Drive API routes
-│   │   ├── google-drive-folders/  # Folder management
-│   │   ├── google-drive-list/     # File listing
-│   │   ├── oauth2/callback/       # OAuth callback
-│   │   └── gallery/               # Gallery upload
-│   ├── dashboard/
-│   │   ├── components/
-│   │   │   └── DriveManager/      # Main Drive component
-│   │   │       ├── subcomponents/
-│   │   │       │   ├── UploadSection/
-│   │   │       │   └── FileList/
-│   │   │       ├── api/          # API utilities
-│   │   │       ├── types/        # TypeScript types
-│   │   │       └── utils/        # Helper functions
-│   │   ├── page.tsx               # Dashboard page
-│   │   └── server.tsx             # Server component
-│   ├── globals.css                # Global styles
-│   ├── layout.tsx                 # Root layout
-│   └── page.tsx                   # Home page
-├── components/
-│   └── ui/                        # UI components
-├── lib/
-│   ├── google-drive.ts            # Google Drive utilities
-│   ├── google-oauth.ts            # OAuth utilities
-│   ├── mongodb.ts                 # MongoDB connection
-│   ├── prisma.ts                  # Prisma client
-│   └── utils.ts                   # General utilities
-├── prisma/
-│   └── schema.prisma              # Database schema
-├── types/                         # TypeScript definitions
-└── middleware.ts                  # Next.js middleware
-\`\`\`
-
 ## 🎯 API Endpoints
 
 ### Google Drive API (\`/api/google-drive\`)
@@ -242,19 +204,19 @@ src/
 │   │   │   └── stats/
 │   │   │       └── page.tsx
 │   │   ├── governance/
-│   │   │   ├── period/
+│   │   │   ├── periods/
 │   │   │   │   ├── all/
 │   │   │   │   │   └── page.tsx
 │   │   │   │   ├── add/
 │   │   │   │   │   └── page.tsx
-│   │   │   └── organizational-structure/
+│   │   │   └── organizationals/
 │   │   │       ├── all/
 │   │   │       │   └── page.tsx
 │   │   │       ├── add/
 │   │   │       │   └── page.tsx
 │   │   │       ├── structure/
 │   │   │       │   └── page.tsx
-│   │   ├── people-access/
+│   │   ├── people/
 │   │   │   ├── users/
 │   │   │   │   ├── all/
 │   │   │   │   │   └── page.tsx
@@ -263,7 +225,7 @@ src/
 │   │   │   │   ├── approval/
 │   │   │   │   │   └── page.tsx
 │   │   ├── programs/
-│   │   │   ├── work/
+│   │   │   ├── works/
 │   │   │   │   ├── all/
 │   │   │   │   │   └── page.tsx
 │   │   │   │   ├── add/
@@ -293,7 +255,7 @@ src/
 │   │   │   │   │   └── page.tsx
 │   │   │   │   ├── reports/
 │   │   │   │   │   └── page.tsx
-│   │   │   ├── letter/
+│   │   │   ├── letters/
 │   │   │   │   ├── all/
 │   │   │   │   │   └── page.tsx
 │   │   │   │   ├── add/
@@ -305,7 +267,7 @@ src/
 │   │   │   │   ├── reports/
 │   │   │   │   │   └── page.tsx
 │   │   ├── content/
-│   │   │   ├── article/
+│   │   │   ├── articles/
 │   │   │   │   ├── all/
 │   │   │   │   │   └── page.tsx
 │   │   │   │   ├── add/
@@ -314,7 +276,7 @@ src/
 │   │   │   │   │   └── page.tsx
 │   │   │   │   ├── categories/
 │   │   │   │   │   └── page.tsx
-│   │   │   ├── gallery/
+│   │   │   ├── galleries/
 │   │   │   │   ├── all/
 │   │   │   │   │   └── page.tsx
 │   │   │   │   ├── add/
@@ -327,7 +289,7 @@ src/
 │   │   │   │   ├── add/
 │   │   │   │   │   └── page.tsx
 │   │   ├── finance/
-│   │   │   ├── transaction/
+│   │   │   ├── transactions/
 │   │   │   │   ├── all/
 │   │   │   │   │   └── page.tsx
 │   │   │   │   ├── add/
@@ -347,6 +309,3 @@ src/
 │   │   │   ├── account/
 │   │   │   │   └── page.tsx
 ```
-
-
-
