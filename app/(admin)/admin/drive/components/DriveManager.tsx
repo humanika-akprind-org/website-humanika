@@ -2,13 +2,20 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
-import { type DriveManagerProps, type LoadingState } from "./types";
-import { callApi, fetchDriveFiles, fetchDriveFolders } from "./api";
+import {
+  type DriveManagerProps,
+  type LoadingState,
+} from "../../../../../types/google-drive";
+import {
+  callApi,
+  fetchDriveFiles,
+  fetchDriveFolders,
+} from "../../../../../lib/api/google-drive";
 import {
   getFolderOptions,
   loadFolderFromLocalStorage,
   saveFolderToLocalStorage,
-} from "./utils";
+} from "../../../../utils";
 import UploadSection from "./subcomponents/UploadSection";
 import FileList from "./subcomponents/FileList";
 

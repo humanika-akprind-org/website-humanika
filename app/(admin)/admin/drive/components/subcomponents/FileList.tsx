@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
-import { type LoadingState } from "../types";
+import { type LoadingState } from "../../../../../../types/google-drive";
 
 interface FileListProps {
   files: drive_v3.Schema$File[];
