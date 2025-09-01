@@ -16,7 +16,7 @@ async function main() {
       username: "dpo",
       password: hashedPassword,
       role: UserRole.DPO,
-      verifiedEmail: true,
+      verifiedAccount: true,
     },
 
     // =========================
@@ -29,7 +29,7 @@ async function main() {
       password: hashedPassword,
       role: UserRole.BPH,
       position: Position.KETUA_UMUM,
-      verifiedEmail: true,
+      verifiedAccount: true,
     },
     {
       name: "Wakil Ketua BPH",
@@ -38,7 +38,7 @@ async function main() {
       password: hashedPassword,
       role: UserRole.BPH,
       position: Position.WAKIL_KETUA_UMUM,
-      verifiedEmail: true,
+      verifiedAccount: true,
     },
     {
       name: "Sekretaris BPH",

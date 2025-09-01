@@ -115,7 +115,7 @@ model User {
   department    Department?
   position      Position?
   isActive      Boolean    @default(true)
-  verifiedEmail Boolean    @default(false)
+  verifiedAccount Boolean    @default(false)
   attemptLogin  Int        @default(0)
   blockExpires  DateTime?
   createdAt     DateTime   @default(now())
