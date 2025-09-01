@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getGoogleDriveFiles } from "@/app/(admin)/admin/server";
+import { getGoogleDriveFiles } from "@/lib/google-drive";
 import DriveManager from "@/app/(admin)/admin/drive/components/DriveManager";
 import GoogleDriveConnect from "@/components/admin/google-drive/GoogleDriveConnect";
 import StatsOverview from "@/app/(admin)/admin/drive/components/StatsOverview";
