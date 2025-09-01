@@ -1,148 +1,367 @@
-// app/dashboard/user/approval/page.tsx
+// app/(admin)/admin/people/users/verify-accounts/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FiSearch,
   FiFilter,
   FiCheckCircle,
-  FiXCircle,
-  FiEye,
-  FiChevronDown,
-  FiUserPlus,
-  FiClock,
-  FiUserCheck,
-  FiUserX,
   FiMail,
-  FiX,
+  FiUser,
+  FiUserX,
+  FiChevronDown,
+  FiRefreshCw,
+  FiSend,
 } from "react-icons/fi";
 
-interface PendingUser {
-  id: number;
-  name: string;
-  email: string;
-  department: string;
-  role: string;
-  requestedRole: string;
-  requestedAt: string;
-  status: "pending" | "approved" | "rejected";
-  avatarColor: string;
-  justification: string;
+// Enum values from Prisma
+enum UserRole {
+  DPO = "DPO",
+  BPH = "BPH",
+  PENGURUS = "PENGURUS",
+  ANGGOTA = "ANGGOTA",
 }
 
-export default function UserApprovalPage() {
-  const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([
-    {
-      id: 1,
-      name: "Alex Johnson",
-      email: "alex.j@organization.org",
-      department: "Marketing",
-      role: "N/A",
-      requestedRole: "Editor",
-      requestedAt: "2023-10-22 14:30:25",
-      status: "pending",
-      avatarColor: "bg-blue-500",
-      justification: "Need access to edit marketing content and campaigns",
-    },
-    {
-      id: 2,
-      name: "Maria Garcia",
-      email: "maria.g@organization.org",
-      department: "Finance",
-      role: "N/A",
-      requestedRole: "Viewer",
-      requestedAt: "2023-10-21 09:15:42",
-      status: "pending",
-      avatarColor: "bg-pink-500",
-      justification: "Require read-only access to financial reports",
-    },
-    {
-      id: 3,
-      name: "James Wilson",
-      email: "james.w@organization.org",
-      department: "Operations",
-      role: "N/A",
-      requestedRole: "Manager",
-      requestedAt: "2023-10-20 16:45:18",
-      status: "pending",
-      avatarColor: "bg-purple-500",
-      justification: "Team lead requiring management access for my department",
-    },
-    {
-      id: 4,
-      name: "Sarah Thompson",
-      email: "sarah.t@organization.org",
-      department: "IT",
-      role: "N/A",
-      requestedRole: "Administrator",
-      requestedAt: "2023-10-19 11:20:35",
-      status: "pending",
-      avatarColor: "bg-green-500",
-      justification:
-        "IT support team requires admin access for system maintenance",
-    },
-    {
-      id: 5,
-      name: "David Kim",
-      email: "david.k@organization.org",
-      department: "HR",
-      role: "N/A",
-      requestedRole: "Editor",
-      requestedAt: "2023-10-18 13:05:57",
-      status: "pending",
-      avatarColor: "bg-yellow-500",
-      justification: "Need to update employee records and documentation",
-    },
-  ]);
+enum Department {
+  INFOKOM = "INFOKOM",
+  PSDM = "PSDM",
+  LITBANG = "LITBANG",
+  KWU = "KWU",
+}
 
+enum Position {
+  KETUA_UMUM = "KETUA_UMUM",
+  WAKIL_KETUA_UMUM = "WAKIL_KETUA_UMUM",
+  SEKRETARIS = "SEKRETARIS",
+  BENDAHARA = "BENDAHARA",
+  KEPALA_DEPARTEMEN = "KEPALA_DEPARTEMEN",
+  STAFF_DEPARTEMEN = "STAFF_DEPARTEMEN",
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  username: string;
+  role: UserRole;
+  department?: Department;
+  position?: Position;
+  isActive: boolean;
+  verifiedAccount: boolean;
+  attemptLogin: number;
+  blockExpires?: string;
+  createdAt: string;
+  updatedAt: string;
+  avatarColor: string;
+}
+
+interface UsersResponse {
+  users: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+}
+
+// Helper function to format enum values for display
+const formatEnumValue = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+// Get all enum values as options for select inputs
+const userRoleOptions = Object.values(UserRole).map((role) => ({
+  value: role,
+  label: formatEnumValue(role),
+}));
+
+const departmentOptions = Object.values(Department).map((dept) => ({
+  value: dept,
+  label: formatEnumValue(dept),
+}));
+
+class UserApi {
+  private static API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+
+  private static async fetchApi<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+        ...options,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error || "An error occurred" };
+      }
+
+      return { data };
+    } catch (_error) {
+      return { error: "Network error occurred" };
+    }
+  }
+
+  static async getUnverifiedUsers(params?: {
+    search?: string;
+    role?: UserRole;
+    department?: Department;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<UsersResponse>> {
+    const queryParams = new URLSearchParams();
+
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.role) queryParams.append("role", params.role);
+    if (params?.department) queryParams.append("department", params.department);
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+
+    // Add filter for unverified accounts
+    queryParams.append("verifiedAccount", "false");
+
+    const queryString = queryParams.toString();
+    const endpoint = `/user${queryString ? `?${queryString}` : ""}`;
+
+    return this.fetchApi<UsersResponse>(endpoint);
+  }
+
+  static async verifyUser(id: string): Promise<ApiResponse<User>> {
+    return this.fetchApi<User>(`/user/${id}/verify`, {
+      method: "PATCH",
+    });
+  }
+
+  static async sendVerificationEmail(
+    id: string
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.fetchApi<{ message: string }>(`/user/${id}/send-verification`, {
+      method: "POST",
+    });
+  }
+
+  static async bulkVerifyUsers(
+    ids: string[]
+  ): Promise<ApiResponse<{ count: number }>> {
+    return this.fetchApi<{ count: number }>("/user/bulk-verify", {
+      method: "POST",
+      body: JSON.stringify({ userIds: ids }),
+    });
+  }
+
+  static async bulkSendVerification(
+    ids: string[]
+  ): Promise<ApiResponse<{ count: number }>> {
+    return this.fetchApi<{ count: number }>("/user/bulk-send-verification", {
+      method: "POST",
+      body: JSON.stringify({ userIds: ids }),
+    });
+  }
+}
+
+export default function VerifyAccountsPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [roleFilter, setRoleFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState({
+    role: "" as UserRole | "",
+    department: "" as Department | "",
+  });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<PendingUser | null>(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState("");
+  const [processingIds, setProcessingIds] = useState<string[]>([]);
 
-  // Filter users based on search term and filters
-  const filteredUsers = pendingUsers
-    .filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .filter((user) => statusFilter === "all" || user.status === statusFilter)
-    .filter(
-      (user) => roleFilter === "all" || user.requestedRole === roleFilter
-    );
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await UserApi.getUnverifiedUsers({
+        search: searchTerm,
+        role: filters.role || undefined,
+        department: filters.department || undefined,
+        page: currentPage,
+        limit: 10,
+      });
 
-  // Get status badge class
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      if (response.error) {
+        setError(response.error);
+      } else if (response.data) {
+        const usersWithColors = response.data.users.map((user, index) => ({
+          ...user,
+          avatarColor: [
+            "bg-blue-500",
+            "bg-pink-500",
+            "bg-purple-500",
+            "bg-green-500",
+            "bg-yellow-500",
+            "bg-red-500",
+            "bg-indigo-500",
+            "bg-teal-500",
+          ][index % 8],
+        }));
+        setUsers(usersWithColors);
+        setTotalPages(response.data.pagination.pages);
+      }
+    } catch (_error) {
+      setError("Failed to fetch unverified users");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Get role badge class
-  const getRoleClass = (role: string) => {
-    switch (role) {
-      case "Administrator":
-        return "bg-purple-100 text-purple-800";
-      case "Editor":
-        return "bg-blue-100 text-blue-800";
-      case "Manager":
-        return "bg-indigo-100 text-indigo-800";
-      case "Viewer":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  useEffect(() => {
+    fetchUsers();
+  }, [searchTerm, currentPage, filters]);
+
+  // Filter users based on search term and filters
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.username.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = filters.role === "" || user.role === filters.role;
+    const matchesDepartment =
+      filters.department === "" || user.department === filters.department;
+
+    return matchesSearch && matchesRole && matchesDepartment;
+  });
+
+  // Toggle user selection
+  const toggleUserSelection = (id: string) => {
+    if (selectedUsers.includes(id)) {
+      setSelectedUsers(selectedUsers.filter((userId) => userId !== id));
+    } else {
+      setSelectedUsers([...selectedUsers, id]);
     }
+  };
+
+  // Select all users on current page
+  const toggleSelectAll = () => {
+    if (selectedUsers.length === filteredUsers.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(filteredUsers.map((user) => user.id));
+    }
+  };
+
+  // Verify a single user
+  const handleVerifyUser = async (userId: string) => {
+    try {
+      setProcessingIds([...processingIds, userId]);
+      const response = await UserApi.verifyUser(userId);
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("User verified successfully");
+        // Remove the user from the list
+        setUsers(users.filter((user) => user.id !== userId));
+        setSelectedUsers(selectedUsers.filter((id) => id !== userId));
+      }
+    } catch (_error) {
+      setError("Failed to verify user");
+    } finally {
+      setProcessingIds(processingIds.filter((id) => id !== userId));
+      setTimeout(() => setSuccess(""), 3000);
+    }
+  };
+
+  // Send verification email to a single user
+  const handleSendVerification = async (userId: string) => {
+    try {
+      setProcessingIds([...processingIds, userId]);
+      const response = await UserApi.sendVerificationEmail(userId);
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Verification email sent successfully");
+      }
+    } catch (_error) {
+      setError("Failed to send verification email");
+    } finally {
+      setProcessingIds(processingIds.filter((id) => id !== userId));
+      setTimeout(() => setSuccess(""), 3000);
+    }
+  };
+
+  // Bulk verify users
+  const handleBulkVerify = async () => {
+    if (selectedUsers.length === 0) return;
+
+    try {
+      setProcessingIds([...processingIds, ...selectedUsers]);
+      const response = await UserApi.bulkVerifyUsers(selectedUsers);
+
+      if (response.error) {
+        setError(response.error);
+      } else if (response.data) {
+        setSuccess(`${response.data.count} users verified successfully`);
+        // Remove verified users from the list
+        setUsers(users.filter((user) => !selectedUsers.includes(user.id)));
+        setSelectedUsers([]);
+      }
+    } catch (_error) {
+      setError("Failed to verify users");
+    } finally {
+      setProcessingIds(
+        processingIds.filter((id) => !selectedUsers.includes(id))
+      );
+      setTimeout(() => setSuccess(""), 3000);
+    }
+  };
+
+  // Bulk send verification emails
+  const handleBulkSendVerification = async () => {
+    if (selectedUsers.length === 0) return;
+
+    try {
+      setProcessingIds([...processingIds, ...selectedUsers]);
+      const response = await UserApi.bulkSendVerification(selectedUsers);
+
+      if (response.error) {
+        setError(response.error);
+      } else if (response.data) {
+        setSuccess(`Verification emails sent to ${response.data.count} users`);
+      }
+    } catch (_error) {
+      setError("Failed to send verification emails");
+    } finally {
+      setProcessingIds(
+        processingIds.filter((id) => !selectedUsers.includes(id))
+      );
+      setTimeout(() => setSuccess(""), 3000);
+    }
+  };
+
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setFilters({ role: "", department: "" });
+    setSearchTerm("");
+    setCurrentPage(1);
   };
 
   // Format date
@@ -151,117 +370,98 @@ export default function UserApprovalPage() {
     return (
       date.toLocaleDateString() +
       " " +
-      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     );
   };
-
-  // View user details
-  const viewUserDetails = (user: PendingUser) => {
-    setSelectedUser(user);
-    setShowDetailModal(true);
-    setRejectionReason("");
-  };
-
-  // Approve user
-  const approveUser = (id: number) => {
-    setPendingUsers(
-      pendingUsers.map((user) =>
-        user.id === id ? { ...user, status: "approved" } : user
-      )
-    );
-    if (selectedUser && selectedUser.id === id) {
-      setSelectedUser({ ...selectedUser, status: "approved" });
-    }
-  };
-
-  // Reject user
-  const rejectUser = (id: number) => {
-    if (rejectionReason.trim() === "") {
-      alert("Please provide a reason for rejection");
-      return;
-    }
-
-    setPendingUsers(
-      pendingUsers.map((user) =>
-        user.id === id ? { ...user, status: "rejected" } : user
-      )
-    );
-    if (selectedUser && selectedUser.id === id) {
-      setSelectedUser({ ...selectedUser, status: "rejected" });
-    }
-    setShowDetailModal(false);
-  };
-
-  // Get stats
-  const getStats = () => ({
-    total: pendingUsers.length,
-    pending: pendingUsers.filter((u) => u.status === "pending").length,
-    approved: pendingUsers.filter((u) => u.status === "approved").length,
-    rejected: pendingUsers.filter((u) => u.status === "rejected").length,
-  });
-
-  const stats = getStats();
 
   return (
     <div className="p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">User Approval</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Account Verification
+          </h1>
           <p className="text-gray-600 mt-1">
-            Review and approve new user registration requests
+            Manage unverified user accounts and send verification emails
           </p>
+        </div>
+        <div className="flex space-x-2 mt-4 md:mt-0">
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50"
+            onClick={handleBulkSendVerification}
+            disabled={selectedUsers.length === 0 || processingIds.length > 0}
+          >
+            <FiSend className="mr-2" />
+            Send Verification ({selectedUsers.length})
+          </button>
+          <button
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center disabled:opacity-50"
+            onClick={handleBulkVerify}
+            disabled={selectedUsers.length === 0 || processingIds.length > 0}
+          >
+            <FiCheckCircle className="mr-2" />
+            Verify Accounts ({selectedUsers.length})
+          </button>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-medium text-gray-600">
-              Total Requests
-            </h3>
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FiUserPlus className="text-blue-500" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-800 mt-2">{stats.total}</p>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">
-              Pending Review
+              Unverified Users
             </h3>
             <div className="p-2 bg-yellow-100 rounded-lg">
-              <FiClock className="text-yellow-500" />
+              <FiUserX className="text-yellow-500" />
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {stats.pending}
+            {users.length}
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Approved</h3>
-            <div className="p-2 bg-green-100 rounded-lg">
-              <FiUserCheck className="text-green-500" />
+            <h3 className="text-sm font-medium text-gray-600">
+              Selected Users
+            </h3>
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FiUser className="text-blue-500" />
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {stats.approved}
+            {selectedUsers.length}
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Rejected</h3>
-            <div className="p-2 bg-red-100 rounded-lg">
-              <FiUserX className="text-red-500" />
+            <h3 className="text-sm font-medium text-gray-600">Processing</h3>
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <FiRefreshCw className="text-purple-500" />
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {stats.rejected}
+            {processingIds.length}
           </p>
         </div>
       </div>
+
+      {/* Success Message */}
+      {success && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          {success}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
 
       {/* Filters and Search */}
       <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
@@ -272,7 +472,7 @@ export default function UserApprovalPage() {
             </div>
             <input
               type="text"
-              placeholder="Search users by name or email..."
+              placeholder="Search unverified users by name, email or username..."
               className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -295,46 +495,47 @@ export default function UserApprovalPage() {
 
         {/* Advanced Filters */}
         {isFilterOpen && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
+                Role
               </label>
               <select
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                value={filters.role}
+                onChange={(e) => handleFilterChange("role", e.target.value)}
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
+                <option value="">All Roles</option>
+                {userRoleOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Requested Role
+                Department
               </label>
               <select
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                value={filters.department}
+                onChange={(e) =>
+                  handleFilterChange("department", e.target.value)
+                }
               >
-                <option value="all">All Roles</option>
-                <option value="Administrator">Administrator</option>
-                <option value="Editor">Editor</option>
-                <option value="Viewer">Viewer</option>
-                <option value="Manager">Manager</option>
+                <option value="">All Departments</option>
+                {departmentOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex items-end">
               <button
-                className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors w-full flex items-center justify-center"
-                onClick={() => {
-                  setSearchTerm("");
-                  setStatusFilter("all");
-                  setRoleFilter("all");
-                }}
+                className="px-4 py-2.5 text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors w-full"
+                onClick={clearFilters}
               >
                 Clear Filters
               </button>
@@ -351,6 +552,21 @@ export default function UserApprovalPage() {
               <tr>
                 <th
                   scope="col"
+                  className="pl-6 pr-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"
+                >
+                  <input
+                    type="checkbox"
+                    checked={
+                      filteredUsers.length > 0 &&
+                      selectedUsers.length === filteredUsers.length
+                    }
+                    onChange={toggleSelectAll}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                    disabled={processingIds.length > 0}
+                  />
+                </th>
+                <th
+                  scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   User
@@ -359,7 +575,7 @@ export default function UserApprovalPage() {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Requested Role
+                  Role
                 </th>
                 <th
                   scope="col"
@@ -371,13 +587,13 @@ export default function UserApprovalPage() {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Requested At
+                  Status
                 </th>
                 <th
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Status
+                  Created At
                 </th>
                 <th
                   scope="col"
@@ -393,6 +609,15 @@ export default function UserApprovalPage() {
                   key={user.id}
                   className="hover:bg-gray-50 transition-colors"
                 >
+                  <td className="pl-6 pr-2 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.includes(user.id)}
+                      onChange={() => toggleUserSelection(user.id)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                      disabled={processingIds.includes(user.id)}
+                    />
+                  </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div
@@ -411,61 +636,57 @@ export default function UserApprovalPage() {
                           <FiMail className="mr-1 text-gray-400" size={14} />
                           {user.email}
                         </div>
+                        <div className="text-xs text-gray-400">
+                          @{user.username}
+                        </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getRoleClass(
-                        user.requestedRole
-                      )}`}
-                    >
-                      {user.requestedRole}
+                    <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                      {formatEnumValue(user.role)}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {user.department}
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(user.requestedAt)}
+                    {user.department ? formatEnumValue(user.department) : "-"}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusClass(
-                        user.status
-                      )}`}
+                      className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
+                        user.isActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
                     >
-                      {user.status.charAt(0).toUpperCase() +
-                        user.status.slice(1)}
+                      {user.isActive ? "Active" : "Inactive"}
                     </span>
+                    {!user.verifiedAccount && (
+                      <span className="ml-2 px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                        Unverified
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatDate(user.createdAt)}
                   </td>
                   <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <button
-                        className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                        onClick={() => viewUserDetails(user)}
-                        title="View details"
+                        className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50"
+                        onClick={() => handleSendVerification(user.id)}
+                        disabled={processingIds.includes(user.id)}
+                        title="Send verification email"
                       >
-                        <FiEye size={16} />
+                        <FiSend size={16} />
                       </button>
-                      {user.status === "pending" && (
-                        <>
-                          <button
-                            className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
-                            onClick={() => approveUser(user.id)}
-                            title="Approve user"
-                          >
-                            <FiCheckCircle size={16} />
-                          </button>
-                          <button
-                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                            onClick={() => viewUserDetails(user)}
-                            title="Reject user"
-                          >
-                            <FiXCircle size={16} />
-                          </button>
-                        </>
-                      )}
+                      <button
+                        className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50"
+                        onClick={() => handleVerifyUser(user.id)}
+                        disabled={processingIds.includes(user.id)}
+                        title="Verify account"
+                      >
+                        <FiCheckCircle size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -474,162 +695,57 @@ export default function UserApprovalPage() {
           </table>
         </div>
 
-        {filteredUsers.length === 0 && (
+        {filteredUsers.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-2">
-              <FiUserPlus size={48} className="mx-auto" />
+              <FiCheckCircle size={48} className="mx-auto" />
             </div>
             <p className="text-gray-500 text-lg font-medium">
-              No pending requests
+              All accounts are verified
             </p>
-            <p className="text-gray-400 mt-1">
-              {searchTerm || statusFilter !== "all" || roleFilter !== "all"
-                ? "Try adjusting your search or filter criteria"
-                : "All user requests have been processed"}
+            <p className="text-gray-400 mt-1">No unverified accounts found</p>
+          </div>
+        )}
+
+        {loading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
+            <p className="text-gray-600 mt-2">Loading unverified users...</p>
+          </div>
+        )}
+
+        {/* Table Footer */}
+        {filteredUsers.length > 0 && (
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
+            <p className="text-sm text-gray-700 mb-4 sm:mb-0">
+              Showing{" "}
+              <span className="font-medium">{filteredUsers.length}</span> of{" "}
+              <span className="font-medium">{users.length}</span> unverified
+              users
             </p>
+            <div className="flex space-x-2">
+              <button
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1 || processingIds.length > 0}
+              >
+                Previous
+              </button>
+              <button
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={
+                  currentPage === totalPages || processingIds.length > 0
+                }
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>
-
-      {/* User Detail Modal */}
-      {showDetailModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  User Request Details
-                </h2>
-                <button
-                  onClick={() => {
-                    setShowDetailModal(false);
-                    setSelectedUser(null);
-                    setRejectionReason("");
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <FiX size={20} />
-                </button>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="flex items-center mb-6">
-                <div
-                  className={`flex-shrink-0 h-16 w-16 rounded-full flex items-center justify-center text-white text-xl ${selectedUser.avatarColor}`}
-                >
-                  {selectedUser.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {selectedUser.name}
-                  </h3>
-                  <p className="text-gray-500 flex items-center">
-                    <FiMail className="mr-1 text-gray-400" size={14} />
-                    {selectedUser.email}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-1">
-                    Department
-                  </h4>
-                  <p className="text-gray-900">{selectedUser.department}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-1">
-                    Requested Role
-                  </h4>
-                  <span
-                    className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getRoleClass(
-                      selectedUser.requestedRole
-                    )}`}
-                  >
-                    {selectedUser.requestedRole}
-                  </span>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-1">
-                    Requested At
-                  </h4>
-                  <p className="text-gray-900">
-                    {formatDate(selectedUser.requestedAt)}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </h4>
-                  <span
-                    className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusClass(
-                      selectedUser.status
-                    )}`}
-                  >
-                    {selectedUser.status.charAt(0).toUpperCase() +
-                      selectedUser.status.slice(1)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-1">
-                  Justification
-                </h4>
-                <p className="text-gray-900 bg-gray-50 p-4 rounded-lg">
-                  {selectedUser.justification}
-                </p>
-              </div>
-
-              {selectedUser.status === "pending" && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-1">
-                    Rejection Reason (if rejecting)
-                  </h4>
-                  <textarea
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    rows={3}
-                    placeholder="Provide a reason for rejection..."
-                    value={rejectionReason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
-                  />
-                </div>
-              )}
-            </div>
-            <div className="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
-              <button
-                className="px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
-                onClick={() => {
-                  setShowDetailModal(false);
-                  setSelectedUser(null);
-                  setRejectionReason("");
-                }}
-              >
-                Close
-              </button>
-              {selectedUser.status === "pending" && (
-                <>
-                  <button
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                    onClick={() => rejectUser(selectedUser.id)}
-                  >
-                    Reject Request
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                    onClick={() => approveUser(selectedUser.id)}
-                  >
-                    Approve Request
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
