@@ -1,7 +1,7 @@
-// app/dashboard/user/page.tsx
+// app/(admin)/admin/people/users/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   FiSearch,
@@ -20,106 +20,193 @@ import {
   FiLock,
 } from "react-icons/fi";
 
+// Enum values from Prisma
+enum UserRole {
+  DPO = "DPO",
+  BPH = "BPH",
+  PENGURUS = "PENGURUS",
+  ANGGOTA = "ANGGOTA",
+}
+
+enum Department {
+  INFOKOM = "INFOKOM",
+  PSDM = "PSDM",
+  LITBANG = "LITBANG",
+  KWU = "KWU",
+}
+
+enum Position {
+  KETUA_UMUM = "KETUA_UMUM",
+  WAKIL_KETUA_UMUM = "WAKIL_KETUA_UMUM",
+  SEKRETARIS = "SEKRETARIS",
+  BENDAHARA = "BENDAHARA",
+  KEPALA_DEPARTEMEN = "KEPALA_DEPARTEMEN",
+  STAFF_DEPARTEMEN = "STAFF_DEPARTEMEN",
+}
+
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  role: string;
-  status: "active" | "inactive" | "locked";
-  lastLogin: string;
-  department: string;
+  username: string;
+  role: UserRole;
+  department?: Department;
+  position?: Position;
+  isActive: boolean;
+  verifiedAccount: boolean;
+  attemptLogin: number;
+  blockExpires?: string;
+  createdAt: string;
+  updatedAt: string;
   avatarColor: string;
 }
 
-export default function UserAllPage() {
-  const router = useRouter();
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@organization.org",
-      role: "Administrator",
-      status: "active",
-      lastLogin: "2023-10-15 09:32:45",
-      department: "IT",
-      avatarColor: "bg-blue-500",
-    },
-    {
-      id: 2,
-      name: "Alice Smith",
-      email: "alice.smith@organization.org",
-      role: "Editor",
-      status: "active",
-      lastLogin: "2023-10-18 14:20:12",
-      department: "Marketing",
-      avatarColor: "bg-pink-500",
-    },
-    {
-      id: 3,
-      name: "Robert Johnson",
-      email: "robert.j@organization.org",
-      role: "Viewer",
-      status: "locked",
-      lastLogin: "2023-10-05 11:45:23",
-      department: "Finance",
-      avatarColor: "bg-purple-500",
-    },
-    {
-      id: 4,
-      name: "Emily Wilson",
-      email: "emily.wilson@organization.org",
-      role: "Manager",
-      status: "inactive",
-      lastLogin: "2023-09-28 16:30:55",
-      department: "HR",
-      avatarColor: "bg-green-500",
-    },
-    {
-      id: 5,
-      name: "Michael Brown",
-      email: "michael.b@organization.org",
-      role: "Editor",
-      status: "active",
-      lastLogin: "2023-10-19 08:12:37",
-      department: "Operations",
-      avatarColor: "bg-yellow-500",
-    },
-    {
-      id: 6,
-      name: "Sarah Davis",
-      email: "sarah.d@organization.org",
-      role: "Viewer",
-      status: "active",
-      lastLogin: "2023-10-20 10:35:21",
-      department: "IT",
-      avatarColor: "bg-red-500",
-    },
-    {
-      id: 7,
-      name: "David Miller",
-      email: "david.m@organization.org",
-      role: "Manager",
-      status: "inactive",
-      lastLogin: "2023-10-12 13:42:18",
-      department: "Operations",
-      avatarColor: "bg-indigo-500",
-    },
-    {
-      id: 8,
-      name: "Lisa Anderson",
-      email: "lisa.a@organization.org",
-      role: "Editor",
-      status: "active",
-      lastLogin: "2023-10-19 16:20:05",
-      department: "Marketing",
-      avatarColor: "bg-teal-500",
-    },
-  ]);
+interface CreateUserData {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+  role?: UserRole;
+  department?: Department;
+  position?: Position;
+  isActive?: boolean;
+}
 
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+interface UsersResponse {
+  users: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+}
+
+// Helper function to format enum values for display
+const formatEnumValue = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+// Get all enum values as options for select inputs
+const userRoleOptions = Object.values(UserRole).map((role) => ({
+  value: role,
+  label: formatEnumValue(role),
+}));
+
+const departmentOptions = Object.values(Department).map((dept) => ({
+  value: dept,
+  label: formatEnumValue(dept),
+}));
+
+class UserApi {
+  private static API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+
+  private static async fetchApi<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+        ...options,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error || "An error occurred" };
+      }
+
+      return { data };
+    } catch (_error) {
+      return { error: "Network error occurred" };
+    }
+  }
+
+  static async getUsers(params?: {
+    search?: string;
+    role?: UserRole;
+    department?: Department;
+    isActive?: boolean;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<UsersResponse>> {
+    const queryParams = new URLSearchParams();
+
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.role) queryParams.append("role", params.role);
+    if (params?.department) queryParams.append("department", params.department);
+    if (params?.isActive !== undefined) queryParams.append("isActive", params.isActive.toString());
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+
+    const queryString = queryParams.toString();
+    const endpoint = `/user${queryString ? `?${queryString}` : ""}`;
+
+    return this.fetchApi<UsersResponse>(endpoint);
+  }
+
+  static async createUser(
+    userData: CreateUserData
+  ): Promise<ApiResponse<User>> {
+    return this.fetchApi<User>("/user", {
+      method: "POST",
+      body: JSON.stringify(userData),
+    });
+  }
+
+  static async updateUser(
+    id: string,
+    userData: Partial<CreateUserData>
+  ): Promise<ApiResponse<User>> {
+    return this.fetchApi<User>(`/user/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(userData),
+    });
+  }
+
+  static async deleteUser(
+    id: string
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.fetchApi<{ message: string }>(`/user/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  static async toggleUserStatus(
+    id: string,
+    isActive: boolean
+  ): Promise<ApiResponse<User>> {
+    return this.updateUser(id, { isActive });
+  }
+}
+
+export default function UsersPage() {
+  const router = useRouter();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [roleFilter, setRoleFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState({
+    role: "" as UserRole | "",
+    department: "" as Department | "",
+    isActive: "",
+  });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -128,20 +215,68 @@ export default function UserAllPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [forceReset, setForceReset] = useState(false);
 
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await UserApi.getUsers({
+        search: searchTerm,
+        role: filters.role || undefined,
+        department: filters.department || undefined,
+        isActive: filters.isActive ? filters.isActive === "true" : undefined,
+        page: currentPage,
+        limit: 10,
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else if (response.data) {
+        const usersWithColors = response.data.users.map((user, index) => ({
+          ...user,
+          avatarColor: [
+            "bg-blue-500",
+            "bg-pink-500",
+            "bg-purple-500",
+            "bg-green-500",
+            "bg-yellow-500",
+            "bg-red-500",
+            "bg-indigo-500",
+            "bg-teal-500",
+          ][index % 8],
+        }));
+        setUsers(usersWithColors);
+        setTotalPages(response.data.pagination.pages);
+      }
+    } catch (_error) {
+      setError("Failed to fetch users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [searchTerm, currentPage, filters.role, filters.department]);
+
   // Filter users based on search term and filters
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.username.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
-      statusFilter === "all" || user.status === statusFilter;
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+      filters.isActive === "" ||
+      (filters.isActive === "true" && user.isActive) ||
+      (filters.isActive === "false" && !user.isActive);
+    const matchesRole = filters.role === "" || user.role === filters.role;
+    const matchesDepartment =
+      filters.department === "" || user.department === filters.department;
 
-    return matchesSearch && matchesStatus && matchesRole;
+    return matchesSearch && matchesStatus && matchesRole && matchesDepartment;
   });
 
   // Toggle user selection
-  const toggleUserSelection = (id: number) => {
+  const toggleUserSelection = (id: string) => {
     if (selectedUsers.includes(id)) {
       setSelectedUsers(selectedUsers.filter((userId) => userId !== id));
     } else {
@@ -164,7 +299,7 @@ export default function UserAllPage() {
   };
 
   // Navigate to edit user page
-  const handleEditUser = (id: number) => {
+  const handleEditUser = (id: string) => {
     router.push(`/admin/people/users/edit/${id}`);
   };
 
@@ -186,51 +321,71 @@ export default function UserAllPage() {
   };
 
   // Lock account
-  const handleLockAccount = (userId: number) => {
-    setUsers(
-      users.map((user) =>
-        user.id === userId ? { ...user, status: "locked" } : user
-      )
-    );
+  const handleLockAccount = async (userId: string) => {
+    try {
+      const response = await UserApi.toggleUserStatus(userId, false);
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Account locked successfully");
+        fetchUsers();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to lock account");
+    }
   };
 
   // Unlock account
-  const handleUnlockAccount = (userId: number) => {
-    setUsers(
-      users.map((user) =>
-        user.id === userId ? { ...user, status: "active" } : user
-      )
-    );
-  };
-
-  // Change user status
-  const handleChangeStatus = (
-    userId: number,
-    status: "active" | "inactive"
-  ) => {
-    setUsers(
-      users.map((user) => (user.id === userId ? { ...user, status } : user))
-    );
+  const handleUnlockAccount = async (userId: string) => {
+    try {
+      const response = await UserApi.toggleUserStatus(userId, true);
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Account unlocked successfully");
+        fetchUsers();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to unlock account");
+    }
   };
 
   // Execute deletion
-  const confirmDelete = () => {
-    if (currentUser) {
-      // Delete single user
-      setUsers(users.filter((user) => user.id !== currentUser.id));
-    } else if (selectedUsers.length > 0) {
-      // Delete multiple users
-      setUsers(users.filter((user) => !selectedUsers.includes(user.id)));
-      setSelectedUsers([]);
+  const confirmDelete = async () => {
+    try {
+      if (currentUser) {
+        // Delete single user
+        const response = await UserApi.deleteUser(currentUser.id);
+        if (response.error) {
+          setError(response.error);
+        } else {
+          setSuccess("User deleted successfully");
+          fetchUsers();
+        }
+      } else if (selectedUsers.length > 0) {
+        // Delete multiple users
+        for (const userId of selectedUsers) {
+          await UserApi.deleteUser(userId);
+        }
+        setSuccess(`${selectedUsers.length} users deleted successfully`);
+        setSelectedUsers([]);
+        fetchUsers();
+      }
+    } catch (_error) {
+      setError("Failed to delete user(s)");
+    } finally {
+      setShowDeleteModal(false);
+      setCurrentUser(null);
+      setTimeout(() => setSuccess(""), 3000);
     }
-    setShowDeleteModal(false);
-    setCurrentUser(null);
   };
 
   // Execute password reset
   const confirmPasswordReset = () => {
     if (newPassword !== confirmPassword) {
-      alert("Passwords don't match!");
+      setError("Passwords don't match!");
       return;
     }
 
@@ -242,46 +397,46 @@ export default function UserAllPage() {
     setCurrentUser(null);
     setNewPassword("");
     setConfirmPassword("");
+    setSuccess("Password reset successfully");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
   // Get status badge class
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "inactive":
-        return "bg-yellow-100 text-yellow-800";
-      case "locked":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  const getStatusClass = (isActive: boolean) =>
+    isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
 
   // Get role badge class
-  const getRoleClass = (role: string) => {
+  const getRoleClass = (role: UserRole) => {
     switch (role) {
-      case "Administrator":
+      case UserRole.DPO:
         return "bg-purple-100 text-purple-800";
-      case "Editor":
+      case UserRole.BPH:
         return "bg-blue-100 text-blue-800";
-      case "Manager":
+      case UserRole.PENGURUS:
         return "bg-indigo-100 text-indigo-800";
-      case "Viewer":
+      case UserRole.ANGGOTA:
         return "bg-gray-100 text-gray-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
-  // Format last login date
-  const formatLastLogin = (dateString: string) => {
+  // Format date
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return (
       date.toLocaleDateString() +
       " " +
-      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     );
+  };
+
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
   };
 
   return (
@@ -323,7 +478,7 @@ export default function UserAllPage() {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {users.filter((u) => u.status === "active").length}
+            {users.filter((u) => u.isActive).length}
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
@@ -336,23 +491,37 @@ export default function UserAllPage() {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {users.filter((u) => u.status === "inactive").length}
+            {users.filter((u) => !u.isActive).length}
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-medium text-gray-600">
-              Locked Accounts
+              Verified Emails
             </h3>
-            <div className="p-2 bg-red-100 rounded-lg">
-              <FiLock className="text-red-500" />
+            <div className="p-2 bg-green-100 rounded-lg">
+              <FiMail className="text-green-500" />
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {users.filter((u) => u.status === "locked").length}
+            {users.filter((u) => u.verifiedAccount).length}
           </p>
         </div>
       </div>
+
+      {/* Success Message */}
+      {success && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          {success}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
 
       {/* Filters and Search */}
       <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
@@ -363,7 +532,7 @@ export default function UserAllPage() {
             </div>
             <input
               type="text"
-              placeholder="Search users by name or email..."
+              placeholder="Search users by name, email or username..."
               className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -386,20 +555,19 @@ export default function UserAllPage() {
 
         {/* Advanced Filters */}
         {isFilterOpen && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
               <select
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                value={filters.isActive}
+                onChange={(e) => handleFilterChange("isActive", e.target.value)}
               >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="locked">Locked</option>
+                <option value="">All Status</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
               </select>
             </div>
             <div>
@@ -408,14 +576,34 @@ export default function UserAllPage() {
               </label>
               <select
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                value={filters.role}
+                onChange={(e) => handleFilterChange("role", e.target.value)}
               >
-                <option value="all">All Roles</option>
-                <option value="Administrator">Administrator</option>
-                <option value="Editor">Editor</option>
-                <option value="Viewer">Viewer</option>
-                <option value="Manager">Manager</option>
+                <option value="">All Roles</option>
+                {userRoleOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Department
+              </label>
+              <select
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={filters.department}
+                onChange={(e) =>
+                  handleFilterChange("department", e.target.value)
+                }
+              >
+                <option value="">All Departments</option>
+                {departmentOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex items-end">
@@ -484,7 +672,7 @@ export default function UserAllPage() {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Last Login
+                  Created At
                 </th>
                 <th
                   scope="col"
@@ -526,6 +714,9 @@ export default function UserAllPage() {
                           <FiMail className="mr-1 text-gray-400" size={14} />
                           {user.email}
                         </div>
+                        <div className="text-xs text-gray-400">
+                          @{user.username}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -535,24 +726,24 @@ export default function UserAllPage() {
                         user.role
                       )}`}
                     >
-                      {user.role}
+                      {formatEnumValue(user.role)}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {user.department}
+                    {user.department ? formatEnumValue(user.department) : "-"}
+                    {user.position && ` • ${formatEnumValue(user.position)}`}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
                       className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusClass(
-                        user.status
+                        user.isActive
                       )}`}
                     >
-                      {user.status.charAt(0).toUpperCase() +
-                        user.status.slice(1)}
+                      {user.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatLastLogin(user.lastLogin)}
+                    {formatDate(user.createdAt)}
                   </td>
                   <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
@@ -577,11 +768,11 @@ export default function UserAllPage() {
                       >
                         <FiKey size={16} />
                       </button>
-                      {user.status === "locked" ? (
+                      {!user.isActive ? (
                         <button
                           className="p-1.5 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors"
                           onClick={() => handleUnlockAccount(user.id)}
-                          title="Unlock account"
+                          title="Activate account"
                         >
                           <FiUnlock size={16} />
                         </button>
@@ -589,31 +780,9 @@ export default function UserAllPage() {
                         <button
                           className="p-1.5 rounded-lg text-orange-600 hover:bg-orange-50 transition-colors"
                           onClick={() => handleLockAccount(user.id)}
-                          title="Lock account"
+                          title="Deactivate account"
                         >
                           <FiLock size={16} />
-                        </button>
-                      )}
-                      {user.status !== "locked" && (
-                        <button
-                          className="p-1.5 rounded-lg text-yellow-600 hover:bg-yellow-50 transition-colors"
-                          onClick={() =>
-                            handleChangeStatus(
-                              user.id,
-                              user.status === "active" ? "inactive" : "active"
-                            )
-                          }
-                          title={
-                            user.status === "active"
-                              ? "Deactivate account"
-                              : "Activate account"
-                          }
-                        >
-                          {user.status === "active" ? (
-                            <FiUserX size={16} />
-                          ) : (
-                            <FiUserCheck size={16} />
-                          )}
                         </button>
                       )}
                     </div>
@@ -624,7 +793,7 @@ export default function UserAllPage() {
           </table>
         </div>
 
-        {filteredUsers.length === 0 && (
+        {filteredUsers.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-2">
               <FiUsers size={48} className="mx-auto" />
@@ -633,6 +802,13 @@ export default function UserAllPage() {
             <p className="text-gray-400 mt-1">
               Try adjusting your search or filter criteria
             </p>
+          </div>
+        )}
+
+        {loading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
+            <p className="text-gray-600 mt-2">Loading users...</p>
           </div>
         )}
 
@@ -645,10 +821,20 @@ export default function UserAllPage() {
               <span className="font-medium">{users.length}</span> users
             </p>
             <div className="flex space-x-2">
-              <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
+              <button
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
                 Previous
               </button>
-              <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
+              <button
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+              >
                 Next
               </button>
             </div>
