@@ -59,8 +59,8 @@ export async function POST(request: Request) {
         username: username.trim().toLowerCase(),
         password: hashedPassword,
         role: UserRole.ANGGOTA,
-        isActive: true,
-        verifiedEmail: false,
+        isActive: false,
+        verifiedAccount: false,
         attemptLogin: 0,
       },
     });

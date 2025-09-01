@@ -31,7 +31,7 @@ export async function GET(req: Request) {
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });
 
-    return NextResponse.redirect(new URL("/admin/drive", req.url));
+    return NextResponse.redirect(new URL("/admin/dashboard/overview", req.url));
   } catch (error) {
     return NextResponse.json({
       error: "Failed to exchange code for access token" + error,
