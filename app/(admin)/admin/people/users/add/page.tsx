@@ -1,3 +1,4 @@
+// app/(admin)/admin/people/users/add/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -12,43 +13,107 @@ import {
 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 
-interface Department {
-  id: number;
-  name: string;
+// Enum values from Prisma
+enum UserRole {
+  DPO = "DPO",
+  BPH = "BPH",
+  PENGURUS = "PENGURUS",
+  ANGGOTA = "ANGGOTA",
 }
 
-interface Role {
-  id: number;
+enum Department {
+  INFOKOM = "INFOKOM",
+  PSDM = "PSDM",
+  LITBANG = "LITBANG",
+  KWU = "KWU",
+}
+
+enum Position {
+  KETUA_UMUM = "KETUA_UMUM",
+  WAKIL_KETUA_UMUM = "WAKIL_KETUA_UMUM",
+  SEKRETARIS = "SEKRETARIS",
+  BENDAHARA = "BENDAHARA",
+  KEPALA_DEPARTEMEN = "KEPALA_DEPARTEMEN",
+  STAFF_DEPARTEMEN = "STAFF_DEPARTEMEN",
+}
+
+// Helper function to format enum values for display
+const formatEnumValue = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+interface CreateUserData {
   name: string;
+  email: string;
+  username: string;
+  password: string;
+  role?: UserRole;
+  department?: Department;
+  position?: Position;
+  isActive?: boolean;
+}
+
+interface ApiResponse<T = unknown> {
+  data?: T;
+  error?: string;
+}
+
+class UserApi {
+  private static API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+
+  private static async fetchApi<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+        ...options,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error || "An error occurred" };
+      }
+
+      return { data };
+    } catch (error) {
+      console.error("API Error:", error);
+      return { error: "Network error occurred" };
+    }
+  }
+
+  static async createUser(userData: CreateUserData): Promise<ApiResponse> {
+    return this.fetchApi("/user", {
+      method: "POST",
+      body: JSON.stringify(userData),
+    });
+  }
 }
 
 export default function AddUserPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState<CreateUserData>({
     name: "",
     email: "",
-    role: "",
-    department: "",
-    status: "active",
-    sendWelcomeEmail: true,
-    requirePasswordChange: false,
+    username: "",
+    password: "",
+    role: UserRole.ANGGOTA,
+    department: undefined,
+    position: undefined,
+    isActive: true,
   });
 
-  const departments: Department[] = [
-    { id: 1, name: "IT" },
-    { id: 2, name: "Marketing" },
-    { id: 3, name: "Finance" },
-    { id: 4, name: "HR" },
-    { id: 5, name: "Operations" },
-  ];
-
-  const roles: Role[] = [
-    { id: 1, name: "Administrator" },
-    { id: 2, name: "Editor" },
-    { id: 3, name: "Viewer" },
-    { id: 4, name: "Manager" },
-  ];
+  const [formErrors, setFormErrors] = useState<Partial<CreateUserData>>({});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -59,17 +124,85 @@ export default function AddUserPage() {
       [name]:
         type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
+
+    // Clear error when field is changed
+    if (formErrors[name as keyof CreateUserData]) {
+      setFormErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Partial<CreateUserData> = {};
+
+    if (!formData.name.trim()) errors.name = "Name is required";
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid";
+    }
+    if (!formData.username.trim()) errors.username = "Username is required";
+    if (!formData.password) {
+      errors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
+    setError("");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await UserApi.createUser(formData);
 
-    // After successful submission, redirect to user list
-    router.push("/dashboard/user");
+      if (response.error) {
+        setError(response.error);
+      } else {
+        // After successful submission, redirect to user list
+        router.push("/admin/people/users");
+      }
+    } catch (err) {
+      console.error("Submission error:", err);
+      setError("Failed to create user. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const generateUsernameFromEmail = (email: string): string => {
+    if (!email || !email.includes("@")) return "";
+
+    const baseUsername = email
+      .split("@")[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "")
+      .replace(/^[^a-z]+/, "") // Remove leading non-letters
+      .replace(/[^a-z0-9]+$/, ""); // Remove trailing non-alphanumeric
+
+    // Ensure minimum length of 3 characters
+    if (baseUsername.length < 3) {
+      return baseUsername + Math.random().toString(36).substring(2, 5);
+    }
+
+    // Limit maximum length to 20 characters
+    return baseUsername.substring(0, 20);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      email,
+      username: prev.username || generateUsernameFromEmail(email),
+    }));
+    handleChange(e);
   };
 
   return (
@@ -84,6 +217,12 @@ export default function AddUserPage() {
         </button>
         <h1 className="text-2xl font-bold text-gray-800">Add New User</h1>
       </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <form onSubmit={handleSubmit}>
@@ -106,6 +245,9 @@ export default function AddUserPage() {
                   placeholder="Enter full name"
                 />
               </div>
+              {formErrors.name && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+              )}
             </div>
 
             <div>
@@ -121,11 +263,39 @@ export default function AddUserPage() {
                   name="email"
                   required
                   value={formData.email}
-                  onChange={handleChange}
+                  onChange={handleEmailChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter email address"
                 />
               </div>
+              {formErrors.email && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Username *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiUser className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  required
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter username"
+                />
+              </div>
+              {formErrors.username && (
+                <p className="text-red-500 text-xs mt-1">
+                  {formErrors.username}
+                </p>
+              )}
             </div>
 
             <div>
@@ -143,10 +313,9 @@ export default function AddUserPage() {
                   onChange={handleChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                 >
-                  <option value="">Select a role</option>
-                  {roles.map((role) => (
-                    <option key={role.id} value={role.name}>
-                      {role.name}
+                  {Object.values(UserRole).map((role) => (
+                    <option key={role} value={role}>
+                      {formatEnumValue(role)}
                     </option>
                   ))}
                 </select>
@@ -168,7 +337,7 @@ export default function AddUserPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Department *
+                Department
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -176,15 +345,51 @@ export default function AddUserPage() {
                 </div>
                 <select
                   name="department"
-                  required
-                  value={formData.department}
+                  value={formData.department || ""}
                   onChange={handleChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                 >
                   <option value="">Select a department</option>
-                  {departments.map((dept) => (
-                    <option key={dept.id} value={dept.name}>
-                      {dept.name}
+                  {Object.values(Department).map((dept) => (
+                    <option key={dept} value={dept}>
+                      {formatEnumValue(dept)}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Position
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiUsers className="text-gray-400" />
+                </div>
+                <select
+                  name="position"
+                  value={formData.position || ""}
+                  onChange={handleChange}
+                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                >
+                  <option value="">Select a position</option>
+                  {Object.values(Position).map((pos) => (
+                    <option key={pos} value={pos}>
+                      {formatEnumValue(pos)}
                     </option>
                   ))}
                 </select>
@@ -213,14 +418,19 @@ export default function AddUserPage() {
                   <FiLock className="text-gray-400" />
                 </div>
                 <select
-                  name="status"
+                  name="isActive"
                   required
-                  value={formData.status}
-                  onChange={handleChange}
+                  value={formData.isActive ? "true" : "false"}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isActive: e.target.value === "true",
+                    }))
+                  }
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                 >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                   <svg
@@ -248,55 +458,22 @@ export default function AddUserPage() {
                 </div>
                 <input
                   type="password"
+                  name="password"
                   required
+                  value={formData.password}
+                  onChange={handleChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Set a password"
+                  placeholder="Set a password (min. 6 characters)"
                 />
               </div>
+              {formErrors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {formErrors.password}
+                </p>
+              )}
               <p className="text-xs text-gray-500 mt-1">
-                Password must be at least 8 characters long and include
-                uppercase, lowercase, and numbers.
+                Password must be at least 6 characters long.
               </p>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-200 pt-6 mb-6">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">
-              Additional Options
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="sendWelcomeEmail"
-                  name="sendWelcomeEmail"
-                  checked={formData.sendWelcomeEmail}
-                  onChange={handleChange}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                />
-                <label
-                  htmlFor="sendWelcomeEmail"
-                  className="ml-2 text-sm text-gray-700"
-                >
-                  Send welcome email with account details
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="requirePasswordChange"
-                  name="requirePasswordChange"
-                  checked={formData.requirePasswordChange}
-                  onChange={handleChange}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                />
-                <label
-                  htmlFor="requirePasswordChange"
-                  className="ml-2 text-sm text-gray-700"
-                >
-                  Require password change at first login
-                </label>
-              </div>
             </div>
           </div>
 
