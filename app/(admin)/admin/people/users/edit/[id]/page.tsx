@@ -1,6 +1,7 @@
+// app/(admin)/admin/people/users/edit/[id]/page.tsx
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   FiUser,
   FiMail,
@@ -14,70 +15,118 @@ import {
 } from "react-icons/fi";
 import { useRouter, useParams } from "next/navigation";
 
+// Enum values from Prisma
+enum UserRole {
+  DPO = "DPO",
+  BPH = "BPH",
+  PENGURUS = "PENGURUS",
+  ANGGOTA = "ANGGOTA",
+}
+
+enum Department {
+  INFOKOM = "INFOKOM",
+  PSDM = "PSDM",
+  LITBANG = "LITBANG",
+  KWU = "KWU",
+}
+
+enum Position {
+  KETUA_UMUM = "KETUA_UMUM",
+  WAKIL_KETUA_UMUM = "WAKIL_KETUA_UMUM",
+  SEKRETARIS = "SEKRETARIS",
+  BENDAHARA = "BENDAHARA",
+  KEPALA_DEPARTEMEN = "KEPALA_DEPARTEMEN",
+  STAFF_DEPARTEMEN = "STAFF_DEPARTEMEN",
+}
+
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  role: string;
-  status: "active" | "inactive" | "locked";
-  lastLogin: string;
-  department: string;
+  username: string;
+  role: UserRole;
+  department?: Department;
+  position?: Position;
+  isActive: boolean;
+  verifiedAccount: boolean;
+  attemptLogin: number;
+  blockExpires?: string;
+  createdAt: string;
+  updatedAt: string;
   avatarColor: string;
 }
 
-interface Department {
-  id: number;
-  name: string;
+interface UpdateUserData {
+  name?: string;
+  email?: string;
+  username?: string;
+  password?: string;
+  role?: UserRole;
+  department?: Department;
+  position?: Position;
+  isActive?: boolean;
 }
 
-interface Role {
-  id: number;
-  name: string;
-}
+// Helper function to format enum values for display
+const formatEnumValue = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
 
-// Sample user data moved outside component to make it stable
-const sampleUsers: User[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@organization.org",
-    role: "Administrator",
-    status: "active",
-    lastLogin: "2023-10-15 09:32:45",
-    department: "IT",
-    avatarColor: "bg-blue-500",
-  },
-  {
-    id: 2,
-    name: "Alice Smith",
-    email: "alice.smith@organization.org",
-    role: "Editor",
-    status: "active",
-    lastLogin: "2023-10-18 14:20:12",
-    department: "Marketing",
-    avatarColor: "bg-pink-500",
-  },
-  {
-    id: 3,
-    name: "Robert Johnson",
-    email: "robert.j@organization.org",
-    role: "Viewer",
-    status: "locked",
-    lastLogin: "2023-10-05 11:45:23",
-    department: "Finance",
-    avatarColor: "bg-purple-500",
-  },
-  {
-    id: 4,
-    name: "Emily Wilson",
-    email: "emily.wilson@organization.org",
-    role: "Manager",
-    status: "inactive",
-    lastLogin: "2023-09-28 16:30:55",
-    department: "HR",
-    avatarColor: "bg-green-500",
-  },
-];
+class UserApi {
+  private static API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+
+  private static async fetchApi<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<{ data?: T; error?: string }> {
+    try {
+      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+        ...options,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: data.error || "An error occurred" };
+      }
+
+      return { data };
+    } catch (_error) {
+      return { error: "Network error occurred" };
+    }
+  }
+
+  static async getUserById(
+    id: string
+  ): Promise<{ data?: User; error?: string }> {
+    return this.fetchApi<User>(`/user/${id}`);
+  }
+
+  static async updateUser(
+    id: string,
+    userData: UpdateUserData
+  ): Promise<{ data?: User; error?: string }> {
+    return this.fetchApi<User>(`/user/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(userData),
+    });
+  }
+
+  static async deleteUser(
+    id: string
+  ): Promise<{ data?: { message: string }; error?: string }> {
+    return this.fetchApi<{ message: string }>(`/user/${id}`, {
+      method: "DELETE",
+    });
+  }
+}
 
 export default function EditUserPage() {
   const router = useRouter();
@@ -88,57 +137,49 @@ export default function EditUserPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState({
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+  const [formData, setFormData] = useState<UpdateUserData>({
     name: "",
     email: "",
-    role: "",
-    department: "",
-    status: "active" as "active" | "inactive" | "locked",
+    username: "",
     password: "",
+    role: UserRole.ANGGOTA,
+    department: undefined,
+    position: undefined,
+    isActive: true,
   });
 
-  // Using useMemo for arrays that are defined inside component
-  const departments = useMemo<Department[]>(
-    () => [
-      { id: 1, name: "IT" },
-      { id: 2, name: "Marketing" },
-      { id: 3, name: "Finance" },
-      { id: 4, name: "HR" },
-      { id: 5, name: "Operations" },
-    ],
-    []
-  );
-
-  const roles = useMemo<Role[]>(
-    () => [
-      { id: 1, name: "Administrator" },
-      { id: 2, name: "Editor" },
-      { id: 3, name: "Viewer" },
-      { id: 4, name: "Manager" },
-    ],
-    []
-  );
+  const [formErrors, setFormErrors] = useState<Partial<UpdateUserData>>({});
 
   useEffect(() => {
-    // Simulate fetching user data
     const fetchUser = async () => {
-      // In a real app, you would fetch from an API
-      const foundUser = sampleUsers.find((u) => u.id === parseInt(userId));
-      if (foundUser) {
-        setUser(foundUser);
-        setFormData({
-          name: foundUser.name,
-          email: foundUser.email,
-          role: foundUser.role,
-          department: foundUser.department,
-          status: foundUser.status,
-          password: "",
-        });
+      try {
+        const response = await UserApi.getUserById(userId);
+
+        if (response.error) {
+          setError(response.error);
+        } else if (response.data) {
+          const userData = response.data;
+          setUser(userData);
+          setFormData({
+            name: userData.name,
+            email: userData.email,
+            username: userData.username,
+            password: "",
+            role: userData.role,
+            department: userData.department,
+            position: userData.position,
+            isActive: userData.isActive,
+          });
+        }
+      } catch (_error) {
+        setError("Failed to fetch user data");
       }
     };
 
     fetchUser();
-  }, [userId]); // Now sampleUsers is stable and doesn't need to be in dependencies
+  }, [userId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -148,27 +189,74 @@ export default function EditUserPage() {
       ...prev,
       [name]: value,
     }));
+
+    // Clear error when field is changed
+    if (formErrors[name as keyof UpdateUserData]) {
+      setFormErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Partial<UpdateUserData> = {};
+
+    if (!formData.name?.trim()) errors.name = "Name is required";
+    if (!formData.email?.trim()) errors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
+    if (!formData.username?.trim()) errors.username = "Username is required";
+    if (formData.password && formData.password.length < 6) errors.password = "Password must be at least 6 characters";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
+    setError("");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await UserApi.updateUser(userId, formData);
 
-    // After successful update, redirect to user list
-    router.push("/dashboard/user");
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("User updated successfully");
+        setTimeout(() => {
+          router.push("/admin/people/users");
+        }, 1000);
+      }
+    } catch (_error) {
+      setError("Failed to update user. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleDelete = async () => {
     setIsDeleting(true);
+    setError("");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await UserApi.deleteUser(userId);
 
-    // After successful deletion, redirect to user list
-    router.push("/dashboard/user");
+      if (response.error) {
+        setError(response.error);
+        setShowDeleteModal(false);
+      } else {
+        setSuccess("User deleted successfully");
+        setTimeout(() => {
+          router.push("/admin/people/users");
+        }, 1000);
+      }
+    } catch (_error) {
+      setError("Failed to delete user. Please try again.");
+      setShowDeleteModal(false);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (!user) {
@@ -201,6 +289,18 @@ export default function EditUserPage() {
         </button>
       </div>
 
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+          {success}
+        </div>
+      )}
+
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6">
         <div className="flex items-center mb-6">
           <div
@@ -215,7 +315,7 @@ export default function EditUserPage() {
             <h2 className="text-xl font-semibold text-gray-800">{user.name}</h2>
             <p className="text-gray-600">{user.email}</p>
             <p className="text-sm text-gray-500">
-              Last login: {user.lastLogin}
+              Member since: {new Date(user.createdAt).toLocaleDateString()}
             </p>
           </div>
         </div>
@@ -234,12 +334,15 @@ export default function EditUserPage() {
                   type="text"
                   name="name"
                   required
-                  value={formData.name}
+                  value={formData.name || ""}
                   onChange={handleChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter full name"
                 />
               </div>
+              {formErrors.name && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+              )}
             </div>
 
             <div>
@@ -254,12 +357,40 @@ export default function EditUserPage() {
                   type="email"
                   name="email"
                   required
-                  value={formData.email}
+                  value={formData.email || ""}
                   onChange={handleChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter email address"
                 />
               </div>
+              {formErrors.email && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Username *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiUser className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  required
+                  value={formData.username || ""}
+                  onChange={handleChange}
+                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter username"
+                />
+              </div>
+              {formErrors.username && (
+                <p className="text-red-500 text-xs mt-1">
+                  {formErrors.username}
+                </p>
+              )}
             </div>
 
             <div>
@@ -273,14 +404,13 @@ export default function EditUserPage() {
                 <select
                   name="role"
                   required
-                  value={formData.role}
+                  value={formData.role || UserRole.ANGGOTA}
                   onChange={handleChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                 >
-                  <option value="">Select a role</option>
-                  {roles.map((role) => (
-                    <option key={role.id} value={role.name}>
-                      {role.name}
+                  {Object.values(UserRole).map((role) => (
+                    <option key={role} value={role}>
+                      {formatEnumValue(role)}
                     </option>
                   ))}
                 </select>
@@ -302,7 +432,7 @@ export default function EditUserPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Department *
+                Department
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -310,15 +440,51 @@ export default function EditUserPage() {
                 </div>
                 <select
                   name="department"
-                  required
-                  value={formData.department}
+                  value={formData.department || ""}
                   onChange={handleChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                 >
                   <option value="">Select a department</option>
-                  {departments.map((dept) => (
-                    <option key={dept.id} value={dept.name}>
-                      {dept.name}
+                  {Object.values(Department).map((dept) => (
+                    <option key={dept} value={dept}>
+                      {formatEnumValue(dept)}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Position
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiUsers className="text-gray-400" />
+                </div>
+                <select
+                  name="position"
+                  value={formData.position || ""}
+                  onChange={handleChange}
+                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                >
+                  <option value="">Select a position</option>
+                  {Object.values(Position).map((pos) => (
+                    <option key={pos} value={pos}>
+                      {formatEnumValue(pos)}
                     </option>
                   ))}
                 </select>
@@ -347,15 +513,19 @@ export default function EditUserPage() {
                   <FiLock className="text-gray-400" />
                 </div>
                 <select
-                  name="status"
+                  name="isActive"
                   required
-                  value={formData.status}
-                  onChange={handleChange}
+                  value={formData.isActive ? "true" : "false"}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isActive: e.target.value === "true",
+                    }))
+                  }
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                 >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="locked">Locked</option>
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                   <svg
@@ -375,7 +545,7 @@ export default function EditUserPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reset Password
+                New Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -384,12 +554,20 @@ export default function EditUserPage() {
                 <input
                   type="password"
                   name="password"
-                  value={formData.password}
+                  value={formData.password || ""}
                   onChange={handleChange}
                   className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Leave blank to keep current"
                 />
               </div>
+              {formErrors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {formErrors.password}
+                </p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Minimum 6 characters. Leave empty to keep current password.
+              </p>
             </div>
           </div>
 
