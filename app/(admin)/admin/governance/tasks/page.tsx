@@ -1,4 +1,3 @@
-// app/dashboard/organizational-structure/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -10,131 +9,280 @@ import {
   FiEdit,
   FiTrash2,
   FiEye,
-  FiDownload,
+  FiCheckCircle,
+  FiClock,
   FiX,
   FiChevronDown,
-  FiClock,
-  FiCheckCircle,
-  FiArrowUp,
-  FiArrowDown,
-  FiUsers,
-  FiFile,
+  FiUser,
+  FiList,
+  FiCheckSquare,
+  FiAlertCircle,
 } from "react-icons/fi";
 
-interface OrganizationalStructure {
-  id: string;
-  name: string;
-  status: "PENDING" | "APPROVED" | "REJECTED" | "ARCHIVED";
-  order: number;
-  fileUrl?: string;
-  mimeType?: string;
-  fileSize?: number;
-  createdAt: string;
-  updatedAt: string;
+// Enum Department
+enum Department {
+  INFOKOM = "INFOKOM",
+  PSDM = "PSDM",
+  LITBANG = "LITBANG",
+  KWU = "KWU",
 }
 
-export default function OrganizationalStructurePage() {
+// Enum Status
+enum Status {
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+  REJECTED = "REJECTED",
+  ARCHIVED = "ARCHIVED",
+}
+
+interface DepartmentTask {
+  id: string;
+  note: string;
+  department: Department;
+  userId?: string;
+  status: Status;
+  createdAt: string;
+  updatedAt: string;
+  // Relations
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  approvals: {
+    id: string;
+    status: Status;
+    createdAt: string;
+    user: {
+      name: string;
+    };
+  }[];
+}
+
+export default function DepartmentTaskManagementPage() {
   const router = useRouter();
-  const [structures, setStructures] = useState<OrganizationalStructure[]>([
+  const [tasks, setTasks] = useState<DepartmentTask[]>([
     {
       id: "1",
-      name: "Struktur Organisasi 2023",
-      status: "APPROVED",
-      order: 1,
-      fileUrl: "/documents/org-structure-2023.pdf",
-      mimeType: "application/pdf",
-      fileSize: 2048576,
-      createdAt: "2023-01-15T09:32:45Z",
-      updatedAt: "2023-01-18T14:20:12Z",
+      note: "Mempersiapkan materi webinar teknologi terkini",
+      department: Department.INFOKOM,
+      userId: "user1",
+      status: Status.COMPLETED,
+      createdAt: "2023-05-10T08:30:45Z",
+      updatedAt: "2023-05-12T14:20:12Z",
+      user: {
+        id: "user1",
+        name: "Ahmad Rizki",
+        email: "ahmad.rizki@example.com",
+      },
+      approvals: [
+        {
+          id: "app1",
+          status: Status.APPROVED,
+          createdAt: "2023-05-11T10:15:30Z",
+          user: {
+            name: "Manager INFOKOM",
+          },
+        },
+      ],
     },
     {
       id: "2",
-      name: "Struktur Divisi Teknologi",
-      status: "PENDING",
-      order: 2,
-      fileUrl: "/documents/tech-division-structure.pdf",
-      mimeType: "application/pdf",
-      fileSize: 1536921,
-      createdAt: "2023-02-10T14:20:12Z",
-      updatedAt: "2023-02-10T14:20:12Z",
+      note: "Melakukan recruitment anggota baru departemen PSDM",
+      department: Department.PSDM,
+      userId: "user2",
+      status: Status.IN_PROGRESS,
+      createdAt: "2023-06-15T09:20:33Z",
+      updatedAt: "2023-06-20T16:45:22Z",
+      user: {
+        id: "user2",
+        name: "Siti Rahayu",
+        email: "siti.rahayu@example.com",
+      },
+      approvals: [],
     },
     {
       id: "3",
-      name: "Struktur Tim Proyek A",
-      status: "APPROVED",
-      order: 3,
-      fileUrl: "/documents/project-a-team-structure.docx",
-      mimeType:
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      fileSize: 512432,
-      createdAt: "2023-03-05T11:45:23Z",
-      updatedAt: "2023-03-07T13:42:18Z",
+      note: "Menelitian inovasi produk terbaru untuk tahun 2023",
+      department: Department.LITBANG,
+      userId: "user3",
+      status: Status.PENDING,
+      createdAt: "2023-07-05T11:45:18Z",
+      updatedAt: "2023-07-05T11:45:18Z",
+      user: {
+        id: "user3",
+        name: "Budi Santoso",
+        email: "budi.santoso@example.com",
+      },
+      approvals: [],
     },
     {
       id: "4",
-      name: "Struktur Organisasi 2022",
-      status: "ARCHIVED",
-      order: 4,
-      fileUrl: "/documents/org-structure-2022.pdf",
-      mimeType: "application/pdf",
-      fileSize: 1987654,
-      createdAt: "2022-12-20T16:30:55Z",
-      updatedAt: "2023-01-10T09:15:22Z",
+      note: "Mengelola keuangan dan pembukuan untuk event bazaar",
+      department: Department.KWU,
+      userId: "user4",
+      status: Status.REJECTED,
+      createdAt: "2023-08-01T14:30:55Z",
+      updatedAt: "2023-08-03T09:15:40Z",
+      user: {
+        id: "user4",
+        name: "Dewi Anggraini",
+        email: "dewi.anggraini@example.com",
+      },
+      approvals: [
+        {
+          id: "app2",
+          status: Status.REJECTED,
+          createdAt: "2023-08-02T16:20:25Z",
+          user: {
+            name: "Manager KWU",
+          },
+        },
+      ],
     },
     {
       id: "5",
-      name: "Struktur Komite Direksi",
-      status: "REJECTED",
-      order: 5,
-      fileUrl: "/documents/board-committee-structure.pdf",
-      mimeType: "application/pdf",
-      fileSize: 3072000,
-      createdAt: "2023-04-18T08:12:37Z",
-      updatedAt: "2023-04-20T10:35:21Z",
+      note: "Memperbarui website organisasi dengan konten terbaru",
+      department: Department.INFOKOM,
+      status: Status.PENDING,
+      createdAt: "2023-08-10T10:15:27Z",
+      updatedAt: "2023-08-10T10:15:27Z",
+      approvals: [],
+    },
+    {
+      id: "6",
+      note: "Menyusun program mentoring untuk anggota baru",
+      department: Department.PSDM,
+      userId: "user2",
+      status: Status.COMPLETED,
+      createdAt: "2023-06-25T13:30:10Z",
+      updatedAt: "2023-07-05T11:20:35Z",
+      user: {
+        id: "user2",
+        name: "Siti Rahayu",
+        email: "siti.rahayu@example.com",
+      },
+      approvals: [
+        {
+          id: "app3",
+          status: Status.APPROVED,
+          createdAt: "2023-07-01T09:45:15Z",
+          user: {
+            name: "Manager PSDM",
+          },
+        },
+      ],
+    },
+    {
+      id: "7",
+      note: "Mengarsipkan dokumen penelitian tahun sebelumnya",
+      department: Department.LITBANG,
+      userId: "user3",
+      status: Status.ARCHIVED,
+      createdAt: "2023-07-20T15:45:22Z",
+      updatedAt: "2023-07-25T10:30:18Z",
+      user: {
+        id: "user3",
+        name: "Budi Santoso",
+        email: "budi.santoso@example.com",
+      },
+      approvals: [
+        {
+          id: "app4",
+          status: Status.APPROVED,
+          createdAt: "2023-07-22T14:15:30Z",
+          user: {
+            name: "Manager LITBANG",
+          },
+        },
+      ],
     },
   ]);
 
-  const [selectedStructures, setSelectedStructures] = useState<string[]>([]);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [departmentFilter, setDepartmentFilter] = useState<Department | "all">(
+    "all"
+  );
+  const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
+  const [assignedFilter, setAssignedFilter] = useState<string>("all");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [currentStructure, setCurrentStructure] =
-    useState<OrganizationalStructure | null>(null);
+  const [currentTask, setCurrentTask] = useState<DepartmentTask | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortField, setSortField] = useState("order");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-  // Filter structures based on search term and filters
-  const filteredStructures = structures.filter((structure) => {
-    const matchesSearch = structure.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+  // Get unique users for filter
+  const users = Array.from(
+    new Set(tasks.map((t) => t.user?.id).filter(Boolean))
+  )
+    .map((id) => {
+      const task = tasks.find((t) => t.user?.id === id);
+      return task?.user;
+    })
+    .filter(Boolean) as { id: string; name: string; email: string }[];
+
+  // Filter tasks based on search term and filters
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch =
+      task.note.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      false;
+
+    const matchesDepartment =
+      departmentFilter === "all" || task.department === departmentFilter;
     const matchesStatus =
-      statusFilter === "all" || structure.status === statusFilter;
+      statusFilter === "all" || task.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    let matchesAssigned = true;
+    if (assignedFilter !== "all") {
+      if (assignedFilter === "assigned") {
+        matchesAssigned = !!task.userId;
+      } else if (assignedFilter === "unassigned") {
+        matchesAssigned = !task.userId;
+      } else {
+        matchesAssigned = task.userId === assignedFilter;
+      }
+    }
+
+    return (
+      matchesSearch && matchesDepartment && matchesStatus && matchesAssigned
+    );
   });
 
-  // Sort structures
-  const sortedStructures = [...filteredStructures].sort((a, b) => {
+  // Sort tasks
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
     let aValue, bValue;
 
     switch (sortField) {
-      case "name":
-        aValue = a.name;
-        bValue = b.name;
+      case "note":
+        aValue = a.note;
+        bValue = b.note;
         break;
-      case "order":
-        aValue = a.order;
-        bValue = b.order;
+      case "department":
+        aValue = a.department;
+        bValue = b.department;
+        break;
+      case "status":
+        aValue = a.status;
+        bValue = b.status;
+        break;
+      case "user":
+        aValue = a.user?.name || "";
+        bValue = b.user?.name || "";
         break;
       case "createdAt":
         aValue = a.createdAt;
         bValue = b.createdAt;
         break;
+      case "updatedAt":
+        aValue = a.updatedAt;
+        bValue = b.updatedAt;
+        break;
       default:
-        aValue = a.order;
-        bValue = b.order;
+        aValue = a.createdAt;
+        bValue = b.createdAt;
     }
 
     if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
@@ -142,25 +290,21 @@ export default function OrganizationalStructurePage() {
     return 0;
   });
 
-  // Toggle structure selection
-  const toggleStructureSelection = (id: string) => {
-    if (selectedStructures.includes(id)) {
-      setSelectedStructures(
-        selectedStructures.filter((structureId) => structureId !== id)
-      );
+  // Toggle task selection
+  const toggleTaskSelection = (id: string) => {
+    if (selectedTasks.includes(id)) {
+      setSelectedTasks(selectedTasks.filter((taskId) => taskId !== id));
     } else {
-      setSelectedStructures([...selectedStructures, id]);
+      setSelectedTasks([...selectedTasks, id]);
     }
   };
 
-  // Select all structures on current page
+  // Select all tasks on current page
   const toggleSelectAll = () => {
-    if (selectedStructures.length === filteredStructures.length) {
-      setSelectedStructures([]);
+    if (selectedTasks.length === filteredTasks.length) {
+      setSelectedTasks([]);
     } else {
-      setSelectedStructures(
-        filteredStructures.map((structure) => structure.id)
-      );
+      setSelectedTasks(filteredTasks.map((task) => task.id));
     }
   };
 
@@ -174,113 +318,120 @@ export default function OrganizationalStructurePage() {
     }
   };
 
-  // Navigate to add structure page
-  const handleAddStructure = () => {
-    router.push("/dashboard/organizational-structure/create");
+  // Navigate to add task page
+  const handleAddTask = () => {
+    router.push("/dashboard/department-tasks/create");
   };
 
-  // Navigate to edit structure page
-  const handleEditStructure = (id: string) => {
-    router.push(`/dashboard/organizational-structure/edit/${id}`);
+  // Navigate to edit task page
+  const handleEditTask = (id: string) => {
+    router.push(`/dashboard/department-tasks/edit/${id}`);
   };
 
-  // View structure details
-  const handleViewStructure = (id: string) => {
-    router.push(`/dashboard/organizational-structure/view/${id}`);
+  // View task details
+  const handleViewTask = (id: string) => {
+    router.push(`/dashboard/department-tasks/view/${id}`);
   };
 
-  // Download structure file
-  const handleDownloadStructure = (structure: OrganizationalStructure) => {
-    if (structure.fileUrl) {
-      // In a real application, this would trigger a download
-      console.log(
-        `Downloading structure: ${structure.name} from ${structure.fileUrl}`
-      );
-      // You might want to use something like:
-      // window.open(structure.fileUrl, '_blank');
-    }
+  // Update task status
+  const handleUpdateStatus = (id: string, newStatus: Status) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id
+          ? { ...task, status: newStatus, updatedAt: new Date().toISOString() }
+          : task
+      )
+    );
   };
 
-  // Delete structure(s)
-  const handleDelete = (structure?: OrganizationalStructure) => {
-    if (structure) {
-      setCurrentStructure(structure);
+  // Delete task(s)
+  const handleDelete = (task?: DepartmentTask) => {
+    if (task) {
+      setCurrentTask(task);
     }
     setShowDeleteModal(true);
   };
 
-  // Reorder structures
-  const handleReorder = (id: string, direction: "up" | "down") => {
-    setStructures((prev) => {
-      const newStructures = [...prev];
-      const index = newStructures.findIndex((s) => s.id === id);
-
-      if (
-        (direction === "up" && index === 0) ||
-        (direction === "down" && index === newStructures.length - 1)
-      ) {
-        return newStructures;
-      }
-
-      const targetIndex = direction === "up" ? index - 1 : index + 1;
-
-      // Swap orders
-      const tempOrder = newStructures[index].order;
-      newStructures[index].order = newStructures[targetIndex].order;
-      newStructures[targetIndex].order = tempOrder;
-
-      // Swap positions in array
-      [newStructures[index], newStructures[targetIndex]] = [
-        newStructures[targetIndex],
-        newStructures[index],
-      ];
-
-      return newStructures;
-    });
-  };
-
   // Execute deletion
   const confirmDelete = () => {
-    if (currentStructure) {
-      // Delete single structure
-      setStructures(
-        structures.filter((structure) => structure.id !== currentStructure.id)
-      );
-    } else if (selectedStructures.length > 0) {
-      // Delete multiple structures
-      setStructures(
-        structures.filter(
-          (structure) => !selectedStructures.includes(structure.id)
-        )
-      );
-      setSelectedStructures([]);
+    if (currentTask) {
+      // Delete single task
+      setTasks(tasks.filter((task) => task.id !== currentTask.id));
+    } else if (selectedTasks.length > 0) {
+      // Delete multiple tasks
+      setTasks(tasks.filter((task) => !selectedTasks.includes(task.id)));
+      setSelectedTasks([]);
     }
     setShowDeleteModal(false);
-    setCurrentStructure(null);
+    setCurrentTask(null);
+  };
+
+  // Get department badge class
+  const getDepartmentClass = (department: Department) => {
+    switch (department) {
+      case Department.INFOKOM:
+        return "bg-blue-100 text-blue-800";
+      case Department.PSDM:
+        return "bg-green-100 text-green-800";
+      case Department.LITBANG:
+        return "bg-purple-100 text-purple-800";
+      case Department.KWU:
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
   // Get status badge class
-  const getStatusClass = (status: string) => {
+  const getStatusClass = (status: Status) => {
     switch (status) {
-      case "PENDING":
+      case Status.PENDING:
         return "bg-yellow-100 text-yellow-800";
-      case "APPROVED":
+      case Status.IN_PROGRESS:
+        return "bg-blue-100 text-blue-800";
+      case Status.COMPLETED:
         return "bg-green-100 text-green-800";
-      case "REJECTED":
+      case Status.REJECTED:
         return "bg-red-100 text-red-800";
-      case "ARCHIVED":
+      case Status.ARCHIVED:
         return "bg-gray-100 text-gray-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
-  // Format file size
-  const formatFileSize = (bytes: number | undefined) => {
-    if (!bytes) return "N/A";
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / 1048576).toFixed(1) + " MB";
+  // Get status display name
+  const getStatusDisplayName = (status: Status) => {
+    switch (status) {
+      case Status.PENDING:
+        return "Menunggu";
+      case Status.IN_PROGRESS:
+        return "Dalam Proses";
+      case Status.COMPLETED:
+        return "Selesai";
+      case Status.REJECTED:
+        return "Ditolak";
+      case Status.ARCHIVED:
+        return "Diarsipkan";
+      default:
+        return status;
+    }
+  };
+
+  // Get department display name
+  const getDepartmentDisplayName = (department: Department) => {
+    switch (department) {
+      case Department.INFOKOM:
+        return "INFOKOM";
+      case Department.PSDM:
+        return "PSDM";
+      case Department.LITBANG:
+        return "LITBANG";
+      case Department.KWU:
+        return "KWU";
+      default:
+        return department;
+    }
   };
 
   // Format date
@@ -293,28 +444,25 @@ export default function OrganizationalStructurePage() {
     });
   };
 
-  // Get file icon based on mime type
-  const getFileIcon = (mimeType: string | undefined) => {
-    if (!mimeType) return <FiFile className="text-gray-400" />;
-
-    if (mimeType.includes("pdf")) return <FiFile className="text-red-500" />;
-    if (mimeType.includes("word")) return <FiFile className="text-blue-500" />;
-    if (mimeType.includes("excel")) {
-      return <FiFile className="text-green-500" />;
-    }
-    if (mimeType.includes("image")) {
-      return <FiFile className="text-purple-500" />;
-    }
-    return <FiFile className="text-gray-400" />;
+  // Format datetime
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   // Get sort icon
   const getSortIcon = (field: string) => {
     if (sortField !== field) return null;
     return sortDirection === "asc" ? (
-      <FiArrowUp size={14} />
+      <FiChevronDown size={14} className="transform rotate-180" />
     ) : (
-      <FiArrowDown size={14} />
+      <FiChevronDown size={14} />
     );
   };
 
@@ -323,18 +471,18 @@ export default function OrganizationalStructurePage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
-            Struktur Organisasi
+            Manajemen Tugas Departemen
           </h1>
           <p className="text-gray-600 mt-1">
-            Kelola semua dokumen struktur organisasi
+            Kelola semua tugas dan tanggung jawab departemen
           </p>
         </div>
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center mt-4 md:mt-0"
-          onClick={handleAddStructure}
+          onClick={handleAddTask}
         >
           <FiPlus className="mr-2" />
-          Tambah Struktur
+          Tambah Tugas
         </button>
       </div>
 
@@ -342,15 +490,13 @@ export default function OrganizationalStructurePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">
-              Total Struktur
-            </h3>
+            <h3 className="text-sm font-medium text-gray-600">Total Tugas</h3>
             <div className="p-2 bg-blue-100 rounded-lg">
-              <FiUsers className="text-blue-500" />
+              <FiList className="text-blue-500" />
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {structures.length}
+            {tasks.length}
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
@@ -361,29 +507,29 @@ export default function OrganizationalStructurePage() {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {structures.filter((s) => s.status === "PENDING").length}
+            {tasks.filter((t) => t.status === Status.PENDING).length}
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Disetujui</h3>
+            <h3 className="text-sm font-medium text-gray-600">Dalam Proses</h3>
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FiAlertCircle className="text-blue-500" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-gray-800 mt-2">
+            {tasks.filter((t) => t.status === Status.IN_PROGRESS).length}
+          </p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-600">Selesai</h3>
             <div className="p-2 bg-green-100 rounded-lg">
-              <FiCheckCircle className="text-green-500" />
+              <FiCheckSquare className="text-green-500" />
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-800 mt-2">
-            {structures.filter((s) => s.status === "APPROVED").length}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Diarsipkan</h3>
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <FiUsers className="text-gray-500" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-800 mt-2">
-            {structures.filter((s) => s.status === "ARCHIVED").length}
+            {tasks.filter((t) => t.status === Status.COMPLETED).length}
           </p>
         </div>
       </div>
@@ -397,7 +543,7 @@ export default function OrganizationalStructurePage() {
             </div>
             <input
               type="text"
-              placeholder="Cari struktur organisasi..."
+              placeholder="Cari deskripsi tugas atau penanggung jawab..."
               className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -420,7 +566,25 @@ export default function OrganizationalStructurePage() {
 
         {/* Advanced Filters */}
         {isFilterOpen && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Departemen
+              </label>
+              <select
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={departmentFilter}
+                onChange={(e) =>
+                  setDepartmentFilter(e.target.value as Department | "all")
+                }
+              >
+                <option value="all">Semua Departemen</option>
+                <option value={Department.INFOKOM}>INFOKOM</option>
+                <option value={Department.PSDM}>PSDM</option>
+                <option value={Department.LITBANG}>LITBANG</option>
+                <option value={Department.KWU}>KWU</option>
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status
@@ -428,34 +592,56 @@ export default function OrganizationalStructurePage() {
               <select
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as Status | "all")
+                }
               >
                 <option value="all">Semua Status</option>
-                <option value="PENDING">Menunggu</option>
-                <option value="APPROVED">Disetujui</option>
-                <option value="REJECTED">Ditolak</option>
-                <option value="ARCHIVED">Diarsipkan</option>
+                <option value={Status.PENDING}>Menunggu</option>
+                <option value={Status.IN_PROGRESS}>Dalam Proses</option>
+                <option value={Status.COMPLETED}>Selesai</option>
+                <option value={Status.REJECTED}>Ditolak</option>
+                <option value={Status.ARCHIVED}>Diarsipkan</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Penugasan
+              </label>
+              <select
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={assignedFilter}
+                onChange={(e) => setAssignedFilter(e.target.value)}
+              >
+                <option value="all">Semua Penugasan</option>
+                <option value="assigned">Ditugaskan</option>
+                <option value="unassigned">Belum Ditugaskan</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex items-end">
               <button
                 className={`px-4 py-2.5 rounded-lg transition-colors w-full flex items-center justify-center ${
-                  selectedStructures.length === 0
+                  selectedTasks.length === 0
                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                     : "bg-red-50 text-red-700 hover:bg-red-100"
                 }`}
                 onClick={() => handleDelete()}
-                disabled={selectedStructures.length === 0}
+                disabled={selectedTasks.length === 0}
               >
                 <FiTrash2 className="mr-2" />
-                Hapus Terpilih ({selectedStructures.length})
+                Hapus Terpilih ({selectedTasks.length})
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Structures Table */}
+      {/* Tasks Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -468,8 +654,8 @@ export default function OrganizationalStructurePage() {
                   <input
                     type="checkbox"
                     checked={
-                      filteredStructures.length > 0 &&
-                      selectedStructures.length === filteredStructures.length
+                      filteredTasks.length > 0 &&
+                      selectedTasks.length === filteredTasks.length
                     }
                     onChange={toggleSelectAll}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
@@ -478,34 +664,42 @@ export default function OrganizationalStructurePage() {
                 <th
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("order")}
+                  onClick={() => handleSort("note")}
                 >
                   <div className="flex items-center">
-                    No. Urut
-                    {getSortIcon("order")}
+                    Deskripsi Tugas
+                    {getSortIcon("note")}
                   </div>
                 </th>
                 <th
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("name")}
+                  onClick={() => handleSort("department")}
                 >
                   <div className="flex items-center">
-                    Nama Struktur
-                    {getSortIcon("name")}
+                    Departemen
+                    {getSortIcon("department")}
                   </div>
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("user")}
                 >
-                  File
+                  <div className="flex items-center">
+                    Penanggung Jawab
+                    {getSortIcon("user")}
+                  </div>
                 </th>
                 <th
                   scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("status")}
                 >
-                  Status
+                  <div className="flex items-center">
+                    Status
+                    {getSortIcon("status")}
+                  </div>
                 </th>
                 <th
                   scope="col"
@@ -526,112 +720,142 @@ export default function OrganizationalStructurePage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {sortedStructures.map((structure, index) => (
+              {sortedTasks.map((task) => (
                 <tr
-                  key={structure.id}
+                  key={task.id}
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="pl-6 pr-2 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
-                      checked={selectedStructures.includes(structure.id)}
-                      onChange={() => toggleStructureSelection(structure.id)}
+                      checked={selectedTasks.includes(task.id)}
+                      onChange={() => toggleTaskSelection(task.id)}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
                     />
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {structure.order}
-                    </div>
-                  </td>
                   <td className="px-4 py-4">
-                    <div className="text-sm font-medium text-gray-900">
-                      {structure.name}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {getFileIcon(structure.mimeType)}
-                      <div className="ml-2">
-                        <div className="text-sm text-gray-900">
-                          {structure.mimeType
-                            ? structure.mimeType.split("/")[1].toUpperCase()
-                            : "N/A"}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {formatFileSize(structure.fileSize)}
-                        </div>
-                      </div>
+                    <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
+                      {task.note}
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusClass(
-                        structure.status
+                      className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getDepartmentClass(
+                        task.department
                       )}`}
                     >
-                      {structure.status === "PENDING"
-                        ? "Menunggu"
-                        : structure.status === "APPROVED"
-                        ? "Disetujui"
-                        : structure.status === "REJECTED"
-                        ? "Ditolak"
-                        : "Diarsipkan"}
+                      {getDepartmentDisplayName(task.department)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
+                    {task.user ? (
+                      <div className="flex items-center">
+                        <div className="p-1.5 bg-gray-100 rounded-lg mr-2">
+                          <FiUser className="text-gray-500" size={14} />
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-900">
+                            {task.user.name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {task.user.email}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-gray-500">
+                        Belum ditugaskan
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusClass(
+                        task.status
+                      )}`}
+                    >
+                      {getStatusDisplayName(task.status)}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(structure.createdAt)}
+                    {formatDate(task.createdAt)}
                   </td>
                   <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
-                      {structure.fileUrl && (
-                        <button
-                          className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
-                          onClick={() => handleDownloadStructure(structure)}
-                          title="Download file"
-                        >
-                          <FiDownload size={16} />
-                        </button>
-                      )}
                       <button
                         className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                        onClick={() => handleViewStructure(structure.id)}
+                        onClick={() => handleViewTask(task.id)}
                         title="Lihat detail"
                       >
                         <FiEye size={16} />
                       </button>
                       <button
                         className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-                        onClick={() => handleEditStructure(structure.id)}
-                        title="Edit struktur"
+                        onClick={() => handleEditTask(task.id)}
+                        title="Edit tugas"
                       >
                         <FiEdit size={16} />
                       </button>
+                      <div className="relative group">
+                        <button
+                          className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
+                          title="Ubah status"
+                        >
+                          <FiCheckCircle size={16} />
+                        </button>
+                        <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+                          <div className="px-4 py-2 text-xs text-gray-500">
+                            Ubah Status:
+                          </div>
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50"
+                            onClick={() =>
+                              handleUpdateStatus(task.id, Status.PENDING)
+                            }
+                          >
+                            Menunggu
+                          </button>
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                            onClick={() =>
+                              handleUpdateStatus(task.id, Status.IN_PROGRESS)
+                            }
+                          >
+                            Dalam Proses
+                          </button>
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-green-50"
+                            onClick={() =>
+                              handleUpdateStatus(task.id, Status.COMPLETED)
+                            }
+                          >
+                            Selesai
+                          </button>
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                            onClick={() =>
+                              handleUpdateStatus(task.id, Status.REJECTED)
+                            }
+                          >
+                            Ditolak
+                          </button>
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                            onClick={() =>
+                              handleUpdateStatus(task.id, Status.ARCHIVED)
+                            }
+                          >
+                            Diarsipkan
+                          </button>
+                        </div>
+                      </div>
                       <button
                         className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                        onClick={() => handleDelete(structure)}
-                        title="Hapus struktur"
+                        onClick={() => handleDelete(task)}
+                        title="Hapus tugas"
                       >
                         <FiTrash2 size={16} />
                       </button>
-                      <div className="flex flex-col">
-                        <button
-                          className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors"
-                          onClick={() => handleReorder(structure.id, "up")}
-                          disabled={index === 0}
-                          title="Pindah ke atas"
-                        >
-                          <FiArrowUp size={12} />
-                        </button>
-                        <button
-                          className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors"
-                          onClick={() => handleReorder(structure.id, "down")}
-                          disabled={index === sortedStructures.length - 1}
-                          title="Pindah ke bawah"
-                        >
-                          <FiArrowDown size={12} />
-                        </button>
-                      </div>
                     </div>
                   </td>
                 </tr>
@@ -640,13 +864,13 @@ export default function OrganizationalStructurePage() {
           </table>
         </div>
 
-        {sortedStructures.length === 0 && (
+        {sortedTasks.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-2">
-              <FiUsers size={48} className="mx-auto" />
+              <FiList size={48} className="mx-auto" />
             </div>
             <p className="text-gray-500 text-lg font-medium">
-              Tidak ada struktur organisasi ditemukan
+              Tidak ada tugas ditemukan
             </p>
             <p className="text-gray-400 mt-1">
               Coba sesuaikan pencarian atau filter Anda
@@ -655,13 +879,12 @@ export default function OrganizationalStructurePage() {
         )}
 
         {/* Table Footer */}
-        {sortedStructures.length > 0 && (
+        {sortedTasks.length > 0 && (
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
             <p className="text-sm text-gray-700 mb-4 sm:mb-0">
               Menampilkan{" "}
-              <span className="font-medium">{sortedStructures.length}</span>{" "}
-              dari <span className="font-medium">{structures.length}</span>{" "}
-              struktur
+              <span className="font-medium">{sortedTasks.length}</span> dari{" "}
+              <span className="font-medium">{tasks.length}</span> tugas
             </p>
             <div className="flex space-x-2">
               <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
@@ -687,7 +910,7 @@ export default function OrganizationalStructurePage() {
                 <button
                   onClick={() => {
                     setShowDeleteModal(false);
-                    setCurrentStructure(null);
+                    setCurrentTask(null);
                   }}
                   className="text-gray-400 hover:text-gray-600"
                 >
@@ -697,9 +920,9 @@ export default function OrganizationalStructurePage() {
             </div>
             <div className="p-6">
               <p className="text-gray-600">
-                {currentStructure
-                  ? `Apakah Anda yakin ingin menghapus struktur "${currentStructure.name}"? Tindakan ini tidak dapat dibatalkan.`
-                  : `Apakah Anda yakin ingin menghapus ${selectedStructures.length} struktur terpilih? Tindakan ini tidak dapat dibatalkan.`}
+                {currentTask
+                  ? `Apakah Anda yakin ingin menghapus tugas "${currentTask.note}"? Tindakan ini tidak dapat dibatalkan.`
+                  : `Apakah Anda yakin ingin menghapus ${selectedTasks.length} tugas terpilih? Tindakan ini tidak dapat dibatalkan.`}
               </p>
             </div>
             <div className="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
@@ -707,7 +930,7 @@ export default function OrganizationalStructurePage() {
                 className="px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
                 onClick={() => {
                   setShowDeleteModal(false);
-                  setCurrentStructure(null);
+                  setCurrentTask(null);
                 }}
               >
                 Batal
