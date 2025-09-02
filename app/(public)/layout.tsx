@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import ".././globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import AIButton from "@/components/AIButton";
+import Header from "@/components/public/layout/Header";
+import Footer from "@/components/public/layout/Footer";
+import AIButton from "@/components/public/AIButton";
 import { getCurrentUser } from "@/lib/auth";
 
 const geistSans = localFont({
