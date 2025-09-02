@@ -22,9 +22,9 @@ import {
 } from "lucide-react";
 import { LogoutButton } from "@/components/admin/auth/LogoutButton";
 import Image from "next/image";
-import NavLink from "@/components/admin/NavLink";
-import NavDropdown from "@/components/admin/NavDropdown";
-import NavDropdownItem from "@/components/admin/NavDropdownItem";
+import NavLink from "@/components/admin/layout/NavLink";
+import NavDropdown from "@/components/admin/layout/NavDropdown";
+import NavDropdownItem from "@/components/admin/layout/NavDropdownItem";
 
 export default function Sidebar() {
   return (
