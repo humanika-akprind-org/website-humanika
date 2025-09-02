@@ -1,4 +1,4 @@
-import EventCard from "@/components/EventCard";
+import EventCard from "@/components/public/EventCard";
 
 export default function EventPage() {
   const events = [
