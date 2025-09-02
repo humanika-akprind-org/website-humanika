@@ -1,5 +1,5 @@
-import GalleryGrid from "@/components/GalleryGrid";
-import AlbumGrid from "@/components/AlbumGrid";
+import GalleryGrid from "@/components/public/GalleryGrid";
+import AlbumGrid from "@/components/public/AlbumGrid";
 
 export default function GalleryPage() {
   const albums = [
@@ -81,7 +81,6 @@ export default function GalleryPage() {
           <GalleryGrid />
         </section>
       </main>
-
     </div>
   );
 }
