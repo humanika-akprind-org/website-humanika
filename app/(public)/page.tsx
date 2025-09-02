@@ -1,7 +1,7 @@
 import Link from "next/link";
-import ArticleCard from "@/components/ArticleCard";
-import EventCard from "@/components/EventCard";
-import GalleryGrid from "@/components/GalleryGrid";
+import ArticleCard from "@/components/public/ArticleCard";
+import EventCard from "@/components/public/EventCard";
+import GalleryGrid from "@/components/public/GalleryGrid";
 
 export default function Home() {
   // Data contoh untuk demo
