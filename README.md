@@ -101,13 +101,13 @@ GOOGLE_DRIVE_API_KEY="your-google-drive-api-key"
 - **POST** \`/api/google-drive\` - Delete files
 - **POST** \`/api/google-drive\` - Get file URLs
 
-### Google Drive Folders (\`/api/google-drive-folders\`)
+### Google Drive Folders (\`/api/google-drive/folders\`)
 
-- **GET** \`/api/google-drive-folders\` - List folders
+- **GET** \`/api/google-drive/folders\` - List folders
 
-### Google Drive List (\`/api/google-drive-list\`)
+### Google Drive List (\`/api/google-drive/files\`)
 
-- **GET** \`/api/google-drive-list\` - List files
+- **GET** \`/api/google-drive/files\` - List files
 
 ### Gallery (\`/api/gallery\`)
 
