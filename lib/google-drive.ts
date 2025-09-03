@@ -12,6 +12,16 @@ if (process.env.ACCESS_TOKEN && process.env.REFRESH_TOKEN) {
 }
 
 const drive = google.drive({ version: "v3", auth: oauth2Client });
+export interface UploadFileParams {
+  file: File;
+  folderName?: string;
+}
+
+export interface UploadResponse {
+  id: string;
+  webViewLink: string;
+  webContentLink?: string;
+}
 
 interface UploadParams {
   originalname: string;
@@ -44,6 +54,53 @@ export async function uploadToGoogleDrive({
     return {
       fileId: response.data.id!,
       webViewLink: response.data.webViewLink!,
+    };
+  } catch (error) {
+    console.error("Error uploading to Google Drive:", error);
+    throw new Error("Failed to upload file to Google Drive");
+  }
+}
+
+export async function uploadFileToDrive(
+  file: File,
+  folderName: string = "management-photos"
+): Promise<UploadResponse> {
+  try {
+    // First, find or create the folder
+    const folderId = await findOrCreateFolder(folderName);
+
+    // Convert File to buffer
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const fileMetadata = {
+      name: file.name,
+      parents: [folderId],
+    };
+
+    const media = {
+      mimeType: file.type,
+      body: Readable.from(buffer),
+    };
+
+    const response = await drive.files.create({
+      requestBody: fileMetadata,
+      media: media,
+      fields: "id, webViewLink, webContentLink",
+    });
+
+    // Make the file publicly viewable
+    await drive.permissions.create({
+      fileId: response.data.id!,
+      requestBody: {
+        role: "reader",
+        type: "anyone",
+      },
+    });
+
+    return {
+      id: response.data.id!,
+      webViewLink: response.data.webViewLink!,
+      webContentLink: response.data.webContentLink || undefined,
     };
   } catch (error) {
     console.error("Error uploading to Google Drive:", error);
@@ -130,5 +187,47 @@ export async function googleDriveUpload(
       success: false,
       error: error instanceof Error ? error.message : "Upload failed",
     };
+  }
+}
+
+
+export async function deleteFileFromDrive(fileId: string): Promise<void> {
+  try {
+    await drive.files.delete({
+      fileId: fileId,
+    });
+  } catch (error) {
+    console.error("Error deleting file from Google Drive:", error);
+    throw new Error("Failed to delete file from Google Drive");
+  }
+}
+
+export async function findOrCreateFolder(folderName: string): Promise<string> {
+  try {
+    // Search for existing folder
+    const response = await drive.files.list({
+      q: `name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      fields: "files(id, name)",
+    });
+
+    if (response.data.files && response.data.files.length > 0) {
+      return response.data.files[0].id!;
+    }
+
+    // Create new folder if not exists
+    const folderMetadata = {
+      name: folderName,
+      mimeType: "application/vnd.google-apps.folder",
+    };
+
+    const folder = await drive.files.create({
+      requestBody: folderMetadata,
+      fields: "id",
+    });
+
+    return folder.data.id!;
+  } catch (error) {
+    console.error("Error finding/creating folder:", error);
+    throw new Error("Failed to find or create folder in Google Drive");
   }
 }
