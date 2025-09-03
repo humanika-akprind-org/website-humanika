@@ -107,7 +107,7 @@ enum ApprovalType {
 
 model User {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
-  name          String     
+  name          String
   email         String     @unique
   username      String     @unique
   password      String
@@ -118,6 +118,7 @@ model User {
   verifiedAccount Boolean    @default(false)
   attemptLogin  Int        @default(0)
   blockExpires  DateTime?
+  avatarColor   String     @default("#3B82F6")
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
