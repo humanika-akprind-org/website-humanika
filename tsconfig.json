@@ -18,7 +18,7 @@
       "@/*": ["./*"],
       "@/components/*": ["components/*"],
       "@/lib/*": ["lib/*"],
-      "@/types": ["types/index.d.ts"]
+      "@/types/*": ["types/*"]
     },
     "typeRoots": ["node_modules/@types", "types"],
     "plugins": [
