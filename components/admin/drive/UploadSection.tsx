@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { type UploadSectionProps } from "../../../../../../types/google-drive";
+import { type UploadSectionProps } from "@/types/google-drive";
 
 const UploadSection: React.FC<UploadSectionProps> = ({
   selectedFile,
