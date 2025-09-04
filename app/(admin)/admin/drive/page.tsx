@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
-import { getGoogleDriveFiles } from "@/lib/google-drive";
-import DriveManager from "@/app/(admin)/admin/drive/components/DriveManager";
+import { getGoogleDriveFiles } from "@/lib/server/google-drive";
+import DriveManager from "@/components/admin/drive/DriveManager";
 import GoogleDriveConnect from "@/components/admin/google-drive/GoogleDriveConnect";
-import StatsOverview from "@/app/(admin)/admin/drive/components/StatsOverview";
-import RecentActivity from "@/app/(admin)/admin/drive/components/RecentActivity";
-import QuickActions from "@/app/(admin)/admin/drive/components/QuickActions";
+import StatsOverview from "@/components/admin/drive/other/StatsOverview";
+import RecentActivity from "@/components/admin/drive/other/RecentActivity";
+import QuickActions from "@/components/admin/drive/other/QuickActions";
 
 export default async function DashboardPage() {
   const cookieStore = cookies();

@@ -29,7 +29,7 @@ async function fetchApi<T>(
     }
 
     return { data };
-  } catch (error) {
+  } catch (_error) {
     return { error: "Network error occurred" };
   }
 }
@@ -68,14 +68,13 @@ export async function createManagement(
   managementData: CreateManagementData
 ): Promise<ApiResponse<Management>> {
   const formData = new FormData();
-
   formData.append("userId", managementData.userId);
   formData.append("periodId", managementData.periodId);
   formData.append("position", managementData.position);
   formData.append("department", managementData.department);
 
-  if (managementData.photo) {
-    formData.append("photo", managementData.photo);
+  if (managementData.photoFile) {
+    formData.append("photo", managementData.photoFile);
   }
 
   return fetchApi<Management>("/management", {
@@ -96,11 +95,11 @@ export async function updateManagement(
   if (managementData.position) formData.append("position", managementData.position);
   if (managementData.department) formData.append("department", managementData.department);
 
-  if (managementData.photo) {
-    formData.append("photo", managementData.photo);
+  if (managementData.photoFile) {
+    formData.append("photo", managementData.photoFile);
   }
 
-  if (managementData.photo === null) {
+  if (managementData.photoFile === null) {
     formData.append("removePhoto", "true");
   }
 
@@ -132,22 +131,26 @@ export async function bulkDeleteManagements(
   });
 }
 
-// Helper function to format enum values for display
-export const formatEnumValue = (value: string) =>
-  value
+// Helper functions for UI
+export const formatPosition = (position: Position) =>
+  position
     .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+export const formatDepartment = (department: Department) =>
+  department.charAt(0) + department.slice(1).toLowerCase();
 
 // Get all enum values as options for select inputs
 export const positionOptions = Object.values(Position).map((position) => ({
   value: position,
-  label: formatEnumValue(position),
+  label: formatPosition(position),
 }));
 
 export const departmentOptions = Object.values(Department).map((dept) => ({
   value: dept,
-  label: formatEnumValue(dept),
+  label: formatDepartment(dept),
 }));
 
 // Export types for convenience
@@ -159,7 +162,7 @@ export type {
   ApiResponse,
 };
 
-// Ekspor objek dengan semua fungsi untuk kemudahan impor
+// Export object with all functions for easy importing
 export const managementAPI = {
   getManagements,
   getManagementById,
@@ -167,7 +170,8 @@ export const managementAPI = {
   updateManagement,
   deleteManagement,
   bulkDeleteManagements,
-  formatEnumValue,
+  formatPosition,
+  formatDepartment,
   positionOptions,
   departmentOptions,
 };

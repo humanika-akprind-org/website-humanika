@@ -143,3 +143,12 @@ export const reorderPeriods = async (periods: Period[]): Promise<boolean> => {
     throw error;
   }
 };
+
+export const PeriodApi = {
+  getPeriods,
+  getPeriod,
+  createPeriod,
+  updatePeriod,
+  deletePeriod,
+  reorderPeriods
+};

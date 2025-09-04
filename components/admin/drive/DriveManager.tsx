@@ -5,19 +5,19 @@ import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
 import {
   type DriveManagerProps,
   type LoadingState,
-} from "../../../../../types/google-drive";
+} from "@/types/google-drive";
 import {
   callApi,
   fetchDriveFiles,
   fetchDriveFolders,
-} from "../../../../../lib/api/google-drive";
+} from "@/lib/api/google-drive";
 import {
   getFolderOptions,
   loadFolderFromLocalStorage,
   saveFolderToLocalStorage,
-} from "../../../../utils";
-import UploadSection from "./subcomponents/UploadSection";
-import FileList from "./subcomponents/FileList";
+} from "@/app/utils/google-drive";
+import UploadSection from "@/components/admin/drive/UploadSection";
+import FileList from "@/components/admin/drive/FileList";
 
 const DriveManager: React.FC<DriveManagerProps> = ({
   files: initialFiles = [],
