@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { uploadFileToDrive } from "@/lib/google-drive";
+import { prisma } from "@/lib/prisma";
 import type { Department, Position } from "@/types/enums";
+import { callApi } from "@/lib/api/google-drive";
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,16 +21,30 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     const where: any = {
-      OR: search
-        ? [
-            { user: { name: { contains: search, mode: "insensitive" } } },
-            { user: { email: { contains: search, mode: "insensitive" } } },
-            { period: { name: { contains: search, mode: "insensitive" } } },
-          ]
-        : undefined,
-      department: department || undefined,
-      position: position || undefined,
+      AND: [],
     };
+
+    if (search) {
+      where.AND.push({
+        OR: [
+          { user: { name: { contains: search, mode: "insensitive" } } },
+          { user: { email: { contains: search, mode: "insensitive" } } },
+          { period: { name: { contains: search, mode: "insensitive" } } },
+        ],
+      });
+    }
+
+    if (department) {
+      where.AND.push({ department });
+    }
+
+    if (position) {
+      where.AND.push({ position });
+    }
+
+    if (where.AND.length === 0) {
+      delete where.AND;
+    }
 
     const [managements, total] = await Promise.all([
       prisma.management.findMany({
@@ -41,7 +55,9 @@ export async function GET(request: NextRequest) {
               id: true,
               name: true,
               email: true,
-              // avatarColor: true,
+              role: true,
+              department: true,
+              position: true,
             },
           },
           period: true,
@@ -53,17 +69,19 @@ export async function GET(request: NextRequest) {
       prisma.management.count({ where }),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
+
     return NextResponse.json({
       managements,
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
     });
   } catch (error) {
     console.error("Error fetching managements:", error);
     return NextResponse.json(
-      { error: "Failed to fetch managements" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
@@ -71,17 +89,17 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // const user = await getCurrentUser();
-    // if (!user || user.role !== "DPO") {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // }
+    const user = await getCurrentUser();
+    if (!user || user.role !== "BPH") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const formData = await request.formData();
     const userId = formData.get("userId") as string;
     const periodId = formData.get("periodId") as string;
     const position = formData.get("position") as Position;
     const department = formData.get("department") as Department;
-    const photo = formData.get("photo") as File | null;
+    const photoFile = formData.get("photo") as File | null;
 
     // Validate required fields
     if (!userId || !periodId || !position || !department) {
@@ -91,7 +109,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already has a position in this period
+    // Check if user already has a management position in this period
     const existingManagement = await prisma.management.findFirst({
       where: {
         userId,
@@ -101,7 +119,23 @@ export async function POST(request: NextRequest) {
 
     if (existingManagement) {
       return NextResponse.json(
-        { error: "User already has a position in this period" },
+        { error: "User already has a management position in this period" },
+        { status: 400 }
+      );
+    }
+
+    // Check if position in department is already taken
+    const existingPosition = await prisma.management.findFirst({
+      where: {
+        periodId,
+        position,
+        department,
+      },
+    });
+
+    if (existingPosition) {
+      return NextResponse.json(
+        { error: "This position in the department is already taken" },
         { status: 400 }
       );
     }
@@ -109,23 +143,41 @@ export async function POST(request: NextRequest) {
     let photoUrl = null;
 
     // Upload photo to Google Drive if provided
-    if (photo) {
+    if (photoFile) {
       try {
-        const uploadResult = await uploadFileToDrive(
-          photo,
-          "management-photos"
+        const accessToken = request.cookies.get("google_access_token")?.value;
+
+        if (!accessToken) {
+          return NextResponse.json(
+            { error: "Google Drive access token required" },
+            { status: 401 }
+          );
+        }
+
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", photoFile);
+        uploadFormData.append("action", "upload");
+        uploadFormData.append("accessToken", accessToken);
+        uploadFormData.append("folderId", "root");
+
+        const uploadResult = await callApi(
+          {
+            action: "upload",
+            accessToken,
+          },
+          uploadFormData
         );
-        photoUrl = uploadResult.webViewLink;
+
+        if (uploadResult.success) {
+          photoUrl = uploadResult.file.url;
+        }
       } catch (uploadError) {
         console.error("Error uploading photo:", uploadError);
-        return NextResponse.json(
-          { error: "Failed to upload photo" },
-          { status: 500 }
-        );
+        // Continue without photo if upload fails
       }
     }
 
-    // Create management
+    // Create management record
     const management = await prisma.management.create({
       data: {
         userId,
@@ -140,7 +192,9 @@ export async function POST(request: NextRequest) {
             id: true,
             name: true,
             email: true,
-            // avatarColor: true,
+            role: true,
+            department: true,
+            position: true,
           },
         },
         period: true,
@@ -151,7 +205,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating management:", error);
     return NextResponse.json(
-      { error: "Failed to create management" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

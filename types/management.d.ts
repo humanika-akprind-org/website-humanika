@@ -1,5 +1,5 @@
-import { Department, Position } from "./enums";
-import { User } from "./user";
+import { type Department, type Position, type UserRole } from "./enums";
+import { type User } from "./user";
 
 export interface Management {
   id: string;
@@ -29,7 +29,7 @@ export interface CreateManagementData {
   periodId: string;
   position: Position;
   department: Department;
-  photo?: File | null;
+  photoFile?: File | null;
 }
 
 export interface UpdateManagementData extends Partial<CreateManagementData> {
