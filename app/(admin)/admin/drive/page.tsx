@@ -1,10 +1,9 @@
 import { cookies } from "next/headers";
 import { getGoogleDriveFiles } from "@/lib/server/google-drive";
-import DriveManager from "@/components/admin/drive/DriveManager";
+import DriveTable from "@/components/admin/drive/Table";
 import GoogleDriveConnect from "@/components/admin/google-drive/GoogleDriveConnect";
-import StatsOverview from "@/components/admin/drive/other/StatsOverview";
-import RecentActivity from "@/components/admin/drive/other/RecentActivity";
-import QuickActions from "@/components/admin/drive/other/QuickActions";
+import StatsOverview from "@/components/admin/drive/Stats";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const cookieStore = cookies();
@@ -13,7 +12,6 @@ export default async function DashboardPage() {
   if (!accessToken) {
     return (
       <div className="h-[80dvh] bg-gray-50 flex">
-        {/* Main Content */}
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-white rounded-xl shadow-sm p-8 text-center">
             <div className="mb-6">
@@ -66,7 +64,12 @@ export default async function DashboardPage() {
 
   // Data dummy untuk komponen dashboard
   const statsData = [
-    { title: "Total Files", value: 100, change: "+12%", trend: "up" as const },
+    {
+      title: "Total Files",
+      value: files.length,
+      change: "+12%",
+      trend: "up" as const,
+    },
     { title: "Active Users", value: 1243, change: "+5%", trend: "up" as const },
     {
       title: "Storage Used",
@@ -82,46 +85,40 @@ export default async function DashboardPage() {
     },
   ];
 
-  const recentActivities = [
-    { id: 1, user: "John Doe", action: "uploaded a file", time: "2 mins ago" },
-    {
-      id: 2,
-      user: "Jane Smith",
-      action: "created a folder",
-      time: "10 mins ago",
-    },
-    {
-      id: 3,
-      user: "Robert Johnson",
-      action: "shared a document",
-      time: "25 mins ago",
-    },
-    {
-      id: 4,
-      user: "Emily Davis",
-      action: "updated settings",
-      time: "1 hour ago",
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="p-6 space-y-6">
+        {/* Header dengan tombol tambah */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Google Drive Manager
+          </h1>
+          <Link
+            href="/admin/drive/add"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Tambah File
+          </Link>
+        </div>
+
         {/* Stats Overview */}
         <StatsOverview stats={statsData} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Drive Manager */}
-          <div className="lg:col-span-2">
-            <DriveManager files={files} accessToken={accessToken} />
+          {/* Drive Table */}
+          <div className="">
+            <DriveTable files={files} accessToken={accessToken} />
           </div>
-
-          {/* Sidebar with Recent Activity and Quick Actions */}
-          <div className="space-y-6">
-            <QuickActions />
-            <RecentActivity activities={recentActivities} />
-          </div>
-        </div>
       </main>
     </div>
   );
