@@ -1,29 +1,38 @@
-import { google } from "googleapis";
-import { oauth2Client } from "../google-oauth";
+export const getGoogleDriveFile = async (
+  accessToken: string,
+  fileId: string
+) => {
+  const response = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=*`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 
-export async function getGoogleDriveFiles(accessToken: string) {
-  if (!accessToken) {
-    throw new Error("Missing access token");
+  if (!response.ok) {
+    throw new Error("Failed to fetch file details");
   }
 
-  // Create a new oauth2Client instance for this specific request
-  const client = oauth2Client;
-  client.setCredentials({ access_token: accessToken });
+  return response.json();
+};
 
-  const driveWithToken = google.drive({ version: "v3", auth: client });
+// Fungsi getGoogleDriveFiles tetap sama
+export const getGoogleDriveFiles = async (accessToken: string) => {
+  const response = await fetch(
+    "https://www.googleapis.com/drive/v3/files?fields=files(id,name,mimeType,size,modifiedTime,webViewLink,webContentLink)",
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 
-  let files;
-
-  try {
-    const result = await driveWithToken.files.list({
-      pageSize: 15,
-      fields: "nextPageToken, files(id, name)",
-    });
-    files = result.data.files;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Failed to fetch files from Google Drive.");
+  if (!response.ok) {
+    throw new Error("Failed to fetch Google Drive files");
   }
 
-  return files;
-}
+  const data = await response.json();
+  return data.files || [];
+};
