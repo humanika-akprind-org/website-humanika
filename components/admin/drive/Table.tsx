@@ -1,47 +1,20 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
+import React, { useState } from "react";
 import Link from "next/link";
+import { callApi } from "@/lib/api/google-drive";
 import {
-  callApi,
-  fetchDriveFiles,
-  fetchDriveFolders,
-} from "@/lib/api/google-drive";
-import {
-  getFolderOptions,
-  loadFolderFromLocalStorage,
-  saveFolderToLocalStorage,
-} from "@/app/utils/google-drive";
-import DeleteModal from "./DeleteModal";
-
-interface DriveTableProps {
-  files: drive_v3.Schema$File[];
-  accessToken: string;
-}
-
-interface LoadingState {
-  files: boolean;
-  folders: boolean;
-  operations: boolean;
-}
+  useGoogleDriveFiles,
+  useFileOperations,
+} from "@/hooks/drive/table/useGoogleDrive";
+import DeleteModal from "./modal/DeleteModal";
+import type { DriveTableProps } from "@/types/google-drive";
 
 const DriveTable: React.FC<DriveTableProps> = ({
   files: initialFiles = [],
   accessToken,
 }) => {
-  const [files, setFiles] = useState<drive_v3.Schema$File[]>(initialFiles);
-  const [copiedFileId, setCopiedFileId] = useState<string | null>(null);
-  const [folders, setFolders] = useState<drive_v3.Schema$File[]>([]);
-  const [selectedFolderId] = useState<string>(
-    loadFolderFromLocalStorage() || "root"
-  );
-  const [isLoading, setIsLoading] = useState<LoadingState>({
-    files: false,
-    folders: false,
-    operations: false,
-  });
-  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "files" | "folders">("all");
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     fileId: string | null;
@@ -51,110 +24,28 @@ const DriveTable: React.FC<DriveTableProps> = ({
     fileId: null,
     fileName: "",
   });
-  const [filter, setFilter] = useState<"all" | "files" | "folders">("all");
 
-  const setLoadingState = (key: keyof LoadingState, value: boolean) => {
-    setIsLoading((prev) => ({ ...prev, [key]: value }));
-  };
+  const { files, isLoading, error, fetchFiles } = useGoogleDriveFiles(
+    accessToken,
+    initialFiles
+  );
 
-  const fetchFiles = useCallback(async () => {
-    setLoadingState("files", true);
-    setError(null);
+  const {
+    copiedFileId,
+    isOperating,
+    operationError,
+    handleApiOperation,
+    handleCopyUrl,
+  } = useFileOperations(accessToken, fetchFiles);
 
-    try {
-      const files = await fetchDriveFiles(accessToken);
-      setFiles(files);
-    } catch (err) {
-      console.error("Error fetching files:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load files. Please try again."
-      );
-    } finally {
-      setLoadingState("files", false);
-    }
-  }, [accessToken]);
-
-  const fetchFolders = useCallback(async () => {
-    setLoadingState("folders", true);
-    setError(null);
-
-    try {
-      const folders = await fetchDriveFolders(accessToken);
-      setFolders(folders);
-    } catch (err) {
-      console.error("Error fetching folders:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load folders. Please try again."
-      );
-    } finally {
-      setLoadingState("folders", false);
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
-    fetchFiles();
-    fetchFolders();
-  }, [fetchFiles, fetchFolders]);
-
-  useEffect(() => {
-    if (selectedFolderId) {
-      saveFolderToLocalStorage(selectedFolderId);
-    }
-  }, [selectedFolderId]);
-
-  const folderOptions = useMemo(() => getFolderOptions(folders), [folders]);
+  // Combine errors from both hooks
+  const displayError = error || operationError;
 
   const filteredFiles = files.filter((file) => {
     if (filter === "all") return true;
     if (filter === "folders") return file.mimeType?.includes("folder");
     return !file.mimeType?.includes("folder");
   });
-
-  const handleApiOperation = async (
-    operation: () => Promise<void>,
-    successMessage?: string
-  ) => {
-    setLoadingState("operations", true);
-    setError(null);
-
-    try {
-      await operation();
-      await fetchFiles();
-      if (successMessage) {
-        // Could show a success toast here
-        console.log(successMessage);
-      }
-    } catch (err) {
-      console.error("Operation error:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Operation failed. Please try again."
-      );
-    } finally {
-      setLoadingState("operations", false);
-    }
-  };
-
-  const handleRename = async (fileId?: string | null) => {
-    if (!fileId) return;
-
-    const newName = prompt("Enter new name:");
-    if (!newName?.trim()) return;
-
-    await handleApiOperation(async () => {
-      await callApi({
-        action: "rename",
-        fileId,
-        fileName: newName,
-        accessToken,
-      });
-    }, "File renamed successfully");
-  };
 
   const handleDelete = async (
     fileId?: string | null,
@@ -181,38 +72,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
     }, "File deleted successfully");
 
     setDeleteModal({ isOpen: false, fileId: null, fileName: "" });
-  };
-
-  const handleCopyUrl = async (fileId?: string | null) => {
-    if (!fileId) return;
-
-    setLoadingState("operations", true);
-    setError(null);
-
-    try {
-      const res = await callApi({
-        action: "getUrl",
-        fileId,
-        accessToken,
-      });
-
-      if (res.success && res.url) {
-        await navigator.clipboard.writeText(res.url);
-        setCopiedFileId(fileId);
-        setTimeout(() => setCopiedFileId(null), 2000);
-      } else {
-        throw new Error(res.message || "Failed to get file URL");
-      }
-    } catch (err) {
-      console.error("Error copying URL:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to copy URL. Please try again."
-      );
-    } finally {
-      setLoadingState("operations", false);
-    }
   };
 
   return (
@@ -252,7 +111,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
         </div>
       </div>
 
-      {error && (
+      {displayError && (
         <div
           className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-start"
           role="alert"
@@ -271,7 +130,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           </svg>
           <div>
             <h3 className="font-medium">Error</h3>
-            <p className="text-sm">{error}</p>
+            <p className="text-sm">{displayError}</p>
           </div>
         </div>
       )}
@@ -407,7 +266,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleCopyUrl(file.id)}
-                          disabled={isLoading.operations}
+                          disabled={isOperating}
                           className={`px-3 py-1 text-sm rounded border ${
                             copiedFileId === file.id
                               ? "bg-green-50 text-green-700 border-green-200"
@@ -424,7 +283,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
                         </Link>
                         <button
                           onClick={() => handleDelete(file.id, file.name)}
-                          disabled={isLoading.operations}
+                          disabled={isOperating}
                           className="px-3 py-1 text-sm bg-red-50 text-red-700 rounded hover:bg-red-100 border border-red-200"
                         >
                           Delete
@@ -439,7 +298,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
         )}
       </div>
 
-      {isLoading.operations && (
+      {isOperating && (
         <div
           className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
           role="status"
@@ -462,7 +321,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           setDeleteModal({ isOpen: false, fileId: null, fileName: "" })
         }
         onConfirm={confirmDelete}
-        isLoading={isLoading.operations}
+        isLoading={isOperating}
       />
     </div>
   );

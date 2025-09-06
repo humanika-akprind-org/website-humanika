@@ -43,9 +43,7 @@ export default function ContactForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-
+  function onSubmit(_values: z.infer<typeof formSchema>) {
     toast.success("Pesan Terkirim", {
       description: "Kami akan segera merespons pesan Anda.",
     });
