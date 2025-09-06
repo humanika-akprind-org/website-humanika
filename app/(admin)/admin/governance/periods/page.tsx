@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Period } from "@/types/period";
 import { getPeriods, deletePeriod, reorderPeriods } from "@/lib/api/period";
@@ -27,23 +27,7 @@ export default function PeriodsPage() {
     loadPeriods();
   }, []);
 
-  useEffect(() => {
-    filterPeriods();
-  }, [periods, searchTerm, statusFilter, sortField, sortDirection]);
-
-  const loadPeriods = async () => {
-    try {
-      setLoading(true);
-      const data = await getPeriods();
-      setPeriods(data);
-    } catch (error) {
-      console.error("Error loading periods:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterPeriods = () => {
+  const filterPeriods = useCallback(() => {
     let result = [...periods];
 
     // Apply search filter
@@ -86,6 +70,22 @@ export default function PeriodsPage() {
     });
 
     setFilteredPeriods(result);
+  }, [periods, searchTerm, statusFilter, sortField, sortDirection]);
+
+  useEffect(() => {
+    filterPeriods();
+  }, [filterPeriods]);
+
+  const loadPeriods = async () => {
+    try {
+      setLoading(true);
+      const data = await getPeriods();
+      setPeriods(data);
+    } catch (error) {
+      console.error("Error loading periods:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const togglePeriodSelection = (id: string) => {
@@ -177,7 +177,7 @@ export default function PeriodsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"/>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
         </div>
       </div>
     );

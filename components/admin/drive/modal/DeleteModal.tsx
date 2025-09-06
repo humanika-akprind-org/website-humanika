@@ -1,12 +1,5 @@
 import React from "react";
-
-interface DeleteModalProps {
-  isOpen: boolean;
-  fileName: string;
-  onClose: () => void;
-  onConfirm: () => void;
-  isLoading?: boolean;
-}
+import { type DeleteModalProps } from "@/types/google-drive";
 
 const DeleteModal: React.FC<DeleteModalProps> = ({
   isOpen,

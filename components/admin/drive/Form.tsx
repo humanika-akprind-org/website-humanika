@@ -1,21 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
-import { callApi, fetchDriveFolders } from "@/lib/api/google-drive";
-import { getFolderOptions } from "@/app/utils/google-drive";
+import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
-
-interface DriveFormProps {
-  accessToken: string;
-  file?: drive_v3.Schema$File;
-  onSuccess?: () => void;
-}
-
-interface LoadingState {
-  upload: boolean;
-  folders: boolean;
-}
+import { useDriveForm } from "@/hooks/drive/form/useDriveForm";
+import type { DriveFormProps } from "@/types/google-drive";
 
 const DriveForm: React.FC<DriveFormProps> = ({
   accessToken,
@@ -23,183 +11,32 @@ const DriveForm: React.FC<DriveFormProps> = ({
   onSuccess,
 }) => {
   const router = useRouter();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState(file?.name?.split(".")[0] || "");
-  const [fileExtension, setFileExtension] = useState(
-    file?.name?.includes(".") ? file.name.split(".").pop() || "" : ""
-  );
-  const [folders, setFolders] = useState<drive_v3.Schema$File[]>([]);
-  const [selectedFolderId, setSelectedFolderId] = useState("root");
-  const [isLoading, setIsLoading] = useState<LoadingState>({
-    upload: false,
-    folders: false,
-  });
-  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const setLoadingState = (key: keyof LoadingState, value: boolean) => {
-    setIsLoading((prev) => ({ ...prev, [key]: value }));
-  };
+  const {
+    selectedFile,
+    fileName,
+    fileExtension,
+    selectedFolderId,
+    isLoading,
+    error,
+    folderOptions,
+    handleSubmit,
+    handleFileInputChange,
+    handleFileNameChange,
+    handleFolderChange,
+  } = useDriveForm({ accessToken, file });
 
-  const fetchFolders = useCallback(async () => {
-    setLoadingState("folders", true);
-    setError(null);
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    const success = await handleSubmit(e);
 
-    try {
-      const folders = await fetchDriveFolders(accessToken);
-      setFolders(folders);
-    } catch (err) {
-      console.error("Error fetching folders:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load folders. Please try again."
-      );
-    } finally {
-      setLoadingState("folders", false);
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
-    fetchFolders();
-  }, [fetchFolders]);
-
-  const folderOptions = getFolderOptions(folders);
-
-  const extractFileInfo = useCallback((file: File) => {
-    const fileNameParts = file.name.split(".");
-    const extension = fileNameParts.length > 1 ? fileNameParts.pop() : "";
-    return {
-      name: fileNameParts.join("."),
-      extension: extension || "",
-    };
-  }, []);
-
-  useEffect(() => {
-    if (selectedFile) {
-      const { name, extension } = extractFileInfo(selectedFile);
-      setFileExtension(extension);
-
-      if (fileName === "" || fileName === name) {
-        setFileName(name);
+    if (success) {
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/admin/drive");
       }
     }
-  }, [selectedFile, fileName, extractFileInfo]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (file) {
-      // Edit mode - rename file
-      if (!fileName.trim()) {
-        setError("Nama file tidak boleh kosong");
-        return;
-      }
-
-      const newFileName = `${fileName.trim()}${
-        fileExtension ? `.${fileExtension}` : ""
-      }`;
-
-      setLoadingState("upload", true);
-      setError(null);
-
-      try {
-        await callApi({
-          action: "rename",
-          fileId: file.id,
-          fileName: newFileName,
-          accessToken,
-        });
-
-        if (onSuccess) {
-          onSuccess();
-        } else {
-          router.push("/admin/drive");
-        }
-      } catch (err) {
-        console.error("Rename error:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Rename failed. Please try again."
-        );
-      } finally {
-        setLoadingState("upload", false);
-      }
-    } else {
-      // Add mode - upload file
-      if (!selectedFile) {
-        setError("Please select a file to upload");
-        return;
-      }
-
-      if (!fileName.trim()) {
-        setError("Nama file tidak boleh kosong");
-        return;
-      }
-
-      const newFileName = `${fileName.trim()}${
-        fileExtension ? `.${fileExtension}` : ""
-      }`;
-      const renamedFile = new File([selectedFile], newFileName, {
-        type: selectedFile.type,
-        lastModified: Date.now(),
-      });
-
-      setLoadingState("upload", true);
-      setError(null);
-
-      const formData = new FormData();
-      formData.append("file", renamedFile);
-      formData.append("action", "upload");
-      formData.append("accessToken", accessToken);
-      formData.append("folderId", selectedFolderId);
-      formData.append("fileName", newFileName);
-
-      try {
-        const result = await callApi(
-          {
-            action: "upload",
-            accessToken,
-          },
-          formData
-        );
-
-        if (result.success) {
-          if (onSuccess) {
-            onSuccess();
-          } else {
-            router.push("/admin/drive");
-          }
-        } else {
-          throw new Error(result.message || "Upload failed");
-        }
-      } catch (err) {
-        console.error("Upload error:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Upload failed. Please try again."
-        );
-      } finally {
-        setLoadingState("upload", false);
-      }
-    }
-  };
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setSelectedFile(e.target.files[0]);
-      setError(null);
-    }
-  };
-
-  const handleFileNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFileName(e.target.value);
-  };
-
-  const handleFolderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedFolderId(e.target.value);
   };
 
   return (
@@ -232,7 +69,7 @@ const DriveForm: React.FC<DriveFormProps> = ({
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleFormSubmit}>
         <div className="space-y-4">
           <div>
             <label

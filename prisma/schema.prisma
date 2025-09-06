@@ -169,6 +169,7 @@ model Management {
   position   Position
   photo      String?
   department Department
+    // isActive    Boolean  @default(false)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
@@ -380,6 +381,8 @@ model OrganizationalStructure {
   fileUrl  String?
   mimeType String?
   fileSize Int?
+  // structure   String?  // JSX as string
+  // isActive    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

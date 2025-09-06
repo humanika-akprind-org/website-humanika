@@ -1,0 +1,113 @@
+import { useState } from "react";
+import { callApi } from "@/lib/api/google-drive";
+
+export function useManagementPhoto(
+  accessToken: string
+): {
+  isLoading: boolean;
+  error: string | null;
+  uploadPhoto: (
+    file: File,
+    fileName: string,
+    folderId?: string
+  ) => Promise<string | null>;
+  deletePhoto: (fileId: string) => Promise<boolean>;
+  renamePhoto: (fileId: string, newName: string) => Promise<boolean>;
+} {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const uploadPhoto = async (
+    file: File,
+    fileName: string,
+    folderId: string = "root"
+  ): Promise<string | null> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("action", "upload");
+      formData.append("accessToken", accessToken);
+      formData.append("folderId", folderId);
+      formData.append("fileName", fileName);
+
+      const result = await callApi(
+        {
+          action: "upload",
+          accessToken,
+        },
+        formData
+      );
+
+      if (result.success && result.file) {
+        // Return only the file ID instead of the full URL
+        return result.file.id;
+      } else {
+        throw new Error(result.message || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Photo upload error:", err);
+      setError(
+        err instanceof Error ? err.message : "Upload failed. Please try again."
+      );
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deletePhoto = async (fileId: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await callApi({
+        action: "delete",
+        fileId,
+        accessToken,
+      });
+      return true;
+    } catch (err) {
+      console.error("Photo delete error:", err);
+      setError(
+        err instanceof Error ? err.message : "Delete failed. Please try again."
+      );
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const renamePhoto = async (fileId: string, newName: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await callApi({
+        action: "rename",
+        fileId,
+        fileName: newName,
+        accessToken,
+      });
+      return true;
+    } catch (err) {
+      console.error("Photo rename error:", err);
+      setError(
+        err instanceof Error ? err.message : "Rename failed. Please try again."
+      );
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    isLoading,
+    error,
+    uploadPhoto,
+    deletePhoto,
+    renamePhoto,
+  };
+}

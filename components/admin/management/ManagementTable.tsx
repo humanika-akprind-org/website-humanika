@@ -1,286 +1,546 @@
-// @/components/admin/management/ManagementTable.tsx
 "use client";
 
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import type { Management } from "@/types/management";
 import { Department, Position } from "@/types/enums";
-import { FiEdit, FiTrash2, FiEye, FiPlus } from "react-icons/fi";
-import Image from "next/image";
+import DeleteModal from "./modal/DeleteModal";
+import { ManagementApi } from "@/lib/api/management";
+import { useFileOperations } from "@/hooks/drive/form/useFileOperations";
 
 interface ManagementTableProps {
   managements: Management[];
-  onEdit: (management: Management) => void;
-  onDelete: (management: Management) => void;
-  onView: (management: Management) => void;
-  onAdd: () => void;
-  isLoading?: boolean;
+  accessToken: string;
 }
 
-export const ManagementTable: React.FC<ManagementTableProps> = ({
+const ManagementTable: React.FC<ManagementTableProps> = ({
   managements,
-  onEdit,
-  onDelete,
-  onView,
-  onAdd,
-  isLoading = false,
+  accessToken,
 }) => {
-  const [selectedManagements, setSelectedManagements] = useState<string[]>([]);
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    managementId: string | null;
+    managementName: string;
+    fileId: string | null;
+    fileName: string;
+  }>({
+    isOpen: false,
+    managementId: null,
+    managementName: "",
+    fileId: null,
+    fileName: "",
+  });
 
-  const toggleManagementSelection = (id: string) => {
-    if (selectedManagements.includes(id)) {
-      setSelectedManagements(
-        selectedManagements.filter((managementId) => managementId !== id)
-      );
-    } else {
-      setSelectedManagements([...selectedManagements, id]);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+
+  // Use the file operations hook
+  const {
+    isLoading: isOperating,
+    error: operationError,
+    deleteFile,
+  } = useFileOperations();
+
+  const [filterDepartment, setFilterDepartment] = useState<Department | "all">(
+    "all"
+  );
+  const [filterPeriod, setFilterPeriod] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Helper function to extract file ID from Google Drive URL
+  const extractFileId = (url: string): string | null => {
+    if (!url) return null;
+
+    // Handle direct file IDs
+    if (url.length === 33 && !url.includes("/")) {
+      return url;
     }
+
+    // Handle Google Drive URLs
+    const patterns = [
+      /\/file\/d\/([a-zA-Z0-9_-]+)/,
+      /id=([a-zA-Z0-9_-]+)/,
+      /uc\?export=view&id=([a-zA-Z0-9_-]+)/,
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    return null;
   };
 
-  const toggleSelectAll = () => {
-    if (selectedManagements.length === managements.length) {
-      setSelectedManagements([]);
-    } else {
-      setSelectedManagements(managements.map((management) => management.id));
-    }
+  // Generate proxy image URL
+  const getProxyImageUrl = (photoUrl: string | null): string | null => {
+    if (!photoUrl) return null;
+
+    const fileId = extractFileId(photoUrl);
+    if (!fileId) return null;
+
+    return `/api/drive-image?fileId=${fileId}${
+      accessToken ? `&accessToken=${accessToken}` : ""
+    }`;
   };
 
-  const getDepartmentClass = (department: Department) => {
-    switch (department) {
-      case Department.INFOKOM:
-        return "bg-blue-100 text-blue-800";
-      case Department.PSDM:
-        return "bg-green-100 text-green-800";
-      case Department.LITBANG:
-        return "bg-purple-100 text-purple-800";
-      case Department.KWU:
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  // Check if image has errored
+  const hasImageError = (url: string | null): boolean => {
+    if (!url) return true;
+    return imageErrors.has(url);
   };
 
-  const getPositionDisplayName = (position: Position) => {
-    switch (position) {
-      case Position.KETUA_UMUM:
-        return "Ketua Umum";
-      case Position.WAKIL_KETUA_UMUM:
-        return "Wakil Ketua Umum";
-      case Position.SEKRETARIS:
-        return "Sekretaris";
-      case Position.BENDAHARA:
-        return "Bendahara";
-      case Position.KEPALA_DEPARTEMEN:
-        return "Kepala Departemen";
-      case Position.STAFF_DEPARTEMEN:
-        return "Staff Departemen";
-      default:
-        return position;
-    }
+  // Handle image error
+  const handleImageError = (url: string) => {
+    setImageErrors((prev) => new Set(prev).add(url));
   };
 
-  const getDepartmentDisplayName = (department: Department) => {
-    switch (department) {
-      case Department.INFOKOM:
-        return "INFOKOM";
-      case Department.PSDM:
-        return "PSDM";
-      case Department.LITBANG:
-        return "LITBANG";
-      case Department.KWU:
-        return "KWU";
-      default:
-        return department;
-    }
-  };
+  // Get unique departments and periods for filters
+  const departments = useMemo(
+    () => Array.from(new Set(managements.map((m) => m.department))),
+    [managements]
+  );
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("id-ID", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
+  const periods = useMemo(
+    () =>
+      Array.from(
+        new Set(managements.map((m) => m.period?.id).filter(Boolean))
+      ) as string[],
+    [managements]
+  );
+
+  const periodNames = useMemo(
+    () =>
+      Array.from(
+        new Set(managements.map((m) => m.period?.name).filter(Boolean))
+      ) as string[],
+    [managements]
+  );
+
+  const handleDelete = (management: Management) => {
+    setDeleteModal({
+      isOpen: true,
+      managementId: management.id,
+      managementName: `${management.user?.name} - ${getPositionLabel(
+        management.position
+      )}`,
+      fileId: null,
+      fileName: "",
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div className="animate-pulse">
-          <div className="h-12 bg-gray-200"/>
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 border-t border-gray-200">
-              <div className="h-full flex items-center px-6">
-                <div className="h-4 bg-gray-200 rounded w-3/4"/>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const handleDeletePhoto = (fileId: string, fileName: string) => {
+    setDeleteModal({
+      isOpen: true,
+      managementId: null,
+      managementName: "",
+      fileId,
+      fileName,
+    });
+  };
+
+  const confirmDelete = async () => {
+    if (deleteModal.fileId) {
+      // Handle file deletion using the hook
+      const success = await deleteFile({
+        fileId: deleteModal.fileId,
+        accessToken: accessToken || "",
+      });
+
+      if (success) {
+        // Find the management record that contains this file
+        const managementToUpdate = managements.find((m) => {
+          const fileId = extractFileId(m.photo || "");
+          return fileId === deleteModal.fileId;
+        });
+
+        if (managementToUpdate) {
+          // Update the management record to remove the photo URL
+          await ManagementApi.updateManagement(managementToUpdate.id, {
+            userId: managementToUpdate.userId,
+            periodId: managementToUpdate.periodId,
+            position: managementToUpdate.position,
+            department: managementToUpdate.department,
+            photo: null,
+          });
+        }
+
+        // Refresh the page to show updated data
+        window.location.reload();
+      }
+    } else if (deleteModal.managementId) {
+      // Handle management deletion
+      try {
+        await ManagementApi.deleteManagement(
+          deleteModal.managementId as string,
+          accessToken
+        );
+        // Refresh the page after successful deletion
+        window.location.reload();
+      } catch (error) {
+        console.error("Error deleting management:", error);
+      }
+    }
+
+    setDeleteModal({
+      isOpen: false,
+      managementId: null,
+      managementName: "",
+      fileId: null,
+      fileName: "",
+    });
+  };
+
+  const getDepartmentLabel = (department: Department) =>
+    Department[department] || department;
+
+  const getPositionLabel = (position: Position) =>
+    Position[position] || position;
+
+  // Filter managements based on selected filters and search term
+  const filteredManagements = useMemo(
+    () =>
+      managements.filter(
+        (management) =>
+          (filterDepartment === "all" ||
+            management.department === filterDepartment) &&
+          (filterPeriod === "all" || management.period?.id === filterPeriod) &&
+          (!searchTerm ||
+            management.user?.name
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            management.user?.email
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            getPositionLabel(management.position)
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            getDepartmentLabel(management.department)
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            management.period?.name
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()))
+      ),
+    [managements, filterDepartment, filterPeriod, searchTerm]
+  );
+
+  // Group by department for better organization
+  const groupedManagements = useMemo(
+    () =>
+      filteredManagements.reduce(
+        (acc, management) => ({
+          ...acc,
+          [management.department]: [
+            ...(acc[management.department] || []),
+            management,
+          ],
+        }),
+        {} as Record<string, Management[]>
+      ),
+    [filteredManagements]
+  );
+
+  // Sort departments alphabetically
+  const sortedDepartments = useMemo(
+    () => Object.keys(groupedManagements).sort(),
+    [groupedManagements]
+  );
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="pl-6 pr-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      {/* Header with Filters */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Management Structure
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {filteredManagements.length} of {managements.length} members
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Search Input */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Cari management..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg
+                className="h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <input
-                  type="checkbox"
-                  checked={
-                    managements.length > 0 &&
-                    selectedManagements.length === managements.length
-                  }
-                  onChange={toggleSelectAll}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Nama
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Departemen
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Posisi
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Periode
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Dibuat
-              </th>
-              <th
-                scope="col"
-                className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Aksi
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {managements.map((management) => (
-              <tr
-                key={management.id}
-                className="hover:bg-gray-50 transition-colors"
-              >
-                <td className="pl-6 pr-2 py-4 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    checked={selectedManagements.includes(management.id)}
-                    onChange={() => toggleManagementSelection(management.id)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                  />
-                </td>
-                <td className="px-4 py-4">
-                  <div className="flex items-center">
-                    {management.photo && (
-                      <Image
-                        src={management.photo}
-                        alt={management.user.name}
-                        className="h-10 w-10 rounded-full object-cover mr-3"
-                      />
-                    )}
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {management.user.name}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {management.user.email}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getDepartmentClass(
-                      management.department
-                    )}`}
-                  >
-                    {getDepartmentDisplayName(management.department)}
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {getPositionDisplayName(management.position)}
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {management.period.name}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(management.createdAt)}
-                </td>
-                <td className="pl-4 pr-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                      onClick={() => onView(management)}
-                      title="Lihat detail"
-                    >
-                      <FiEye size={16} />
-                    </button>
-                    <button
-                      className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-                      onClick={() => onEdit(management)}
-                      title="Edit management"
-                    >
-                      <FiEdit size={16} />
-                    </button>
-                    <button
-                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                      onClick={() => onDelete(management)}
-                      title="Hapus management"
-                    >
-                      <FiTrash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              </svg>
+            </div>
+          </div>
+
+          {/* Department Filter */}
+          <select
+            value={filterDepartment}
+            onChange={(e) =>
+              setFilterDepartment(e.target.value as Department | "all")
+            }
+            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="all">Semua Departemen</option>
+            {departments.map((dept) => (
+              <option key={dept} value={dept}>
+                {getDepartmentLabel(dept)}
+              </option>
             ))}
-          </tbody>
-        </table>
+          </select>
+
+          {/* Period Filter */}
+          <select
+            value={filterPeriod}
+            onChange={(e) => setFilterPeriod(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="all">Semua Periode</option>
+            {periods.map((periodId, index) => (
+              <option key={periodId} value={periodId}>
+                {periodNames[index]}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {managements.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-2">
-            <FiPlus size={48} className="mx-auto" />
-          </div>
-          <p className="text-gray-500 text-lg font-medium">
-            Tidak ada data management
-          </p>
-          <p className="text-gray-400 mt-1">
-            Klik tombol &quot;Tambah Management&quot; untuk menambahkan data
-            baru
-          </p>
-          <button
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            onClick={onAdd}
-          >
-            Tambah Management
-          </button>
+      {operationError && (
+        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
+          <h3 className="font-medium">Error</h3>
+          <p className="text-sm">{operationError}</p>
         </div>
       )}
+
+      {/* Management Cards by Department */}
+      <div className="space-y-8">
+        {sortedDepartments.length > 0 ? (
+          sortedDepartments.map((department) => (
+            <div key={department} className="border border-gray-200 rounded-lg">
+              {/* Department Header */}
+              <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {getDepartmentLabel(department as Department)}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {groupedManagements[department].length} anggota
+                </p>
+              </div>
+
+              {/* Management Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                {groupedManagements[department]
+                  .sort(
+                    (a, b) =>
+                      Object.values(Position).indexOf(a.position) -
+                      Object.values(Position).indexOf(b.position)
+                  )
+                  .map((management) => {
+                    const proxyImageUrl = getProxyImageUrl(
+                      management.photo || ""
+                    );
+                    const hasError = proxyImageUrl
+                      ? hasImageError(proxyImageUrl)
+                      : true;
+
+                    return (
+                      <div
+                        key={management.id}
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start space-x-4">
+                          {/* Photo */}
+                          <div className="flex-shrink-0 relative">
+                            {proxyImageUrl && !hasError ? (
+                              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden">
+                                <Image
+                                  src={proxyImageUrl}
+                                  alt={management.user?.name || "Management"}
+                                  width={64}
+                                  height={64}
+                                  className="w-full h-full object-cover rounded-full"
+                                  onError={() =>
+                                    handleImageError(proxyImageUrl)
+                                  }
+                                  unoptimized={true}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200">
+                                <svg
+                                  className="w-8 h-8 text-gray-500"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                  />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Details */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-semibold text-gray-800 truncate">
+                              {management.user?.name}
+                            </h3>
+                            <p className="text-sm text-blue-600 font-medium">
+                              {getPositionLabel(management.position)}
+                            </p>
+                            <p className="text-sm text-gray-500 truncate">
+                              {management.user?.email}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              Periode: {management.period?.name}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex justify-end space-x-2 mt-4 pt-4 border-t border-gray-100">
+                          <Link
+                            href={`/admin/governance/managements/edit/${management.id}`}
+                            className="px-3 py-1 text-sm bg-yellow-50 text-yellow-700 rounded hover:bg-yellow-100 border border-yellow-200"
+                          >
+                            Edit
+                          </Link>
+                          {management.photo && (
+                            <button
+                              onClick={() => {
+                                const fileId = extractFileId(
+                                  management.photo || ""
+                                );
+                                if (fileId) {
+                                  handleDeletePhoto(
+                                    fileId,
+                                    `${management.user?.name} - Photo`
+                                  );
+                                }
+                              }}
+                              disabled={isOperating}
+                              className="px-3 py-1 text-sm bg-orange-50 text-orange-700 rounded hover:bg-orange-100 border border-orange-200 disabled:opacity-50"
+                            >
+                              Hapus Foto
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDelete(management)}
+                            disabled={isOperating}
+                            className="px-3 py-1 text-sm bg-red-50 text-red-700 rounded hover:bg-red-100 border border-red-200 disabled:opacity-50"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+            <h3 className="mt-4 text-sm font-medium text-gray-900">
+              Tidak ada management
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {managements.length === 0
+                ? "Mulai dengan menambahkan anggota management pertama."
+                : "Tidak ada hasil yang cocok dengan filter yang dipilih."}
+            </p>
+            {managements.length === 0 && (
+              <div className="mt-6">
+                <Link
+                  href="/admin/governance/managements/add"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <svg
+                    className="-ml-1 mr-2 h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                  Tambah Management
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Loading Overlay */}
+      {isOperating && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+            <div
+              className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"
+              aria-hidden="true"
+            />
+            <p className="text-gray-700">Processing your request...</p>
+          </div>
+        </div>
+      )}
+
+      <DeleteModal
+        isOpen={deleteModal.isOpen}
+        managementName={deleteModal.managementName || deleteModal.fileName}
+        onClose={() =>
+          setDeleteModal({
+            isOpen: false,
+            managementId: null,
+            managementName: "",
+            fileId: null,
+            fileName: "",
+          })
+        }
+        onConfirm={confirmDelete}
+        isLoading={isOperating}
+      />
     </div>
   );
 };
+
+export default ManagementTable;

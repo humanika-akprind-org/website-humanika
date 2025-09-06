@@ -20,6 +20,11 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "HUMANIKA",
   description: "HIMPUNAN MAHASISWA INFORMATIKA",
+  icons: {
+    icon: ["/favicon.ico?v=4"],
+    apple: ["/apple-touch-icon.png"],
+    shortcut: ["/apple-touch-icon.png"],
+  },
 };
 
 export default async function RootLayout({

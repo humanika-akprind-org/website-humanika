@@ -40,15 +40,22 @@ export async function POST(request: NextRequest) {
           mimeType: file.type,
           body: stream,
         },
-        fields: "id,name,webViewLink,webContentLink",
+        fields: "id,name,webViewLink,webContentLink,mimeType",
       });
+
+      // Use direct image URL for Next.js Image component if it's an image
+      let imageUrl = data.webViewLink;
+      if (file.type.startsWith('image/')) {
+        imageUrl = `https://drive.google.com/uc?export=view&id=${data.id}`;
+      }
 
       return NextResponse.json({
         success: true,
         file: {
           id: data.id,
           name: data.name,
-          url: data.webViewLink,
+          url: imageUrl,
+          originalUrl: data.webViewLink,
           downloadUrl: data.webContentLink,
         },
       });
@@ -94,13 +101,21 @@ export async function POST(request: NextRequest) {
         });
         const { data } = await drive.files.get({
           fileId,
-          fields: "webViewLink",
+          fields: "webViewLink,mimeType,thumbnailLink",
         });
+
+        // Return direct image URL for Next.js Image component
+        let imageUrl = data.webViewLink || `https://drive.google.com/file/d/${fileId}/view`;
+
+        // If it's an image, use the direct download URL format
+        if (data.mimeType && data.mimeType.startsWith('image/')) {
+          imageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+        }
+
         return NextResponse.json({
           success: true,
-          url:
-            data.webViewLink ||
-            `https://drive.google.com/file/d/${fileId}/view`,
+          url: imageUrl,
+          originalUrl: data.webViewLink,
         });
 
       default:

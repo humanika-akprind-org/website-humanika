@@ -1,5 +1,9 @@
 import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
-import { type FolderOption } from "../../types/google-drive";
+
+export interface FolderOption {
+  id: string;
+  name: string;
+}
 
 export const getFolderOptions = (
   folders: drive_v3.Schema$File[]
