@@ -1,104 +1,65 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import type { Management, UpdateManagementData, CreateManagementData } from "@/types/management";
-import { managementAPI } from "@/lib/api/management";
+import { UserApi } from "@/lib/api/user";
+import { PeriodApi } from "@/lib/api/period";
+import { ManagementApi } from "@/lib/api/management";
 import ManagementForm from "@/components/admin/management/ManagementForm";
+import PageHeader from "@/components/admin/drive/PageHeader";
+import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
+import { cookies } from "next/headers";
+import type { ManagementServerData } from "@/types/management";
 
-export default function EditManagementPage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
+async function EditManagementPage({
+  params,
+}: { params: { id: string } }) {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("google_access_token")?.value || "";
 
-  const [management, setManagement] = useState<Management | null>(null);
-  const [periods, setPeriods] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  try {
+    const [management, usersResponse, periods] = await Promise.all([
+      ManagementApi.getManagement(params.id),
+      UserApi.getUsers(),
+      PeriodApi.getPeriods(),
+    ]);
 
-  useEffect(() => {
-    fetchData();
-  }, [id]);
+    const users = usersResponse.data?.users || [];
 
-  const fetchData = async () => {
-    try {
-      const [managementResponse, periodsResponse] = await Promise.all([
-        managementAPI.getManagementById(id),
-        fetch("/api/periods").then((res) => res.json()),
-      ]);
+    const handleSubmit = async (data: ManagementServerData) => {
+      "use server";
+      await ManagementApi.updateManagement(params.id, data);
+    };
 
-      if (managementResponse.error) {
-        setError(managementResponse.error);
-      } else if (managementResponse.data) {
-        setManagement(managementResponse.data);
-      }
-
-      setPeriods(periodsResponse.periods || []);
-    } catch (error) {
-      setError("Failed to fetch data");
-      console.error("Error fetching data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmit = async (data: UpdateManagementData | CreateManagementData) => {
-    setIsSubmitting(true);
-    try {
-      const response = await managementAPI.updateManagement(id, data as UpdateManagementData);
-      if (response.error) {
-        alert(response.error);
-      } else {
-        router.push("/admin/governance/managements");
-      }
-    } catch (error) {
-      alert("Failed to update management");
-      console.error("Error updating management:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"/>
-      </div>
-    );
-  }
-
-  if (error || !management) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error || "Management not found"}
+      <AuthGuard accessToken={accessToken}>
+        <div className="min-h-screen bg-gray-50 p-6">
+          <div className="max-w-4xl mx-auto">
+            <PageHeader title={`Edit Management: ${management.user?.name}`} />
+            <ManagementForm
+              accessToken={accessToken}
+              users={users}
+              periods={periods}
+              management={management}
+              onSubmit={handleSubmit}
+            />
+          </div>
         </div>
-        <button
-          onClick={() => router.back()}
-          className="mt-4 bg-gray-500 text-white px-4 py-2 rounded"
-        >
-          Go Back
-        </button>
+      </AuthGuard>
+    );
+  } catch (error) {
+    console.error("Error loading management:", error);
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="text-center text-red-500">
+              <h2 className="text-xl font-semibold mb-4">
+                Error Loading Management
+              </h2>
+              <p>{error instanceof Error ? error.message : "Unknown error"}</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
-
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Edit Management</h1>
-        <p className="text-gray-600 mt-2">Update management position details</p>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6">
-        <ManagementForm
-          management={management}
-          periods={periods}
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-        />
-      </div>
-    </div>
-  );
 }
+
+export default EditManagementPage;

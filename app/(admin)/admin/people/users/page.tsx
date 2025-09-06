@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { FiPlus } from "react-icons/fi";
 import UserStats from "@/components/admin/user/Stats";
@@ -33,7 +33,7 @@ export default function UsersPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [forceReset, setForceReset] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -70,11 +70,11 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, currentPage, filters.role, filters.department, filters.isActive]);
 
   useEffect(() => {
     fetchUsers();
-  }, [searchTerm, currentPage, filters.role, filters.department]);
+  }, [fetchUsers]);
 
   const toggleUserSelection = (id: string) => {
     if (selectedUsers.includes(id)) {

@@ -1,7 +1,7 @@
 // app/(admin)/admin/people/users/verify-accounts/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   FiSearch,
   FiFilter,
@@ -39,7 +39,7 @@ export default function VerifyAccountsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [processingIds, setProcessingIds] = useState<string[]>([]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -75,11 +75,11 @@ export default function VerifyAccountsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, currentPage, filters]);
 
   useEffect(() => {
     fetchUsers();
-  }, [searchTerm, currentPage, filters]);
+  }, [fetchUsers]);
 
   // Filter users based on search term and filters
   const filteredUsers = users.filter((user) => {
