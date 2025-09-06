@@ -1,50 +1,38 @@
-import { type Department, type Position, type UserRole } from "./enums";
-import { type User } from "./user";
+import { Department, Position } from "./enums";
 
 export interface Management {
   id: string;
   userId: string;
   periodId: string;
   position: Position;
-  photo: string | null;
   department: Department;
-  createdAt: string;
-  updatedAt: string;
-  user: User;
-  period: Period;
+  photo?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user?: User;
+  period?: Period;
 }
 
-export interface Period {
-  id: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateManagementData {
+export interface ManagementFormData {
   userId: string;
   periodId: string;
   position: Position;
   department: Department;
-  photoFile?: File | null;
+  photoFile?: File;
+  photo?: string;
 }
 
-export interface UpdateManagementData extends Partial<CreateManagementData> {
-  id: string;
+export interface ManagementServerData {
+  userId: string;
+  periodId: string;
+  position: Position;
+  department: Department;
+  photo?: string | null;
 }
 
-export interface ManagementsResponse {
-  managements: Management[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-export interface ApiResponse<T> {
-  data?: T;
+export interface ManagementApiResponse {
+  success: boolean;
+  data?: Management | Management[];
+  message?: string;
   error?: string;
 }
