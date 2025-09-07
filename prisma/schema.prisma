@@ -72,11 +72,10 @@ enum Status {
 }
 
 // Enum Status untuk berbagai entitas
-enum StatusApproval{
+enum StatusApproval {
  APPROVED
  REJECTED
 }
-
 
 // Enum Letter Type
 enum LetterType {
