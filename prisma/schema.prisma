@@ -64,17 +64,19 @@ enum DocumentType {
 
 // Enum Status untuk berbagai entitas
 enum Status {
-  DRAFT
-  PENDING
-  APPROVED
-  REJECTED
-  REVISION
-  ARCHIVED
-  ONGOING
-  COMPLETED
-  CANCELLED
-  POSTPONED
+ DRAFT
+ PENDING
+ PUBLISH
+ PRIVATE
+ ARCHIVE
 }
+
+// Enum Status untuk berbagai entitas
+enum StatusApproval{
+ APPROVED
+ REJECTED
+}
+
 
 // Enum Letter Type
 enum LetterType {
@@ -157,6 +159,7 @@ model Period {
   workPrograms WorkProgram[]
   events      Event[]
   articles    Article[]
+  organizationalStructures OrganizationalStructure[] @relation("OrganizationalStructurePeriod")
 
   @@index([isActive, startYear, endYear])
   @@map("periods")
@@ -169,7 +172,7 @@ model Management {
   position   Position
   photo      String?
   department Department
-    // isActive    Boolean  @default(false)
+  isActive    Boolean  @default(false) // NEW Menandakan apakah manajemen tersebut aktif pada periode tersebut
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
@@ -211,6 +214,8 @@ model WorkProgram {
 model Event {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
+  slug         String   @unique
+  thumbnail    String?    // URL gambar thumbnail
   description  String
   responsibleId String     @db.ObjectId
   goal         String
@@ -221,7 +226,6 @@ model Event {
   funds        Float
   usedFunds    Float      @default(0)
   remainingFunds Float    @default(0)
-  thumbnail    String?
   status       Status     @default(DRAFT)
   workProgramId String?    @db.ObjectId
   createdAt    DateTime   @default(now())
@@ -248,9 +252,7 @@ model Document {
   letterId  String?        @db.ObjectId
   type      DocumentType
   status    Status         @default(PENDING)
-  fileUrl   String?
-  mimeType  String?
-  fileSize  Int?
+  document   String?      // URL dokumen
   userId    String         @db.ObjectId
   version   Int            @default(1)
   parentId  String?        @db.ObjectId
@@ -275,9 +277,7 @@ model Gallery {
   title    String
   image    String
   eventId  String     @db.ObjectId
-  fileUrl  String?
-  mimeType String?
-  fileSize Int?
+  gallery String?  // URL gambar
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -292,16 +292,13 @@ model Article {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   slug         String   @unique
+  thumbnail    String? // URL gambar thumbnail
   content      String
-  thumbnail    String?
   authorId     String     @db.ObjectId
   categoryId   String     @db.ObjectId
   periodId     String?    @db.ObjectId
   isPublished  Boolean  @default(false)
   publishedAt  DateTime?
-  fileUrl      String?
-  mimeType     String?
-  fileSize     Int?
   status       Status   @default(DRAFT)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -315,7 +312,6 @@ model Article {
   @@index([isPublished, authorId, categoryId, status])
   @@map("articles")
 }
-
 model CategoryArticle {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String    @unique
@@ -328,7 +324,7 @@ model CategoryArticle {
   @@map("categoryArticles")
 }
 
-model FinanceCategory {
+model CategoryFinance {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String      @unique
   description String?
@@ -341,7 +337,7 @@ model FinanceCategory {
   finances Finance[]
 
   @@index([type, isActive])
-  @@map("financeCategories")
+  @@map("categoriesFinance")
 }
 
 model Finance {
@@ -354,16 +350,13 @@ model Finance {
   periodId    String     @db.ObjectId
   eventId     String?    @db.ObjectId
   userId      String     @db.ObjectId
-  proofFile   String?
-  fileUrl     String?
-  mimeType    String?
-  fileSize    Int?
   status      Status   @default(PENDING)
+  proof       String?   // URL file bukti transaksi
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  category FinanceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category CategoryFinance @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   period   Period          @relation(fields: [periodId], references: [id], onDelete: Cascade)
   event    Event?          @relation(fields: [eventId], references: [id], onDelete: SetNull)
   user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -377,19 +370,18 @@ model OrganizationalStructure {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   name     String
   status   Status   @default(PENDING)
-  order    Int
-  fileUrl  String?
-  mimeType String?
-  fileSize Int?
-  // structure   String?  // JSX as string
-  // isActive    Boolean  @default(false)
+  periodId String     @db.ObjectId
+  decree   String   // URL file Surat Keputusan (SK)
+  structure   String?  // JSX as string
+  isActive    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
+  period      Period           @relation(fields: [periodId], references: [id], onDelete: Cascade, name: "OrganizationalStructurePeriod")
   approvals Approval[] @relation("OrganizationalStructureApprovals")
 
-  @@index([status, order])
+  @@index([status, isActive])
   @@map("organizationalStructures")
 }
 
@@ -495,6 +487,7 @@ model Letter {
   type         LetterType
   priority     LetterPriority @default(NORMAL)
   body         String?
+  letter       String?        // URL file surat
   notes        String?
   status       Status         @default(PENDING)
   createdById  String         @db.ObjectId
@@ -522,11 +515,8 @@ model Approval {
   entityType   ApprovalType
   entityId     String             @db.ObjectId
   userId       String             @db.ObjectId
-  status       Status             @default(PENDING)
+  status       StatusApproval
   note         String?
-  fileUrl      String?
-  mimeType     String?
-  fileSize     Int?
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 
