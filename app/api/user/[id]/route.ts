@@ -1,14 +1,12 @@
 // app/api/user/[id]/route.ts
 import { type NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import {
-  PrismaClient,
   type UserRole,
   type Department,
   type Position,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
-
-const prisma = new PrismaClient();
 
 // GET - Get user by ID
 export async function GET(

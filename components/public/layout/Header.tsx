@@ -33,8 +33,8 @@ function DesktopHeader({ currentUser }: HeaderProps) {
           <div className="flex items-center space-x-4">
             <div className="bg-white rounded-full shadow-md">
               <Image
-                src="https://drive.google.com/uc?export=view&id=1gb5FoF_-uUJ6LnVH6ZJr2OAdwbZxl-tg"
-                alt="HUMANIKA Logo"
+                src="/logo.png"
+                alt="HUMANIKA"
                 width={75}
                 height={75}
                 className="rounded-full"

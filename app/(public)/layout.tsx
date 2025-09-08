@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import ".././globals.css";
 import Header from "@/components/public/layout/Header";
 import Footer from "@/components/public/layout/Footer";
 import AIButton from "@/components/public/AIButton";
 import { getCurrentUser } from "@/lib/auth";
-
-const geistSans = localFont({
-  src: "../ui/fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "../ui/fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import { geistSans, geistMono } from "@/app/ui/fonts";
 
 export const metadata: Metadata = {
   title: "HUMANIKA",

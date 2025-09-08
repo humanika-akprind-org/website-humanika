@@ -1,6 +1,6 @@
 import { UserApi } from "@/lib/api/user";
 import { PeriodApi } from "@/lib/api/period";
-import ManagementForm from "@/components/admin/management/ManagementForm";
+import ManagementForm from "@/components/admin/management/Form";
 import PageHeader from "@/components/admin/drive/PageHeader";
 import { ManagementApi } from "@/lib/api/management";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";

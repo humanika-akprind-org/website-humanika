@@ -13,6 +13,7 @@ import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 import { useManagementPhoto } from "@/hooks/management/useManagementPhoto";
 import DeleteModal from "./modal/DeleteModal";
+import { formatEnumValue } from "@/lib/utils";
 
 // Helper function to validate image URL
 const isValidImageUrl = (url: string): boolean => {
@@ -233,8 +234,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
         const uploadedFileId = await uploadPhoto(
           formData.photoFile,
           tempFileName,
-          process.env.NEXT_PUBLIC_MANAGEMENT_PHOTOS_FOLDER_ID ||
-            "1s4gUKFAxxz56h69fcuE2oTMGLvelqJ8b"
+          process.env.NEXT_PUBLIC_MANAGEMENT_PHOTOS_FOLDER_ID || "root"
         );
 
         if (uploadedFileId) {
@@ -345,7 +345,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
             >
               {Object.values(Department).map((dept) => (
                 <option key={dept} value={dept}>
-                  {Department[dept as keyof typeof Department]}
+                  {dept}
                 </option>
               ))}
             </select>
@@ -365,7 +365,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
             >
               {Object.values(Position).map((pos) => (
                 <option key={pos} value={pos}>
-                  {Position[pos as keyof typeof Position]}
+                  {formatEnumValue(pos)}
                 </option>
               ))}
             </select>

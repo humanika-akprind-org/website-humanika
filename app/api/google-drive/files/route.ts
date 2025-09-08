@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       q: "trashed=false",
       fields: "files(id, name, size, mimeType, createdTime, webViewLink)",
       orderBy: "createdTime desc",
-      pageSize: 1000,
+      pageSize: 100,
     });
 
     return NextResponse.json({

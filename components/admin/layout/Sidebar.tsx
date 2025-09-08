@@ -34,8 +34,8 @@ export default function Sidebar() {
         <div className="flex items-center space-x-3">
           <div className="bg-white rounded-full shadow-sm p-1 border border-gray-100">
             <Image
-              src="https://drive.google.com/uc?export=view&id=1gb5FoF_-uUJ6LnVH6ZJr2OAdwbZxl-tg"
-              alt="HUMANIKA Logo"
+              src="/logo.png"
+              alt="HUMANIKA"
               width={60}
               height={60}
               className="rounded-full"

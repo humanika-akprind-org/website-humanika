@@ -6,6 +6,7 @@ export enum UserRole {
 }
 
 export enum Department {
+  BPH = "BPH",
   INFOKOM = "INFOKOM",
   PSDM = "PSDM",
   LITBANG = "LITBANG",
@@ -29,7 +30,7 @@ export enum PeriodStatus {
 
 export enum FinanceType {
   INCOME = "INCOME",
-  EXPENSE = "EXPENSE"
+  EXPENSE = "EXPENSE",
 }
 
 export enum DocumentType {
@@ -51,7 +52,7 @@ export enum DocumentType {
   PRESENTATION = "PRESENTATION",
   CERTIFICATE = "CERTIFICATE",
   DECREE = "DECREE",
-  OTHER = "OTHER"
+  OTHER = "OTHER",
 }
 
 // Enum Status untuk berbagai entitas
@@ -65,20 +66,20 @@ export enum Status {
   ONGOING = "ONGOING",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
-  POSTPONED = "POSTPONED"
+  POSTPONED = "POSTPONED",
 }
 
 // Enum Letter Type
 export enum LetterType {
   OUTGOING = "OUTGOING",
-  INCOMING = "INCOMING"
+  INCOMING = "INCOMING",
 }
 
 // Enum Letter Priority
 export enum LetterPriority {
   NORMAL = "NORMAL",
   IMPORTANT = "IMPORTANT",
-  URGENT = "URGENT"
+  URGENT = "URGENT",
 }
 
 export enum ApprovalType {
@@ -93,7 +94,7 @@ export enum ApprovalType {
   LINK_HUB_DETAIL = "LINK_HUB_DETAIL",
   LINK_HUB_THEME = "LINK_HUB_THEME",
   ORGANIZATIONAL_STRUCTURE = "ORGANIZATIONAL_STRUCTURE",
-  DEPARTMENT_TASK = "DEPARTMENT_TASK"
+  DEPARTMENT_TASK = "DEPARTMENT_TASK",
 }
 
 export enum ApiResponseStatus {

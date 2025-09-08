@@ -1,5 +1,5 @@
 import { FiUsers, FiUserCheck, FiUserX, FiMail } from "react-icons/fi";
-import type { User } from "../../../types/user";
+import type { User } from "@/types/user";
 
 interface UserStatsProps {
   users: User[];

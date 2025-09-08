@@ -12,37 +12,8 @@ import {
   FiSave,
 } from "react-icons/fi";
 import { useRouter } from "next/navigation";
-
-// Enum values from Prisma
-enum UserRole {
-  DPO = "DPO",
-  BPH = "BPH",
-  PENGURUS = "PENGURUS",
-  ANGGOTA = "ANGGOTA",
-}
-
-enum Department {
-  INFOKOM = "INFOKOM",
-  PSDM = "PSDM",
-  LITBANG = "LITBANG",
-  KWU = "KWU",
-}
-
-enum Position {
-  KETUA_UMUM = "KETUA_UMUM",
-  WAKIL_KETUA_UMUM = "WAKIL_KETUA_UMUM",
-  SEKRETARIS = "SEKRETARIS",
-  BENDAHARA = "BENDAHARA",
-  KEPALA_DEPARTEMEN = "KEPALA_DEPARTEMEN",
-  STAFF_DEPARTEMEN = "STAFF_DEPARTEMEN",
-}
-
-// Helper function to format enum values for display
-const formatEnumValue = (value: string): string =>
-  value
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
+import {UserRole, Department, Position } from "@/types/enums";
+import { formatEnumValue } from "@/lib/utils";
 
 interface CreateUserData {
   name: string;
@@ -315,7 +286,7 @@ export default function AddUserPage() {
                 >
                   {Object.values(UserRole).map((role) => (
                     <option key={role} value={role}>
-                      {formatEnumValue(role)}
+                      {role}
                     </option>
                   ))}
                 </select>
@@ -352,7 +323,7 @@ export default function AddUserPage() {
                   <option value="">Select a department</option>
                   {Object.values(Department).map((dept) => (
                     <option key={dept} value={dept}>
-                      {formatEnumValue(dept)}
+                      {dept}
                     </option>
                   ))}
                 </select>

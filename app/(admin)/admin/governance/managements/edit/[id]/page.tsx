@@ -1,15 +1,13 @@
 import { UserApi } from "@/lib/api/user";
 import { PeriodApi } from "@/lib/api/period";
 import { ManagementApi } from "@/lib/api/management";
-import ManagementForm from "@/components/admin/management/ManagementForm";
+import ManagementForm from "@/components/admin/management/Form";
 import PageHeader from "@/components/admin/drive/PageHeader";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 import type { ManagementServerData } from "@/types/management";
 
-async function EditManagementPage({
-  params,
-}: { params: { id: string } }) {
+async function EditManagementPage({ params }: { params: { id: string } }) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("google_access_token")?.value || "";
 
