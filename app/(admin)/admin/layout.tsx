@@ -2,22 +2,12 @@ import type { Metadata } from "next";
 import AuthProvider from "@/components/admin/auth/AuthProvider";
 import Sidebar from "@/components/admin/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
-import localFont from "next/font/local";
-import "./../../globals.css";
+import "@/app/globals.css";
 import { cookies } from "next/headers";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/components/admin/layout/UserInfo";
-
-const geistSans = localFont({
-  src: "./../../ui/fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./../../ui/fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import { geistSans, geistMono } from "@/app/ui/fonts";
+import SidebarMobile from "@/components/admin/layout/SidebarMobile";
 
 export const metadata: Metadata = {
   title: "Organizational Management System",
@@ -40,7 +30,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
           <div className="flex h-screen overflow-hidden">
@@ -48,6 +38,8 @@ export default async function RootLayout({
 
             <div className="flex-1 overflow-auto">
               <header className="bg-white shadow-sm">
+                <SidebarMobile />
+
                 <div className="px-6 py-4 flex justify-between items-center">
                   <h1 className="text-2xl font-semibold text-gray-800">
                     Organizational Dashboard
