@@ -8,6 +8,8 @@ import { Department, Position } from "@/types/enums";
 import DeleteModal from "./modal/DeleteModal";
 import { ManagementApi } from "@/lib/api/management";
 import { useFileOperations } from "@/hooks/drive/form/useFileOperations";
+import PeriodFilters from "./Filters";
+import ManagementStats from "./Stats";
 
 interface ManagementTableProps {
   managements: Management[];
@@ -18,6 +20,26 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
   managements,
   accessToken,
 }) => {
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+  const [selectedManagements, setSelectedManagements] = useState<string[]>([]);
+
+  // Computed filter values
+  const filterIsActive =
+    statusFilter === "all"
+      ? "all"
+      : statusFilter === "ACTIVE"
+      ? "active"
+      : "inactive";
+
+  const handleDeleteSelected = () => {
+    // Handle bulk delete logic here
+    console.log("Delete selected managements:", selectedManagements);
+  };
+
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     managementId: string | null;
@@ -40,12 +62,6 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
     error: operationError,
     deleteFile,
   } = useFileOperations();
-
-  const [filterDepartment, setFilterDepartment] = useState<Department | "all">(
-    "all"
-  );
-  const [filterPeriod, setFilterPeriod] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Helper function to extract file ID from Google Drive URL
   const extractFileId = (url: string): string | null => {
@@ -95,28 +111,6 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
   const handleImageError = (url: string) => {
     setImageErrors((prev) => new Set(prev).add(url));
   };
-
-  // Get unique departments and periods for filters
-  const departments = useMemo(
-    () => Array.from(new Set(managements.map((m) => m.department))),
-    [managements]
-  );
-
-  const periods = useMemo(
-    () =>
-      Array.from(
-        new Set(managements.map((m) => m.period?.id).filter(Boolean))
-      ) as string[],
-    [managements]
-  );
-
-  const periodNames = useMemo(
-    () =>
-      Array.from(
-        new Set(managements.map((m) => m.period?.name).filter(Boolean))
-      ) as string[],
-    [managements]
-  );
 
   const handleDelete = (management: Management) => {
     setDeleteModal({
@@ -203,9 +197,13 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
     () =>
       managements.filter(
         (management) =>
-          (filterDepartment === "all" ||
-            management.department === filterDepartment) &&
-          (filterPeriod === "all" || management.period?.id === filterPeriod) &&
+          (departmentFilter === "all" ||
+            management.department === departmentFilter) &&
+          (periodFilter === "all" ||
+            management.period?.name === periodFilter) &&
+          (filterIsActive === "all" ||
+            (filterIsActive === "active" && management.period?.isActive) ||
+            (filterIsActive === "inactive" && !management.period?.isActive)) &&
           (!searchTerm ||
             management.user?.name
               ?.toLowerCase()
@@ -223,8 +221,37 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
               ?.toLowerCase()
               .includes(searchTerm.toLowerCase()))
       ),
-    [managements, filterDepartment, filterPeriod, searchTerm]
+    [managements, departmentFilter, periodFilter, filterIsActive, searchTerm]
   );
+
+  // Stats for departments INFOKOM, PSDM, LITBANG, KWU based on filtered managements
+  const departmentStats = useMemo(() => {
+    const stats = {
+      INFOKOM: 0,
+      PSDM: 0,
+      LITBANG: 0,
+      KWU: 0,
+    };
+
+    filteredManagements.forEach((management) => {
+      switch (management.department) {
+        case Department.INFOKOM:
+          stats.INFOKOM += 1;
+          break;
+        case Department.PSDM:
+          stats.PSDM += 1;
+          break;
+        case Department.LITBANG:
+          stats.LITBANG += 1;
+          break;
+        case Department.KWU:
+          stats.KWU += 1;
+          break;
+      }
+    });
+
+    return stats;
+  }, [filteredManagements]);
 
   // Group by department for better organization
   const groupedManagements = useMemo(
@@ -249,96 +276,49 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      {/* Header with Filters */}
+    <div className="rounded-xl">
+      <ManagementStats departmentStats={departmentStats} />
+
+      <PeriodFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        periodFilter={periodFilter}
+        onPeriodFilterChange={setPeriodFilter}
+        departmentFilter={departmentFilter}
+        onDepartmentFilterChange={setDepartmentFilter}
+        selectedCount={selectedManagements.length}
+        onDeleteSelected={handleDeleteSelected}
+      />
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">
-            Management Structure
-          </h1>
           <p className="text-sm text-gray-500 mt-1">
             {filteredManagements.length} of {managements.length} members
           </p>
         </div>
-
-        <div className="flex flex-col sm:flex-row gap-3">
-          {/* Search Input */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Cari management..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64"
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          </div>
-
-          {/* Department Filter */}
-          <select
-            value={filterDepartment}
-            onChange={(e) =>
-              setFilterDepartment(e.target.value as Department | "all")
-            }
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="all">Semua Departemen</option>
-            {departments.map((dept) => (
-              <option key={dept} value={dept}>
-                {getDepartmentLabel(dept)}
-              </option>
-            ))}
-          </select>
-
-          {/* Period Filter */}
-          <select
-            value={filterPeriod}
-            onChange={(e) => setFilterPeriod(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="all">Semua Periode</option>
-            {periods.map((periodId, index) => (
-              <option key={periodId} value={periodId}>
-                {periodNames[index]}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
-
       {operationError && (
         <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
           <h3 className="font-medium">Error</h3>
           <p className="text-sm">{operationError}</p>
         </div>
       )}
-
       {/* Management Cards by Department */}
       <div className="space-y-8">
         {sortedDepartments.length > 0 ? (
           sortedDepartments.map((department) => (
-            <div key={department} className="border border-gray-200 rounded-lg">
+            <div
+              key={department}
+              className="bg-white rounded-xl shadow-sm border border-gray-100"
+            >
               {/* Department Header */}
               <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-800">
                   {getDepartmentLabel(department as Department)}
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {groupedManagements[department].length} anggota
+                  {groupedManagements[department].length} members
                 </p>
               </div>
 
@@ -364,6 +344,31 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                         className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                       >
                         <div className="flex items-start space-x-4">
+                          {/* Checkbox */}
+                          <div className="flex-shrink-0 pt-1">
+                            <input
+                              type="checkbox"
+                              checked={selectedManagements.includes(
+                                management.id
+                              )}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedManagements([
+                                    ...selectedManagements,
+                                    management.id,
+                                  ]);
+                                } else {
+                                  setSelectedManagements(
+                                    selectedManagements.filter(
+                                      (id) => id !== management.id
+                                    )
+                                  );
+                                }
+                              }}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                            />
+                          </div>
+
                           {/* Photo */}
                           <div className="flex-shrink-0 relative">
                             {proxyImageUrl && !hasError ? (
@@ -506,7 +511,6 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
           </div>
         )}
       </div>
-
       {/* Loading Overlay */}
       {isOperating && (
         <div
@@ -523,7 +527,6 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
           </div>
         </div>
       )}
-
       <DeleteModal
         isOpen={deleteModal.isOpen}
         managementName={deleteModal.managementName || deleteModal.fileName}

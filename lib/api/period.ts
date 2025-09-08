@@ -150,5 +150,5 @@ export const PeriodApi = {
   createPeriod,
   updatePeriod,
   deletePeriod,
-  reorderPeriods
+  reorderPeriods,
 };

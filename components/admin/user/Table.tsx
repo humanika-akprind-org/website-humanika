@@ -7,8 +7,8 @@ import {
   FiMail,
   FiX,
 } from "react-icons/fi";
-import type { User } from "../../../types/user";
-import { UserRole } from "../../../types/enums";
+import type { User } from "@/types/user";
+import { UserRole } from "@/types/enums";
 import { formatEnumValue } from "@/lib/api/user";
 
 interface UserTableProps {
