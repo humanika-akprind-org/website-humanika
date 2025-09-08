@@ -1,21 +1,19 @@
 // app/api/user/route.ts
 import { type NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import {
-  PrismaClient,
   type UserRole,
   type Department,
   type Position,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
-
 // GET - Get all users
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const limit = parseInt(searchParams.get("limit") || "50");
     const search = searchParams.get("search") || "";
     const role = searchParams.get("role") || "";
     const department = searchParams.get("department") || "";

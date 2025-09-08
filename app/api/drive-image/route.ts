@@ -5,19 +5,29 @@ export async function GET(request: NextRequest) {
   const fileId = searchParams.get("fileId");
   const accessToken = searchParams.get("accessToken");
 
-  if (!fileId || !accessToken) {
-    return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
+  if (!fileId) {
+    return NextResponse.json({ error: "Missing fileId parameter" }, { status: 400 });
   }
 
   try {
-    const response = await fetch(
-      `https://drive.google.com/uc?export=view&id=${fileId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    let response: Response;
+
+    if (accessToken) {
+      // For private files, use Google Drive API
+      response = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+    } else {
+      // For public files, use direct download URL
+      response = await fetch(
+        `https://drive.google.com/uc?export=view&id=${fileId}`
+      );
+    }
 
     if (!response.ok) {
       throw new Error("Failed to fetch image");
