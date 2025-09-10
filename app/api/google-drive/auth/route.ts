@@ -1,11 +1,13 @@
 import { oauth2Client } from "@/lib/google-oauth";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { isProduction } from "@/lib/config";
+import {googleClientId, googleClientSecret} from "@/lib/config";
 
 export async function GET() {
   try {
     // Validasi environment variables
-    if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    if (!googleClientId || !googleClientSecret) {
       throw new Error("Missing Google OAuth credentials");
     }
 
@@ -27,14 +29,14 @@ export async function GET() {
       state,
       prompt: "consent",
       // Include client_id untuk memastikan tidak ada kesalahan
-      client_id: process.env.CLIENT_ID,
+      client_id: googleClientId,
     });
 
     // Simpan state ke cookie untuk verifikasi nanti
     const response = NextResponse.json({ url });
     response.cookies.set("oauth_state", state, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       maxAge: 60 * 10, // 10 menit
       path: "/",
     });

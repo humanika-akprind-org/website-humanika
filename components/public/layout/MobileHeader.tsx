@@ -9,11 +9,20 @@ import { useState } from "react";
 interface User {
   name: string;
   role: string;
+  avatarColor?: string;
 }
 
 interface MobileHeaderClientProps {
   currentUser: User | null;
 }
+
+// Helper function to get user initials
+const getUserInitials = (name: string): string =>
+  name
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join("");
 
 export function MobileHeaderClient({ currentUser }: MobileHeaderClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,7 +37,7 @@ export function MobileHeaderClient({ currentUser }: MobileHeaderClientProps) {
         <div className="flex items-center space-x-2">
           <div className="bg-white rounded-full shadow-md">
             <Image
-              src="https://drive.google.com/uc?export=view&id=1gb5FoF_-uUJ6LnVH6ZJr2OAdwbZxl-tg"
+              src="/logo.png"
               alt="HUMANIKA Logo"
               width={50}
               height={50}
@@ -51,6 +60,16 @@ export function MobileHeaderClient({ currentUser }: MobileHeaderClientProps) {
             // Tampilkan informasi user dan tombol Logout jika user sudah login (versi ringkas)
             <div className="flex items-center space-x-2">
               <div className="hidden xs:flex items-center space-x-2 bg-blue-700/30 py-1 px-3 rounded-full border border-blue-500/50">
+                {/* User Avatar */}
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-xs"
+                  style={{
+                    backgroundColor: currentUser.avatarColor || "#3B82F6",
+                  }}
+                >
+                  {getUserInitials(currentUser.name)}
+                </div>
+
                 <div className="text-right max-w-[100px]">
                   <p
                     className="font-medium text-sm truncate"
@@ -114,16 +133,28 @@ export function MobileHeaderClient({ currentUser }: MobileHeaderClientProps) {
           {currentUser && (
             <div className="pt-3 pb-2 px-2 bg-blue-700/20 rounded-lg mb-2">
               <div className="flex items-center justify-between">
-                <div>
-                  <p
-                    className="font-medium text-sm truncate"
-                    title={currentUser.name}
+                <div className="flex items-center space-x-3">
+                  {/* User Avatar */}
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                    style={{
+                      backgroundColor: currentUser.avatarColor || "#3B82F6",
+                    }}
                   >
-                    {currentUser.name}
-                  </p>
-                  <p className="text-blue-200 text-xs bg-blue-900/40 px-2 py-1 rounded-full mt-1 inline-block">
-                    {currentUser.role}
-                  </p>
+                    {getUserInitials(currentUser.name)}
+                  </div>
+
+                  <div>
+                    <p
+                      className="font-medium text-sm truncate"
+                      title={currentUser.name}
+                    >
+                      {currentUser.name}
+                    </p>
+                    <p className="text-blue-200 text-xs bg-blue-900/40 px-2 py-1 rounded-full mt-1 inline-block">
+                      {currentUser.role}
+                    </p>
+                  </div>
                 </div>
                 <LogoutButton />
               </div>

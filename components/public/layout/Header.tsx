@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { NavLink } from "./NavLink";
 import Image from "next/image";
-import { LogoutButton } from "@/components/public/LogoutButton";
 import { getCurrentUser } from "@/lib/auth";
 import { MobileHeaderClient } from "./MobileHeader";
+import { UserDropdown } from "./UserDropdown";
 
 interface User {
   name: string;
   role: string;
+  avatarColor?: string;
 }
 
 interface HeaderProps {
@@ -69,19 +70,8 @@ function DesktopHeader({ currentUser }: HeaderProps) {
                 </Link>
               </>
             ) : (
-              // Tampilkan informasi user dan tombol Logout jika user sudah login
-              <div className="flex items-center space-x-6 bg-blue-700/30 py-2 px-4 rounded-full border border-blue-500/50">
-                <div className="text-right min-w-[120px] max-w-[200px]">
-                  <p className="font-medium truncate" title={currentUser.name}>
-                    {currentUser.name}
-                  </p>
-                  <p className="text-blue-200 text-xs bg-blue-900/40 px-2 py-1 rounded-full mt-1 inline-block">
-                    {currentUser.role}
-                  </p>
-                </div>
-                <div className="h-8 w-px bg-blue-500/50" />
-                <LogoutButton />
-              </div>
+              // Tampilkan avatar dengan dropdown
+              <UserDropdown currentUser={currentUser} />
             )}
           </div>
         </div>

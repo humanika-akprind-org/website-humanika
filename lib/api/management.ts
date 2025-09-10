@@ -4,8 +4,9 @@ import type {
   ManagementApiResponse,
 } from "@/types/management";
 // import { ApiResponseStatus } from "@/types/enums";
+import { apiUrl } from "@/lib/config";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+const API_BASE_URL = apiUrl;
 
 export const ManagementApi = {
   async getManagements(): Promise<Management[]> {

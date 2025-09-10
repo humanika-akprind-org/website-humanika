@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Period, PeriodFormData } from "@/types/period";
 import { createPeriod, updatePeriod } from "@/lib/api/period";
+import { FiFileText, FiCalendar } from "react-icons/fi";
+import { FiArrowLeft } from "react-icons/fi";
+import Link from "next/link";
 
 interface PeriodFormProps {
   period?: Period;
@@ -69,75 +72,113 @@ export default function PeriodForm({
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6">
-        {isEdit ? "Edit Period" : "Tambah Period Baru"}
-      </h1>
-
+    <div className="p-6 max-w-4xl min-h-screen mx-auto">
+      <div className="flex items-center mb-6">
+        <Link
+          href="/admin/governance/periods"
+          className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
+        >
+          <FiArrowLeft className="mr-1" />
+          Back
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-800">
+          {isEdit ? "Edit Period" : "Tambah Period Baru"}
+        </h1>
+      </div>
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+      >
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Nama Period
+            Nama Period *
           </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <FiFileText className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Masukkan nama period"
+              required
+              className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Wajib diisi dengan nama period yang jelas
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label
               htmlFor="startYear"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Tahun Mulai
+              Tahun Mulai *
             </label>
-            <input
-              type="number"
-              id="startYear"
-              name="startYear"
-              value={formData.startYear}
-              onChange={handleChange}
-              min="2000"
-              max="2100"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiCalendar className="text-gray-400" />
+              </div>
+              <input
+                type="number"
+                id="startYear"
+                name="startYear"
+                value={formData.startYear}
+                onChange={handleChange}
+                placeholder="2024"
+                min="2000"
+                max="2100"
+                required
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Tahun mulai period (min: 2000, max: 2100)
+            </p>
           </div>
 
           <div>
             <label
               htmlFor="endYear"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Tahun Selesai
+              Tahun Selesai *
             </label>
-            <input
-              type="number"
-              id="endYear"
-              name="endYear"
-              value={formData.endYear}
-              onChange={handleChange}
-              min="2001"
-              max="2101"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiCalendar className="text-gray-400" />
+              </div>
+              <input
+                type="number"
+                id="endYear"
+                name="endYear"
+                value={formData.endYear}
+                onChange={handleChange}
+                placeholder="2025"
+                min="2001"
+                max="2101"
+                required
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Tahun selesai period (min: 2001, max: 2101)
+            </p>
           </div>
         </div>
 

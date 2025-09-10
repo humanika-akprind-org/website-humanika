@@ -3,15 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  FiSearch,
-  FiFilter,
   FiEdit,
   FiTrash2,
   FiEye,
-  FiDollarSign,
   FiCalendar,
   FiUser,
-  FiChevronDown,
   FiTrendingUp,
   FiClock,
   FiCheckCircle,
@@ -20,8 +16,11 @@ import {
   FiPlus,
 } from "react-icons/fi";
 import type { WorkProgram } from "@/types/work";
-import { Department, Status } from "@/types/enums";
+import type { Department } from "@/types/enums";
+import { Status } from "@/types/enums";
 import DeleteModal from "./modal/DeleteModal";
+import Stats from "./Stats";
+import Filters from "./Filters";
 
 interface WorkProgramTableProps {
   workPrograms: WorkProgram[];
@@ -215,187 +214,26 @@ export default function WorkProgramTable({
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">
-              Total Programs
-            </h3>
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FiTrendingUp className="text-blue-500" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-800 mt-2">
-            {workPrograms.length}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Total Budget</h3>
-            <div className="p-2 bg-green-100 rounded-lg">
-              <FiDollarSign className="text-green-500" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-800 mt-2">
-            {formatCurrency(
-              workPrograms.reduce((sum, program) => sum + program.funds, 0)
-            )}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Used Funds</h3>
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <FiDollarSign className="text-yellow-500" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-800 mt-2">
-            {formatCurrency(
-              workPrograms.reduce((sum, program) => sum + program.usedFunds, 0)
-            )}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">
-              Remaining Funds
-            </h3>
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <FiDollarSign className="text-purple-500" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-gray-800 mt-2">
-            {formatCurrency(
-              workPrograms.reduce(
-                (sum, program) => sum + program.remainingFunds,
-                0
-              )
-            )}
-          </p>
-        </div>
-      </div>
+      <Stats workPrograms={workPrograms} />
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-          <div className="relative flex-1">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiSearch className="text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search work programs by name or goal..."
-              className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <button
-            className="flex items-center px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50"
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-          >
-            <FiFilter className="mr-2 text-gray-500" />
-            Filters
-            <FiChevronDown
-              className={`ml-2 transition-transform ${
-                isFilterOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-        </div>
-
-        {/* Advanced Filters */}
-        {isFilterOpen && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-gray-100">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <select
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={statusFilter}
-                onChange={(e) =>
-                  setStatusFilter(e.target.value as Status | "all")
-                }
-              >
-                <option value="all">All Status</option>
-                {Object.values(Status).map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Department
-              </label>
-              <select
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={departmentFilter}
-                onChange={(e) =>
-                  setDepartmentFilter(e.target.value as Department | "all")
-                }
-              >
-                <option value="all">All Departments</option>
-                {Object.values(Department).map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Period
-              </label>
-              <select
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={periodFilter}
-                onChange={(e) => setPeriodFilter(e.target.value)}
-              >
-                <option value="all">All Periods</option>
-                {periods.map((period) => (
-                  <option key={period} value={period}>
-                    {period}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Period Status
-              </label>
-              <select
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={isActiveFilter}
-                onChange={(e) =>
-                  setIsActiveFilter(e.target.value as "all" | "active" | "inactive")
-                }
-              >
-                <option value="all">All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button
-                className={`px-4 py-2.5 rounded-lg transition-colors w-full flex items-center justify-center ${
-                  selectedPrograms.length === 0
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-red-50 text-red-700 hover:bg-red-100"
-                }`}
-                onClick={() => handleDelete()}
-                disabled={selectedPrograms.length === 0}
-              >
-                <FiTrash2 className="mr-2" />
-                Delete Selected ({selectedPrograms.length})
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      <Filters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        departmentFilter={departmentFilter}
+        setDepartmentFilter={setDepartmentFilter}
+        periodFilter={periodFilter}
+        setPeriodFilter={setPeriodFilter}
+        isActiveFilter={isActiveFilter}
+        setIsActiveFilter={setIsActiveFilter}
+        isFilterOpen={isFilterOpen}
+        setIsFilterOpen={setIsFilterOpen}
+        periods={periods}
+        selectedPrograms={selectedPrograms}
+        handleDelete={handleDelete}
+      />
 
       {/* Work Programs Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">

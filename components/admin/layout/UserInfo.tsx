@@ -10,6 +10,7 @@ interface User {
   role: string;
   department: string;
   position: string;
+  avatarColor: string;
 }
 
 export default function UserInfo() {
@@ -81,20 +82,17 @@ export default function UserInfo() {
             {user.role}
           </p>
         </div>
-        <Link href="/admin/profile">
-          <span className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-blue-600"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              />
-            </svg>
+        <Link href="/admin/settings/profile">
+          <span
+            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+            style={{ backgroundColor: user.avatarColor }}
+          >
+            {user.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2)}
           </span>
         </Link>
       </button>

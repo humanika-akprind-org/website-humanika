@@ -10,6 +10,15 @@ import type {
 } from "@/types/work";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
+import {
+  FiFileText,
+  FiBriefcase,
+  FiCalendar,
+  FiDollarSign,
+  FiTrendingUp,
+  FiTrendingDown,
+  FiUser,
+} from "react-icons/fi";
 
 interface FormData {
   name: string;
@@ -106,142 +115,182 @@ export default function WorkProgramForm({
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Program Name *
             </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter program name"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiFileText className="text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder="Enter program name"
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Department *
             </label>
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {Object.values(Department).map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiBriefcase className="text-gray-400" />
+              </div>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                required
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {Object.values(Department).map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Schedule
             </label>
-            <input
-              type="text"
-              name="schedule"
-              value={formData.schedule}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="e.g., Q1 2024 - Q2 2024"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiCalendar className="text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="schedule"
+                value={formData.schedule}
+                onChange={handleChange}
+                placeholder="e.g., Q1 2024 - Q2 2024"
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Budget (IDR) *
             </label>
-            <input
-              type="number"
-              name="funds"
-              value={formData.funds}
-              onChange={handleChange}
-              required
-              min="0"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter budget amount"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiDollarSign className="text-gray-400" />
+              </div>
+              <input
+                type="number"
+                name="funds"
+                value={formData.funds}
+                onChange={handleChange}
+                required
+                min="0"
+                placeholder="Enter budget amount"
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Used Funds (IDR)
             </label>
-            <input
-              type="number"
-              name="usedFunds"
-              value={formData.usedFunds}
-              onChange={handleChange}
-              min="0"
-              max={formData.funds}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter used funds amount"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiTrendingDown className="text-gray-400" />
+              </div>
+              <input
+                type="number"
+                name="usedFunds"
+                value={formData.usedFunds}
+                onChange={handleChange}
+                min="0"
+                max={formData.funds}
+                placeholder="Enter used funds amount"
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Remaining Funds (IDR)
             </label>
-            <input
-              type="number"
-              name="remainingFunds"
-              value={formData.remainingFunds}
-              readOnly
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-100 cursor-not-allowed"
-              placeholder="Remaining funds"
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiTrendingUp className="text-gray-400" />
+              </div>
+              <input
+                type="number"
+                name="remainingFunds"
+                value={formData.remainingFunds}
+                readOnly
+                placeholder="Remaining funds"
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-100 cursor-not-allowed"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Period *
             </label>
-            <select
-              name="periodId"
-              value={formData.periodId}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Period</option>
-              {periods.map((period) => (
-                <option key={period.id} value={period.id}>
-                  {period.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiCalendar className="text-gray-400" />
+              </div>
+              <select
+                name="periodId"
+                value={formData.periodId}
+                onChange={handleChange}
+                required
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select Period</option>
+                {periods.map((period) => (
+                  <option key={period.id} value={period.id}>
+                    {period.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Responsible Person *
             </label>
-            <select
-              name="responsibleId"
-              value={formData.responsibleId}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Responsible Person</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name} - {user.department}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiUser className="text-gray-400" />
+              </div>
+              <select
+                name="responsibleId"
+                value={formData.responsibleId}
+                onChange={handleChange}
+                required
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select Responsible Person</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} - {user.department}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Goals and Objectives *
           </label>
           <textarea
@@ -250,8 +299,8 @@ export default function WorkProgramForm({
             onChange={handleChange}
             required
             rows={4}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Describe the goals and objectives of this work program..."
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 

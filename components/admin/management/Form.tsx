@@ -14,6 +14,8 @@ import type { Period } from "@/types/period";
 import { useManagementPhoto } from "@/hooks/management/useManagementPhoto";
 import DeleteModal from "./modal/DeleteModal";
 import { formatEnumValue } from "@/lib/utils";
+import { managementFolderId } from "@/lib/config";
+import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";
 
 // Helper function to validate image URL
 const isValidImageUrl = (url: string): boolean => {
@@ -234,7 +236,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
         const uploadedFileId = await uploadPhoto(
           formData.photoFile,
           tempFileName,
-          process.env.NEXT_PUBLIC_MANAGEMENT_PHOTOS_FOLDER_ID || "root"
+          managementFolderId
         );
 
         if (uploadedFileId) {
@@ -276,10 +278,6 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">
-        {management ? "Edit Management" : "Tambah Management Baru"}
-      </h2>
-
       {error && (
         <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
           <h3 className="font-medium">Error</h3>
@@ -290,85 +288,106 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               User *
             </label>
-            <select
-              name="userId"
-              value={formData.userId}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-              disabled={isLoading}
-            >
-              <option value="">Pilih User</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name} ({user.email})
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiUser className="text-gray-400" />
+              </div>
+              <select
+                name="userId"
+                value={formData.userId}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                disabled={isLoading}
+              >
+                <option value="">Pilih User</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} ({user.email})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Periode *
             </label>
-            <select
-              name="periodId"
-              value={formData.periodId}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-              disabled={isLoading}
-            >
-              <option value="">Pilih Periode</option>
-              {periods.map((period) => (
-                <option key={period.id} value={period.id}>
-                  {period.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiCalendar className="text-gray-400" />
+              </div>
+              <select
+                name="periodId"
+                value={formData.periodId}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                disabled={isLoading}
+              >
+                <option value="">Pilih Periode</option>
+                {periods.map((period) => (
+                  <option key={period.id} value={period.id}>
+                    {period.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Departemen *
             </label>
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-              disabled={isLoading}
-            >
-              {Object.values(Department).map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiHome className="text-gray-400" />
+              </div>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                disabled={isLoading}
+              >
+                <option value="">Pilih Departemen</option>
+                {Object.values(Department).map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Posisi *
             </label>
-            <select
-              name="position"
-              value={formData.position}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-              disabled={isLoading}
-            >
-              {Object.values(Position).map((pos) => (
-                <option key={pos} value={pos}>
-                  {formatEnumValue(pos)}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiBriefcase className="text-gray-400" />
+              </div>
+              <select
+                name="position"
+                value={formData.position}
+                onChange={handleInputChange}
+                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                disabled={isLoading}
+              >
+                {Object.values(Position).map((pos) => (
+                  <option key={pos} value={pos}>
+                    {formatEnumValue(pos)}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 

@@ -1,5 +1,8 @@
-// app/api/email/route.ts
 import { type NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
+import { appConfig } from "@/lib/config";
+
+const resend = new Resend(appConfig.resendApiKey);
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,32 +17,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Here you would integrate with your email service provider
-    // For example, using Nodemailer, SendGrid, Resend, etc.
-
-    // Example with Resend:
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    // const { data, error } = await resend.emails.send({
-    //   from: 'your-email@domain.com',
-    //   to,
-    //   subject,
-    //   html,
-    // });
-
-    // if (error) {
-    //   throw new Error(error.message);
-    // }
-
-    // For now, we'll just log the email data
-    console.log("Email would be sent:", {
+    // Send email using Resend
+    const { data, error } = await resend.emails.send({
+      from: "no-reply@yourdomain.com",
       to,
       subject,
       html,
     });
 
+    if (error) {
+      console.error("Resend error:", error);
+      throw new Error(error.message);
+    }
+
     return NextResponse.json({
       message: "Email sent successfully",
-      // data: data // if using actual email service
+      data,
     });
   } catch (error) {
     console.error("Error sending email:", error);

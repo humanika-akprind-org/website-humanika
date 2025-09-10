@@ -1,5 +1,6 @@
 // lib/auth/clearAuthCookies.ts
 import { NextResponse } from "next/server";
+import { isProduction } from "@/lib/config";
 
 export function clearAuthCookies(response?: NextResponse) {
   const res = response || NextResponse.next();
@@ -13,7 +14,7 @@ export function clearAuthCookies(response?: NextResponse) {
   const cookieOptions = {
     path: "/",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     sameSite: "lax" as const,
   };
 
