@@ -1,63 +1,85 @@
 "use client";
 
-export default function DevelopmentPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 rounded-lg">
-      <div className="text-center max-w-md mx-auto">
-        <div className="mx-auto w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-8">
-          <svg
-            className="w-20 h-20 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { FiArrowLeft } from "react-icons/fi";
+import Link from "next/link";
+import EventForm from "@/components/admin/event/Form";
+import type { CreateEventInput, UpdateEventInput } from "@/types/event";
+import { useToast } from "@/hooks/use-toast";
 
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-500 mb-2">
-            Page Not Built Yet
-          </h1>
-          <p className="text-gray-400">
-            This page has not been developed by the engineering team.
+export default function AddEventPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (data: CreateEventInput | UpdateEventInput) => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch("/api/event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Event created successfully",
+        });
+        router.push("/admin/programs/events");
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.message || "Failed to create event",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error creating event:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create event",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link
+            href="/admin/programs/events"
+            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <FiArrowLeft className="h-4 w-4 mr-2" />
+            Back to Events
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Add New Event</h1>
+            <p className="text-gray-600">Create a new event for your organization</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Event Form */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-medium text-gray-900">Event Details</h2>
+          <p className="text-sm text-gray-600">
+            Fill in the information below to create a new event.
           </p>
         </div>
-
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <div className="flex items-start">
-            <svg
-              className="w-5 h-5 text-yellow-500 mt-0.5 mr-2 flex-shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <p className="text-yellow-700 text-sm">
-              <span className="font-medium">Development Status:</span> This page
-              is on the product roadmap but has not been scheduled for
-              implementation.
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-2 text-xs text-gray-400">
-          <p>Last updated: {new Date().toLocaleDateString()}</p>
-          <div className="inline-flex items-center bg-gray-100 px-3 py-1 rounded-full">
-            <span className="h-2 w-2 bg-gray-400 rounded-full mr-2" />
-            STATUS: NOT STARTED
-          </div>
+        <div className="p-6">
+          <EventForm onSubmit={handleSubmit} isLoading={isLoading} />
         </div>
       </div>
     </div>
