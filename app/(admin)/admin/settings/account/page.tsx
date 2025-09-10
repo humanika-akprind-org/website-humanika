@@ -49,7 +49,7 @@ export default function AccountPage() {
             variant: "destructive",
           });
         }
-      } catch (error) {
+      } catch (_error) {
         toast({
           title: "Error",
           description: "Network error occurred while loading account status",
@@ -146,7 +146,7 @@ export default function AccountPage() {
         });
         setIsChangingPassword(false);
       }
-    } catch (error) {
+    } catch (_error) {
       setError("Network error occurred while changing password");
     } finally {
       setIsSubmitting(false);
@@ -188,7 +188,7 @@ export default function AccountPage() {
           window.location.href = "/";
         }, 2000);
       }
-    } catch (error) {
+    } catch (_error) {
       setError("Network error occurred while deleting account");
     } finally {
       setIsSubmitting(false);
