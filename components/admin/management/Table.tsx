@@ -124,7 +124,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
     });
   };
 
-  const handleDeletePhoto = (fileId: string, fileName: string) => {
+  const handledeleteFile = (fileId: string, fileName: string) => {
     setDeleteModal({
       isOpen: true,
       managementId: null,
@@ -436,7 +436,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                                   management.photo || ""
                                 );
                                 if (fileId) {
-                                  handleDeletePhoto(
+                                  handledeleteFile(
                                     fileId,
                                     `${management.user?.name} - Photo`
                                   );
