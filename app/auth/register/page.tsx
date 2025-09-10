@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -13,7 +12,6 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
