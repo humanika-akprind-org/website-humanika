@@ -7,9 +7,9 @@ import type {
   UsersResponse,
   ApiResponse,
 } from "@/types/user";
+import { apiUrl } from "@/lib/config";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+const API_BASE_URL = apiUrl;
 
 // Fungsi fetch dasar yang dapat digunakan oleh semua fungsi API
 async function fetchApi<T>(

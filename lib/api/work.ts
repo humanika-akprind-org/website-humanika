@@ -4,8 +4,9 @@ import type {
   UpdateWorkProgramInput,
   WorkProgramFilter,
 } from "@/types/work";
+import { apiUrl } from "@/lib/config";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+const API_URL = apiUrl;
 
 export const getWorkPrograms = async (
   filter?: WorkProgramFilter

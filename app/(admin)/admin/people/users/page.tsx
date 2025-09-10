@@ -49,20 +49,7 @@ export default function UsersPage() {
       if (response.error) {
         setError(response.error);
       } else if (response.data) {
-        const usersWithColors = response.data.users.map((user, index) => ({
-          ...user,
-          avatarColor: [
-            "bg-blue-500",
-            "bg-pink-500",
-            "bg-purple-500",
-            "bg-green-500",
-            "bg-yellow-500",
-            "bg-red-500",
-            "bg-indigo-500",
-            "bg-teal-500",
-          ][index % 8],
-        }));
-        setUsers(usersWithColors);
+        setUsers(response.data.users);
         setTotalPages(response.data.pagination.pages);
       }
     } catch (_error) {

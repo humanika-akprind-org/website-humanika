@@ -78,6 +78,7 @@ export default function DevelopmentPage() {
 //   FiEye,
 //   FiChevronDown,
 // } from "react-icons/fi";
+// import { apiUrl } from "@/lib/config";
 
 // interface Approval {
 //   id: string;
@@ -119,8 +120,7 @@ export default function DevelopmentPage() {
 // }
 
 // class ApprovalApi {
-//   private static API_BASE_URL =
-//     process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+//   private static API_BASE_URL = apiUrl
 
 //   private static async fetchApi<T>(
 //     endpoint: string,

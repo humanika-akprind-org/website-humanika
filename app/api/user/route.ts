@@ -1,19 +1,16 @@
 // app/api/user/route.ts
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import {
-  type UserRole,
-  type Department,
-  type Position,
-} from "@prisma/client";
+import { type UserRole, type Department, type Position } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { randomColor } from "@/lib/randomColor";
 
 // GET - Get all users
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "50");
+    const limit = parseInt(searchParams.get("limit") || "10");
     const search = searchParams.get("search") || "";
     const role = searchParams.get("role") || "";
     const department = searchParams.get("department") || "";
@@ -34,6 +31,9 @@ export async function GET(request: NextRequest) {
       isActive?: boolean;
       verifiedAccount?: boolean;
     } = {};
+
+    // Default to showing only verified accounts
+    where.verifiedAccount = true;
 
     if (search) {
       where.OR = [
@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
           blockExpires: true,
           createdAt: true,
           updatedAt: true,
+          avatarColor: true,
         },
       }),
       prisma.user.count({ where }),
@@ -155,6 +156,7 @@ export async function POST(request: NextRequest) {
         isActive: isActive !== undefined ? isActive : true,
         verifiedAccount:
           verifiedAccount !== undefined ? verifiedAccount : false,
+        avatarColor: randomColor,
       },
       select: {
         id: true,
@@ -167,6 +169,7 @@ export async function POST(request: NextRequest) {
         isActive: true,
         verifiedAccount: true,
         createdAt: true,
+        avatarColor: true,
       },
     });
 

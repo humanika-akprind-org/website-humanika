@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import type { User } from "@/types/user";
 import { UserRole } from "@/types/enums";
+import { nodeEnv, isProduction, jwtSecret } from "@/lib/config";
 
 // Use the singleton pattern for Prisma to avoid multiple instances
 const globalForPrisma = globalThis as unknown as {
@@ -14,13 +15,13 @@ const globalForPrisma = globalThis as unknown as {
 
 const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (nodeEnv !== "production") globalForPrisma.prisma = prisma;
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-very-secure-secret";
+const JWT_SECRET = jwtSecret;
 const COOKIE_NAME = "auth-token";
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: isProduction,
   sameSite: "strict" as const,
   maxAge: 60 * 60 * 24 * 7, // 1 week
   path: "/",
@@ -149,6 +150,7 @@ export async function getCurrentUser() {
         role: true,
         department: true,
         position: true,
+        avatarColor: true,
         createdAt: true,
         updatedAt: true,
       },

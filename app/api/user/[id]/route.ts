@@ -32,6 +32,7 @@ export async function GET(
         blockExpires: true,
         createdAt: true,
         updatedAt: true,
+        avatarColor: true,
       },
     });
 
@@ -137,6 +138,7 @@ export async function PUT(
         isActive: true,
         verifiedAccount: true,
         updatedAt: true,
+        avatarColor: true,
       },
     });
 

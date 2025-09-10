@@ -11,6 +11,7 @@ export default function RegisterPage() {
     name: "",
   });
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -25,6 +26,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
     setIsLoading(true);
 
     try {
@@ -37,7 +39,14 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("/");
+        setSuccessMessage(data.message || "Registration successful. Please wait for admin verification before logging in.");
+        // Reset form
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          name: "",
+        });
       } else {
         setError(data.error || "Registration failed");
       }
@@ -78,6 +87,28 @@ export default function RegisterPage() {
         {error && (
           <div className="bg-red-50 text-red-700 p-3 rounded-lg text-center border border-red-100">
             {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="bg-green-50 text-green-700 p-4 rounded-lg border border-green-100">
+            <div className="flex items-center">
+              <svg
+                className="w-5 h-5 text-green-400 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div>
+                <p className="font-medium">Registration Successful!</p>
+                <p className="text-sm mt-1">{successMessage}</p>
+              </div>
+            </div>
           </div>
         )}
 

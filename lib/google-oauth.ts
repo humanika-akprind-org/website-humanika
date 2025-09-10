@@ -1,18 +1,19 @@
 import { google } from "googleapis";
+import { googleClientId, googleClientSecret, googleRedirectUri } from "@/lib/config";
 
 export const oauth2Client = new google.auth.OAuth2(
-  process.env.CLIENT_ID,
-  process.env.CLIENT_SECRET,
-  process.env.REDIRECT_URI
+  googleClientId,
+  googleClientSecret,
+  googleRedirectUri
 );
 
 // Set credentials if available
-if (process.env.ACCESS_TOKEN && process.env.REFRESH_TOKEN) {
-  oauth2Client.setCredentials({
-    access_token: process.env.ACCESS_TOKEN,
-    refresh_token: process.env.REFRESH_TOKEN,
-  });
-}
+// if (process.env.ACCESS_TOKEN && process.env.REFRESH_TOKEN) {
+//   oauth2Client.setCredentials({
+//     access_token: process.env.ACCESS_TOKEN,
+//     refresh_token: process.env.REFRESH_TOKEN,
+//   });
+// }
 
 export const drive = google.drive({
   version: "v3",

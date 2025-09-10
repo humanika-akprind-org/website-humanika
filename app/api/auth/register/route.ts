@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { hashPassword, generateToken, setAuthCookie } from "@/lib/auth";
+import { hashPassword } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
+import { randomColor } from "@/lib/randomColor";
 
 export async function POST(request: Request) {
   try {
@@ -62,21 +63,20 @@ export async function POST(request: Request) {
         isActive: false,
         verifiedAccount: false,
         attemptLogin: 0,
+        avatarColor: randomColor,
       },
     });
-
-    // Generate token
-    const token = generateToken(user.id);
 
     // Create response without password
     const { password: _, ...userWithoutPassword } = user;
     const response = NextResponse.json({
       success: true,
+      message: "Registration successful. Please wait for admin verification before logging in.",
       user: userWithoutPassword,
     });
 
-    // Set cookie
-    return setAuthCookie(response, token);
+    // Do NOT set auth cookie here to prevent auto-login before verification
+    return response;
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(

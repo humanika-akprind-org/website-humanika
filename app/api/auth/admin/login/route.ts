@@ -30,6 +30,29 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check if account is active
+    if (!user.isActive) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Account is inactive. Please contact administrator.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Note: Admin accounts may not need verification check as they have elevated privileges
+    // Uncomment the following lines if you want to enforce verification for admins too
+    if (!user.verifiedAccount) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Account not verified. Please contact administrator.",
+        },
+        { status: 401 }
+      );
+    }
+
     // Check if account is blocked
     if (user.blockExpires && user.blockExpires > new Date()) {
       return NextResponse.json(

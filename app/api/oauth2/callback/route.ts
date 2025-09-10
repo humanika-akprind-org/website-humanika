@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { oauth2Client } from "@/lib/google-oauth";
 import { cookies } from "next/headers";
+import { isProduction } from "@/lib/config";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -26,7 +27,7 @@ export async function GET(req: Request) {
       name: "google_access_token",
       value: tokens.access_token || "", // the access token
       httpOnly: true, // for security, the cookie is accessible only by the server
-      secure: process.env.NODE_ENV === "production", // send cookie over HTTPS only in production
+      secure: isProduction, // send cookie over HTTPS only in production
       path: "/", // cookie is available on every route
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });

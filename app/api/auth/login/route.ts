@@ -30,6 +30,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check if account is active
+    if (!user.isActive) {
+      return NextResponse.json(
+        { success: false, error: "Account is inactive. Please contact administrator." },
+        { status: 401 }
+      );
+    }
+
+    // Check if account is verified
+    if (!user.verifiedAccount) {
+      return NextResponse.json(
+        { success: false, error: "Account not verified. Please wait for admin verification." },
+        { status: 401 }
+      );
+    }
+
     // Check if account is blocked
     if (user.blockExpires && user.blockExpires > new Date()) {
       return NextResponse.json(

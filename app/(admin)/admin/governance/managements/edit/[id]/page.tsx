@@ -2,10 +2,11 @@ import { UserApi } from "@/lib/api/user";
 import { PeriodApi } from "@/lib/api/period";
 import { ManagementApi } from "@/lib/api/management";
 import ManagementForm from "@/components/admin/management/Form";
-import PageHeader from "@/components/admin/drive/PageHeader";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 import type { ManagementServerData } from "@/types/management";
+import { FiArrowLeft } from "react-icons/fi";
+import Link from "next/link";
 
 async function EditManagementPage({ params }: { params: { id: string } }) {
   const cookieStore = cookies();
@@ -14,7 +15,7 @@ async function EditManagementPage({ params }: { params: { id: string } }) {
   try {
     const [management, usersResponse, periods] = await Promise.all([
       ManagementApi.getManagement(params.id),
-      UserApi.getUsers(),
+      UserApi.getUsers({ limit: 50 }),
       PeriodApi.getPeriods(),
     ]);
 
@@ -27,9 +28,19 @@ async function EditManagementPage({ params }: { params: { id: string } }) {
 
     return (
       <AuthGuard accessToken={accessToken}>
-        <div className="min-h-screen bg-gray-50 p-6">
-          <div className="max-w-4xl mx-auto">
-            <PageHeader title={`Edit Management: ${management.user?.name}`} />
+              <div className="p-6 max-w-4xl min-h-screen mx-auto">
+                <div className="flex items-center mb-6">
+                  <Link
+                    href="/admin/governance/managements"
+                    className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
+                  >
+                    <FiArrowLeft className="mr-1" />
+                    Back
+                  </Link>
+                  <h1 className="text-2xl font-bold text-gray-800">
+                    Edit Management
+                  </h1>
+                </div>
             <ManagementForm
               accessToken={accessToken}
               users={users}
@@ -37,7 +48,6 @@ async function EditManagementPage({ params }: { params: { id: string } }) {
               management={management}
               onSubmit={handleSubmit}
             />
-          </div>
         </div>
       </AuthGuard>
     );
