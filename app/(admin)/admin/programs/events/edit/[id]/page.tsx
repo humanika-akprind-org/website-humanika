@@ -8,20 +8,27 @@ import EventForm from "@/components/admin/event/Form";
 import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
 import { useToast } from "@/hooks/use-toast";
 
+import type { User } from "@/types/user";
+import type { Period } from "@/types/period";
+
 export default function EditEventPage() {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
   const [event, setEvent] = useState<Event | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [periods, setPeriods] = useState<Period[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
 
   const eventId = params.id as string;
 
-  // Fetch event data
+  // Fetch event data, users, and periods
   useEffect(() => {
     if (eventId) {
       fetchEvent();
+      fetchUsers();
+      fetchPeriods();
     }
   }, [eventId]);
 
@@ -31,7 +38,7 @@ export default function EditEventPage() {
       const response = await fetch(`/api/event/${eventId}`);
       if (response.ok) {
         const data = await response.json();
-        setEvent(data.event);
+        setEvent(data);
       } else {
         toast({
           title: "Error",
@@ -50,6 +57,54 @@ export default function EditEventPage() {
       router.push("/admin/programs/events");
     } finally {
       setIsFetching(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("/api/user?limit=50");
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data.users || []);
+      } else {
+        console.error("Failed to fetch users:", response.statusText);
+        toast({
+          title: "Error",
+          description: "Failed to fetch users",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch users",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchPeriods = async () => {
+    try {
+      const response = await fetch("/api/period");
+      if (response.ok) {
+        const data = await response.json();
+        setPeriods(data.data || []);
+      } else {
+        console.error("Failed to fetch periods:", response.statusText);
+        toast({
+          title: "Error",
+          description: "Failed to fetch periods",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching periods:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch periods",
+        variant: "destructive",
+      });
     }
   };
 
@@ -171,6 +226,9 @@ export default function EditEventPage() {
             event={event}
             onSubmit={handleSubmit}
             isLoading={isLoading}
+            accessToken=""
+            users={users}
+            periods={periods}
           />
         </div>
       </div>

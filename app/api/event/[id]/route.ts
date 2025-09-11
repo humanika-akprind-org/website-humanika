@@ -96,7 +96,13 @@ export async function PUT(
     if (body.endDate) updateData.endDate = new Date(body.endDate);
     if (body.funds !== undefined) updateData.funds = body.funds;
     if (body.usedFunds !== undefined) updateData.usedFunds = body.usedFunds;
-    if (body.workProgramId !== undefined) updateData.workProgramId = body.workProgramId;
+    // Only include workProgramId if it's provided and not empty
+    if (body.workProgramId !== undefined && body.workProgramId.trim() !== "") {
+      updateData.workProgramId = body.workProgramId;
+    } else if (body.workProgramId === "") {
+      // If empty string is provided, set to null to clear the relation
+      updateData.workProgramId = null;
+    }
     if (body.status) updateData.status = body.status;
 
     updateData.remainingFunds = remainingFunds;
@@ -134,7 +140,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

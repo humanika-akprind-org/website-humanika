@@ -14,7 +14,7 @@ import type { Period } from "@/types/period";
 import { useFile } from "@/hooks/useFile";
 import DeleteModal from "./modal/DeleteModal";
 import { formatEnumValue } from "@/lib/utils";
-import { managementFolderId } from "@/lib/config";
+import { photoManagementFolderId } from "@/lib/config";
 import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";
 
 // Helper function to validate image URL
@@ -236,7 +236,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
         const uploadedFileId = await uploadFile(
           formData.photoFile,
           tempFileName,
-          managementFolderId
+          photoManagementFolderId
         );
 
         if (uploadedFileId) {

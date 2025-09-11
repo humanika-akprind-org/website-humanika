@@ -26,6 +26,7 @@ export const getEvents = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     cache: "no-store",
   });
 
@@ -42,6 +43,7 @@ export const getEvent = async (id: string): Promise<Event> => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     cache: "no-store",
   });
 
@@ -60,11 +62,26 @@ export const createEvent = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to create event");
+    let errorMessage = "Failed to create event";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (e) {
+      // If we can't parse the error response, use the status text
+      errorMessage = response.statusText || errorMessage;
+    }
+    console.error("Event creation failed:", {
+      status: response.status,
+      statusText: response.statusText,
+      errorMessage,
+      data
+    });
+    throw new Error(errorMessage);
   }
 
   return response.json();
@@ -79,6 +96,7 @@ export const updateEvent = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
@@ -92,6 +110,7 @@ export const updateEvent = async (
 export const deleteEvent = async (id: string): Promise<void> => {
   const response = await fetch(`${API_URL}/event/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
   if (!response.ok) {

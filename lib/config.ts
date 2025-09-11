@@ -54,8 +54,12 @@ class AppConfig {
   }
 
   // Google Drive Folder ID
-  get managementFolderId(): string {
-    return process.env.MANAGEMENT_FOLDER_ID || "";
+  get photoManagementFolderId(): string {
+    return process.env.PHOTO_MANAGEMENT_FOLDER_ID || "";
+  }
+
+  get eventThumbnailFolderId(): string {
+    return process.env.EVENT_THUMBNAIL_FOLDER_ID || "";
   }
 
   // Email
@@ -81,7 +85,8 @@ export const {
   jwtExpiresIn,
   databaseUrl,
   apiUrl,
-  managementFolderId,
+  photoManagementFolderId,
+  eventThumbnailFolderId,
   resendApiKey,
 } = appConfig;
 

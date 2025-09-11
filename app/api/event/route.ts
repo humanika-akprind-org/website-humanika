@@ -101,23 +101,29 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
+    const eventData: any = {
+      name: body.name,
+      slug,
+      thumbnail: body.thumbnail,
+      description: body.description || "",
+      goal: body.goal || "",
+      department: body.department,
+      periodId: body.periodId,
+      responsibleId: body.responsibleId,
+      startDate: new Date(body.startDate),
+      endDate: new Date(body.endDate),
+      funds: parseFloat(body.funds as any) || 0,
+      usedFunds: 0,
+      remainingFunds: parseFloat(body.funds as any) || 0,
+    };
+
+    // Only include workProgramId if it's provided and not empty
+    if (body.workProgramId && body.workProgramId.trim() !== "") {
+      eventData.workProgramId = body.workProgramId;
+    }
+
     const event = await prisma.event.create({
-      data: {
-        name: body.name,
-        slug,
-        thumbnail: body.thumbnail,
-        description: body.description || "",
-        goal: body.goal || "",
-        department: body.department,
-        periodId: body.periodId,
-        responsibleId: body.responsibleId,
-        startDate: new Date(body.startDate),
-        endDate: new Date(body.endDate),
-        funds: parseFloat(body.funds as any) || 0,
-        usedFunds: 0,
-        remainingFunds: parseFloat(body.funds as any) || 0,
-        workProgramId: body.workProgramId,
-      },
+      data: eventData,
       include: {
         period: true,
         responsible: {

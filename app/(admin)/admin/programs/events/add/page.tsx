@@ -1,87 +1,123 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { UserApi } from "@/lib/api/user";
+import { PeriodApi } from "@/lib/api/period";
+import EventForm from "@/components/admin/event/Form";
+import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
+import { cookies } from "next/headers";
+import type { CreateEventInput, UpdateEventInput } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
-import EventForm from "@/components/admin/event/Form";
-import type { CreateEventInput, UpdateEventInput } from "@/types/event";
-import { useToast } from "@/hooks/use-toast";
+import prisma from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function AddEventPage() {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+async function AddEventPage() {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("google_access_token")?.value || "";
 
-  const handleSubmit = async (data: CreateEventInput | UpdateEventInput) => {
-    try {
-      setIsLoading(true);
+  try {
+    const [usersResponse, periods] = await Promise.all([
+      UserApi.getUsers({ limit: 50 }),
+      PeriodApi.getPeriods(),
+    ]);
 
-      const response = await fetch("/api/event", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    const users = usersResponse.data?.users || [];
+    const periodsData = periods || [];
 
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Event created successfully",
-        });
-        router.push("/admin/programs/events");
-      } else {
-        const errorData = await response.json();
-        toast({
-          title: "Error",
-          description: errorData.message || "Failed to create event",
-          variant: "destructive",
-        });
+    const handleSubmit = async (data: CreateEventInput | UpdateEventInput) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
       }
-    } catch (error) {
-      console.error("Error creating event:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create event",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/admin/programs/events"
-            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <FiArrowLeft className="h-4 w-4 mr-2" />
-            Back to Events
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add New Event</h1>
-            <p className="text-gray-600">Create a new event for your organization</p>
+      // Cast data to CreateEventInput since this is the add page
+      const eventData = data as CreateEventInput;
+
+      if (
+        !eventData.name ||
+        !eventData.department ||
+        !eventData.periodId ||
+        !eventData.responsibleId ||
+        !eventData.startDate ||
+        !eventData.endDate
+      ) {
+        throw new Error("Missing required fields");
+      }
+
+      // Generate slug from name
+      const slug = eventData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+
+      const eventPayload: any = {
+        name: eventData.name,
+        slug,
+        thumbnail: eventData.thumbnail,
+        description: eventData.description || "",
+        goal: eventData.goal || "",
+        department: eventData.department,
+        periodId: eventData.periodId,
+        responsibleId: eventData.responsibleId,
+        startDate: new Date(eventData.startDate),
+        endDate: new Date(eventData.endDate),
+        funds: parseFloat(eventData.funds as any) || 0,
+        usedFunds: 0,
+        remainingFunds: parseFloat(eventData.funds as any) || 0,
+      };
+
+      // Only include workProgramId if it's provided and not empty
+      if (eventData.workProgramId && eventData.workProgramId.trim() !== "") {
+        eventPayload.workProgramId = eventData.workProgramId;
+      }
+
+      await prisma.event.create({
+        data: eventPayload,
+      });
+
+      redirect("/admin/programs/events");
+    };
+
+    return (
+      <AuthGuard accessToken={accessToken}>
+        <div className="p-6 max-w-4xl min-h-screen mx-auto">
+          <div className="flex items-center mb-6">
+            <Link
+              href="/admin/programs/events"
+              className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
+            >
+              <FiArrowLeft className="mr-1" />
+              Back
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Add New Event
+            </h1>
+          </div>
+          <EventForm
+            accessToken={accessToken}
+            users={users}
+            periods={periodsData}
+            onSubmit={handleSubmit}
+          />
+        </div>
+      </AuthGuard>
+    );
+  } catch (error) {
+    console.error("Error loading form data:", error);
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="text-center text-red-500">
+              <h2 className="text-xl font-semibold mb-4">Error Loading Form</h2>
+              <p>{error instanceof Error ? error.message : "Unknown error"}</p>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Event Form */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900">Event Details</h2>
-          <p className="text-sm text-gray-600">
-            Fill in the information below to create a new event.
-          </p>
-        </div>
-        <div className="p-6">
-          <EventForm onSubmit={handleSubmit} isLoading={isLoading} />
-        </div>
-      </div>
-    </div>
-  );
+    );
+  }
 }
+
+export default AddEventPage;

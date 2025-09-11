@@ -33,8 +33,8 @@ export default function EventsPage() {
       const response = await fetch("/api/event");
       if (response.ok) {
         const data = await response.json();
-        setEvents(data.events || []);
-        setFilteredEvents(data.events || []);
+        setEvents(data || []);
+        setFilteredEvents(data || []);
       } else {
         toast({
           title: "Error",
