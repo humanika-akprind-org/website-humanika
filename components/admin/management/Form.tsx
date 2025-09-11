@@ -11,10 +11,10 @@ import type {
 import { Department, Position } from "@/types/enums";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
-import { useManagementPhoto } from "@/hooks/management/useManagementPhoto";
+import { useFile } from "@/hooks/useFile";
 import DeleteModal from "./modal/DeleteModal";
 import { formatEnumValue } from "@/lib/utils";
-import { managementFolderId } from "@/lib/config";
+import { photoManagementFolderId } from "@/lib/config";
 import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";
 
 // Helper function to validate image URL
@@ -92,12 +92,12 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
 }) => {
   const router = useRouter();
   const {
-    uploadPhoto,
-    deletePhoto,
-    renamePhoto,
+    uploadFile,
+    deleteFile,
+    renameFile,
     isLoading: photoLoading,
     error: photoError,
-  } = useManagementPhoto(accessToken);
+  } = useFile(accessToken);
 
   const [formData, setFormData] = useState<ManagementFormData>({
     userId: management?.userId || "",
@@ -186,7 +186,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
 
     setIsDeleting(true);
     try {
-      const success = await deletePhoto(deleteModal.fileId);
+      const success = await deleteFile(deleteModal.fileId);
 
       if (success) {
         // Remove the photo from the form
@@ -223,7 +223,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
           const fileId = getFileIdFromPhoto(existingPhoto);
           if (fileId) {
             try {
-              await deletePhoto(fileId);
+              await deleteFile(fileId);
             } catch (deleteError) {
               console.warn("Failed to delete old photo:", deleteError);
               // Continue with upload even if delete fails
@@ -233,16 +233,16 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
 
         // Upload with temporary filename first
         const tempFileName = `temp_${Date.now()}`;
-        const uploadedFileId = await uploadPhoto(
+        const uploadedFileId = await uploadFile(
           formData.photoFile,
           tempFileName,
-          managementFolderId
+          photoManagementFolderId
         );
 
         if (uploadedFileId) {
-          // Rename the file using the renamePhoto hook
+          // Rename the file using the renameFile hook
           const finalFileName = `management_${formData.userId}_${Date.now()}`;
-          const renameSuccess = await renamePhoto(uploadedFileId, finalFileName);
+          const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
           if (renameSuccess) {
             photoUrl = uploadedFileId;

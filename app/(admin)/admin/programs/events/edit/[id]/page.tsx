@@ -1,63 +1,235 @@
 "use client";
 
-export default function DevelopmentPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 rounded-lg">
-      <div className="text-center max-w-md mx-auto">
-        <div className="mx-auto w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-8">
-          <svg
-            className="w-20 h-20 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { FiArrowLeft } from "react-icons/fi";
+import Link from "next/link";
+import EventForm from "@/components/admin/event/Form";
+import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
+import { useToast } from "@/hooks/use-toast";
+
+import type { User } from "@/types/user";
+import type { Period } from "@/types/period";
+
+export default function EditEventPage() {
+  const router = useRouter();
+  const params = useParams();
+  const { toast } = useToast();
+  const [event, setEvent] = useState<Event | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [periods, setPeriods] = useState<Period[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+
+  const eventId = params.id as string;
+
+  // Fetch event data, users, and periods
+  useEffect(() => {
+    if (eventId) {
+      fetchEvent();
+      fetchUsers();
+      fetchPeriods();
+    }
+  }, [eventId]);
+
+  const fetchEvent = async () => {
+    try {
+      setIsFetching(true);
+      const response = await fetch(`/api/event/${eventId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setEvent(data);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to fetch event",
+          variant: "destructive",
+        });
+        router.push("/admin/programs/events");
+      }
+    } catch (error) {
+      console.error("Error fetching event:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch event",
+        variant: "destructive",
+      });
+      router.push("/admin/programs/events");
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("/api/user?limit=50");
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data.users || []);
+      } else {
+        console.error("Failed to fetch users:", response.statusText);
+        toast({
+          title: "Error",
+          description: "Failed to fetch users",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch users",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchPeriods = async () => {
+    try {
+      const response = await fetch("/api/period");
+      if (response.ok) {
+        const data = await response.json();
+        setPeriods(data.data || []);
+      } else {
+        console.error("Failed to fetch periods:", response.statusText);
+        toast({
+          title: "Error",
+          description: "Failed to fetch periods",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching periods:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch periods",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSubmit = async (data: CreateEventInput | UpdateEventInput) => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch(`/api/event/${eventId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Event updated successfully",
+        });
+        router.push("/admin/programs/events");
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.message || "Failed to update event",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating event:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update event",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isFetching) {
+    return (
+      <div className="space-y-6">
+        {/* Page Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="h-10 w-24 bg-gray-200 rounded" />
+            <div>
+              <div className="h-8 w-48 bg-gray-200 rounded mb-2" />
+              <div className="h-4 w-64 bg-gray-200 rounded" />
+            </div>
+          </div>
         </div>
 
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-500 mb-2">
-            Page Not Built Yet
-          </h1>
-          <p className="text-gray-400">
-            This page has not been developed by the engineering team.
+        {/* Form Skeleton */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-1/4" />
+            <div className="space-y-3">
+              <div className="h-10 bg-gray-200 rounded" />
+              <div className="h-10 bg-gray-200 rounded" />
+              <div className="h-10 bg-gray-200 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold text-gray-900">Event not found</h2>
+          <p className="text-gray-600 mt-2">
+            The event you&apos;re looking for doesn&apos;t exist.
+          </p>
+          <Link
+            href="/admin/programs/events"
+            className="inline-flex items-center px-4 py-2 mt-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+          >
+            Back to Events
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link
+            href="/admin/programs/events"
+            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <FiArrowLeft className="h-4 w-4 mr-2" />
+            Back to Events
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Edit Event</h1>
+            <p className="text-gray-600">Update event information</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Event Form */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-medium text-gray-900">Event Details</h2>
+          <p className="text-sm text-gray-600">
+            Update the information below to modify the event.
           </p>
         </div>
-
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <div className="flex items-start">
-            <svg
-              className="w-5 h-5 text-yellow-500 mt-0.5 mr-2 flex-shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <p className="text-yellow-700 text-sm">
-              <span className="font-medium">Development Status:</span> This page
-              is on the product roadmap but has not been scheduled for
-              implementation.
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-2 text-xs text-gray-400">
-          <p>Last updated: {new Date().toLocaleDateString()}</p>
-          <div className="inline-flex items-center bg-gray-100 px-3 py-1 rounded-full">
-            <span className="h-2 w-2 bg-gray-400 rounded-full mr-2" />
-            STATUS: NOT STARTED
-          </div>
+        <div className="p-6">
+          <EventForm
+            event={event}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+            accessToken=""
+            users={users}
+            periods={periods}
+          />
         </div>
       </div>
     </div>

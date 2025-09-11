@@ -1,23 +1,21 @@
 import { useState } from "react";
 import { callApi } from "@/lib/api/google-drive";
 
-export function useManagementPhoto(
-  accessToken: string
-): {
+export function useFile(accessToken: string): {
   isLoading: boolean;
   error: string | null;
-  uploadPhoto: (
+  uploadFile: (
     file: File,
     fileName: string,
     folderId?: string
   ) => Promise<string | null>;
-  deletePhoto: (fileId: string) => Promise<boolean>;
-  renamePhoto: (fileId: string, newName: string) => Promise<boolean>;
+  deleteFile: (fileId: string) => Promise<boolean>;
+  renameFile: (fileId: string, newName: string) => Promise<boolean>;
 } {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const uploadPhoto = async (
+  const uploadFile = async (
     file: File,
     fileName: string,
     folderId: string = "root"
@@ -58,7 +56,7 @@ export function useManagementPhoto(
     }
   };
 
-  const deletePhoto = async (fileId: string): Promise<boolean> => {
+  const deleteFile = async (fileId: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
@@ -80,7 +78,10 @@ export function useManagementPhoto(
     }
   };
 
-  const renamePhoto = async (fileId: string, newName: string): Promise<boolean> => {
+  const renameFile = async (
+    fileId: string,
+    newName: string
+  ): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
@@ -106,8 +107,8 @@ export function useManagementPhoto(
   return {
     isLoading,
     error,
-    uploadPhoto,
-    deletePhoto,
-    renamePhoto,
+    uploadFile,
+    deleteFile,
+    renameFile,
   };
 }

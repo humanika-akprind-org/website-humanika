@@ -23,6 +23,7 @@ export const getWorkPrograms = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     cache: "no-store",
   });
 
