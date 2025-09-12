@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiCalendar, FiUser, FiImage } from "react-icons/fi";
+import { FiCalendar, FiUser } from "react-icons/fi";
 import type { Event } from "@/types/event";
 import type { Status } from "@/types/enums";
 import { Status as StatusEnum } from "@/types/enums";
-import Image from "next/image";
 import EventStats from "./Stats";
 import EventFilters from "./Filters";
 import DeleteModal from "./modal/DeleteModal";
@@ -23,10 +22,44 @@ interface ImageState {
   };
 }
 
+// Helper function to get preview URL from photo (file ID or URL)
+const getPreviewUrl = (photo: string | null | undefined): string | null => {
+  if (!photo) return null;
+
+  if (photo.includes("drive.google.com")) {
+    // It's a full Google Drive URL, convert to direct image URL
+    const fileIdMatch = photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch) {
+      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+    }
+
+    // Try other common Google Drive URL patterns
+    const otherPatterns = [
+      /\/open\?id=([a-zA-Z0-9_-]+)/,
+      /\/uc\?id=([a-zA-Z0-9_-]+)/,
+      /id=([a-zA-Z0-9_-]+)/,
+    ];
+
+    for (const pattern of otherPatterns) {
+      const match = photo.match(pattern);
+      if (match) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      }
+    }
+
+    return photo;
+  } else if (photo.match(/^[a-zA-Z0-9_-]+$/)) {
+    // It's a Google Drive file ID, construct direct URL
+    return `https://drive.google.com/uc?export=view&id=${photo}`;
+  } else {
+    // It's a direct URL or other format
+    return photo;
+  }
+};
+
 export default function EventTable({
   events,
   onDelete,
-  accessToken,
 }: EventTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
@@ -36,6 +69,7 @@ export default function EventTable({
   const [imageStates, setImageStates] = useState<ImageState>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
 
   const handleStatusFilterChange = (status: string) =>
     (status === "all" ||
@@ -48,18 +82,15 @@ export default function EventTable({
 
     events.forEach((event) => {
       if (event.thumbnail) {
-        const fileId = extractFileId(event.thumbnail);
-        if (fileId) {
-          const imageUrl = getDirectImageUrl(fileId);
-          if (imageUrl) {
-            // Only initialize if not already in state or if previous state didn't have error
-            if (!imageStates[imageUrl] || !imageStates[imageUrl].hasError) {
-              newImageStates[imageUrl] = {
-                isLoading: true,
-                hasError: false,
-                isLoaded: false,
-              };
-            }
+        const imageUrl = getPreviewUrl(event.thumbnail);
+        if (imageUrl) {
+          // Initialize state for this image URL if not already present
+          if (!imageStates[imageUrl]) {
+            newImageStates[imageUrl] = {
+              isLoading: true,
+              hasError: false,
+              isLoaded: false,
+            };
           }
         }
       }
@@ -83,45 +114,6 @@ export default function EventTable({
       maximumFractionDigits: 0,
     }).format(amount);
 
-  const extractFileId = (url: string): string | null => {
-    if (!url) return null;
-
-    // If it's already a file ID (alphanumeric with dashes/underscores)
-    if (/^[a-zA-Z0-9-_]+$/.test(url)) {
-      return url;
-    }
-
-    // Handle various Google Drive URL formats
-    const patterns = [
-      /\/file\/d\/([a-zA-Z0-9-_]+)/,
-      /\/thumbnail\?id=([a-zA-Z0-9-_]+)/,
-      /\/uc\?.*id=([a-zA-Z0-9-_]+)/,
-      /id=([a-zA-Z0-9-_]+)/,
-      /\/d\/([a-zA-Z0-9-_]+)\//,
-      /\/open\?id=([a-zA-Z0-9-_]+)/,
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        return match[1];
-      }
-    }
-
-    // Try to extract from sharing URLs
-    const sharingMatch = url.match(
-      /https:\/\/drive\.google\.com\/[a-z]+\/[a-z]+\/([a-zA-Z0-9-_]+)/
-    );
-    if (sharingMatch && sharingMatch[1]) {
-      return sharingMatch[1];
-    }
-
-    return null;
-  };
-
-const getDirectImageUrl = (fileId: string): string =>
-  `https://drive.google.com/uc?export=download&id=${fileId}`;
-
   const handleImageLoad = (imageUrl: string) => {
     setImageStates((prev) => ({
       ...prev,
@@ -134,6 +126,7 @@ const getDirectImageUrl = (fileId: string): string =>
   };
 
   const handleImageError = (imageUrl: string) => {
+    console.error(`Failed to load image: ${imageUrl}`);
     setImageStates((prev) => ({
       ...prev,
       [imageUrl]: {
@@ -177,16 +170,21 @@ const getDirectImageUrl = (fileId: string): string =>
   };
 
   const handleConfirmDelete = () => {
-    if (eventToDelete) {
+    if (isBulkDelete) {
+      selectedEvents.forEach((id) => onDelete(id));
+      setSelectedEvents([]);
+    } else if (eventToDelete) {
       onDelete(eventToDelete.id);
-      setIsDeleteModalOpen(false);
-      setEventToDelete(null);
     }
+    setIsDeleteModalOpen(false);
+    setEventToDelete(null);
+    setIsBulkDelete(false);
   };
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setEventToDelete(null);
+    setIsBulkDelete(false);
   };
 
   // Filter events based on search term and filters
@@ -218,29 +216,12 @@ const getDirectImageUrl = (fileId: string): string =>
     );
   };
 
-  // Select all filtered events
-  const toggleSelectAll = () => {
-    setSelectedEvents((prev) =>
-      prev.length === filteredEvents.length
-        ? []
-        : filteredEvents.map((event) => event.id)
-    );
-  };
-
   // Handle bulk delete
   const handleBulkDelete = () => {
     if (selectedEvents.length === 0) return;
 
-    if (
-      window.confirm(
-        `Are you sure you want to delete ${
-          selectedEvents.length
-        } selected event${selectedEvents.length > 1 ? "s" : ""}?`
-      )
-    ) {
-      selectedEvents.forEach((id) => onDelete(id));
-      setSelectedEvents([]);
-    }
+    setIsBulkDelete(true);
+    setIsDeleteModalOpen(true);
   };
 
   if (events.length === 0) {
@@ -295,8 +276,7 @@ const getDirectImageUrl = (fileId: string): string =>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEvents.length > 0 ? (
           filteredEvents.map((event) => {
-            const fileId = extractFileId(event.thumbnail || "");
-            const imageUrl = fileId ? getDirectImageUrl(fileId) : null;
+            const imageUrl = getPreviewUrl(event.thumbnail || "");
             const imageState = imageUrl ? imageStates[imageUrl] : null;
 
             return (
@@ -313,36 +293,6 @@ const getDirectImageUrl = (fileId: string): string =>
                       onChange={() => toggleEventSelection(event.id)}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
                     />
-                  </div>
-
-                  {/* Thumbnail */}
-                  <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden">
-                      {imageUrl && imageState ? (
-                        <>
-                          {imageState.isLoaded && !imageState.hasError ? (
-                            <Image
-                              src={imageUrl}
-                              alt={event.name}
-                              width={64}
-                              height={64}
-                              className="w-full h-full object-cover rounded-full"
-                              onLoad={() => handleImageLoad(imageUrl)}
-                              onError={() => handleImageError(imageUrl)}
-                              unoptimized={true}
-                            />
-                          ) : imageState.isLoading ? (
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500" />
-                          ) : imageState.hasError ? (
-                            <FiImage className="w-8 h-8 text-gray-400" />
-                          ) : (
-                            <FiImage className="w-8 h-8 text-gray-400" />
-                          )}
-                        </>
-                      ) : (
-                        <FiImage className="w-8 h-8 text-gray-400" />
-                      )}
-                    </div>
                   </div>
 
                   {/* Details */}
@@ -382,12 +332,6 @@ const getDirectImageUrl = (fileId: string): string =>
                 {/* Actions */}
                 <div className="flex justify-end space-x-2 mt-4 pt-4 border-t border-gray-100">
                   <Link
-                    href={`/admin/programs/events/${event.id}`}
-                    className="px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100 border border-blue-200 transition-colors"
-                  >
-                    View
-                  </Link>
-                  <Link
                     href={`/admin/programs/events/edit/${event.id}`}
                     className="px-3 py-1 text-sm bg-yellow-50 text-yellow-700 rounded hover:bg-yellow-100 border border-yellow-200 transition-colors"
                   >
@@ -423,6 +367,7 @@ const getDirectImageUrl = (fileId: string): string =>
         onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         eventName={eventToDelete?.name || ""}
+        count={isBulkDelete ? selectedEvents.length : 1}
         isLoading={false}
       />
     </div>

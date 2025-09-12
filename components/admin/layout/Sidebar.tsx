@@ -35,6 +35,7 @@ export default function Sidebar() {
           <div className="bg-white rounded-full shadow-sm p-1 border border-gray-100">
             <Image
               // src="https://drive.google.com/uc?export=download&id=11IWY2m6YPvZ-cTBLhZikmziIz0qbc_AG"
+              // src="https://drive.google.com/file/d/11IWY2m6YPvZ-cTBLhZikmziIz0qbc_AG/view?usp=sharing"
               src="/logo.png"
               alt="HUMANIKA"
               width={60}

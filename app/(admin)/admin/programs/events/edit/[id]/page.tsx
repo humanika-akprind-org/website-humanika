@@ -1,237 +1,146 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { UserApi } from "@/lib/api/user";
+import { PeriodApi } from "@/lib/api/period";
+import EventForm from "@/components/admin/event/Form";
+import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
+import { cookies } from "next/headers";
+import type { CreateEventInput, UpdateEventInput } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
-import EventForm from "@/components/admin/event/Form";
-import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
-import { useToast } from "@/hooks/use-toast";
+import prisma from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
-import type { User } from "@/types/user";
-import type { Period } from "@/types/period";
+async function EditEventPage({ params }: { params: { id: string } }) {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("google_access_token")?.value || "";
 
-export default function EditEventPage() {
-  const router = useRouter();
-  const params = useParams();
-  const { toast } = useToast();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [periods, setPeriods] = useState<Period[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
+  try {
+    // Fetch event data
+    const event = await prisma.event.findUnique({
+      where: { id: params.id },
+      include: {
+        responsible: true,
+        period: true,
+        workProgram: true,
+      },
+    });
 
-  const eventId = params.id as string;
-
-  // Fetch event data, users, and periods
-  useEffect(() => {
-    if (eventId) {
-      fetchEvent();
-      fetchUsers();
-      fetchPeriods();
+    if (!event) {
+      notFound();
     }
-  }, [eventId]);
 
-  const fetchEvent = async () => {
-    try {
-      setIsFetching(true);
-      const response = await fetch(`/api/event/${eventId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setEvent(data);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch event",
-          variant: "destructive",
-        });
-        router.push("/admin/programs/events");
+    // Transform event data to match Event type (convert null thumbnail to undefined)
+    const { thumbnail, ...eventWithoutThumbnail } = event;
+    const transformedEvent = {
+      ...eventWithoutThumbnail,
+      thumbnail: thumbnail === null ? undefined : thumbnail,
+    } as any; // Bypass strict typing for now
+
+    const [usersResponse, periods] = await Promise.all([
+      UserApi.getUsers({ limit: 50 }),
+      PeriodApi.getPeriods(),
+    ]);
+
+    const users = usersResponse.data?.users || [];
+    const periodsData = periods || [];
+
+    const handleSubmit = async (data: CreateEventInput | UpdateEventInput) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
       }
-    } catch (error) {
-      console.error("Error fetching event:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch event",
-        variant: "destructive",
-      });
-      router.push("/admin/programs/events");
-    } finally {
-      setIsFetching(false);
-    }
-  };
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("/api/user?limit=50");
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users || []);
-      } else {
-        console.error("Failed to fetch users:", response.statusText);
-        toast({
-          title: "Error",
-          description: "Failed to fetch users",
-          variant: "destructive",
-        });
+      // Cast data to UpdateEventInput since this is the edit page
+      const eventData = data as UpdateEventInput;
+
+      if (
+        !eventData.name ||
+        !eventData.department ||
+        !eventData.periodId ||
+        !eventData.responsibleId ||
+        !eventData.startDate ||
+        !eventData.endDate
+      ) {
+        throw new Error("Missing required fields");
       }
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch users",
-        variant: "destructive",
-      });
-    }
-  };
 
-  const fetchPeriods = async () => {
-    try {
-      const response = await fetch("/api/period");
-      if (response.ok) {
-        const data = await response.json();
-        setPeriods(data.data || []);
-      } else {
-        console.error("Failed to fetch periods:", response.statusText);
-        toast({
-          title: "Error",
-          description: "Failed to fetch periods",
-          variant: "destructive",
-        });
+      // Generate slug from name
+      const slug = eventData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+
+      const eventPayload: any = {
+        name: eventData.name,
+        slug,
+        thumbnail: eventData.thumbnail,
+        description: eventData.description || "",
+        goal: eventData.goal || "",
+        department: eventData.department,
+        periodId: eventData.periodId,
+        responsibleId: eventData.responsibleId,
+        startDate: new Date(eventData.startDate),
+        endDate: new Date(eventData.endDate),
+        funds: parseFloat(eventData.funds as any) || 0,
+        remainingFunds: parseFloat(eventData.funds as any) || 0,
+      };
+
+      // Only include workProgramId if it's provided and not empty
+      if (eventData.workProgramId && eventData.workProgramId.trim() !== "") {
+        eventPayload.workProgramId = eventData.workProgramId;
       }
-    } catch (error) {
-      console.error("Error fetching periods:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch periods",
-        variant: "destructive",
-      });
-    }
-  };
 
-  const handleSubmit = async (data: CreateEventInput | UpdateEventInput) => {
-    try {
-      setIsLoading(true);
-
-      const response = await fetch(`/api/event/${eventId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      await prisma.event.update({
+        where: { id: params.id },
+        data: eventPayload,
       });
 
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Event updated successfully",
-        });
-        router.push("/admin/programs/events");
-      } else {
-        const errorData = await response.json();
-        toast({
-          title: "Error",
-          description: errorData.message || "Failed to update event",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error updating event:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update event",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      redirect("/admin/programs/events");
+    };
 
-  if (isFetching) {
     return (
-      <div className="space-y-6">
-        {/* Page Header Skeleton */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="h-10 w-24 bg-gray-200 rounded" />
-            <div>
-              <div className="h-8 w-48 bg-gray-200 rounded mb-2" />
-              <div className="h-4 w-64 bg-gray-200 rounded" />
-            </div>
+      <AuthGuard accessToken={accessToken}>
+        <div className="p-6 max-w-4xl min-h-screen mx-auto">
+          <div className="flex items-center mb-6">
+            <Link
+              href="/admin/programs/events"
+              className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
+            >
+              <FiArrowLeft className="mr-1" />
+              Back
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Edit Event
+            </h1>
           </div>
-        </div>
-
-        {/* Form Skeleton */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-gray-200 rounded w-1/4" />
-            <div className="space-y-3">
-              <div className="h-10 bg-gray-200 rounded" />
-              <div className="h-10 bg-gray-200 rounded" />
-              <div className="h-10 bg-gray-200 rounded" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!event) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900">Event not found</h2>
-          <p className="text-gray-600 mt-2">
-            The event you&apos;re looking for doesn&apos;t exist.
-          </p>
-          <Link
-            href="/admin/programs/events"
-            className="inline-flex items-center px-4 py-2 mt-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-          >
-            Back to Events
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/admin/programs/events"
-            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <FiArrowLeft className="h-4 w-4 mr-2" />
-            Back to Events
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Edit Event</h1>
-            <p className="text-gray-600">Update event information</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Event Form */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900">Event Details</h2>
-          <p className="text-sm text-gray-600">
-            Update the information below to modify the event.
-          </p>
-        </div>
-        <div className="p-6">
           <EventForm
-            event={event}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-            accessToken=""
+            event={transformedEvent}
+            accessToken={accessToken}
             users={users}
-            periods={periods}
+            periods={periodsData}
+            onSubmit={handleSubmit}
           />
         </div>
+      </AuthGuard>
+    );
+  } catch (error) {
+    console.error("Error loading form data:", error);
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="text-center text-red-500">
+              <h2 className="text-xl font-semibold mb-4">Error Loading Form</h2>
+              <p>{error instanceof Error ? error.message : "Unknown error"}</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
+
+export default EditEventPage;

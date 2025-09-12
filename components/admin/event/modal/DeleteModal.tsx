@@ -5,6 +5,7 @@ interface DeleteModalProps {
   onClose: () => void;
   onConfirm: () => void;
   eventName: string;
+  count?: number;
   isLoading?: boolean;
 }
 
@@ -13,6 +14,7 @@ export default function DeleteModal({
   onClose,
   onConfirm,
   eventName,
+  count = 1,
   isLoading = false,
 }: DeleteModalProps) {
   if (!isOpen) return null;
@@ -37,16 +39,28 @@ export default function DeleteModal({
 
               <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Delete Event
+                  Delete {count > 1 ? "Events" : "Event"}
                 </h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
                     Are you sure you want to delete{" "}
-                    <span className="font-medium text-gray-900">
-                      &ldquo;{eventName}&rdquo;
-                    </span>
-                    ? This action cannot be undone. This will permanently delete
-                    the event and all associated data including:
+                    {count > 1 ? (
+                      <>
+                        <span className="font-medium text-gray-900">
+                          {count} selected events
+                        </span>
+                        ? This action cannot be undone. This will permanently delete
+                        all selected events and their associated data including:
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-medium text-gray-900">
+                          &ldquo;{eventName}&rdquo;
+                        </span>
+                        ? This action cannot be undone. This will permanently delete
+                        the event and all associated data including:
+                      </>
+                    )}
                   </p>
                   <ul className="mt-2 text-sm text-gray-500 list-disc list-inside">
                     <li>Event documents</li>
@@ -67,7 +81,7 @@ export default function DeleteModal({
               disabled={isLoading}
               className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Deleting..." : "Delete Event"}
+              {isLoading ? "Deleting..." : `Delete ${count > 1 ? "Events" : "Event"}`}
             </button>
             <button
               type="button"
