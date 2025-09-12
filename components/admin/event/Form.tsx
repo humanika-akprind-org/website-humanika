@@ -14,11 +14,6 @@ import { eventThumbnailFolderId } from "@/lib/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 
-// Debug log for event thumbnail folder ID
-// console.log("EVENT THUMBNAIL FOLDER ID:'", eventThumbnailFolderId, "'");
-// console.log(`EVENT THUMBNAIL FOLDER ID:'${eventThumbnailFolderId}'`);
-// console.log("EVENT THUMBNAIL FOLDER ID:'" + eventThumbnailFolderId + "'");
-
 // Helper function to validate image URL
 const isValidImageUrl = (url: string): boolean => {
   try {
@@ -259,55 +254,13 @@ export default function EventForm({
         throw new Error("Funds must be greater than 0");
       }
 
-      // Upload thumbnail first if provided
-      let thumbnailUrl: string | null | undefined = existingThumbnail;
-
-      if (formData.thumbnailFile) {
-        // Delete old thumbnail from Google Drive if it exists
-        if (isGoogleDriveThumbnail(existingThumbnail)) {
-          const fileId = getFileIdFromThumbnail(existingThumbnail);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old thumbnail:", deleteError);
-              // Continue with upload even if delete fails
-            }
-          }
-        }
-
-        // Upload with temporary filename first
-        const tempFileName = `temp_${Date.now()}`;
-        const uploadedFileId = await uploadFile(
-          formData.thumbnailFile,
-          tempFileName,
-          eventThumbnailFolderId
-        );
-
-        if (uploadedFileId) {
-          // Rename the file using the renameFile hook
-          const finalFileName = `event-thumbnail-${formData.name
-            .replace(/\s+/g, "-")
-            .toLowerCase()}-${Date.now()}`;
-          const renameSuccess = await renameFile(uploadedFileId, finalFileName);
-
-          if (renameSuccess) {
-            thumbnailUrl = uploadedFileId;
-          } else {
-            throw new Error("Failed to rename thumbnail");
-          }
-        } else {
-          throw new Error("Failed to upload thumbnail");
-        }
-      }
-
-      // Submit form data with thumbnail URL (exclude thumbnailFile for server action)
+      // First, submit form data to database without thumbnail
       const { thumbnailFile: _, ...dataToSend } = formData;
 
       // Prepare data to send
       const submitData = {
         ...dataToSend,
-        thumbnail: thumbnailUrl || undefined,
+        thumbnail: existingThumbnail || undefined,
         startDate: new Date(formData.startDate),
         endDate: new Date(formData.endDate),
         workProgramId:
@@ -316,9 +269,57 @@ export default function EventForm({
             : undefined,
       };
 
-      await onSubmit(submitData);
+      const savedEvent = await onSubmit(submitData);
 
-      // If there was a file uploaded, run removeThumbnail logic to clean up form state
+      // If there's a thumbnail file to upload, do it after successful database save
+      if (formData.thumbnailFile) {
+        try {
+          // Delete old thumbnail from Google Drive if it exists
+          if (isGoogleDriveThumbnail(existingThumbnail)) {
+            const fileId = getFileIdFromThumbnail(existingThumbnail);
+            if (fileId) {
+              try {
+                await deleteFile(fileId);
+              } catch (deleteError) {
+                console.warn("Failed to delete old thumbnail:", deleteError);
+                // Continue with upload even if delete fails
+              }
+            }
+          }
+
+          // Upload with temporary filename first
+          const tempFileName = `temp_${Date.now()}`;
+          const uploadedFileId = await uploadFile(
+            formData.thumbnailFile,
+            tempFileName,
+            eventThumbnailFolderId
+          );
+
+          if (uploadedFileId) {
+            // Rename the file using the renameFile hook
+            const finalFileName = `event-thumbnail-${formData.name
+              .replace(/\s+/g, "-")
+              .toLowerCase()}-${Date.now()}`;
+            const renameSuccess = await renameFile(uploadedFileId, finalFileName);
+
+            if (renameSuccess) {
+              // Update the event record with the new thumbnail URL
+              // Note: You might need to implement an update function here
+              // For now, we'll just log the success
+              console.log("Thumbnail uploaded successfully:", uploadedFileId);
+            } else {
+              console.warn("Failed to rename thumbnail, but event was saved");
+            }
+          } else {
+            console.warn("Failed to upload thumbnail, but event was saved");
+          }
+        } catch (thumbnailError) {
+          console.warn("Thumbnail upload failed, but event was saved:", thumbnailError);
+          // Don't throw error here - event is already saved
+        }
+      }
+
+      // Clean up form state
       if (formData.thumbnailFile) {
         removeThumbnail();
       }

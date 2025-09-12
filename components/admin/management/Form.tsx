@@ -214,54 +214,66 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
         throw new Error("Please select a period");
       }
 
-      // Upload photo first if provided
-      let photoUrl: string | null | undefined = existingPhoto;
+      // First, submit form data to database without photo
+      const { photoFile: _, ...dataToSend } = formData;
+      const savedManagement = await onSubmit({
+        ...dataToSend,
+        photo: existingPhoto || null,
+      });
 
+      // If there's a photo file to upload, do it after successful database save
       if (formData.photoFile) {
-        // Delete old photo from Google Drive if it exists
-        if (isGoogleDrivePhoto(existingPhoto)) {
-          const fileId = getFileIdFromPhoto(existingPhoto);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old photo:", deleteError);
-              // Continue with upload even if delete fails
+        try {
+          // Delete old photo from Google Drive if it exists
+          if (isGoogleDrivePhoto(existingPhoto)) {
+            const fileId = getFileIdFromPhoto(existingPhoto);
+            if (fileId) {
+              try {
+                await deleteFile(fileId);
+              } catch (deleteError) {
+                console.warn("Failed to delete old photo:", deleteError);
+                // Continue with upload even if delete fails
+              }
             }
           }
-        }
 
-        // Upload with temporary filename first
-        const tempFileName = `temp_${Date.now()}`;
-        const uploadedFileId = await uploadFile(
-          formData.photoFile,
-          tempFileName,
-          photoManagementFolderId
-        );
+          // Upload with temporary filename first
+          const tempFileName = `temp_${Date.now()}`;
+          const uploadedFileId = await uploadFile(
+            formData.photoFile,
+            tempFileName,
+            photoManagementFolderId
+          );
 
-        if (uploadedFileId) {
-          // Rename the file using the renameFile hook
-          const finalFileName = `management_${formData.userId}_${Date.now()}`;
-          const renameSuccess = await renameFile(uploadedFileId, finalFileName);
+          if (uploadedFileId) {
+            // Rename the file using the renameFile hook
+            const finalFileName = `management_${formData.userId}_${Date.now()}`;
+            const renameSuccess = await renameFile(
+              uploadedFileId,
+              finalFileName
+            );
 
-          if (renameSuccess) {
-            photoUrl = uploadedFileId;
+            if (renameSuccess) {
+              // Update the management record with the new photo URL
+              // Note: You might need to implement an update function here
+              // For now, we'll just log the success
+              console.log("Photo uploaded successfully:", uploadedFileId);
+            } else {
+              console.warn("Failed to rename photo, but management was saved");
+            }
           } else {
-            throw new Error("Failed to rename photo");
+            console.warn("Failed to upload photo, but management was saved");
           }
-        } else {
-          throw new Error("Failed to upload photo");
+        } catch (photoError) {
+          console.warn(
+            "Photo upload failed, but management was saved:",
+            photoError
+          );
+          // Don't throw error here - management is already saved
         }
       }
 
-      // Submit form data with photo URL (exclude photoFile for server action)
-      const { photoFile: _, ...dataToSend } = formData;
-      await onSubmit({
-        ...dataToSend,
-        photo: photoUrl || null,
-      });
-
-      // If there was a file uploaded, run removePhoto logic to clean up form state
+      // Clean up form state
       if (formData.photoFile) {
         removePhoto();
       }

@@ -53,13 +53,19 @@ class AppConfig {
     return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
   }
 
-  // Google Drive Folder ID
+  // Google Drive Folder ID (disarankan jangan ambil folder ID dari environment variable (.env), gunakan default. Dikarenakan folder ID tidak dapat membaca dari environment variable)
   get photoManagementFolderId(): string {
-    return process.env.PHOTO_MANAGEMENT_FOLDER_ID || "";
+    return (
+      process.env.PHOTO_MANAGEMENT_FOLDER_ID ||
+      "1b-rGfIotafs5GIoatDEaJPBFKnfzDsha"
+    );
   }
 
   get eventThumbnailFolderId(): string {
-    return process.env.EVENT_THUMBNAIL_FOLDER_ID || "";
+    return (
+      process.env.EVENT_THUMBNAIL_FOLDER_ID ||
+      "1_Wo5jifUNXcr6ipWEvKbNfWJ3ZrZTU8h"
+    );
   }
 
   // Email
