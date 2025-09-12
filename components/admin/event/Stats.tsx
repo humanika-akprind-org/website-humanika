@@ -1,6 +1,11 @@
 "use client";
 
-import { FiCalendar, FiTrendingUp, FiDollarSign, FiCheckCircle } from "react-icons/fi";
+import {
+  FiCalendar,
+  FiTrendingUp,
+  FiDollarSign,
+  FiCheckCircle,
+} from "react-icons/fi";
 import type { Event } from "@/types/event";
 import { Status } from "@/types/enums";
 
@@ -12,8 +17,13 @@ export default function Stats({ events }: StatsProps) {
   // Calculate stats
   const totalEvents = events.length;
   const totalBudget = events.reduce((sum, event) => sum + event.funds, 0);
-  const totalUsedFunds = events.reduce((sum, event) => sum + event.usedFunds, 0);
-  const completedEvents = events.filter(event => event.status === Status.COMPLETED).length;
+  const totalUsedFunds = events.reduce(
+    (sum, event) => sum + event.usedFunds,
+    0
+  );
+  const completedEvents = events.filter(
+    (event) => event.status === Status.COMPLETED
+  ).length;
   // const upcomingEvents = events.filter(event => new Date(event.startDate) > new Date()).length;
 
   // Format currency

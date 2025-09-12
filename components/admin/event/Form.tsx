@@ -95,6 +95,7 @@ export default function EventForm({
     uploadFile,
     deleteFile,
     renameFile,
+    setPublicAccess,
     isLoading: photoLoading,
     error: photoError,
   } = useFile(accessToken);
@@ -263,7 +264,13 @@ export default function EventForm({
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
           if (renameSuccess) {
-            thumbnailUrl = uploadedFileId;
+            // Set the file to public access
+            const publicAccessSuccess = await setPublicAccess(uploadedFileId);
+            if (publicAccessSuccess) {
+              thumbnailUrl = uploadedFileId;
+            } else {
+              throw new Error("Failed to set public access for thumbnail");
+            }
           } else {
             throw new Error("Failed to rename thumbnail");
           }

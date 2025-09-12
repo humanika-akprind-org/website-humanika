@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiPlus, FiDownload, FiUpload } from "react-icons/fi";
-import EventFilters from "@/components/admin/event/Filters";
 import EventTable from "@/components/admin/event/Table";
-import EventStats from "@/components/admin/event/Stats";
 import DeleteModal from "@/components/admin/event/modal/DeleteModal";
 import type { Event } from "@/types/event";
 import type { EventFilter } from "@/types/event";
@@ -20,11 +18,22 @@ export default function EventsPage() {
     eventId: "",
     eventName: "",
   });
+  const [accessToken, setAccessToken] = useState<string>("");
   const { toast } = useToast();
 
-  // Fetch events
+
+
+  // Fetch events and access token
   useEffect(() => {
     fetchEvents();
+    // Get access token from cookies
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("google_access_token="))
+      ?.split("=")[1];
+    if (token) {
+      setAccessToken(token);
+    }
   }, []);
 
   const fetchEvents = async () => {
@@ -158,7 +167,9 @@ export default function EventsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Events Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Events Management
+          </h1>
           <p className="text-gray-600">Manage and organize your events</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -186,12 +197,6 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <EventStats events={events} />
-
-      {/* Filters */}
-      <EventFilters onFilterChange={handleFilterChange} />
-
       {/* Events Table */}
       {isLoading ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
@@ -205,15 +210,11 @@ export default function EventsPage() {
           </div>
         </div>
       ) : (
-        <EventTable
-          events={filteredEvents}
-          onDelete={(id) => {
-            const event = events.find((e) => e.id === id);
-            if (event) {
-              openDeleteModal(id, event.name);
-            }
-          }}
-        />
+          <EventTable
+            events={filteredEvents}
+            onDelete={handleDelete}
+            accessToken={accessToken}
+          />
       )}
 
       {/* Delete Modal */}

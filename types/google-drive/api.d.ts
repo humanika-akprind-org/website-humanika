@@ -5,12 +5,17 @@ export interface ApiResponse {
 }
 
 export interface ApiCallParams {
-  action: "getUrl" | "delete" | "upload" | "rename";
+  action: "getUrl" | "delete" | "upload" | "rename" | "setPublicAccess";
   fileId?: string;
   accessToken: string;
   file?: File;
   fileName?: string;
   folderId?: string;
+  permission?: {
+    type: string;
+    role: string;
+    allowFileDiscovery: boolean;
+  };
 }
 
 export interface ApiRequestBody {
@@ -19,4 +24,9 @@ export interface ApiRequestBody {
   fileName?: string;
   newName?: string;
   accessToken: string;
+  permission?: {
+    type: string;
+    role: string;
+    allowFileDiscovery: boolean;
+  };
 }
