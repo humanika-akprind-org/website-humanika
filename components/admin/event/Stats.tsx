@@ -14,7 +14,7 @@ export default function Stats({ events }: StatsProps) {
   const totalBudget = events.reduce((sum, event) => sum + event.funds, 0);
   const totalUsedFunds = events.reduce((sum, event) => sum + event.usedFunds, 0);
   const completedEvents = events.filter(event => event.status === Status.COMPLETED).length;
-  const upcomingEvents = events.filter(event => new Date(event.startDate) > new Date()).length;
+  // const upcomingEvents = events.filter(event => new Date(event.startDate) > new Date()).length;
 
   // Format currency
   const formatCurrency = (amount: number) =>

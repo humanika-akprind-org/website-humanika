@@ -4,11 +4,20 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
-import { Department as DepartmentEnum, Status as StatusEnum } from "@/types/enums";
+import {
+  Department as DepartmentEnum,
+  Status as StatusEnum,
+} from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { useWorkPrograms } from "@/hooks/useWorkPrograms";
-import { useToast } from "@/hooks/use-toast";
 import { eventThumbnailFolderId } from "@/lib/config";
+import type { User } from "@/types/user";
+import type { Period } from "@/types/period";
+
+// Debug log for event thumbnail folder ID
+// console.log("EVENT THUMBNAIL FOLDER ID:'", eventThumbnailFolderId, "'");
+// console.log(`EVENT THUMBNAIL FOLDER ID:'${eventThumbnailFolderId}'`);
+// console.log("EVENT THUMBNAIL FOLDER ID:'" + eventThumbnailFolderId + "'");
 
 // Helper function to validate image URL
 const isValidImageUrl = (url: string): boolean => {
@@ -45,7 +54,9 @@ const getPreviewUrl = (thumbnail: string | null | undefined): string | null => {
 };
 
 // Helper function to check if thumbnail is from Google Drive (either URL or file ID)
-const isGoogleDriveThumbnail = (thumbnail: string | null | undefined): boolean => {
+const isGoogleDriveThumbnail = (
+  thumbnail: string | null | undefined
+): boolean => {
   if (!thumbnail) return false;
   return (
     thumbnail.includes("drive.google.com") ||
@@ -73,20 +84,25 @@ interface EventFormProps {
   onSubmit: (data: CreateEventInput | UpdateEventInput) => Promise<void>;
   isLoading?: boolean;
   accessToken: string;
-  users: any[];
-  periods: any[];
+  users: User[];
+  periods: Period[];
 }
 
-export default function EventForm({ event, onSubmit, isLoading = false, accessToken, users, periods }: EventFormProps) {
+export default function EventForm({
+  event,
+  onSubmit,
+  accessToken,
+  users,
+  periods,
+}: EventFormProps) {
   const router = useRouter();
-  const { toast } = useToast();
 
   const {
     uploadFile,
     deleteFile,
     renameFile,
-    isLoading: photoLoading,
-    error: photoError,
+    isLoading: thumbnailLoading,
+    error: thumbnailError,
   } = useFile(accessToken);
 
   // Fetch work programs
@@ -101,8 +117,12 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
     department: event?.department || DepartmentEnum.BPH,
     periodId: event?.period?.id || "",
     responsibleId: event?.responsible?.id || "",
-    startDate: event?.startDate ? new Date(event.startDate).toISOString().split("T")[0] : "",
-    endDate: event?.endDate ? new Date(event.endDate).toISOString().split("T")[0] : "",
+    startDate: event?.startDate
+      ? new Date(event.startDate).toISOString().split("T")[0]
+      : "",
+    endDate: event?.endDate
+      ? new Date(event.endDate).toISOString().split("T")[0]
+      : "",
     funds: event?.funds || 0,
     status: event?.status || StatusEnum.DRAFT,
     workProgramId: event?.workProgram?.id || "",
@@ -112,9 +132,9 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
   const [isLoadingState, setIsLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [existingThumbnail, setExistingThumbnail] = useState<string | null | undefined>(
-    event?.thumbnail
-  );
+  const [existingThumbnail, setExistingThumbnail] = useState<
+    string | null | undefined
+  >(event?.thumbnail);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -129,18 +149,22 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
   }, [existingThumbnail]);
 
   useEffect(() => {
-    if (photoError) {
-      setError(photoError);
+    if (thumbnailError) {
+      setError(thumbnailError);
     }
-  }, [photoError]);
+  }, [thumbnailError]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -178,30 +202,30 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
     setExistingThumbnail(null);
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  // const validateForm = () => {
+  //   const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) newErrors.name = "Event name is required";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
-    if (!formData.goal.trim()) newErrors.goal = "Goal is required";
-    if (!formData.periodId) newErrors.periodId = "Period is required";
-    if (!formData.responsibleId) newErrors.responsibleId = "Responsible person is required";
-    if (!formData.startDate) newErrors.startDate = "Start date is required";
-    if (!formData.endDate) newErrors.endDate = "End date is required";
-    if (formData.funds <= 0) newErrors.funds = "Funds must be greater than 0";
+  //   if (!formData.name.trim()) newErrors.name = "Event name is required";
+  //   if (!formData.description.trim()) newErrors.description = "Description is required";
+  //   if (!formData.goal.trim()) newErrors.goal = "Goal is required";
+  //   if (!formData.periodId) newErrors.periodId = "Period is required";
+  //   if (!formData.responsibleId) newErrors.responsibleId = "Responsible person is required";
+  //   if (!formData.startDate) newErrors.startDate = "Start date is required";
+  //   if (!formData.endDate) newErrors.endDate = "End date is required";
+  //   if (formData.funds <= 0) newErrors.funds = "Funds must be greater than 0";
 
-    // Validate date range
-    if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate);
-      const end = new Date(formData.endDate);
-      if (end < start) {
-        newErrors.endDate = "End date must be after start date";
-      }
-    }
+  //   // Validate date range
+  //   if (formData.startDate && formData.endDate) {
+  //     const start = new Date(formData.startDate);
+  //     const end = new Date(formData.endDate);
+  //     if (end < start) {
+  //       newErrors.endDate = "End date must be after start date";
+  //     }
+  //   }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,7 +286,9 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
 
         if (uploadedFileId) {
           // Rename the file using the renameFile hook
-          const finalFileName = `event-thumbnail-${formData.name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
+          const finalFileName = `event-thumbnail-${formData.name
+            .replace(/\s+/g, "-")
+            .toLowerCase()}-${Date.now()}`;
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
           if (renameSuccess) {
@@ -284,7 +310,10 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
         thumbnail: thumbnailUrl || undefined,
         startDate: new Date(formData.startDate),
         endDate: new Date(formData.endDate),
-        workProgramId: formData.workProgramId && formData.workProgramId.trim() !== "" ? formData.workProgramId : undefined,
+        workProgramId:
+          formData.workProgramId && formData.workProgramId.trim() !== ""
+            ? formData.workProgramId
+            : undefined,
       };
 
       await onSubmit(submitData);
@@ -296,9 +325,7 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
 
       router.push("/admin/programs/events");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to save event"
-      );
+      setError(err instanceof Error ? err.message : "Failed to save event");
     } finally {
       setIsLoadingState(false);
     }
@@ -458,7 +485,9 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
               ))}
             </select>
             {workProgramsLoading && (
-              <p className="text-sm text-gray-500 mt-1">Memuat work programs...</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Memuat work programs...
+              </p>
             )}
           </div>
 
@@ -521,7 +550,8 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
             Thumbnail
           </label>
           <div className="flex items-start space-x-4">
-            {(previewUrl || (existingThumbnail && existingThumbnail.trim() !== "")) && (
+            {(previewUrl ||
+              (existingThumbnail && existingThumbnail.trim() !== "")) && (
               <div className="flex flex-col items-center">
                 <div className="flex-shrink-0">
                   {(() => {
@@ -547,6 +577,7 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
                                 e
                               );
                             }}
+                            unoptimized={displayUrl.startsWith("blob:")}
                           />
                         </div>
                       );
@@ -590,13 +621,15 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
                 accept="image/*"
                 onChange={handleFileChange}
                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                disabled={isLoadingState || photoLoading}
+                disabled={isLoadingState || thumbnailLoading}
               />
               <p className="text-sm text-gray-500 mt-1">
                 Upload thumbnail (max 5MB, format: JPG, PNG, GIF)
               </p>
-              {photoLoading && (
-                <p className="text-sm text-blue-600 mt-1">Mengupload thumbnail...</p>
+              {thumbnailLoading && (
+                <p className="text-sm text-blue-600 mt-1">
+                  Mengupload thumbnail...
+                </p>
               )}
             </div>
           </div>
@@ -613,7 +646,7 @@ export default function EventForm({ event, onSubmit, isLoading = false, accessTo
           </button>
           <button
             type="submit"
-            disabled={isLoadingState || photoLoading}
+            disabled={isLoadingState || thumbnailLoading}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
           >
             {isLoadingState ? (

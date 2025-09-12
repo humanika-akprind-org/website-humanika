@@ -7,7 +7,7 @@ export function useFile(accessToken: string): {
   uploadFile: (
     file: File,
     fileName: string,
-    folderId?: string
+    folderId: string
   ) => Promise<string | null>;
   deleteFile: (fileId: string) => Promise<boolean>;
   renameFile: (fileId: string, newName: string) => Promise<boolean>;
@@ -18,7 +18,7 @@ export function useFile(accessToken: string): {
   const uploadFile = async (
     file: File,
     fileName: string,
-    folderId: string = "root"
+    folderId: string
   ): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
@@ -52,6 +52,7 @@ export function useFile(accessToken: string): {
       );
       return null;
     } finally {
+      console.log("Uploading file:", fileName, "to folder:", folderId);
       setIsLoading(false);
     }
   };

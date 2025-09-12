@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Link from "next/link";
 import { FiEdit, FiTrash2, FiEye, FiCalendar } from "react-icons/fi";
 import type { Event } from "@/types/event";
@@ -12,8 +11,6 @@ interface EventTableProps {
 }
 
 export default function EventTable({ events, onDelete }: EventTableProps) {
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("id-ID", {
       day: "2-digit",
@@ -66,8 +63,12 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
         <FiCalendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No events found</h3>
-        <p className="text-gray-500">Get started by creating your first event.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          No events found
+        </h3>
+        <p className="text-gray-500">
+          Get started by creating your first event.
+        </p>
       </div>
     );
   }
@@ -109,8 +110,15 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                     {event.thumbnail && (
                       <Image
                         className="h-10 w-10 rounded-lg object-cover mr-3"
-                        src={event.thumbnail}
+                        src={
+                          event.thumbnail.startsWith("http") ||
+                          event.thumbnail.startsWith("/")
+                            ? event.thumbnail
+                            : `/${event.thumbnail}`
+                        }
                         alt={event.name}
+                        width={40}
+                        height={40}
                       />
                     )}
                     <div>
@@ -124,7 +132,9 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">{event.department}</span>
+                  <span className="text-sm text-gray-900">
+                    {event.department}
+                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
