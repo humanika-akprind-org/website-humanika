@@ -541,13 +541,13 @@ export default function EventForm({
                     // Check if thumbnail exists and is a valid URL
                     if (displayUrl && isValidImageUrl(displayUrl)) {
                       return (
-                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden">
+                        <div className="w-80 h-60 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden">
                           <Image
                             src={displayUrl}
                             alt={event?.name || "Event thumbnail"}
-                            width={64}
-                            height={64}
-                            className="w-full h-full object-cover rounded-full"
+                            width={400}
+                            height={300}
+                            className="w-full h-full object-contain rounded-lg"
                             onError={(e) => {
                               console.error(
                                 "Image failed to load:",
