@@ -91,13 +91,12 @@ export default function EventForm({
   periods,
 }: EventFormProps) {
   const router = useRouter();
-
   const {
     uploadFile,
     deleteFile,
     renameFile,
-    isLoading: thumbnailLoading,
-    error: thumbnailError,
+    isLoading: photoLoading,
+    error: photoError,
   } = useFile(accessToken);
 
   // Fetch work programs
@@ -144,10 +143,10 @@ export default function EventForm({
   }, [existingThumbnail]);
 
   useEffect(() => {
-    if (thumbnailError) {
-      setError(thumbnailError);
+    if (photoError) {
+      setError(photoError);
     }
-  }, [thumbnailError]);
+  }, [photoError]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -197,30 +196,7 @@ export default function EventForm({
     setExistingThumbnail(null);
   };
 
-  // const validateForm = () => {
-  //   const newErrors: Record<string, string> = {};
 
-  //   if (!formData.name.trim()) newErrors.name = "Event name is required";
-  //   if (!formData.description.trim()) newErrors.description = "Description is required";
-  //   if (!formData.goal.trim()) newErrors.goal = "Goal is required";
-  //   if (!formData.periodId) newErrors.periodId = "Period is required";
-  //   if (!formData.responsibleId) newErrors.responsibleId = "Responsible person is required";
-  //   if (!formData.startDate) newErrors.startDate = "Start date is required";
-  //   if (!formData.endDate) newErrors.endDate = "End date is required";
-  //   if (formData.funds <= 0) newErrors.funds = "Funds must be greater than 0";
-
-  //   // Validate date range
-  //   if (formData.startDate && formData.endDate) {
-  //     const start = new Date(formData.startDate);
-  //     const end = new Date(formData.endDate);
-  //     if (end < start) {
-  //       newErrors.endDate = "End date must be after start date";
-  //     }
-  //   }
-
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0;
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -254,13 +230,55 @@ export default function EventForm({
         throw new Error("Funds must be greater than 0");
       }
 
-      // First, submit form data to database without thumbnail
+      // Upload thumbnail first if provided
+      let thumbnailUrl: string | null | undefined = existingThumbnail;
+
+      if (formData.thumbnailFile) {
+        // Delete old thumbnail from Google Drive if it exists
+        if (isGoogleDriveThumbnail(existingThumbnail)) {
+          const fileId = getFileIdFromThumbnail(existingThumbnail);
+          if (fileId) {
+            try {
+              await deleteFile(fileId);
+            } catch (deleteError) {
+              console.warn("Failed to delete old thumbnail:", deleteError);
+              // Continue with upload even if delete fails
+            }
+          }
+        }
+
+        // Upload with temporary filename first
+        const tempFileName = `temp_${Date.now()}`;
+        const uploadedFileId = await uploadFile(
+          formData.thumbnailFile,
+          tempFileName,
+          eventThumbnailFolderId
+        );
+
+        if (uploadedFileId) {
+          // Rename the file using the renameFile hook
+          const finalFileName = `event-thumbnail-${formData.name
+            .replace(/\s+/g, "-")
+            .toLowerCase()}-${Date.now()}`;
+          const renameSuccess = await renameFile(uploadedFileId, finalFileName);
+
+          if (renameSuccess) {
+            thumbnailUrl = uploadedFileId;
+          } else {
+            throw new Error("Failed to rename thumbnail");
+          }
+        } else {
+          throw new Error("Failed to upload thumbnail");
+        }
+      }
+
+      // Submit form data with thumbnail URL (exclude thumbnailFile for server action)
       const { thumbnailFile: _, ...dataToSend } = formData;
 
       // Prepare data to send
       const submitData = {
         ...dataToSend,
-        thumbnail: existingThumbnail || undefined,
+        thumbnail: thumbnailUrl || undefined,
         startDate: new Date(formData.startDate),
         endDate: new Date(formData.endDate),
         workProgramId:
@@ -269,57 +287,9 @@ export default function EventForm({
             : undefined,
       };
 
-      const savedEvent = await onSubmit(submitData);
+      await onSubmit(submitData);
 
-      // If there's a thumbnail file to upload, do it after successful database save
-      if (formData.thumbnailFile) {
-        try {
-          // Delete old thumbnail from Google Drive if it exists
-          if (isGoogleDriveThumbnail(existingThumbnail)) {
-            const fileId = getFileIdFromThumbnail(existingThumbnail);
-            if (fileId) {
-              try {
-                await deleteFile(fileId);
-              } catch (deleteError) {
-                console.warn("Failed to delete old thumbnail:", deleteError);
-                // Continue with upload even if delete fails
-              }
-            }
-          }
-
-          // Upload with temporary filename first
-          const tempFileName = `temp_${Date.now()}`;
-          const uploadedFileId = await uploadFile(
-            formData.thumbnailFile,
-            tempFileName,
-            eventThumbnailFolderId
-          );
-
-          if (uploadedFileId) {
-            // Rename the file using the renameFile hook
-            const finalFileName = `event-thumbnail-${formData.name
-              .replace(/\s+/g, "-")
-              .toLowerCase()}-${Date.now()}`;
-            const renameSuccess = await renameFile(uploadedFileId, finalFileName);
-
-            if (renameSuccess) {
-              // Update the event record with the new thumbnail URL
-              // Note: You might need to implement an update function here
-              // For now, we'll just log the success
-              console.log("Thumbnail uploaded successfully:", uploadedFileId);
-            } else {
-              console.warn("Failed to rename thumbnail, but event was saved");
-            }
-          } else {
-            console.warn("Failed to upload thumbnail, but event was saved");
-          }
-        } catch (thumbnailError) {
-          console.warn("Thumbnail upload failed, but event was saved:", thumbnailError);
-          // Don't throw error here - event is already saved
-        }
-      }
-
-      // Clean up form state
+      // If there was a file uploaded, run removeThumbnail logic to clean up form state
       if (formData.thumbnailFile) {
         removeThumbnail();
       }
@@ -578,7 +548,6 @@ export default function EventForm({
                                 e
                               );
                             }}
-                            unoptimized={displayUrl.startsWith("blob:")}
                           />
                         </div>
                       );
@@ -622,12 +591,12 @@ export default function EventForm({
                 accept="image/*"
                 onChange={handleFileChange}
                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                disabled={isLoadingState || thumbnailLoading}
+                disabled={isLoadingState || photoLoading}
               />
               <p className="text-sm text-gray-500 mt-1">
                 Upload thumbnail (max 5MB, format: JPG, PNG, GIF)
               </p>
-              {thumbnailLoading && (
+              {photoLoading && (
                 <p className="text-sm text-blue-600 mt-1">
                   Mengupload thumbnail...
                 </p>
@@ -647,7 +616,7 @@ export default function EventForm({
           </button>
           <button
             type="submit"
-            disabled={isLoadingState || thumbnailLoading}
+            disabled={isLoadingState || photoLoading}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
           >
             {isLoadingState ? (

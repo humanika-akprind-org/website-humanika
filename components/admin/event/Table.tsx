@@ -102,6 +102,7 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
               </th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-200">
             {events.map((event) => (
               <tr key={event.id} className="hover:bg-gray-50">
