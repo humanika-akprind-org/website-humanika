@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle other actions (rename, delete, etc.)
-    const { action, fileId, fileName, accessToken } = await request.json();
+    const { action, fileId, fileName, accessToken, permission } = await request.json();
 
     const drive = google.drive({
       version: "v3",
@@ -119,6 +119,16 @@ export async function POST(request: NextRequest) {
           url: imageUrl,
           originalUrl: data.webViewLink,
         });
+
+      case "setPublicAccess":
+        if (!fileId || !permission) {
+          throw new Error("Missing file ID or permission");
+        }
+        await drive.permissions.create({
+          fileId,
+          requestBody: permission,
+        });
+        return NextResponse.json({ success: true });
 
       default:
         throw new Error("Invalid action");
