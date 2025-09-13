@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
       const action = formData.get("action") as string;
       const accessToken = formData.get("accessToken") as string;
       const folderId = formData.get("folderId") as string;
+      const fileName = formData.get("fileName") as string;
 
       if (action !== "upload" || !file) {
         throw new Error("Invalid upload request");
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       // Upload to Google Drive
       const { data } = await drive.files.create({
         requestBody: {
-          name: file.name,
+          name: fileName || file.name,
           mimeType: file.type,
           parents: folderId && folderId !== "root" ? [folderId] : undefined,
         },
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
       // Use direct image URL for Next.js Image component if it's an image
       let imageUrl = data.webViewLink;
-      if (file.type.startsWith('image/')) {
+      if (file.type.startsWith("image/")) {
         imageUrl = `https://drive.google.com/uc?export=view&id=${data.id}`;
       }
 
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle other actions (rename, delete, etc.)
-    const { action, fileId, fileName, accessToken } = await request.json();
+    const { action, fileId, fileName, accessToken, permission } = await request.json();
 
     const drive = google.drive({
       version: "v3",
@@ -105,10 +106,11 @@ export async function POST(request: NextRequest) {
         });
 
         // Return direct image URL for Next.js Image component
-        let imageUrl = data.webViewLink || `https://drive.google.com/file/d/${fileId}/view`;
+        let imageUrl =
+          data.webViewLink || `https://drive.google.com/file/d/${fileId}/view`;
 
         // If it's an image, use the direct download URL format
-        if (data.mimeType && data.mimeType.startsWith('image/')) {
+        if (data.mimeType && data.mimeType.startsWith("image/")) {
           imageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
         }
 
@@ -117,6 +119,16 @@ export async function POST(request: NextRequest) {
           url: imageUrl,
           originalUrl: data.webViewLink,
         });
+
+      case "setPublicAccess":
+        if (!fileId || !permission) {
+          throw new Error("Missing file ID or permission");
+        }
+        await drive.permissions.create({
+          fileId,
+          requestBody: permission,
+        });
+        return NextResponse.json({ success: true });
 
       default:
         throw new Error("Invalid action");

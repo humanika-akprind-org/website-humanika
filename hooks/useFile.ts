@@ -7,10 +7,11 @@ export function useFile(accessToken: string): {
   uploadFile: (
     file: File,
     fileName: string,
-    folderId?: string
+    folderId: string
   ) => Promise<string | null>;
   deleteFile: (fileId: string) => Promise<boolean>;
   renameFile: (fileId: string, newName: string) => Promise<boolean>;
+  setPublicAccess: (fileId: string) => Promise<boolean>;
 } {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export function useFile(accessToken: string): {
   const uploadFile = async (
     file: File,
     fileName: string,
-    folderId: string = "root"
+    folderId: string
   ): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
@@ -52,6 +53,7 @@ export function useFile(accessToken: string): {
       );
       return null;
     } finally {
+      console.log("Uploading file:", fileName, "to folder:", folderId);
       setIsLoading(false);
     }
   };
@@ -104,11 +106,41 @@ export function useFile(accessToken: string): {
     }
   };
 
+  const setPublicAccess = async (fileId: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await callApi({
+        action: "setPublicAccess",
+        fileId,
+        accessToken,
+        permission: {
+          type: "anyone",
+          role: "reader",
+          allowFileDiscovery: false,
+        },
+      });
+      return true;
+    } catch (err) {
+      console.error("Set public access error:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to set public access. Please try again."
+      );
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isLoading,
     error,
     uploadFile,
     deleteFile,
     renameFile,
+    setPublicAccess,
   };
 }

@@ -1,18 +1,103 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiEdit, FiTrash2, FiEye, FiCalendar } from "react-icons/fi";
+import { FiCalendar, FiUser } from "react-icons/fi";
 import type { Event } from "@/types/event";
 import type { Status } from "@/types/enums";
 import { Status as StatusEnum } from "@/types/enums";
-import Image from "next/image";
+import EventStats from "./Stats";
+import EventFilters from "./Filters";
+import DeleteModal from "./modal/DeleteModal";
 
 interface EventTableProps {
   events: Event[];
   onDelete: (id: string) => void;
+  accessToken?: string;
 }
 
-export default function EventTable({ events, onDelete }: EventTableProps) {
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+interface ImageState {
+  [key: string]: {
+    isLoading: boolean;
+    hasError: boolean;
+    isLoaded: boolean;
+  };
+}
+
+// Helper function to get preview URL from photo (file ID or URL)
+const getPreviewUrl = (photo: string | null | undefined): string | null => {
+  if (!photo) return null;
+
+  if (photo.includes("drive.google.com")) {
+    // It's a full Google Drive URL, convert to direct image URL
+    const fileIdMatch = photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch) {
+      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+    }
+
+    // Try other common Google Drive URL patterns
+    const otherPatterns = [
+      /\/open\?id=([a-zA-Z0-9_-]+)/,
+      /\/uc\?id=([a-zA-Z0-9_-]+)/,
+      /id=([a-zA-Z0-9_-]+)/,
+    ];
+
+    for (const pattern of otherPatterns) {
+      const match = photo.match(pattern);
+      if (match) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      }
+    }
+
+    return photo;
+  } else if (photo.match(/^[a-zA-Z0-9_-]+$/)) {
+    // It's a Google Drive file ID, construct direct URL
+    return `https://drive.google.com/uc?export=view&id=${photo}`;
+  } else {
+    // It's a direct URL or other format
+    return photo;
+  }
+};
+
+export default function EventTable({
+  events,
+  onDelete,
+}: EventTableProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
+  const [periodFilter, setPeriodFilter] = useState<string>("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+  const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
+  const [imageStates, setImageStates] = useState<ImageState>({});
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
+
+  const handleStatusFilterChange = (status: string) =>
+    (status === "all" ||
+      Object.values(StatusEnum).includes(status as StatusEnum)) &&
+    setStatusFilter(status as Status | "all");
+
+  // Initialize image states when events change
+  useEffect(() => {
+    const newImageStates: ImageState = {};
+
+    events.forEach((event) => {
+      if (event.thumbnail) {
+        const imageUrl = getPreviewUrl(event.thumbnail);
+        if (imageUrl) {
+          // Initialize state for this image URL if not already present
+          if (!imageStates[imageUrl]) {
+            newImageStates[imageUrl] = {
+              isLoading: true,
+              hasError: false,
+              isLoaded: false,
+            };
+          }
+        }
+      }
+    });
+
+    setImageStates((prev) => ({ ...prev, ...newImageStates }));
+  }, [events]);
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("id-ID", {
@@ -28,6 +113,29 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+
+  const handleImageLoad = (imageUrl: string) => {
+    setImageStates((prev) => ({
+      ...prev,
+      [imageUrl]: {
+        isLoading: false,
+        hasError: false,
+        isLoaded: true,
+      },
+    }));
+  };
+
+  const handleImageError = (imageUrl: string) => {
+    console.error(`Failed to load image: ${imageUrl}`);
+    setImageStates((prev) => ({
+      ...prev,
+      [imageUrl]: {
+        isLoading: false,
+        hasError: true,
+        isLoaded: false,
+      },
+    }));
+  };
 
   const getStatusColor = (status: Status) => {
     switch (status) {
@@ -56,139 +164,316 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
-      onDelete(id);
+  const handleDelete = (event: Event) => {
+    setEventToDelete(event);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (isBulkDelete) {
+      selectedEvents.forEach((id) => onDelete(id));
+      setSelectedEvents([]);
+    } else if (eventToDelete) {
+      onDelete(eventToDelete.id);
     }
+    setIsDeleteModalOpen(false);
+    setEventToDelete(null);
+    setIsBulkDelete(false);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setEventToDelete(null);
+    setIsBulkDelete(false);
+  };
+
+  // Filter events based on search term and filters
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch =
+      event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.responsible?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || event.status === statusFilter;
+
+    const matchesPeriod =
+      periodFilter === "all" || event.period?.id === periodFilter;
+
+    const matchesDepartment =
+      departmentFilter === "all" || event.department === departmentFilter;
+
+    return matchesSearch && matchesStatus && matchesPeriod && matchesDepartment;
+  });
+
+  // Toggle event selection
+  const toggleEventSelection = (id: string) => {
+    setSelectedEvents((prev) =>
+      prev.includes(id)
+        ? prev.filter((eventId) => eventId !== id)
+        : [...prev, id]
+    );
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = () => {
+    if (selectedEvents.length === 0) return;
+
+    setIsBulkDelete(true);
+    setIsDeleteModalOpen(true);
   };
 
   if (events.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
         <FiCalendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No events found</h3>
-        <p className="text-gray-500">Get started by creating your first event.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          No events found
+        </h3>
+        <p className="text-gray-500">
+          Get started by creating your first event.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Event
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Department
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Budget
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Responsible
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {events.map((event) => (
-              <tr key={event.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    {event.thumbnail && (
-                      <Image
-                        className="h-10 w-10 rounded-lg object-cover mr-3"
-                        src={event.thumbnail}
-                        alt={event.name}
-                      />
-                    )}
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {event.name}
-                      </div>
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
-                        {event.description}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">{event.department}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {formatDate(event.startDate)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    to {formatDate(event.endDate)}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {formatCurrency(event.funds)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Used: {formatCurrency(event.usedFunds)}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                      event.status
-                    )}`}
-                  >
-                    {event.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {event.responsible.name}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {event.responsible.email}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex items-center justify-end space-x-2">
-                    <Link
-                      href={`/admin/programs/events/${event.id}`}
-                      className="text-blue-600 hover:text-blue-900 p-1"
-                      title="View Details"
-                    >
-                      <FiEye className="h-4 w-4" />
-                    </Link>
-                    <Link
-                      href={`/admin/programs/events/edit/${event.id}`}
-                      className="text-indigo-600 hover:text-indigo-900 p-1"
-                      title="Edit"
-                    >
-                      <FiEdit className="h-4 w-4" />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(event.id)}
-                      className="text-red-600 hover:text-red-900 p-1"
-                      title="Delete"
-                    >
-                      <FiTrash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="rounded-xl">
+      <EventStats events={filteredEvents} />
+
+      <EventFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
+        periodFilter={periodFilter}
+        onPeriodFilterChange={setPeriodFilter}
+        departmentFilter={departmentFilter}
+        onDepartmentFilterChange={setDepartmentFilter}
+        selectedCount={selectedEvents.length}
+        onDeleteSelected={handleBulkDelete}
+      />
+
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <p className="text-sm text-gray-500 mt-1">
+            Showing {filteredEvents.length} of {events.length} events
+          </p>
+        </div>
+
+        {selectedEvents.length > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">
+              {selectedEvents.length} event
+              {selectedEvents.length > 1 ? "s" : ""} selected
+            </span>
+          </div>
+        )}
       </div>
+
+      {/* Events Table */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  className="pl-6 pr-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"
+                >
+                  <input
+                    type="checkbox"
+                    checked={
+                      filteredEvents.length > 0 && selectedEvents.length === filteredEvents.length
+                    }
+                    onChange={() => {
+                      if (selectedEvents.length === filteredEvents.length) {
+                        setSelectedEvents([]);
+                      } else {
+                        setSelectedEvents(filteredEvents.map(event => event.id));
+                      }
+                    }}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                  />
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Event
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  style={{ width: "300px", minWidth: "300px" }}
+                >
+                  Description
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Department
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Status
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date Range
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Budget
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Responsible
+                </th>
+                <th
+                  scope="col"
+                  className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredEvents.length > 0 ? (
+                filteredEvents.map((event) => {
+                  const imageUrl = getPreviewUrl(event.thumbnail || "");
+                  const imageState = imageUrl ? imageStates[imageUrl] : null;
+
+                  return (
+                    <tr key={event.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="pl-6 pr-2 py-4 whitespace-nowrap">
+                        <input
+                          type="checkbox"
+                          checked={selectedEvents.includes(event.id)}
+                          onChange={() => toggleEventSelection(event.id)}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                        />
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {event.name}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4" style={{ width: "300px", minWidth: "300px" }}>
+                        <div className="text-sm text-gray-600 break-words">
+                          {event.description || "No description"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {event.department || "No department"}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusColor(
+                            event.status
+                          )}`}
+                        >
+                          {event.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatDate(event.startDate)} - {formatDate(event.endDate)}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatCurrency(event.funds || 0)}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <div className="flex items-center">
+                          <FiUser className="mr-2 text-gray-400" size={14} />
+                          {event.responsible?.name || "Unknown"}
+                        </div>
+                      </td>
+                      <td className="pl-4 pr-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center space-x-2">
+                          <Link
+                            href={`/admin/programs/events/edit/${event.id}`}
+                            className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                            title="Edit event"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </Link>
+                          <button
+                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                            onClick={() => handleDelete(event)}
+                            title="Delete event"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={9} className="px-6 py-12 text-center">
+                    <FiCalendar className="mx-auto h-12 w-12 text-gray-400" />
+                    <h3 className="mt-4 text-sm font-medium text-gray-900">
+                      No events found
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {events.length === 0
+                        ? "Get started by creating your first event."
+                        : "No events match the selected filters."}
+                    </p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table Footer */}
+        {filteredEvents.length > 0 && (
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
+            <p className="text-sm text-gray-700 mb-4 sm:mb-0">
+              Showing <span className="font-medium">{filteredEvents.length}</span> of <span className="font-medium">{events.length}</span> events
+            </p>
+            <div className="flex space-x-2">
+              <button
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                disabled
+              >
+                Previous
+              </button>
+              <button
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                disabled
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        eventName={eventToDelete?.name || ""}
+        count={isBulkDelete ? selectedEvents.length : 1}
+        isLoading={false}
+      />
     </div>
   );
 }
