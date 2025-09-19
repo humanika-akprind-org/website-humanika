@@ -24,27 +24,50 @@ const isValidImageUrl = (url: string): boolean => {
     return (
       /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) ||
       url.includes("drive.google.com") ||
-      url.startsWith("blob:")
+      url.startsWith("blob:") ||
+      url.startsWith("/api/drive-image")
     );
   } catch {
     return false;
   }
 };
 
+// Helper function to extract file ID from various Google Drive URL formats
+const extractFileId = (url: string): string | null => {
+  if (!url) return null;
+
+  // Handle direct file IDs
+  if (url.length === 33 && !url.includes("/")) {
+    return url;
+  }
+
+  // Handle Google Drive URLs
+  const patterns = [
+    /\/file\/d\/([a-zA-Z0-9_-]+)/,
+    /id=([a-zA-Z0-9_-]+)/,
+    /uc\?export=view&id=([a-zA-Z0-9_-]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  return null;
+};
+
 // Helper function to get preview URL from photo (file ID or URL)
-const getPreviewUrl = (photo: string | null | undefined): string | null => {
+const getPreviewUrl = (photo: string | null | undefined, accessToken: string): string | null => {
   if (!photo) return null;
 
-  if (photo.includes("drive.google.com")) {
-    // It's a full Google Drive URL, convert to direct image URL
-    const fileIdMatch = photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch) {
-      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
-    }
-    return photo;
-  } else if (photo.match(/^[a-zA-Z0-9_-]+$/)) {
-    // It's a Google Drive file ID, construct direct URL
-    return `https://drive.google.com/uc?export=view&id=${photo}`;
+  if (isGoogleDrivePhoto(photo)) {
+    // Generate proxy image URL for preview
+    const fileId = extractFileId(photo);
+    if (!fileId) return null;
+
+    return `/api/drive-image?fileId=${fileId}${accessToken ? `&accessToken=${accessToken}` : ""}`;
   } else {
     // It's a direct URL or other format
     return photo;
@@ -124,16 +147,19 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
     fileName: "",
   });
   const [isDeleting, setIsDeleting] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   // Initialize preview URL when component mounts with existing data
   useEffect(() => {
-    setPreviewUrl(getPreviewUrl(management?.photo));
-  }, [management?.photo]);
+    setPreviewUrl(getPreviewUrl(management?.photo, accessToken));
+  }, [management?.photo, accessToken]);
 
   // Update preview URL when existingPhoto changes
   useEffect(() => {
-    setPreviewUrl(getPreviewUrl(existingPhoto));
-  }, [existingPhoto]);
+    setPreviewUrl(getPreviewUrl(existingPhoto, accessToken));
+    // Clear any previous image errors when photo changes
+    setImageErrors(new Set());
+  }, [existingPhoto, accessToken]);
 
   useEffect(() => {
     if (photoError) {
@@ -169,6 +195,17 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
     }
+  };
+
+  // Check if image has errored
+  const hasImageError = (url: string | null): boolean => {
+    if (!url) return true;
+    return imageErrors.has(url);
+  };
+
+  // Handle image error
+  const handleImageError = (url: string) => {
+    setImageErrors((prev) => new Set(prev).add(url));
   };
 
   const removePhoto = () => {
@@ -396,57 +433,57 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
             Foto Profil
           </label>
           <div className="flex items-start space-x-4">
-            {(previewUrl || (existingPhoto && existingPhoto.trim() !== "")) && (
-              <div className="flex flex-col items-center">
-                <div className="flex-shrink-0">
-                  {(() => {
-                    // Get the display URL using the helper function
-                    const displayUrl = getPreviewUrl(
-                      previewUrl || existingPhoto
-                    );
+            <div className="flex flex-col items-center">
+              <div className="flex-shrink-0">
+                {(() => {
+                  // Get the proxy image URL (similar to Table component)
+                  const proxyImageUrl = getPreviewUrl(
+                    previewUrl || existingPhoto,
+                    accessToken
+                  );
+                  const hasError = proxyImageUrl
+                    ? hasImageError(proxyImageUrl)
+                    : true;
 
-                    // Check if photo exists and is a valid URL
-                    if (displayUrl && isValidImageUrl(displayUrl)) {
-                      return (
-                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden">
-                          <Image
-                            src={displayUrl}
-                            alt={management?.user?.name || "Management"}
-                            width={64}
-                            height={64}
-                            className="w-full h-full object-cover rounded-full"
-                            onError={(e) => {
-                              console.error(
-                                "Image failed to load:",
-                                displayUrl,
-                                e
-                              );
-                            }}
+                  // Show image if URL exists and no error
+                  if (proxyImageUrl && !hasError) {
+                    return (
+                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden">
+                        <Image
+                          src={proxyImageUrl}
+                          alt={management?.user?.name || "Management"}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover rounded-full"
+                          onError={() => handleImageError(proxyImageUrl)}
+                          unoptimized={true}
+                        />
+                      </div>
+                    );
+                  } else {
+                    // Show fallback avatar
+                    return (
+                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200">
+                        <svg
+                          className="w-8 h-8 text-gray-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                           />
-                        </div>
-                      );
-                    } else {
-                      return (
-                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200">
-                          <svg
-                            className="w-8 h-8 text-gray-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                            />
-                          </svg>
-                        </div>
-                      );
-                    }
-                  })()}
-                </div>
-                <div className="flex gap-2">
+                        </svg>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
+              {(previewUrl || (existingPhoto && existingPhoto.trim() !== "")) && (
+                <div className="flex gap-2 mt-2">
                   <button
                     type="button"
                     onClick={removePhoto}
@@ -456,8 +493,8 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
                     Hapus Foto
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             <div className="flex-1">
               <input

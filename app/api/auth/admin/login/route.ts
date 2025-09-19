@@ -19,25 +19,20 @@ export async function POST(request: Request) {
           { username: usernameOrEmail.trim() },
           { email: usernameOrEmail.trim() },
         ],
-        role: { in: ["DPO", "BPH", "PENGURUS"] }, // Only admin roles
       },
     });
 
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "Access denied. Admin only." },
-        { status: 401 }
+        { success: false, error: "User not found" },
+        { status: 404 }
       );
     }
 
-    // Check if account is active
-    if (!user.isActive) {
+    if (!["DPO", "BPH", "PENGURUS"].includes(user.role)) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Account is inactive. Please contact administrator.",
-        },
-        { status: 401 }
+        { success: false, error: "Access denied. ADMIN only." },
+        { status: 403 }
       );
     }
 
@@ -48,6 +43,17 @@ export async function POST(request: Request) {
         {
           success: false,
           error: "Account not verified. Please contact administrator.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Check if account is active
+    if (!user.isActive) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Account is inactive. Please contact administrator.",
         },
         { status: 401 }
       );

@@ -36,8 +36,8 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
       : "inactive";
 
   const handleDeleteSelected = () => {
-    // Handle bulk delete logic here
-    console.log("Delete selected managements:", selectedManagements);
+    if (selectedManagements.length === 0) return;
+    setBulkDeleteModal({ isOpen: true, selectedIds: selectedManagements });
   };
 
   const [deleteModal, setDeleteModal] = useState<{
@@ -52,6 +52,14 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
     managementName: "",
     fileId: null,
     fileName: "",
+  });
+
+  const [bulkDeleteModal, setBulkDeleteModal] = useState<{
+    isOpen: boolean;
+    selectedIds: string[];
+  }>({
+    isOpen: false,
+    selectedIds: [],
   });
 
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
@@ -184,6 +192,23 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
       fileId: null,
       fileName: "",
     });
+  };
+
+  // Confirm bulk delete
+  const confirmBulkDelete = async () => {
+    if (bulkDeleteModal.selectedIds.length === 0) return;
+
+    try {
+      for (const id of bulkDeleteModal.selectedIds) {
+        await ManagementApi.deleteManagement(id, accessToken);
+      }
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting managements:", error);
+    } finally {
+      setBulkDeleteModal({ isOpen: false, selectedIds: [] });
+      setSelectedManagements([]);
+    }
   };
 
   const getDepartmentLabel = (department: Department) =>
@@ -540,6 +565,15 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
           })
         }
         onConfirm={confirmDelete}
+        isLoading={isOperating}
+      />
+      <DeleteModal
+        isOpen={bulkDeleteModal.isOpen}
+        managementName={`${bulkDeleteModal.selectedIds.length} selected managements`}
+        onClose={() =>
+          setBulkDeleteModal({ isOpen: false, selectedIds: [] })
+        }
+        onConfirm={confirmBulkDelete}
         isLoading={isOperating}
       />
     </div>
