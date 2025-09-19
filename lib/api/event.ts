@@ -71,7 +71,7 @@ export const createEvent = async (
     try {
       const errorData = await response.json();
       errorMessage = errorData.error || errorMessage;
-    } catch (e) {
+    } catch (_e) {
       // If we can't parse the error response, use the status text
       errorMessage = response.statusText || errorMessage;
     }

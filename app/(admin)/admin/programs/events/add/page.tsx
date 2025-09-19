@@ -3,7 +3,7 @@ import { PeriodApi } from "@/lib/api/period";
 import EventForm from "@/components/admin/event/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
-import type { CreateEventInput, UpdateEventInput } from "@/types/event";
+import type { CreateEventInput, UpdateEventInput, Event } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -51,7 +51,7 @@ async function AddEventPage() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-      const eventPayload: any = {
+      const eventPayload: Omit<Event, 'id' | 'responsible' | 'period' | 'workProgram' | 'status' | 'createdAt' | 'updatedAt'> = {
         name: eventData.name,
         slug,
         thumbnail: eventData.thumbnail,
@@ -62,9 +62,9 @@ async function AddEventPage() {
         responsibleId: eventData.responsibleId,
         startDate: new Date(eventData.startDate),
         endDate: new Date(eventData.endDate),
-        funds: parseFloat(eventData.funds as any) || 0,
+        funds: parseFloat(String(eventData.funds)) || 0,
         usedFunds: 0,
-        remainingFunds: parseFloat(eventData.funds as any) || 0,
+        remainingFunds: parseFloat(String(eventData.funds)) || 0,
       };
 
       // Only include workProgramId if it's provided and not empty

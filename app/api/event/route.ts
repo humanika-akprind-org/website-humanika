@@ -101,25 +101,25 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-    const eventData: any = {
+    const eventData: Prisma.EventCreateInput = {
       name: body.name,
       slug,
       thumbnail: body.thumbnail,
       description: body.description || "",
       goal: body.goal || "",
       department: body.department,
-      periodId: body.periodId,
-      responsibleId: body.responsibleId,
+      period: { connect: { id: body.periodId } },
+      responsible: { connect: { id: body.responsibleId } },
       startDate: new Date(body.startDate),
       endDate: new Date(body.endDate),
-      funds: parseFloat(body.funds as any) || 0,
+      funds: typeof body.funds === 'string' ? parseFloat(body.funds) : (body.funds || 0),
       usedFunds: 0,
-      remainingFunds: parseFloat(body.funds as any) || 0,
+      remainingFunds: typeof body.funds === 'string' ? parseFloat(body.funds) : (body.funds || 0),
     };
 
     // Only include workProgramId if it's provided and not empty
     if (body.workProgramId && body.workProgramId.trim() !== "") {
-      eventData.workProgramId = body.workProgramId;
+      eventData.workProgram = { connect: { id: body.workProgramId } };
     }
 
     const event = await prisma.event.create({
