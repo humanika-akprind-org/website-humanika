@@ -116,6 +116,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Validate ID parameter
+    if (!params.id || params.id === 'undefined' || params.id.trim() === '') {
+      return NextResponse.json({ error: "Invalid work program ID" }, { status: 400 });
+    }
+
     await prisma.workProgram.delete({
       where: { id: params.id },
     });

@@ -132,7 +132,9 @@ export default function WorkFilters({
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={isActiveFilter}
               onChange={(e) =>
-                setIsActiveFilter(e.target.value as "all" | "active" | "inactive")
+                setIsActiveFilter(
+                  e.target.value as "all" | "active" | "inactive"
+                )
               }
             >
               <option value="all">All</option>
@@ -147,7 +149,7 @@ export default function WorkFilters({
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "bg-red-50 text-red-700 hover:bg-red-100"
               }`}
-              onClick={handleDelete}
+              onClick={() => handleDelete()}
               disabled={selectedPrograms.length === 0}
             >
               <FiTrash2 className="mr-2" />

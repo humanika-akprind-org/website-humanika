@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { FiAlertCircle } from "react-icons/fi";
 import WorkProgramTable from "@/components/admin/work/Table";
 import type { WorkProgram } from "@/types/work";
-import { getWorkPrograms, deleteWorkProgram } from "@/lib/api/work";
+import { getWorkPrograms, deleteWorkProgram, deleteWorkPrograms } from "@/lib/api/work";
 
 export default function WorkProgramPage() {
   const [workPrograms, setWorkPrograms] = useState<WorkProgram[]>([]);
@@ -42,10 +42,13 @@ export default function WorkProgramPage() {
 
   const handleDeleteMultiple = async (ids: string[]) => {
     try {
-      await Promise.all(ids.map((id) => deleteWorkProgram(id)));
-      setWorkPrograms((prev) =>
-        prev.filter((program) => !ids.includes(program.id))
-      );
+      const validIds = ids.filter((id) => id && typeof id === 'string' && id.trim() !== '' && id !== 'undefined');
+      if (validIds.length > 0) {
+        await deleteWorkPrograms(validIds);
+        setWorkPrograms((prev) =>
+          prev.filter((program) => !validIds.includes(program.id))
+        );
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to delete work programs"

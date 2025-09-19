@@ -96,3 +96,19 @@ export const deleteWorkProgram = async (id: string): Promise<void> => {
     throw new Error("Failed to delete work program");
   }
 };
+
+export const deleteWorkPrograms = async (ids: string[]): Promise<{ deletedCount: number }> => {
+  const response = await fetch(`${API_URL}/work`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ids }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete work programs");
+  }
+
+  return response.json();
+};

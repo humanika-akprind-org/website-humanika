@@ -1,13 +1,14 @@
 "use client";
 
 import { FiX } from "react-icons/fi";
+import type { WorkProgram } from "@/types/work";
 
 interface DeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: string;
-  message: string;
+  program?: WorkProgram | null;
+  selectedCount: number;
   isLoading?: boolean;
 }
 
@@ -15,8 +16,8 @@ export default function DeleteModal({
   isOpen,
   onClose,
   onConfirm,
-  title,
-  message,
+  program,
+  selectedCount,
   isLoading = false,
 }: DeleteModalProps) {
   if (!isOpen) return null;
@@ -26,7 +27,9 @@ export default function DeleteModal({
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Konfirmasi Penghapusan
+            </h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
@@ -37,7 +40,11 @@ export default function DeleteModal({
           </div>
         </div>
         <div className="p-6">
-          <p className="text-gray-600">{message}</p>
+          <p className="text-gray-600">
+            {program
+              ? `Apakah Anda yakin ingin menghapus program "${program.name}"? Tindakan ini tidak dapat dibatalkan.`
+              : `Apakah Anda yakin ingin menghapus ${selectedCount} program terpilih? Tindakan ini tidak dapat dibatalkan.`}
+          </p>
         </div>
         <div className="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
           <button
@@ -45,14 +52,14 @@ export default function DeleteModal({
             onClick={onClose}
             disabled={isLoading}
           >
-            Cancel
+            Batal
           </button>
           <button
             className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? "Menghapus..." : "Hapus"}
           </button>
         </div>
       </div>

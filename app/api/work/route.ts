@@ -111,3 +111,51 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { ids } = body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json(
+        { error: "Invalid or missing IDs array" },
+        { status: 400 }
+      );
+    }
+
+    // Validate all IDs are strings and not empty
+    const validIds = ids.filter((id) => typeof id === 'string' && id.trim() !== '' && id !== 'undefined');
+    if (validIds.length === 0) {
+      return NextResponse.json(
+        { error: "No valid IDs provided" },
+        { status: 400 }
+      );
+    }
+
+    // Delete work programs
+    const deleteResult = await prisma.workProgram.deleteMany({
+      where: {
+        id: {
+          in: validIds,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      message: `Successfully deleted ${deleteResult.count} work programs`,
+      deletedCount: deleteResult.count,
+    });
+  } catch (error) {
+    console.error("Error deleting work programs:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

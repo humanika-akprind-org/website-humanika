@@ -73,23 +73,30 @@ export default function WorkProgramTable({
     );
   });
 
+  // Filter out programs with invalid IDs
+  const validPrograms = filteredPrograms.filter((program) =>
+    program.id && typeof program.id === 'string' && program.id.trim() !== '' && program.id !== 'undefined'
+  );
+
   // Toggle program selection
   const toggleProgramSelection = (id: string) => {
+    if (!id || typeof id !== 'string' || id.trim() === '' || id === 'undefined') {
+      console.warn('Attempted to select invalid program ID:', id);
+      return;
+    }
     if (selectedPrograms.includes(id)) {
-      setSelectedPrograms(
-        selectedPrograms.filter((programId) => programId !== id)
-      );
+      setSelectedPrograms(selectedPrograms.filter((programId) => programId !== id));
     } else {
       setSelectedPrograms([...selectedPrograms, id]);
     }
   };
 
-  // Select all programs on current page 
+  // Select all programs on current page
   const toggleSelectAll = () => {
-    if (selectedPrograms.length === filteredPrograms.length) {
+    if (selectedPrograms.length === validPrograms.length) {
       setSelectedPrograms([]);
     } else {
-      setSelectedPrograms(filteredPrograms.map((program) => program.id));
+      setSelectedPrograms(validPrograms.map((program) => program.id));
     }
   };
 
@@ -110,19 +117,34 @@ export default function WorkProgramTable({
 
   // Delete program(s)
   const handleDelete = (program?: WorkProgram) => {
-    if (program) {
-      setCurrentProgram(program);
-    }
+    setCurrentProgram(program || null);
     setShowDeleteModal(true);
   };
 
   // Execute deletion
   const confirmDelete = () => {
     if (currentProgram) {
-      onDelete(currentProgram.id);
+      // Validate single program ID
+      if (currentProgram.id && typeof currentProgram.id === 'string' && currentProgram.id.trim() !== '' && currentProgram.id !== 'undefined') {
+        onDelete(currentProgram.id);
+      } else {
+        console.warn('Attempted to delete program with invalid ID:', currentProgram.id);
+      }
     } else if (selectedPrograms.length > 0) {
-      onDeleteMultiple(selectedPrograms);
-      setSelectedPrograms([]);
+      // Filter out invalid IDs and log if any invalid found
+      const validIds = selectedPrograms.filter(
+        (id) => id && typeof id === "string" && id.trim() !== "" && id !== "undefined"
+      );
+      if (validIds.length !== selectedPrograms.length) {
+        console.warn(
+          "Some selected program IDs are invalid and will be ignored:",
+          selectedPrograms.filter((id) => !validIds.includes(id))
+        );
+      }
+      if (validIds.length > 0) {
+        onDeleteMultiple(validIds);
+      }
+      setSelectedPrograms([]); // Clear selection after bulk delete
     }
     setShowDeleteModal(false);
     setCurrentProgram(null);
@@ -248,8 +270,8 @@ export default function WorkProgramTable({
                   <input
                     type="checkbox"
                     checked={
-                      filteredPrograms.length > 0 &&
-                      selectedPrograms.length === filteredPrograms.length
+                      validPrograms.length > 0 &&
+                      selectedPrograms.length === validPrograms.length
                     }
                     onChange={toggleSelectAll}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
@@ -307,7 +329,7 @@ export default function WorkProgramTable({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredPrograms.map((program) => {
+              {validPrograms.map((program) => {
                 const statusInfo = getStatusInfo(program.status);
                 const usagePercentage = calculateUsagePercentage(
                   program.usedFunds,
@@ -422,7 +444,7 @@ export default function WorkProgramTable({
           </table>
         </div>
 
-        {filteredPrograms.length === 0 && (
+        {validPrograms.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-2">
               <FiTrendingUp size={48} className="mx-auto" />
@@ -437,11 +459,11 @@ export default function WorkProgramTable({
         )}
 
         {/* Table Footer */}
-        {filteredPrograms.length > 0 && (
+        {validPrograms.length > 0 && (
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
             <p className="text-sm text-gray-700 mb-4 sm:mb-0">
               Showing{" "}
-              <span className="font-medium">{filteredPrograms.length}</span> of{" "}
+              <span className="font-medium">{validPrograms.length}</span> of{" "}
               <span className="font-medium">{workPrograms.length}</span>{" "}
               programs
             </p>
@@ -465,12 +487,8 @@ export default function WorkProgramTable({
           setCurrentProgram(null);
         }}
         onConfirm={confirmDelete}
-        title="Confirm Deletion"
-        message={
-          currentProgram
-            ? `Are you sure you want to delete "${currentProgram.name}"? This action cannot be undone.`
-            : `Are you sure you want to delete ${selectedPrograms.length} selected programs? This action cannot be undone.`
-        }
+        program={currentProgram}
+        selectedCount={selectedPrograms.length}
       />
     </div>
   );
