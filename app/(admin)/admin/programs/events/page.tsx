@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
 import EventTable from "@/components/admin/event/Table";
 import DeleteModal from "@/components/admin/event/modal/DeleteModal";
 import type { Event } from "@/types/event";
-import type { EventFilter } from "@/types/event";
 import { useToast } from "@/hooks/use-toast";
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [_events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState({
@@ -18,25 +17,10 @@ export default function EventsPage() {
     eventId: "",
     eventName: "",
   });
-  const [accessToken, setAccessToken] = useState<string>("");
+
   const { toast } = useToast();
 
-
-
-  // Fetch events and access token
-  useEffect(() => {
-    fetchEvents();
-    // Get access token from cookies
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("google_access_token="))
-      ?.split("=")[1];
-    if (token) {
-      setAccessToken(token);
-    }
-  }, []);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch("/api/event");
@@ -61,47 +45,12 @@ export default function EventsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
-  const handleFilterChange = (filters: EventFilter) => {
-    let filtered = [...events];
-
-    // Search filter
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(
-        (event) =>
-          event.name.toLowerCase().includes(searchTerm) ||
-          event.description.toLowerCase().includes(searchTerm) ||
-          event.department.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    // Department filter
-    if (filters.department) {
-      filtered = filtered.filter((event) => event.department === filters.department);
-    }
-
-    // Status filter
-    if (filters.status) {
-      filtered = filtered.filter((event) => event.status === filters.status);
-    }
-
-    // Date range filter
-    if (filters.startDate) {
-      filtered = filtered.filter(
-        (event) => new Date(event.startDate) >= filters.startDate!
-      );
-    }
-
-    if (filters.endDate) {
-      filtered = filtered.filter(
-        (event) => new Date(event.startDate) <= filters.endDate!
-      );
-    }
-
-    setFilteredEvents(filtered);
-  };
+  // Fetch events
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const handleDelete = async (eventId: string) => {
     try {
@@ -134,32 +83,8 @@ export default function EventsPage() {
     }
   };
 
-  const openDeleteModal = (eventId: string, eventName: string) => {
-    setDeleteModal({
-      isOpen: true,
-      eventId,
-      eventName,
-    });
-  };
-
   const closeDeleteModal = () => {
     setDeleteModal({ isOpen: false, eventId: "", eventName: "" });
-  };
-
-  const exportEvents = () => {
-    // Export functionality would be implemented here
-    toast({
-      title: "Export",
-      description: "Export functionality will be implemented",
-    });
-  };
-
-  const importEvents = () => {
-    // Import functionality would be implemented here
-    toast({
-      title: "Import",
-      description: "Import functionality will be implemented",
-    });
   };
 
   return (
@@ -199,7 +124,6 @@ export default function EventsPage() {
           <EventTable
             events={filteredEvents}
             onDelete={handleDelete}
-            accessToken={accessToken}
           />
       )}
 

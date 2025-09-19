@@ -77,7 +77,7 @@ export async function PUT(
       remainingFunds = newFunds - newUsedFunds;
     }
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
 
     if (body.name) {
       updateData.name = body.name;

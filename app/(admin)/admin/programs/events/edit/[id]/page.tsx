@@ -3,7 +3,7 @@ import { PeriodApi } from "@/lib/api/period";
 import EventForm from "@/components/admin/event/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
-import type { CreateEventInput, UpdateEventInput } from "@/types/event";
+import type { CreateEventInput, UpdateEventInput, Event } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -35,7 +35,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
     const transformedEvent = {
       ...eventWithoutThumbnail,
       thumbnail: thumbnail === null ? undefined : thumbnail,
-    } as any; // Bypass strict typing for now
+    } as unknown as Event;
 
     const [usersResponse, periods] = await Promise.all([
       UserApi.getUsers({ limit: 50 }),
@@ -73,7 +73,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-      const eventPayload: any = {
+      const eventPayload: Omit<Event, 'id' | 'responsible' | 'period' | 'workProgram' | 'status' | 'createdAt' | 'updatedAt'> & { usedFunds: number } = {
         name: eventData.name,
         slug,
         thumbnail: eventData.thumbnail,
@@ -84,8 +84,9 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         responsibleId: eventData.responsibleId,
         startDate: new Date(eventData.startDate),
         endDate: new Date(eventData.endDate),
-        funds: parseFloat(eventData.funds as any) || 0,
-        remainingFunds: parseFloat(eventData.funds as any) || 0,
+        funds: parseFloat(String(eventData.funds)) || 0,
+        remainingFunds: parseFloat(String(eventData.funds)) || 0,
+        usedFunds: eventData.usedFunds || 0,
       };
 
       // Only include workProgramId if it's provided and not empty
@@ -112,9 +113,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
               <FiArrowLeft className="mr-1" />
               Back
             </Link>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Edit Event
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-800">Edit Event</h1>
           </div>
           <EventForm
             event={transformedEvent}

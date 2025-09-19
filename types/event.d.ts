@@ -41,8 +41,7 @@ export interface CreateEventInput {
   workProgramId?: string;
 }
 
-export interface UpdateEventInput
-  extends Partial<CreateEventInput> {
+export interface UpdateEventInput extends Partial<CreateEventInput> {
   status?: Status;
   usedFunds?: number;
 }

@@ -6,7 +6,7 @@ import Image from "next/image";
 import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
 import {
   Department as DepartmentEnum,
-  Status as StatusEnum,
+  Status,
 } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { useWorkPrograms } from "@/hooks/useWorkPrograms";
@@ -119,7 +119,7 @@ export default function EventForm({
       ? new Date(event.endDate).toISOString().split("T")[0]
       : "",
     funds: event?.funds || 0,
-    status: event?.status || StatusEnum.DRAFT,
+    status: event?.status || Status.DRAFT,
     workProgramId: event?.workProgram?.id || "",
     thumbnailFile: undefined as File | undefined,
   });
@@ -368,7 +368,7 @@ export default function EventForm({
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={isLoadingState}
             >
-              {Object.values(StatusEnum).map((status) => (
+              {Object.values(Status).map((status) => (
                 <option key={status} value={status}>
                   {status}
                 </option>

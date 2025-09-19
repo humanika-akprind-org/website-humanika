@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { FiCalendar, FiUser } from "react-icons/fi";
 import type { Event } from "@/types/event";
@@ -14,48 +14,9 @@ interface EventTableProps {
   accessToken?: string;
 }
 
-interface ImageState {
-  [key: string]: {
-    isLoading: boolean;
-    hasError: boolean;
-    isLoaded: boolean;
-  };
-}
 
-// Helper function to get preview URL from photo (file ID or URL)
-const getPreviewUrl = (photo: string | null | undefined): string | null => {
-  if (!photo) return null;
 
-  if (photo.includes("drive.google.com")) {
-    // It's a full Google Drive URL, convert to direct image URL
-    const fileIdMatch = photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch) {
-      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
-    }
 
-    // Try other common Google Drive URL patterns
-    const otherPatterns = [
-      /\/open\?id=([a-zA-Z0-9_-]+)/,
-      /\/uc\?id=([a-zA-Z0-9_-]+)/,
-      /id=([a-zA-Z0-9_-]+)/,
-    ];
-
-    for (const pattern of otherPatterns) {
-      const match = photo.match(pattern);
-      if (match) {
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-      }
-    }
-
-    return photo;
-  } else if (photo.match(/^[a-zA-Z0-9_-]+$/)) {
-    // It's a Google Drive file ID, construct direct URL
-    return `https://drive.google.com/uc?export=view&id=${photo}`;
-  } else {
-    // It's a direct URL or other format
-    return photo;
-  }
-};
 
 export default function EventTable({
   events,
@@ -66,7 +27,6 @@ export default function EventTable({
   const [periodFilter, setPeriodFilter] = useState<string>("all");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
-  const [imageStates, setImageStates] = useState<ImageState>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
@@ -76,28 +36,7 @@ export default function EventTable({
       Object.values(StatusEnum).includes(status as StatusEnum)) &&
     setStatusFilter(status as Status | "all");
 
-  // Initialize image states when events change
-  useEffect(() => {
-    const newImageStates: ImageState = {};
 
-    events.forEach((event) => {
-      if (event.thumbnail) {
-        const imageUrl = getPreviewUrl(event.thumbnail);
-        if (imageUrl) {
-          // Initialize state for this image URL if not already present
-          if (!imageStates[imageUrl]) {
-            newImageStates[imageUrl] = {
-              isLoading: true,
-              hasError: false,
-              isLoaded: false,
-            };
-          }
-        }
-      }
-    });
-
-    setImageStates((prev) => ({ ...prev, ...newImageStates }));
-  }, [events]);
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("id-ID", {
@@ -114,28 +53,7 @@ export default function EventTable({
       maximumFractionDigits: 0,
     }).format(amount);
 
-  const handleImageLoad = (imageUrl: string) => {
-    setImageStates((prev) => ({
-      ...prev,
-      [imageUrl]: {
-        isLoading: false,
-        hasError: false,
-        isLoaded: true,
-      },
-    }));
-  };
 
-  const handleImageError = (imageUrl: string) => {
-    console.error(`Failed to load image: ${imageUrl}`);
-    setImageStates((prev) => ({
-      ...prev,
-      [imageUrl]: {
-        isLoading: false,
-        hasError: true,
-        isLoaded: false,
-      },
-    }));
-  };
 
   const getStatusColor = (status: Status) => {
     switch (status) {
@@ -350,12 +268,8 @@ export default function EventTable({
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredEvents.length > 0 ? (
-                filteredEvents.map((event) => {
-                  const imageUrl = getPreviewUrl(event.thumbnail || "");
-                  const imageState = imageUrl ? imageStates[imageUrl] : null;
-
-                  return (
-                    <tr key={event.id} className="hover:bg-gray-50 transition-colors">
+                filteredEvents.map((event) => (
+                  <tr key={event.id} className="hover:bg-gray-50 transition-colors">
                       <td className="pl-6 pr-2 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
@@ -421,8 +335,8 @@ export default function EventTable({
                         </div>
                       </td>
                     </tr>
-                  );
-                })
+                  )
+                )
               ) : (
                 <tr>
                   <td colSpan={9} className="px-6 py-12 text-center">
