@@ -24,27 +24,50 @@ const isValidImageUrl = (url: string): boolean => {
     return (
       /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) ||
       url.includes("drive.google.com") ||
-      url.startsWith("blob:")
+      url.startsWith("blob:") ||
+      url.startsWith("/api/drive-image")
     );
   } catch {
     return false;
   }
 };
 
+// Helper function to extract file ID from various Google Drive URL formats
+const extractFileId = (url: string): string | null => {
+  if (!url) return null;
+
+  // Handle direct file IDs
+  if (url.length === 33 && !url.includes("/")) {
+    return url;
+  }
+
+  // Handle Google Drive URLs
+  const patterns = [
+    /\/file\/d\/([a-zA-Z0-9_-]+)/,
+    /id=([a-zA-Z0-9_-]+)/,
+    /uc\?export=view&id=([a-zA-Z0-9_-]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  return null;
+};
+
 // Helper function to get preview URL from photo (file ID or URL)
-const getPreviewUrl = (photo: string | null | undefined): string | null => {
+const getPreviewUrl = (photo: string | null | undefined, accessToken: string): string | null => {
   if (!photo) return null;
 
-  if (photo.includes("drive.google.com")) {
-    // It's a full Google Drive URL, convert to direct image URL
-    const fileIdMatch = photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch) {
-      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
-    }
-    return photo;
-  } else if (photo.match(/^[a-zA-Z0-9_-]+$/)) {
-    // It's a Google Drive file ID, construct direct URL
-    return `https://drive.google.com/uc?export=view&id=${photo}`;
+  if (isGoogleDrivePhoto(photo)) {
+    // Generate direct Google Drive image URL for preview
+    const fileId = extractFileId(photo);
+    if (!fileId) return null;
+
+    return `https://drive.google.com/uc?export=view&id=${fileId}`;
   } else {
     // It's a direct URL or other format
     return photo;
@@ -127,13 +150,13 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
 
   // Initialize preview URL when component mounts with existing data
   useEffect(() => {
-    setPreviewUrl(getPreviewUrl(management?.photo));
-  }, [management?.photo]);
+    setPreviewUrl(getPreviewUrl(management?.photo, accessToken));
+  }, [management?.photo, accessToken]);
 
   // Update preview URL when existingPhoto changes
   useEffect(() => {
-    setPreviewUrl(getPreviewUrl(existingPhoto));
-  }, [existingPhoto]);
+    setPreviewUrl(getPreviewUrl(existingPhoto, accessToken));
+  }, [existingPhoto, accessToken]);
 
   useEffect(() => {
     if (photoError) {
@@ -402,7 +425,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
                   {(() => {
                     // Get the display URL using the helper function
                     const displayUrl = getPreviewUrl(
-                      previewUrl || existingPhoto
+                      previewUrl || existingPhoto, accessToken
                     );
 
                     // Check if photo exists and is a valid URL
