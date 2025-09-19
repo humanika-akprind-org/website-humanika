@@ -17,21 +17,6 @@ import { formatEnumValue } from "@/lib/utils";
 import { photoManagementFolderId } from "@/lib/config";
 import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";
 
-// Helper function to validate image URL
-const isValidImageUrl = (url: string): boolean => {
-  try {
-    new URL(url);
-    return (
-      /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) ||
-      url.includes("drive.google.com") ||
-      url.startsWith("blob:") ||
-      url.startsWith("/api/drive-image")
-    );
-  } catch {
-    return false;
-  }
-};
-
 // Helper function to extract file ID from various Google Drive URL formats
 const extractFileId = (url: string): string | null => {
   if (!url) return null;
