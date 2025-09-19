@@ -19,13 +19,30 @@ export async function POST(request: Request) {
           { username: usernameOrEmail.trim() },
           { email: usernameOrEmail.trim() },
         ],
-        role: "ANGGOTA",
       },
     });
 
     if (!user) {
       return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    if (!["ANGGOTA"].includes(user.role)) {
+      return NextResponse.json(
         { success: false, error: "Access denied. ANGGOTA only." },
+        { status: 403 }
+      );
+    }
+
+    // Check if account is verified
+    if (!user.verifiedAccount) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Account not verified. Please wait for admin verification.",
+        },
         { status: 401 }
       );
     }
@@ -33,15 +50,10 @@ export async function POST(request: Request) {
     // Check if account is active
     if (!user.isActive) {
       return NextResponse.json(
-        { success: false, error: "Account is inactive. Please contact administrator." },
-        { status: 401 }
-      );
-    }
-
-    // Check if account is verified
-    if (!user.verifiedAccount) {
-      return NextResponse.json(
-        { success: false, error: "Account not verified. Please wait for admin verification." },
+        {
+          success: false,
+          error: "Account is inactive. Please contact administrator.",
+        },
         { status: 401 }
       );
     }
