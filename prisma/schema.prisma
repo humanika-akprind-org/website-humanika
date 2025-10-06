@@ -386,14 +386,14 @@ model Article {
 
   // Relations - Data yang terkait dengan artikel
   author   User            @relation(fields: [authorId], references: [id], onDelete: Cascade) // Penulis artikel
-  category CategoryArticle @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori artikel
+  category ArticleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori artikel
   period   Period?         @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode terkait
   approvals Approval[]     @relation("ArticleApprovals") // Persetujuan untuk artikel
 
   @@index([isPublished, authorId, categoryId, status])
   @@map("articles")
 }
-model CategoryArticle {
+model ArticleCategory {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId // ID unik kategori artikel (auto-generated)
   name      String    @unique // Nama kategori artikel (harus unik)
   createdAt DateTime  @default(now()) // Waktu pembuatan kategori
@@ -402,10 +402,10 @@ model CategoryArticle {
   // Relations - Data yang terkait dengan kategori artikel
   articles Article[] // Artikel yang termasuk dalam kategori ini
 
-  @@map("categoryArticles")
+  @@map("articleCategory")
 }
 
-model CategoryFinance {
+model FinanceCategory {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId // ID unik kategori keuangan (auto-generated)
   name        String      @unique // Nama kategori keuangan (harus unik)
   description String?     // Deskripsi kategori keuangan
@@ -418,7 +418,7 @@ model CategoryFinance {
   finances Finance[] // Transaksi keuangan yang termasuk dalam kategori ini
 
   @@index([type, isActive])
-  @@map("categoriesFinance")
+  @@map("financeCategory")
 }
 
 model Finance {
@@ -438,7 +438,7 @@ model Finance {
   updatedAt   DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan transaksi keuangan
-  category CategoryFinance @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori transaksi
+  category FinanceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori transaksi
   period   Period          @relation(fields: [periodId], references: [id], onDelete: Cascade)   // Periode transaksi
   event    Event?          @relation(fields: [eventId], references: [id], onDelete: SetNull)    // Kegiatan terkait (opsional)
   user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)     // Pengguna yang membuat transaksi
