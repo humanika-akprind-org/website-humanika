@@ -1,65 +1,97 @@
 "use client";
 
-export default function DevelopmentPage() {
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { FiPlus } from "react-icons/fi";
+import ArticleCategoryTable from "@/components/admin/article/category/Table";
+import type { ArticleCategory } from "@/types/article-category";
+import { getArticleCategories, deleteArticleCategory } from "@/lib/api/article-category";
+import { useToast } from "@/hooks/use-toast";
+
+export default function ArticleCategoriesPage() {
+  const [categories, setCategories] = useState<ArticleCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await getArticleCategories();
+      setCategories(data || []);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch article categories",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  // Fetch categories
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const handleDelete = async (categoryId: string) => {
+    try {
+      await deleteArticleCategory(categoryId);
+      toast({
+        title: "Success",
+        description: "Article category deleted successfully",
+      });
+      fetchCategories(); // Refresh the list
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete category",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 rounded-lg">
-      <div className="text-center max-w-md mx-auto">
-        <div className="mx-auto w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-8">
-          <svg
-            className="w-20 h-20 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-500 mb-2">
-            Page Not Built Yet
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Article Categories
           </h1>
-          <p className="text-gray-400">
-            This page has not been developed by the engineering team.
-          </p>
+          <p className="text-gray-600">Manage article categories</p>
         </div>
-
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <div className="flex items-start">
-            <svg
-              className="w-5 h-5 text-yellow-500 mt-0.5 mr-2 flex-shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <p className="text-yellow-700 text-sm">
-              <span className="font-medium">Development Status:</span> This page
-              is on the product roadmap but has not been scheduled for
-              implementation.
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-2 text-xs text-gray-400">
-          <p>Last updated: {new Date().toLocaleDateString()}</p>
-          <div className="inline-flex items-center bg-gray-100 px-3 py-1 rounded-full">
-            <span className="h-2 w-2 bg-gray-400 rounded-full mr-2" />
-            STATUS: NOT STARTED
-          </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            href="/admin/content/articles/categories/add"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <FiPlus className="h-4 w-4 mr-2" />
+            Add Category
+          </Link>
         </div>
       </div>
+
+      {/* Categories Table */}
+      {isLoading ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
+          <div className="animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
+            <div className="space-y-3">
+              <div className="h-4 bg-gray-200 rounded" />
+              <div className="h-4 bg-gray-200 rounded" />
+              <div className="h-4 bg-gray-200 rounded" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <ArticleCategoryTable
+          categories={categories}
+          onDelete={handleDelete}
+        />
+      )}
     </div>
   );
 }
