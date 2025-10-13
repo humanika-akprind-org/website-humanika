@@ -1,7 +1,6 @@
 import React from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import DecoupledEditor from "@ckeditor/ckeditor5-build-decoupled-document";
-// import "@ckeditor/ckeditor5-build-decoupled-document/build/ckeditor.css";
 
 interface TextEditorProps {
   value: string;
@@ -118,8 +117,18 @@ export default function TextEditor({
 }: TextEditorProps) {
   return (
     <div className="document-editor border border-gray-300 rounded-md overflow-hidden">
+      <style>
+        {`
+          .ck-content h1 { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
+          .ck-content h2 { font-size: 1.5em; font-weight: bold; margin: 0.83em 0; }
+          .ck-content h3 { font-size: 1.17em; font-weight: bold; margin: 1em 0; }
+          .ck-content h4 { font-size: 1em; font-weight: bold; margin: 1.33em 0; }
+          .ck-content h5 { font-size: 0.83em; font-weight: bold; margin: 1.67em 0; }
+          .ck-content h6 { font-size: 0.67em; font-weight: bold; margin: 2.33em 0; }
+        `}
+      </style>
       <div className="document-editor__toolbar bg-gray-50 border-b border-gray-300 p-2" />
-      <div className="document-editor__editable-container p-4 min-h-[200px]">
+      <div className="document-editor__editable-container p-4">
         <CKEditor
           editor={DecoupledEditor as any}
           data={value}
