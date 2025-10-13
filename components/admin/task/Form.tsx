@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { DepartmentTask, CreateDepartmentTaskInput, UpdateDepartmentTaskInput } from "@/types/task";
 import { Department as DepartmentEnum, Status } from "@/types/enums";
 import type { User } from "@/types/user";
+import TextEditor from "@/components/admin/ui/TextEditor";
 
 interface TaskFormProps {
   task?: DepartmentTask;
@@ -85,81 +86,81 @@ export default function TaskForm({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Task Note *
             </label>
-            <textarea
-              name="note"
+            <TextEditor
               value={formData.note}
-              onChange={handleInputChange}
-              rows={4}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter task note"
-              required
+              onChange={(data) =>
+                setFormData((prev) => ({ ...prev, note: data }))
+              }
               disabled={isLoadingState}
+              height="200px"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Department *
-            </label>
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-              disabled={isLoadingState}
-            >
-              <option value="">Pilih Department</option>
-              {Object.values(DepartmentEnum).map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Department *
+              </label>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+                disabled={isLoadingState}
+              >
+                <option value="">Pilih Department</option>
+                {Object.values(DepartmentEnum).map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Assigned User
-            </label>
-            <select
-              name="userId"
-              value={formData.userId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState}
-            >
-              <option value="">Pilih User (Opsional)</option>
-              {(users || []).map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Assigned User
+              </label>
+              <select
+                name="userId"
+                value={formData.userId}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={isLoadingState}
+              >
+                <option value="">Pilih User (Opsional)</option>
+                {(users || []).map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState}
-            >
-              {Object.values(Status).map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={isLoadingState}
+              >
+                {Object.values(Status).map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 

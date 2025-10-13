@@ -6,6 +6,7 @@ interface TextEditorProps {
   value: string;
   onChange: (data: string) => void;
   disabled?: boolean;
+  height?: string;
 }
 
 const editorConfig = {
