@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { LogoutButton } from "@/components/admin/auth/LogoutButton";
 
 interface User {
   username: string;
@@ -159,6 +160,7 @@ export default function UserInfo() {
               <p className="text-sm text-gray-900">{user.position}</p>
             </div>
           </div>
+          <LogoutButton />
         </div>
       )}
     </div>
