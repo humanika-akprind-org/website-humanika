@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import FinanceCategoryForm from "@/components/admin/finance/category/Form";
 import { createFinanceCategory } from "@/lib/api/finance-category";
-import type { CreateFinanceCategoryInput, UpdateFinanceCategoryInput } from "@/types/finance-category";
+import type {
+  CreateFinanceCategoryInput,
+  UpdateFinanceCategoryInput,
+} from "@/types/finance-category";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AddFinanceCategoryPage() {
@@ -12,7 +15,9 @@ export default function AddFinanceCategoryPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput) => {
+  const handleSubmit = async (
+    data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput
+  ) => {
     try {
       setIsLoading(true);
       await createFinanceCategory(data as CreateFinanceCategoryInput);
@@ -20,7 +25,7 @@ export default function AddFinanceCategoryPage() {
         title: "Success",
         description: "Finance category created successfully",
       });
-      router.push("/admin/finance/transactions/finance/categories");
+      router.push("/admin/finance/transactions/categories");
     } catch (error) {
       console.error("Error creating finance category:", error);
       toast({
@@ -46,10 +51,7 @@ export default function AddFinanceCategoryPage() {
       </div>
 
       {/* Form */}
-      <FinanceCategoryForm
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-      />
+      <FinanceCategoryForm onSubmit={handleSubmit} isLoading={isLoading} />
     </div>
   );
 }
