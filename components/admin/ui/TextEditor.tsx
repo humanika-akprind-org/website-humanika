@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import DecoupledEditor from "@ckeditor/ckeditor5-build-decoupled-document";
 
@@ -115,33 +115,49 @@ export default function TextEditor({
   onChange,
   disabled = false,
 }: TextEditorProps) {
+  const toolbarContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => () => {
+    if (toolbarContainerRef.current) {
+      toolbarContainerRef.current.innerHTML = "";
+    }
+  }, []);
+
   return (
     <div className="document-editor border border-gray-300 rounded-md overflow-hidden">
       <style>
         {`
-          .ck-content h1 { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
-          .ck-content h2 { font-size: 1.5em; font-weight: bold; margin: 0.83em 0; }
-          .ck-content h3 { font-size: 1.17em; font-weight: bold; margin: 1em 0; }
-          .ck-content h4 { font-size: 1em; font-weight: bold; margin: 1.33em 0; }
-          .ck-content h5 { font-size: 0.83em; font-weight: bold; margin: 1.67em 0; }
-          .ck-content h6 { font-size: 0.67em; font-weight: bold; margin: 2.33em 0; }
+          .ck-content h1 { font-size: 2em; margin: 0.67em 0; }
+          .ck-content h2 { font-size: 1.5em; margin: 0.83em 0; }
+          .ck-content h3 { font-size: 1.17em; margin: 1em 0; }
+          .ck-content h4 { font-size: 1em; margin: 1.33em 0; }
+          .ck-content h5 { font-size: 0.83em; margin: 1.67em 0; }
+          .ck-content h6 { font-size: 0.67em; margin: 2.33em 0; }
+          .document-editor__editable { height: 200px; }
         `}
       </style>
-      <div className="document-editor__toolbar bg-gray-50 border-b border-gray-300 p-2" />
+      <div
+        ref={toolbarContainerRef}
+        className="document-editor__toolbar bg-gray-50 border-b border-gray-300 p-2"
+      />
       <div className="document-editor__editable-container p-4">
         <CKEditor
           editor={DecoupledEditor as any}
           data={value}
           onReady={(editor) => {
-            // Attach the toolbar to a custom container.
-            const toolbarContainer = document.querySelector(
-              ".document-editor__toolbar"
-            );
-            if (toolbarContainer && editor.ui.view.toolbar) {
-              toolbarContainer.appendChild(editor.ui.view.toolbar.element!);
+            // Bersihkan toolbar container terlebih dahulu
+            if (toolbarContainerRef.current) {
+              toolbarContainerRef.current.innerHTML = "";
             }
 
-            // Set the editor's editable element class.
+            // Attach toolbar hanya jika belum ada
+            if (toolbarContainerRef.current && editor.ui.view.toolbar) {
+              toolbarContainerRef.current.appendChild(
+                editor.ui.view.toolbar.element!
+              );
+            }
+
+            // Set the editor's editable element class
             const editable = editor.ui.getEditableElement();
             if (editable) {
               editable.classList.add("document-editor__editable");
