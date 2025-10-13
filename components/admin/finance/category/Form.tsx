@@ -2,12 +2,18 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { FinanceCategory, CreateFinanceCategoryInput, UpdateFinanceCategoryInput } from "@/types/finance-category";
+import type {
+  FinanceCategory,
+  CreateFinanceCategoryInput,
+  UpdateFinanceCategoryInput,
+} from "@/types/finance-category";
 import { FinanceType } from "@/types/enums";
 
 interface FinanceCategoryFormProps {
   category?: FinanceCategory;
-  onSubmit: (data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput) => Promise<void>;
+  onSubmit: (
+    data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput
+  ) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -63,7 +69,7 @@ export default function FinanceCategoryForm({
 
       await onSubmit(formData);
 
-      router.push("/admin/finance/transactions/finance/categories");
+      router.push("/admin/finance/transactions/categories");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save category");
     } finally {

@@ -4,15 +4,20 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
-import {
-  Department as DepartmentEnum,
-  Status,
-} from "@/types/enums";
+import { Department as DepartmentEnum, Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { useWorkPrograms } from "@/hooks/useWorkPrograms";
 import { eventThumbnailFolderId } from "@/lib/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+// Helper function to check if HTML content is empty
+const isHtmlEmpty = (html: string): boolean => {
+  const text = html.replace(/<[^>]*>/g, "").trim();
+  return text.length === 0;
+};
 
 // Helper function to validate image URL
 const isValidImageUrl = (url: string): boolean => {
@@ -197,8 +202,6 @@ export default function EventForm({
     setExistingThumbnail(null);
   };
 
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoadingState(true);
@@ -209,7 +212,7 @@ export default function EventForm({
       if (!formData.name.trim()) {
         throw new Error("Please enter event name");
       }
-      if (!formData.description.trim()) {
+      if (isHtmlEmpty(formData.description)) {
         throw new Error("Please enter description");
       }
       if (!formData.goal.trim()) {
@@ -495,15 +498,29 @@ export default function EventForm({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Description *
           </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows={4}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter event description"
-            required
+          <CKEditor
+            editor={ClassicEditor as any}
+            data={formData.description}
+            onChange={(_, editor) => {
+              const data = editor.getData();
+              setFormData((prev) => ({ ...prev, description: data }));
+            }}
             disabled={isLoadingState}
+            config={{
+              toolbar: [
+                "heading",
+                "|",
+                "bold",
+                "italic",
+                "link",
+                "bulletedList",
+                "numberedList",
+                "blockQuote",
+                "|",
+                "undo",
+                "redo",
+              ],
+            }}
           />
         </div>
 

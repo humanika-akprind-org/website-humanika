@@ -23,7 +23,8 @@ export default function FinanceCategoryTable({
   const [isActiveFilter, setIsActiveFilter] = useState<string>("all");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<FinanceCategory | null>(null);
+  const [categoryToDelete, setCategoryToDelete] =
+    useState<FinanceCategory | null>(null);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
 
   const handleTypeFilterChange = (type: string) =>
@@ -74,8 +75,7 @@ export default function FinanceCategoryTable({
       category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       category.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesType =
-      typeFilter === "all" || category.type === typeFilter;
+    const matchesType = typeFilter === "all" || category.type === typeFilter;
 
     const matchesIsActive =
       isActiveFilter === "all" ||
@@ -134,7 +134,8 @@ export default function FinanceCategoryTable({
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
           <p className="text-sm text-gray-500 mt-1">
-            Showing {filteredCategories.length} of {categories.length} categories
+            Showing {filteredCategories.length} of {categories.length}{" "}
+            categories
           </p>
         </div>
 
@@ -161,13 +162,18 @@ export default function FinanceCategoryTable({
                   <input
                     type="checkbox"
                     checked={
-                      filteredCategories.length > 0 && selectedCategories.length === filteredCategories.length
+                      filteredCategories.length > 0 &&
+                      selectedCategories.length === filteredCategories.length
                     }
                     onChange={() => {
-                      if (selectedCategories.length === filteredCategories.length) {
+                      if (
+                        selectedCategories.length === filteredCategories.length
+                      ) {
                         setSelectedCategories([]);
                       } else {
-                        setSelectedCategories(filteredCategories.map(category => category.id));
+                        setSelectedCategories(
+                          filteredCategories.map((category) => category.id)
+                        );
                       }
                     }}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
@@ -215,73 +221,100 @@ export default function FinanceCategoryTable({
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredCategories.length > 0 ? (
                 filteredCategories.map((category) => (
-                  <tr key={category.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="pl-6 pr-2 py-4 whitespace-nowrap">
-                        <input
-                          type="checkbox"
-                          checked={selectedCategories.includes(category.id)}
-                          onChange={() => toggleCategorySelection(category.id)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                        />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {category.name}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4" style={{ width: "300px", minWidth: "300px" }}>
-                        <div className="text-sm text-gray-600 break-words">
-                          {category.description || "No description"}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getTypeColor(
-                            category.type
-                          )}`}
+                  <tr
+                    key={category.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="pl-6 pr-2 py-4 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedCategories.includes(category.id)}
+                        onChange={() => toggleCategorySelection(category.id)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                      />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {category.name}
+                      </div>
+                    </td>
+                    <td
+                      className="px-4 py-4"
+                      style={{ width: "300px", minWidth: "300px" }}
+                    >
+                      <div className="text-sm text-gray-600 break-words">
+                        {category.description || "No description"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getTypeColor(
+                          category.type
+                        )}`}
+                      >
+                        {category.type === FinanceType.INCOME
+                          ? "Pemasukan"
+                          : "Pengeluaran"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
+                          category.isActive
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {category.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {category._count?.finances || 0}
+                    </td>
+                    <td className="pl-4 pr-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <Link
+                          href={`/admin/finance/transactions/categories/edit/${category.id}`}
+                          className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                          title="Edit category"
                         >
-                          {category.type === FinanceType.INCOME ? "Pemasukan" : "Pengeluaran"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                            category.isActive
-                              ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                          </svg>
+                        </Link>
+                        <button
+                          className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                          onClick={() => handleDelete(category)}
+                          title="Delete category"
                         >
-                          {category.isActive ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {category._count?.finances || 0}
-                      </td>
-                      <td className="pl-4 pr-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-2">
-                          <Link
-                            href={`/admin/finance/transactions/finance/categories/edit/${category.id}`}
-                            className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                            title="Edit category"
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </Link>
-                          <button
-                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                            onClick={() => handleDelete(category)}
-                            title="Delete category"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                )
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               ) : (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
@@ -305,7 +338,10 @@ export default function FinanceCategoryTable({
         {filteredCategories.length > 0 && (
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
             <p className="text-sm text-gray-700 mb-4 sm:mb-0">
-              Showing <span className="font-medium">{filteredCategories.length}</span> of <span className="font-medium">{categories.length}</span> categories
+              Showing{" "}
+              <span className="font-medium">{filteredCategories.length}</span>{" "}
+              of <span className="font-medium">{categories.length}</span>{" "}
+              categories
             </p>
             <div className="flex space-x-2">
               <button
