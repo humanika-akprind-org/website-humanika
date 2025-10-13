@@ -1,12 +1,13 @@
 import { useState } from "react";
 import Link from "next/link";
-import { FiCheckCircle, FiUser } from "react-icons/fi";
+import { FiCheckCircle, FiUser, FiEye } from "react-icons/fi";
 import type { DepartmentTask } from "@/types/task";
 import type { Status } from "@/types/enums";
 import { Status as StatusEnum } from "@/types/enums";
 import TaskStats from "./Stats";
 import TaskFilters from "./Filters";
 import DeleteModal from "./modal/DeleteModal";
+import PreviewModal from "./modal/PreviewModal";
 
 interface TaskTableProps {
   tasks: DepartmentTask[];
@@ -24,6 +25,8 @@ export default function TaskTable({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<DepartmentTask | null>(null);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [taskToPreview, setTaskToPreview] = useState<DepartmentTask | null>(null);
 
   const handleStatusFilterChange = (status: string) =>
     (status === "all" ||
@@ -85,6 +88,16 @@ export default function TaskTable({
     setIsDeleteModalOpen(false);
     setTaskToDelete(null);
     setIsBulkDelete(false);
+  };
+
+  const handlePreview = (task: DepartmentTask) => {
+    setTaskToPreview(task);
+    setIsPreviewModalOpen(true);
+  };
+
+  const handleClosePreviewModal = () => {
+    setIsPreviewModalOpen(false);
+    setTaskToPreview(null);
   };
 
   // Filter tasks based on search term and filters
@@ -248,9 +261,11 @@ export default function TaskTable({
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
                         />
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {task.note}
+                      <td className="px-4 py-4">
+                        <div className="text-sm text-gray-900">
+                          {task.note.length > 50
+                            ? `${task.note.replace(/<[^>]*>/g, '').substring(0, 50)}...`
+                            : task.note.replace(/<[^>]*>/g, '')}
                         </div>
                       </td>
                       <td className="px-4 py-4" style={{ width: "250px", minWidth: "250px" }}>
@@ -281,6 +296,13 @@ export default function TaskTable({
                       </td>
                       <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                         <div className="flex items-center space-x-2">
+                          <button
+                            className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
+                            onClick={() => handlePreview(task)}
+                            title="Preview task"
+                          >
+                            <FiEye className="w-4 h-4" />
+                          </button>
                           <Link
                             href={`/admin/governance/tasks/edit/${task.id}`}
                             className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
@@ -354,6 +376,12 @@ export default function TaskTable({
         taskName={taskToDelete?.note || ""}
         count={isBulkDelete ? selectedTasks.length : 1}
         isLoading={false}
+      />
+
+      <PreviewModal
+        isOpen={isPreviewModalOpen}
+        onClose={handleClosePreviewModal}
+        task={taskToPreview}
       />
     </div>
   );

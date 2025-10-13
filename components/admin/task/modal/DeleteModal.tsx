@@ -55,7 +55,9 @@ export default function DeleteModal({
                     ) : (
                       <>
                         <span className="font-medium text-gray-900">
-                          &ldquo;{taskName}&rdquo;
+                          &ldquo;{taskName.length > 50
+                            ? `${taskName.replace(/<[^>]*>/g, '').substring(0, 50)}...`
+                            : taskName.replace(/<[^>]*>/g, '')}&rdquo;
                         </span>
                         ? This action cannot be undone. This will permanently delete
                         the task and all associated data including:
