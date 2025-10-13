@@ -10,8 +10,7 @@ import { useWorkPrograms } from "@/hooks/useWorkPrograms";
 import { eventThumbnailFolderId } from "@/lib/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import DescriptionEditor from "../ui/TextEditor";
 
 // Helper function to check if HTML content is empty
 const isHtmlEmpty = (html: string): boolean => {
@@ -498,29 +497,10 @@ export default function EventForm({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Description *
           </label>
-          <CKEditor
-            editor={ClassicEditor as any}
-            data={formData.description}
-            onChange={(_, editor) => {
-              const data = editor.getData();
-              setFormData((prev) => ({ ...prev, description: data }));
-            }}
+          <DescriptionEditor
+            value={formData.description}
+            onChange={(data) => setFormData((prev) => ({ ...prev, description: data }))}
             disabled={isLoadingState}
-            config={{
-              toolbar: [
-                "heading",
-                "|",
-                "bold",
-                "italic",
-                "link",
-                "bulletedList",
-                "numberedList",
-                "blockQuote",
-                "|",
-                "undo",
-                "redo",
-              ],
-            }}
           />
         </div>
 
