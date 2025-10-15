@@ -7,6 +7,8 @@ import type { CreateDepartmentTaskInput, UpdateDepartmentTaskInput } from "@/typ
 import type { User } from "@/types/user";
 import { getUsers } from "@/lib/api/user";
 
+export const dynamic = 'force-dynamic';
+
 export default function AddTaskPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
