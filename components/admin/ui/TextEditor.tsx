@@ -142,9 +142,10 @@ const toolbarContainerRef = useRef<HTMLDivElement>(null);
     import("@ckeditor/ckeditor5-build-decoupled-document").then((mod) => {
       setDecoupledEditor(mod.default);
     });
+    const toolbarContainer = toolbarContainerRef.current;
     return () => {
-      if (toolbarContainerRef.current) {
-        toolbarContainerRef.current.innerHTML = "";
+      if (toolbarContainer) {
+        toolbarContainer.innerHTML = "";
       }
     };
   }, []);
