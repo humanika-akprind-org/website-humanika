@@ -73,7 +73,16 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-      const eventPayload: Omit<Event, 'id' | 'responsible' | 'period' | 'workProgram' | 'status' | 'createdAt' | 'updatedAt'> & { usedFunds: number } = {
+      const eventPayload: Omit<
+        Event,
+        | "id"
+        | "responsible"
+        | "period"
+        | "workProgram"
+        | "status"
+        | "createdAt"
+        | "updatedAt"
+      > & { usedFunds: number } = {
         name: eventData.name,
         slug,
         thumbnail: eventData.thumbnail,
@@ -99,7 +108,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         data: eventPayload,
       });
 
-      redirect("/admin/programs/events");
+      redirect("/admin/program/events");
     };
 
     return (
@@ -107,7 +116,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         <div className="p-6 max-w-4xl min-h-screen mx-auto">
           <div className="flex items-center mb-6">
             <Link
-              href="/admin/programs/events"
+              href="/admin/program/events"
               className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
             >
               <FiArrowLeft className="mr-1" />

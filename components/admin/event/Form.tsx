@@ -303,7 +303,7 @@ export default function EventForm({
         removeThumbnail();
       }
 
-      router.push("/admin/programs/events");
+      router.push("/admin/program/events");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save event");
     } finally {
@@ -499,7 +499,9 @@ export default function EventForm({
           </label>
           <DescriptionEditor
             value={formData.description}
-            onChange={(data) => setFormData((prev) => ({ ...prev, description: data }))}
+            onChange={(data) =>
+              setFormData((prev) => ({ ...prev, description: data }))
+            }
             disabled={isLoadingState}
           />
         </div>

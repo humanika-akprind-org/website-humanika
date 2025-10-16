@@ -41,7 +41,9 @@ export default function WorkProgramTable({
     "all"
   );
   const [periodFilter, setPeriodFilter] = useState<string>("all");
-  const [isActiveFilter, setIsActiveFilter] = useState<"all" | "active" | "inactive">("all");
+  const [isActiveFilter, setIsActiveFilter] = useState<
+    "all" | "active" | "inactive"
+  >("all");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentProgram, setCurrentProgram] = useState<WorkProgram | null>(
     null
@@ -74,18 +76,29 @@ export default function WorkProgramTable({
   });
 
   // Filter out programs with invalid IDs
-  const validPrograms = filteredPrograms.filter((program) =>
-    program.id && typeof program.id === 'string' && program.id.trim() !== '' && program.id !== 'undefined'
+  const validPrograms = filteredPrograms.filter(
+    (program) =>
+      program.id &&
+      typeof program.id === "string" &&
+      program.id.trim() !== "" &&
+      program.id !== "undefined"
   );
 
   // Toggle program selection
   const toggleProgramSelection = (id: string) => {
-    if (!id || typeof id !== 'string' || id.trim() === '' || id === 'undefined') {
-      console.warn('Attempted to select invalid program ID:', id);
+    if (
+      !id ||
+      typeof id !== "string" ||
+      id.trim() === "" ||
+      id === "undefined"
+    ) {
+      console.warn("Attempted to select invalid program ID:", id);
       return;
     }
     if (selectedPrograms.includes(id)) {
-      setSelectedPrograms(selectedPrograms.filter((programId) => programId !== id));
+      setSelectedPrograms(
+        selectedPrograms.filter((programId) => programId !== id)
+      );
     } else {
       setSelectedPrograms([...selectedPrograms, id]);
     }
@@ -102,17 +115,17 @@ export default function WorkProgramTable({
 
   // Navigate to add work program page
   const handleAddProgram = () => {
-    router.push("/admin/programs/works/add");
+    router.push("/admin/program/works/add");
   };
 
   // Navigate to edit work program page
   const handleEditProgram = (id: string) => {
-    router.push(`/admin/programs/works/edit/${id}`);
+    router.push(`/admin/program/works/edit/${id}`);
   };
 
   // Navigate to view work program page
   const handleViewProgram = (id: string) => {
-    router.push(`/admin/programs/works/${id}`);
+    router.push(`/admin/program/works/${id}`);
   };
 
   // Delete program(s)
@@ -125,15 +138,24 @@ export default function WorkProgramTable({
   const confirmDelete = () => {
     if (currentProgram) {
       // Validate single program ID
-      if (currentProgram.id && typeof currentProgram.id === 'string' && currentProgram.id.trim() !== '' && currentProgram.id !== 'undefined') {
+      if (
+        currentProgram.id &&
+        typeof currentProgram.id === "string" &&
+        currentProgram.id.trim() !== "" &&
+        currentProgram.id !== "undefined"
+      ) {
         onDelete(currentProgram.id);
       } else {
-        console.warn('Attempted to delete program with invalid ID:', currentProgram.id);
+        console.warn(
+          "Attempted to delete program with invalid ID:",
+          currentProgram.id
+        );
       }
     } else if (selectedPrograms.length > 0) {
       // Filter out invalid IDs and log if any invalid found
       const validIds = selectedPrograms.filter(
-        (id) => id && typeof id === "string" && id.trim() !== "" && id !== "undefined"
+        (id) =>
+          id && typeof id === "string" && id.trim() !== "" && id !== "undefined"
       );
       if (validIds.length !== selectedPrograms.length) {
         console.warn(
@@ -354,7 +376,10 @@ export default function WorkProgramTable({
                         {program.name}
                       </div>
                     </td>
-                    <td className="px-4 py-4" style={{ width: "300px", minWidth: "300px" }}>
+                    <td
+                      className="px-4 py-4"
+                      style={{ width: "300px", minWidth: "300px" }}
+                    >
                       <div className="text-sm text-gray-600 break-words">
                         {program.goal}
                       </div>

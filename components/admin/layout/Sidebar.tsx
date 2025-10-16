@@ -146,31 +146,31 @@ export default function Sidebar() {
         </div>
 
         <NavDropdown icon={Target} title="Work Programs">
-          <NavDropdownItem href="/admin/programs/works">
+          <NavDropdownItem href="/admin/program/works">
             All Programs
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/works/add">
+          <NavDropdownItem href="/admin/program/works/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/works/approval">
+          <NavDropdownItem href="/admin/program/works/approval">
             Approval
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/works/reports">
+          <NavDropdownItem href="/admin/program/works/reports">
             Reports
           </NavDropdownItem>
         </NavDropdown>
 
         <NavDropdown icon={Calendar} title="Events">
-          <NavDropdownItem href="/admin/programs/events">
+          <NavDropdownItem href="/admin/program/events">
             All Events
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/events/add">
+          <NavDropdownItem href="/admin/program/events/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/events/approval">
+          <NavDropdownItem href="/admin/program/events/approval">
             Approval
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/programs/events/reports">
+          <NavDropdownItem href="/admin/program/events/reports">
             Reports
           </NavDropdownItem>
         </NavDropdown>

@@ -57,7 +57,7 @@ export default function WorkProgramForm({
     schedule: workProgram?.schedule || "",
     funds: workProgram?.funds || 0,
     usedFunds: workProgram?.usedFunds || 0,
-    remainingFunds: workProgram ? (workProgram.funds - workProgram.usedFunds) : 0,
+    remainingFunds: workProgram ? workProgram.funds - workProgram.usedFunds : 0,
     goal: workProgram?.goal || "",
     periodId: workProgram?.periodId || "",
     responsibleId: workProgram?.responsibleId || "",
@@ -72,7 +72,10 @@ export default function WorkProgramForm({
     setFormData((prev) => {
       const newData = {
         ...prev,
-        [name]: name === "funds" || name === "usedFunds" ? parseFloat(value) || 0 : value,
+        [name]:
+          name === "funds" || name === "usedFunds"
+            ? parseFloat(value) || 0
+            : value,
       };
       if (name === "funds" || name === "usedFunds") {
         newData.remainingFunds = newData.funds - newData.usedFunds;
@@ -87,7 +90,7 @@ export default function WorkProgramForm({
 
     try {
       await onSubmit(formData);
-      router.push("/admin/programs/works");
+      router.push("/admin/program/works");
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Failed to submit form. Please try again.");
