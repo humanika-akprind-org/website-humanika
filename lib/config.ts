@@ -68,6 +68,12 @@ class AppConfig {
     );
   }
 
+  get galleryFolderId(): string {
+    return (
+      process.env.GALLERY_FOLDER_ID || "1Ww2JrMagrvlQ-FfqJO17UJ_8ONU8UgmF?hl"
+    );
+  }
+
   // Email
   get resendApiKey(): string {
     return process.env.RESEND_API_KEY || "";
@@ -93,6 +99,7 @@ export const {
   apiUrl,
   photoManagementFolderId,
   eventThumbnailFolderId,
+  galleryFolderId,
   resendApiKey,
 } = appConfig;
 
