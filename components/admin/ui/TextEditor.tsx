@@ -140,7 +140,7 @@ const toolbarContainerRef = useRef<HTMLDivElement>(null);
     setIsClient(true);
     // Dynamically import DecoupledEditor on client side
     import("@ckeditor/ckeditor5-build-decoupled-document").then((mod) => {
-      setDecoupledEditor(mod.default);
+      setDecoupledEditor(() => mod.default);
     });
     const toolbarContainer = toolbarContainerRef.current;
     return () => {
