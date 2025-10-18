@@ -134,11 +134,11 @@ export default function TextEditor({
 }: TextEditorProps) {
 const toolbarContainerRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [DecoupledEditor, setDecoupledEditor] = useState<any>(null);
 
   useEffect(() => {
     setIsClient(true);
-    // Dynamically import DecoupledEditor on client side
     import("@ckeditor/ckeditor5-build-decoupled-document").then((mod) => {
       setDecoupledEditor(() => mod.default);
     });
@@ -187,23 +187,19 @@ const toolbarContainerRef = useRef<HTMLDivElement>(null);
       <div className="document-editor__editable-container p-4">
         {DecoupledEditor && (
           <CKEditor
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             editor={DecoupledEditor}
             data={value}
             onReady={(editor) => {
-              // Bersihkan toolbar container terlebih dahulu
               if (toolbarContainerRef.current) {
                 toolbarContainerRef.current.innerHTML = "";
               }
 
-              // Attach toolbar hanya jika belum ada
               if (toolbarContainerRef.current && editor.ui.view.toolbar) {
                 toolbarContainerRef.current.appendChild(
                   editor.ui.view.toolbar.element!
                 );
               }
 
-              // Set the editor's editable element class
               const editable = editor.ui.getEditableElement();
               if (editable) {
                 editable.classList.add("document-editor__editable");
