@@ -250,13 +250,19 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
-                          <Image
-                            className="h-12 w-12 rounded-lg object-cover"
-                            src={getPreviewUrl(gallery.image)}
-                            alt={gallery.title}
-                            width={48}
-                            height={48}
-                          />
+                          {gallery.image ? (
+                            <Image
+                              className="h-12 w-12 rounded-lg object-cover"
+                              src={getPreviewUrl(gallery.image)}
+                              alt={gallery.title}
+                              width={48}
+                              height={48}
+                            />
+                          ) : (
+                            <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                              <FiImage className="h-6 w-6 text-gray-400" />
+                            </div>
+                          )}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
