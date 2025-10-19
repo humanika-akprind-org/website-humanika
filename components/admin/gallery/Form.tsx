@@ -63,6 +63,7 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(gallery?.image || null);
+  const [removedFile, setRemovedFile] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
 
@@ -76,7 +77,7 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+      setErrors(prev => ({ ...prev, name: "" }));
     }
   };
 
@@ -98,6 +99,7 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
 
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
+    setRemovedFile(false);
     if (errors.file) {
       setErrors(prev => ({ ...prev, file: "" }));
     }
@@ -172,6 +174,20 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
         } else {
           throw new Error("Failed to upload image");
         }
+      } else if (removedFile) {
+        // If file was removed, delete from Google Drive and set imageUrl to undefined
+        if (isGoogleDriveImage(gallery?.image)) {
+          const fileId = getFileIdFromImage(gallery?.image);
+          if (fileId) {
+            try {
+              await deleteFile(fileId);
+            } catch (deleteError) {
+              console.warn("Failed to delete image:", deleteError);
+              // Continue with submission even if delete fails
+            }
+          }
+        }
+        imageUrl = undefined;
       }
 
       const submitData = {
@@ -187,8 +203,16 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
   };
 
   const removeFile = () => {
-    setSelectedFile(null);
-    setPreviewUrl(gallery?.image || null);
+    if (selectedFile) {
+      // If there's a newly selected file, remove it
+      setSelectedFile(null);
+      setPreviewUrl(gallery?.image || null);
+      setRemovedFile(false);
+    } else if (previewUrl) {
+      // If there's an existing image being previewed, mark as removed
+      setPreviewUrl(null);
+      setRemovedFile(true);
+    }
   };
 
   // Helper function to get preview URL from image (file ID or URL)
