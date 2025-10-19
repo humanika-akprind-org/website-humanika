@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
-import { FiCalendar, FiUser } from "react-icons/fi";
+import Image from "next/image";
+import { FiCalendar, FiUser, FiImage } from "react-icons/fi";
 import type { Event } from "@/types/event";
 import type { Status } from "@/types/enums";
 import { Status as StatusEnum } from "@/types/enums";
@@ -23,6 +24,7 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   const handleStatusFilterChange = (status: string) =>
     (status === "all" ||
@@ -68,6 +70,26 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
         return "bg-yellow-100 text-yellow-600";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Helper function to get preview URL from image (file ID or URL)
+  const getPreviewUrl = (image: string | null | undefined): string => {
+    if (!image) return "";
+
+    if (image.includes("drive.google.com")) {
+      // It's a full Google Drive URL, convert to direct image URL
+      const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+      }
+      return image;
+    } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
+      // It's a Google Drive file ID, construct direct URL
+      return `https://drive.google.com/uc?export=view&id=${image}`;
+    } else {
+      // It's a direct URL or other format
+      return image;
     }
   };
 
@@ -211,6 +233,12 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                  Thumbnail
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Event
                 </th>
                 <th
@@ -274,6 +302,24 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                       />
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex-shrink-0 h-12 w-12">
+                        {event.thumbnail && !imageErrors.has(event.id) ? (
+                          <Image
+                            className="h-12 w-12 rounded-lg object-cover"
+                            src={getPreviewUrl(event.thumbnail)}
+                            alt={event.name}
+                            width={48}
+                            height={48}
+                            onError={() => setImageErrors(prev => new Set(prev).add(event.id))}
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                            <FiImage className="h-6 w-6 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         {event.name}
                       </div>
@@ -283,7 +329,11 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                       style={{ width: "300px", minWidth: "300px" }}
                     >
                       <div className="text-sm text-gray-600 break-words">
-                        {event.description || "No description"}
+                        {event.description
+                          ? event.description.length > 50
+                            ? `${event.description.replace(/<[^>]*>/g, '').substring(0, 50)}...`
+                            : event.description.replace(/<[^>]*>/g, '')
+                          : "No description"}
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
@@ -357,7 +407,7 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center">
+                  <td colSpan={10} className="px-6 py-12 text-center">
                     <FiCalendar className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-4 text-sm font-medium text-gray-900">
                       No events found

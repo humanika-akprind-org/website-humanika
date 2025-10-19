@@ -134,6 +134,7 @@ export default function EventForm({
   const [existingThumbnail, setExistingThumbnail] = useState<
     string | null | undefined
   >(event?.thumbnail);
+  const [removedThumbnail, setRemovedThumbnail] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -187,15 +188,17 @@ export default function EventForm({
       // Create preview URL
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
+      setRemovedThumbnail(false); // Reset removed state when new file is selected
     }
   };
 
   const removeThumbnail = () => {
     if (isGoogleDriveThumbnail(existingThumbnail)) {
-      // For Google Drive files, we'll handle deletion during form submission
+      // Mark thumbnail as removed for deletion during form submission
+      setRemovedThumbnail(true);
     }
 
-    // If it's a local file or no thumbnail, just remove it
+    // Clear form state
     setFormData((prev) => ({ ...prev, thumbnailFile: undefined }));
     setPreviewUrl(null);
     setExistingThumbnail(null);
@@ -233,13 +236,29 @@ export default function EventForm({
         throw new Error("Funds must be greater than 0");
       }
 
-      // Upload thumbnail first if provided
+      // Handle thumbnail deletion if marked for removal
       let thumbnailUrl: string | null | undefined = existingThumbnail;
 
+      if (removedThumbnail) {
+        // Delete from Google Drive and set thumbnailUrl to undefined
+        if (event?.thumbnail && isGoogleDriveThumbnail(event.thumbnail)) {
+          const fileId = getFileIdFromThumbnail(event.thumbnail);
+          if (fileId) {
+            try {
+              await deleteFile(fileId);
+            } catch (deleteError) {
+              console.warn("Failed to delete thumbnail:", deleteError);
+              // Continue with submission even if delete fails
+            }
+          }
+        }
+        thumbnailUrl = undefined;
+      }
+
       if (formData.thumbnailFile) {
-        // Delete old thumbnail from Google Drive if it exists
-        if (isGoogleDriveThumbnail(existingThumbnail)) {
-          const fileId = getFileIdFromThumbnail(existingThumbnail);
+        // Delete old thumbnail from Google Drive if it exists and wasn't already removed
+        if (!removedThumbnail && event?.thumbnail && isGoogleDriveThumbnail(event.thumbnail)) {
+          const fileId = getFileIdFromThumbnail(event.thumbnail);
           if (fileId) {
             try {
               await deleteFile(fileId);
@@ -287,7 +306,7 @@ export default function EventForm({
       // Prepare data to send
       const submitData = {
         ...dataToSend,
-        thumbnail: thumbnailUrl || undefined,
+        thumbnail: thumbnailUrl as string | undefined,
         startDate: new Date(formData.startDate),
         endDate: new Date(formData.endDate),
         workProgramId:
@@ -298,10 +317,8 @@ export default function EventForm({
 
       await onSubmit(submitData);
 
-      // If there was a file uploaded, run removeThumbnail logic to clean up form state
-      if (formData.thumbnailFile) {
-        removeThumbnail();
-      }
+      // Reset form state after successful submission
+      setRemovedThumbnail(false);
 
       router.push("/admin/program/events");
     } catch (err) {
