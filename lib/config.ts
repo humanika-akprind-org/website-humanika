@@ -70,7 +70,7 @@ class AppConfig {
 
   get galleryFolderId(): string {
     return (
-      process.env.GALLERY_FOLDER_ID || "1Ww2JrMagrvlQ-FfqJO17UJ_8ONU8UgmF?hl"
+      process.env.GALLERY_FOLDER_ID || "1Ww2JrMagrvlQ-FfqJO17UJ_8ONU8UgmF"
     );
   }
 
