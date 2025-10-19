@@ -7,10 +7,15 @@ export interface Event {
   id: string;
   name: string;
   slug: string;
-  thumbnail?: string;
+  thumbnail?: string | null;
   description: string;
   responsibleId: string;
-  responsible: User;
+  responsible: {
+    id: string;
+    name: string;
+    email: string;
+    department?: Department | null;
+  };
   goal: string;
   department: Department;
   periodId: string;
@@ -21,8 +26,8 @@ export interface Event {
   usedFunds: number;
   remainingFunds: number;
   status: Status;
-  workProgramId?: string;
-  workProgram?: WorkProgram;
+  workProgramId?: string | null;
+  workProgram?: WorkProgram | null;
   createdAt: Date;
   updatedAt: Date;
 }
