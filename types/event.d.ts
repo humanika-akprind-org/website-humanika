@@ -34,7 +34,7 @@ export interface Event {
 
 export interface CreateEventInput {
   name: string;
-  thumbnail?: string;
+  thumbnail?: string | null;
   description: string;
   responsibleId: string;
   goal: string;

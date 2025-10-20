@@ -69,9 +69,11 @@ class AppConfig {
   }
 
   get galleryFolderId(): string {
-    return (
-      process.env.GALLERY_FOLDER_ID || "1Ww2JrMagrvlQ-FfqJO17UJ_8ONU8UgmF"
-    );
+    return process.env.GALLERY_FOLDER_ID || "1Ww2JrMagrvlQ-FfqJO17UJ_8ONU8UgmF";
+  }
+
+  get articleFolderId(): string {
+    return process.env.ARTICLE_FOLDER_ID || "1TF3amcf7AJDMtsK7PzKpjyoCGhrrgrI1";
   }
 
   // Email
@@ -100,6 +102,7 @@ export const {
   photoManagementFolderId,
   eventThumbnailFolderId,
   galleryFolderId,
+  articleFolderId,
   resendApiKey,
 } = appConfig;
 

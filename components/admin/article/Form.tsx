@@ -3,13 +3,18 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
-import { Department as DepartmentEnum, Status } from "@/types/enums";
+import type {
+  Article,
+  CreateArticleInput,
+  UpdateArticleInput,
+} from "@/types/article";
+import { Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
-import { useWorkPrograms } from "@/hooks/useWorkPrograms";
-import { eventThumbnailFolderId } from "@/lib/config";
+import { articleFolderId } from "@/lib/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
+import { getArticleCategories } from "@/lib/api/article-category";
+import type { ArticleCategory } from "@/types/article-category";
 import DescriptionEditor from "../ui/TextEditor";
 
 // Helper function to check if HTML content is empty
@@ -78,22 +83,22 @@ const getFileIdFromThumbnail = (
   return null;
 };
 
-interface EventFormProps {
-  event?: Event;
-  onSubmit: (data: CreateEventInput | UpdateEventInput) => Promise<void>;
+interface ArticleFormProps {
+  article?: Article;
+  onSubmit: (data: CreateArticleInput | UpdateArticleInput) => Promise<void>;
   isLoading?: boolean;
   accessToken: string;
   users: User[];
   periods: Period[];
 }
 
-export default function EventForm({
-  event,
+export default function ArticleForm({
+  article,
   onSubmit,
   accessToken,
   users,
   periods,
-}: EventFormProps) {
+}: ArticleFormProps) {
   const router = useRouter();
   const {
     uploadFile,
@@ -104,27 +109,35 @@ export default function EventForm({
     error: photoError,
   } = useFile(accessToken);
 
-  // Fetch work programs
-  const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
+  // Fetch article categories
+  const [categories, setCategories] = useState<ArticleCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-  // Users and periods are now passed as props
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getArticleCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const [formData, setFormData] = useState({
-    name: event?.name || "",
-    description: event?.description || "",
-    goal: event?.goal || "",
-    department: event?.department || DepartmentEnum.BPH,
-    periodId: event?.period?.id || "",
-    responsibleId: event?.responsible?.id || "",
-    startDate: event?.startDate
-      ? new Date(event.startDate).toISOString().split("T")[0]
+    title: article?.title || "",
+    content: article?.content || "",
+    authorId: article?.author?.id || "",
+    categoryId: article?.category?.id || "",
+    periodId: article?.period?.id || "",
+    isPublished: article?.isPublished || false,
+    publishedAt: article?.publishedAt
+      ? new Date(article.publishedAt).toISOString().split("T")[0]
       : "",
-    endDate: event?.endDate
-      ? new Date(event.endDate).toISOString().split("T")[0]
-      : "",
-    funds: event?.funds || 0,
-    status: event?.status || Status.DRAFT,
-    workProgramId: event?.workProgram?.id || "",
+    status: article?.status || Status.DRAFT,
     thumbnailFile: undefined as File | undefined,
   });
 
@@ -133,15 +146,15 @@ export default function EventForm({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState<
     string | null | undefined
-  >(event?.thumbnail);
+  >(article?.thumbnail);
   const [removedThumbnail, setRemovedThumbnail] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Initialize preview URL when component mounts with existing data
   useEffect(() => {
-    setPreviewUrl(getPreviewUrl(event?.thumbnail));
-  }, [event?.thumbnail]);
+    setPreviewUrl(getPreviewUrl(article?.thumbnail));
+  }, [article?.thumbnail]);
 
   // Update preview URL when existingThumbnail changes
   useEffect(() => {
@@ -159,8 +172,13 @@ export default function EventForm({
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
 
     // Clear error when user starts typing
     if (errors[name]) {
@@ -211,29 +229,17 @@ export default function EventForm({
 
     try {
       // Validate required fields
-      if (!formData.name.trim()) {
-        throw new Error("Please enter event name");
+      if (!formData.title.trim()) {
+        throw new Error("Please enter article title");
       }
-      if (isHtmlEmpty(formData.description)) {
-        throw new Error("Please enter description");
+      if (isHtmlEmpty(formData.content)) {
+        throw new Error("Please enter article content");
       }
-      if (!formData.goal.trim()) {
-        throw new Error("Please enter goal");
+      if (!formData.authorId) {
+        throw new Error("Please select author");
       }
-      if (!formData.periodId) {
-        throw new Error("Please select a period");
-      }
-      if (!formData.responsibleId) {
-        throw new Error("Please select responsible person");
-      }
-      if (!formData.startDate) {
-        throw new Error("Please select start date");
-      }
-      if (!formData.endDate) {
-        throw new Error("Please select end date");
-      }
-      if (formData.funds <= 0) {
-        throw new Error("Funds must be greater than 0");
+      if (!formData.categoryId) {
+        throw new Error("Please select category");
       }
 
       // Handle thumbnail deletion if marked for removal
@@ -241,8 +247,8 @@ export default function EventForm({
 
       if (removedThumbnail) {
         // Delete from Google Drive and set thumbnailUrl to null
-        if (event?.thumbnail && isGoogleDriveThumbnail(event.thumbnail)) {
-          const fileId = getFileIdFromThumbnail(event.thumbnail);
+        if (article?.thumbnail && isGoogleDriveThumbnail(article.thumbnail)) {
+          const fileId = getFileIdFromThumbnail(article.thumbnail);
           if (fileId) {
             try {
               await deleteFile(fileId);
@@ -259,10 +265,10 @@ export default function EventForm({
         // Delete old thumbnail from Google Drive if it exists and wasn't already removed
         if (
           !removedThumbnail &&
-          event?.thumbnail &&
-          isGoogleDriveThumbnail(event.thumbnail)
+          article?.thumbnail &&
+          isGoogleDriveThumbnail(article.thumbnail)
         ) {
-          const fileId = getFileIdFromThumbnail(event.thumbnail);
+          const fileId = getFileIdFromThumbnail(article.thumbnail);
           if (fileId) {
             try {
               await deleteFile(fileId);
@@ -278,12 +284,12 @@ export default function EventForm({
         const uploadedFileId = await uploadFile(
           formData.thumbnailFile,
           tempFileName,
-          eventThumbnailFolderId
+          articleFolderId
         );
 
         if (uploadedFileId) {
           // Rename the file using the renameFile hook
-          const finalFileName = `event-thumbnail-${formData.name
+          const finalFileName = `article-thumbnail-${formData.title
             .replace(/\s+/g, "-")
             .toLowerCase()}-${Date.now()}`;
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
@@ -311,11 +317,12 @@ export default function EventForm({
       const submitData = {
         ...dataToSend,
         thumbnail: thumbnailUrl,
-        startDate: new Date(formData.startDate),
-        endDate: new Date(formData.endDate),
-        workProgramId:
-          formData.workProgramId && formData.workProgramId.trim() !== ""
-            ? formData.workProgramId
+        publishedAt: formData.publishedAt
+          ? new Date(formData.publishedAt)
+          : undefined,
+        periodId:
+          formData.periodId && formData.periodId.trim() !== ""
+            ? formData.periodId
             : undefined,
       };
 
@@ -324,9 +331,9 @@ export default function EventForm({
       // Reset form state after successful submission
       setRemovedThumbnail(false);
 
-      router.push("/admin/program/events");
+      router.push("/admin/content/articles");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save event");
+      setError(err instanceof Error ? err.message : "Failed to save article");
     } finally {
       setIsLoadingState(false);
     }
@@ -345,39 +352,18 @@ export default function EventForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Event Name *
+              Article Title *
             </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="title"
+              value={formData.title}
               onChange={handleInputChange}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter event name"
+              placeholder="Enter article title"
               required
               disabled={isLoadingState}
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Department *
-            </label>
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-              disabled={isLoadingState}
-            >
-              <option value="">Pilih Department</option>
-              {Object.values(DepartmentEnum).map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div>
@@ -401,64 +387,61 @@ export default function EventForm({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Budget (IDR) *
+              Author *
             </label>
-            <input
-              type="number"
-              name="funds"
-              value={formData.funds}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="0"
-              min="0"
-              required
-              disabled={isLoadingState}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Date *
-            </label>
-            <input
-              type="date"
-              name="startDate"
-              value={formData.startDate}
+            <select
+              name="authorId"
+              value={formData.authorId}
               onChange={handleInputChange}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
               disabled={isLoadingState}
-            />
+            >
+              <option value="">Pilih Author</option>
+              {(users || []).map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Date *
+              Category *
             </label>
-            <input
-              type="date"
-              name="endDate"
-              value={formData.endDate}
+            <select
+              name="categoryId"
+              value={formData.categoryId}
               onChange={handleInputChange}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
-              disabled={isLoadingState}
-            />
+              disabled={isLoadingState || categoriesLoading}
+            >
+              <option value="">Pilih Category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+            {categoriesLoading && (
+              <p className="text-sm text-gray-500 mt-1">Memuat categories...</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Period *
+              Period (Optional)
             </label>
             <select
               name="periodId"
               value={formData.periodId}
               onChange={handleInputChange}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
               disabled={isLoadingState}
             >
-              <option value="">Pilih Period</option>
+              <option value="">Pilih Period (Opsional)</option>
               {(periods || []).map((period) => (
                 <option key={period.id} value={period.id}>
                   {period.name}
@@ -469,78 +452,44 @@ export default function EventForm({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Work Program
+              Published At
             </label>
-            <select
-              name="workProgramId"
-              value={formData.workProgramId}
+            <input
+              type="date"
+              name="publishedAt"
+              value={formData.publishedAt}
               onChange={handleInputChange}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState || workProgramsLoading}
-            >
-              <option value="">Pilih Work Program (Opsional)</option>
-              {workPrograms.map((workProgram) => (
-                <option key={workProgram.id} value={workProgram.id}>
-                  {workProgram.name}
-                </option>
-              ))}
-            </select>
-            {workProgramsLoading && (
-              <p className="text-sm text-gray-500 mt-1">
-                Memuat work programs...
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Responsible Person *
-            </label>
-            <select
-              name="responsibleId"
-              value={formData.responsibleId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
               disabled={isLoadingState}
-            >
-              <option value="">Pilih Person</option>
-              {(users || []).map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description *
+            Content *
           </label>
           <DescriptionEditor
-            value={formData.description}
+            value={formData.content}
             onChange={(data) =>
-              setFormData((prev) => ({ ...prev, description: data }))
+              setFormData((prev) => ({ ...prev, content: data }))
             }
             disabled={isLoadingState}
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Goal *
-          </label>
-          <textarea
-            name="goal"
-            value={formData.goal}
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            name="isPublished"
+            checked={formData.isPublished}
             onChange={handleInputChange}
-            rows={3}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter event goal"
-            required
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             disabled={isLoadingState}
           />
+          <label className="ml-2 block text-sm text-gray-900">
+            Publish this article
+          </label>
         </div>
 
         <div>
@@ -564,7 +513,7 @@ export default function EventForm({
                         <div className="w-80 h-60 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden">
                           <Image
                             src={displayUrl}
-                            alt={event?.name || "Event thumbnail"}
+                            alt={article?.title || "Article thumbnail"}
                             width={400}
                             height={300}
                             className="w-full h-full object-contain rounded-lg"
