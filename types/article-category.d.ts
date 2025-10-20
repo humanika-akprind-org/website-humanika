@@ -1,5 +1,3 @@
-import { Status } from "./enums";
-
 export interface ArticleCategory {
   id: string;
   name: string;
@@ -14,9 +12,4 @@ export interface CreateArticleCategoryInput {
   name: string;
 }
 
-export interface UpdateArticleCategoryInput extends Partial<CreateArticleCategoryInput> {
-}
-
-export interface ArticleCategoryFilter {
-  search?: string;
-}
+export interface UpdateArticleCategoryInput extends Partial<CreateArticleCategoryInput> {}
