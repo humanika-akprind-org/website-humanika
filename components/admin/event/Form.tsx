@@ -240,7 +240,7 @@ export default function EventForm({
       let thumbnailUrl: string | null | undefined = existingThumbnail;
 
       if (removedThumbnail) {
-        // Delete from Google Drive and set thumbnailUrl to undefined
+        // Delete from Google Drive and set thumbnailUrl to null
         if (event?.thumbnail && isGoogleDriveThumbnail(event.thumbnail)) {
           const fileId = getFileIdFromThumbnail(event.thumbnail);
           if (fileId) {
@@ -252,12 +252,16 @@ export default function EventForm({
             }
           }
         }
-        thumbnailUrl = undefined;
+        thumbnailUrl = null;
       }
 
       if (formData.thumbnailFile) {
         // Delete old thumbnail from Google Drive if it exists and wasn't already removed
-        if (!removedThumbnail && event?.thumbnail && isGoogleDriveThumbnail(event.thumbnail)) {
+        if (
+          !removedThumbnail &&
+          event?.thumbnail &&
+          isGoogleDriveThumbnail(event.thumbnail)
+        ) {
           const fileId = getFileIdFromThumbnail(event.thumbnail);
           if (fileId) {
             try {
@@ -306,7 +310,7 @@ export default function EventForm({
       // Prepare data to send
       const submitData = {
         ...dataToSend,
-        thumbnail: thumbnailUrl as string | undefined,
+        thumbnail: thumbnailUrl,
         startDate: new Date(formData.startDate),
         endDate: new Date(formData.endDate),
         workProgramId:
