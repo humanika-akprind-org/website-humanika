@@ -2,6 +2,7 @@ import GalleryForm from "@/components/admin/gallery/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 import type { UpdateGalleryInput } from "@/types/gallery";
+import type { Event } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -86,7 +87,7 @@ async function EditGalleryPage({ params }: { params: { id: string } }) {
           <GalleryForm
             gallery={gallery}
             accessToken={accessToken}
-            events={events as any[]}
+            events={events as Event[]}
             onSubmit={handleSubmit}
             isLoading={false}
           />
