@@ -2,20 +2,14 @@ import type {
   ArticleCategory,
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-  ArticleCategoryFilter,
 } from "@/types/article-category";
+
 import { apiUrl } from "@/lib/config";
 
 const API_URL = apiUrl;
 
-export const getArticleCategories = async (
-  filter?: ArticleCategoryFilter
-): Promise<ArticleCategory[]> => {
-  const params = new URLSearchParams();
-
-  if (filter?.search) params.append("search", filter.search);
-
-  const response = await fetch(`${API_URL}/article/category?${params.toString()}`, {
+export const getArticleCategories = async (): Promise<ArticleCategory[]> => {
+  const response = await fetch(`${API_URL}/article-categories`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -32,7 +26,7 @@ export const getArticleCategories = async (
 };
 
 export const getArticleCategory = async (id: string): Promise<ArticleCategory> => {
-  const response = await fetch(`${API_URL}/article/category/${id}`, {
+  const response = await fetch(`${API_URL}/article-categories/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -51,7 +45,7 @@ export const getArticleCategory = async (id: string): Promise<ArticleCategory> =
 export const createArticleCategory = async (
   data: CreateArticleCategoryInput
 ): Promise<ArticleCategory> => {
-  const response = await fetch(`${API_URL}/article/category`, {
+  const response = await fetch(`${API_URL}/article-categories`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -85,7 +79,7 @@ export const updateArticleCategory = async (
   id: string,
   data: UpdateArticleCategoryInput
 ): Promise<ArticleCategory> => {
-  const response = await fetch(`${API_URL}/article/category/${id}`, {
+  const response = await fetch(`${API_URL}/article-categories/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -102,7 +96,7 @@ export const updateArticleCategory = async (
 };
 
 export const deleteArticleCategory = async (id: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/article/category/${id}`, {
+  const response = await fetch(`${API_URL}/article-categories/${id}`, {
     method: "DELETE",
     credentials: "include",
   });
