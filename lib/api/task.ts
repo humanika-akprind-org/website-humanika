@@ -14,7 +14,7 @@ export const getDepartmentTasks = async (
   const params = new URLSearchParams();
 
   if (filter?.department) params.append("department", filter.department);
-  if (filter?.status) params.append("status", filter.status);
+  if (filter?.status) params.append("status", filter.status.toString());
   if (filter?.userId) params.append("userId", filter.userId);
   if (filter?.search) params.append("search", filter.search);
 

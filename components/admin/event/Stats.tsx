@@ -22,7 +22,7 @@ export default function Stats({ events }: StatsProps) {
     0
   );
   const completedEvents = events.filter(
-    (event) => event.status === Status.COMPLETED
+    (event) => event.status === Status.PUBLISH
   ).length;
   // const upcomingEvents = events.filter(event => new Date(event.startDate) > new Date()).length;
 

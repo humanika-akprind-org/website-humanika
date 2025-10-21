@@ -33,7 +33,9 @@ export default function ArticleFilters({
 }: ArticleFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    []
+  );
   const [loadingPeriods, setLoadingPeriods] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,22 +50,25 @@ export default function ArticleFilters({
           PeriodApi.getPeriods(),
           getArticleCategories(),
         ]);
-        const periodOptions = periodData.map(period => ({ id: period.id, name: period.name }));
+        const periodOptions = periodData.map((period) => ({
+          id: period.id,
+          name: period.name,
+        }));
         setPeriods(periodOptions);
         setCategories(categoryData);
         setError(null);
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load filters');
+        console.error("Error fetching data:", err);
+        setError("Failed to load filters");
         // Fallback data
         setPeriods([
-          { id: 'fallback-2024', name: '2024' },
-          { id: 'fallback-2023', name: '2023' },
-          { id: 'fallback-2022', name: '2022' }
+          { id: "fallback-2024", name: "2024" },
+          { id: "fallback-2023", name: "2023" },
+          { id: "fallback-2022", name: "2022" },
         ]);
         setCategories([
-          { id: 'fallback-news', name: 'News' },
-          { id: 'fallback-announcement', name: 'Announcement' },
+          { id: "fallback-news", name: "News" },
+          { id: "fallback-announcement", name: "Announcement" },
         ]);
       } finally {
         setLoadingPeriods(false);
@@ -119,7 +124,8 @@ export default function ArticleFilters({
               <option value="all">Semua Status</option>
               {Object.values(Status).map((status) => (
                 <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
+                  {status.toString().charAt(0).toUpperCase() +
+                    status.toString().slice(1).toLowerCase()}
                 </option>
               ))}
             </select>
@@ -163,7 +169,9 @@ export default function ArticleFilters({
               ))}
             </select>
             {loadingCategories && (
-              <p className="text-xs text-gray-500 mt-1">Loading categories...</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Loading categories...
+              </p>
             )}
           </div>
           <div className="flex items-end">
@@ -182,9 +190,7 @@ export default function ArticleFilters({
           </div>
         </div>
       )}
-      {error && (
-        <p className="text-xs text-red-500 mt-2">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
     </div>
   );
 }

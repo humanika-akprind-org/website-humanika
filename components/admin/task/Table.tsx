@@ -14,10 +14,7 @@ interface TaskTableProps {
   onDelete: (id: string) => void;
 }
 
-export default function TaskTable({
-  tasks,
-  onDelete,
-}: TaskTableProps) {
+export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
@@ -26,12 +23,14 @@ export default function TaskTable({
   const [taskToDelete, setTaskToDelete] = useState<DepartmentTask | null>(null);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-  const [taskToPreview, setTaskToPreview] = useState<DepartmentTask | null>(null);
+  const [taskToPreview, setTaskToPreview] = useState<DepartmentTask | null>(
+    null
+  );
 
   const handleStatusFilterChange = (status: string) =>
     (status === "all" ||
-      Object.values(StatusEnum).includes(status as StatusEnum)) &&
-    setStatusFilter(status as Status | "all");
+      Object.values(StatusEnum).includes(status as unknown as StatusEnum)) &&
+    setStatusFilter(status === "all" ? "all" : (status as unknown as Status));
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("id-ID", {
@@ -46,22 +45,12 @@ export default function TaskTable({
         return "bg-gray-100 text-gray-800";
       case StatusEnum.PENDING:
         return "bg-yellow-100 text-yellow-800";
-      case StatusEnum.APPROVED:
+      case StatusEnum.PUBLISH:
         return "bg-green-100 text-green-800";
-      case StatusEnum.REJECTED:
-        return "bg-red-100 text-red-800";
-      case StatusEnum.REVISION:
-        return "bg-orange-100 text-orange-800";
-      case StatusEnum.ARCHIVED:
-        return "bg-gray-100 text-gray-600";
-      case StatusEnum.ONGOING:
+      case StatusEnum.PRIVATE:
         return "bg-blue-100 text-blue-800";
-      case StatusEnum.COMPLETED:
-        return "bg-green-100 text-green-800";
-      case StatusEnum.CANCELLED:
+      case StatusEnum.ARCHIVE:
         return "bg-red-100 text-red-800";
-      case StatusEnum.POSTPONED:
-        return "bg-yellow-100 text-yellow-600";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -119,9 +108,7 @@ export default function TaskTable({
   // Toggle task selection
   const toggleTaskSelection = (id: string) => {
     setSelectedTasks((prev) =>
-      prev.includes(id)
-        ? prev.filter((taskId) => taskId !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((taskId) => taskId !== id) : [...prev, id]
     );
   };
 
@@ -154,7 +141,7 @@ export default function TaskTable({
       <TaskFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
+        statusFilter={statusFilter.toString()}
         onStatusFilterChange={handleStatusFilterChange}
         departmentFilter={departmentFilter}
         onDepartmentFilterChange={setDepartmentFilter}
@@ -192,13 +179,14 @@ export default function TaskTable({
                   <input
                     type="checkbox"
                     checked={
-                      filteredTasks.length > 0 && selectedTasks.length === filteredTasks.length
+                      filteredTasks.length > 0 &&
+                      selectedTasks.length === filteredTasks.length
                     }
                     onChange={() => {
                       if (selectedTasks.length === filteredTasks.length) {
                         setSelectedTasks([]);
                       } else {
-                        setSelectedTasks(filteredTasks.map(task => task.id));
+                        setSelectedTasks(filteredTasks.map((task) => task.id));
                       }
                     }}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
@@ -252,80 +240,107 @@ export default function TaskTable({
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredTasks.length > 0 ? (
                 filteredTasks.map((task) => (
-                  <tr key={task.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="pl-6 pr-2 py-4 whitespace-nowrap">
-                        <input
-                          type="checkbox"
-                          checked={selectedTasks.includes(task.id)}
-                          onChange={() => toggleTaskSelection(task.id)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                        />
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="text-sm text-gray-900">
-                          {task.note.length > 50
-                            ? `${task.note.replace(/<[^>]*>/g, '').substring(0, 50)}...`
-                            : task.note.replace(/<[^>]*>/g, '')}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4" style={{ width: "250px", minWidth: "250px" }}>
-                        <div className="text-sm text-gray-600">
-                          {task.department}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <FiUser className="mr-2 text-gray-400" size={14} />
-                          {task.user?.name || "Unassigned"}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusColor(
-                            task.status
-                          )}`}
+                  <tr
+                    key={task.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="pl-6 pr-2 py-4 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedTasks.includes(task.id)}
+                        onChange={() => toggleTaskSelection(task.id)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                      />
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="text-sm text-gray-900">
+                        {task.note.length > 50
+                          ? `${task.note
+                              .replace(/<[^>]*>/g, "")
+                              .substring(0, 50)}...`
+                          : task.note.replace(/<[^>]*>/g, "")}
+                      </div>
+                    </td>
+                    <td
+                      className="px-4 py-4"
+                      style={{ width: "250px", minWidth: "250px" }}
+                    >
+                      <div className="text-sm text-gray-600">
+                        {task.department}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <FiUser className="mr-2 text-gray-400" size={14} />
+                        {task.user?.name || "Unassigned"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusColor(
+                          task.status
+                        )}`}
+                      >
+                        {task.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {task._count?.approvals || 0}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(task.createdAt)}
+                    </td>
+                    <td className="pl-4 pr-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
+                          onClick={() => handlePreview(task)}
+                          title="Preview task"
                         >
-                          {task.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {task._count?.approvals || 0}
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(task.createdAt)}
-                      </td>
-                      <td className="pl-4 pr-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
-                            onClick={() => handlePreview(task)}
-                            title="Preview task"
+                          <FiEye className="w-4 h-4" />
+                        </button>
+                        <Link
+                          href={`/admin/governance/tasks/edit/${task.id}`}
+                          className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                          title="Edit task"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
                           >
-                            <FiEye className="w-4 h-4" />
-                          </button>
-                          <Link
-                            href={`/admin/governance/tasks/edit/${task.id}`}
-                            className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                            title="Edit task"
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                          </svg>
+                        </Link>
+                        <button
+                          className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                          onClick={() => handleDelete(task)}
+                          title="Delete task"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </Link>
-                          <button
-                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                            onClick={() => handleDelete(task)}
-                            title="Delete task"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                )
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               ) : (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center">
@@ -349,7 +364,9 @@ export default function TaskTable({
         {filteredTasks.length > 0 && (
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
             <p className="text-sm text-gray-700 mb-4 sm:mb-0">
-              Showing <span className="font-medium">{filteredTasks.length}</span> of <span className="font-medium">{tasks.length}</span> tasks
+              Showing{" "}
+              <span className="font-medium">{filteredTasks.length}</span> of{" "}
+              <span className="font-medium">{tasks.length}</span> tasks
             </p>
             <div className="flex space-x-2">
               <button
