@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status") as Status;
+    const status = searchParams.get("status") as unknown as Status;
     const periodId = searchParams.get("periodId");
     const categoryId = searchParams.get("categoryId");
     const authorId = searchParams.get("authorId");
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     const where: Prisma.ArticleWhereInput = {};
 
-    if (status) where.status = { equals: status as PrismaStatus };
+    if (status) where.status = { equals: status as unknown as PrismaStatus };
     if (periodId) where.periodId = periodId;
     if (categoryId) where.categoryId = categoryId;
     if (authorId) where.authorId = authorId;
@@ -69,12 +69,7 @@ export async function POST(request: NextRequest) {
 
     const body: CreateArticleInput = await request.json();
 
-    if (
-      !body.title ||
-      !body.content ||
-      !body.authorId ||
-      !body.categoryId
-    ) {
+    if (!body.title || !body.content || !body.authorId || !body.categoryId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }

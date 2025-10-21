@@ -20,7 +20,7 @@ export default function Stats({ tasks }: StatsProps) {
     (task) => task.status === Status.PENDING
   ).length;
   const completedTasks = tasks.filter(
-    (task) => task.status === Status.COMPLETED
+    (task) => task.status === Status.PUBLISH
   ).length;
   const totalApprovals = tasks.reduce(
     (sum, task) => sum + (task._count?.approvals || 0),

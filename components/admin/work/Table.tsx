@@ -187,23 +187,23 @@ export default function WorkProgramTable({
           icon: <FiAlertCircle className="mr-1" />,
           text: "Pending",
         };
-      case Status.APPROVED:
+      case Status.PUBLISH:
         return {
           class: "bg-green-100 text-green-800",
           icon: <FiCheckCircle className="mr-1" />,
-          text: "Approved",
+          text: "Published",
         };
-      case Status.REJECTED:
+      case Status.PRIVATE:
+        return {
+          class: "bg-yellow-100 text-yellow-800",
+          icon: <FiEye className="mr-1" />,
+          text: "Private",
+        };
+      case Status.ARCHIVE:
         return {
           class: "bg-red-100 text-red-800",
           icon: <FiXCircle className="mr-1" />,
-          text: "Rejected",
-        };
-      case Status.COMPLETED:
-        return {
-          class: "bg-purple-100 text-purple-800",
-          icon: <FiCheckCircle className="mr-1" />,
-          text: "Completed",
+          text: "Archived",
         };
       default:
         return {

@@ -13,7 +13,7 @@ export const getArticles = async (
 ): Promise<Article[]> => {
   const params = new URLSearchParams();
 
-  if (filter?.status) params.append("status", filter.status);
+  if (filter?.status) params.append("status", filter.status.toString());
   if (filter?.periodId) params.append("periodId", filter.periodId);
   if (filter?.categoryId) params.append("categoryId", filter.categoryId);
   if (filter?.authorId) params.append("authorId", filter.authorId);

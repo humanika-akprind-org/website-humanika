@@ -14,14 +14,14 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const department = searchParams.get("department") as Department;
-    const status = searchParams.get("status") as Status;
+    const status = searchParams.get("status") as unknown as Status;
     const periodId = searchParams.get("periodId");
     const search = searchParams.get("search");
 
     const where: Prisma.WorkProgramWhereInput = {};
 
     if (department) where.department = { equals: department };
-    if (status) where.status = { equals: status as PrismaStatus };
+    if (status) where.status = { equals: status as unknown as PrismaStatus };
     if (periodId) where.periodId = periodId;
     if (search) {
       where.OR = [
@@ -130,7 +130,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Validate all IDs are strings and not empty
-    const validIds = ids.filter((id) => typeof id === 'string' && id.trim() !== '' && id !== 'undefined');
+    const validIds = ids.filter(
+      (id) => typeof id === "string" && id.trim() !== "" && id !== "undefined"
+    );
     if (validIds.length === 0) {
       return NextResponse.json(
         { error: "No valid IDs provided" },
