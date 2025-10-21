@@ -55,18 +55,18 @@ export enum DocumentType {
   OTHER = "OTHER",
 }
 
-// Enum Status untuk berbagai entitas
+// Enum untuk status berbagai entitas dalam sistem
+// DRAFT: Draft, belum dipublikasikan
+// PENDING: Menunggu persetujuan atau proses
+// PUBLISH: Sudah dipublikasikan
+// PRIVATE: Hanya dapat diakses oleh pihak tertentu
+// ARCHIVE: Diarsipkan, tidak aktif
 export enum Status {
-  DRAFT = "DRAFT",
-  PENDING = "PENDING",
-  APPROVED = "APPROVED",
-  REJECTED = "REJECTED",
-  REVISION = "REVISION",
-  ARCHIVED = "ARCHIVED",
-  ONGOING = "ONGOING",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
-  POSTPONED = "POSTPONED",
+ DRAFT,   // Draft
+ PENDING, // Menunggu persetujuan
+ PUBLISH, // Sudah dipublikasikan
+ PRIVATE, // Hanya untuk pihak tertentu
+ ARCHIVE  // Diarsipkan
 }
 
 // Enum Letter Type

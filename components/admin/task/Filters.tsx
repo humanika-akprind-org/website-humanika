@@ -72,7 +72,7 @@ export default function TaskFilters({
               <option value="all">Semua Status</option>
               {Object.values(Status).map((status) => (
                 <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
+                  {status.toString().charAt(0).toUpperCase() + status.toString().slice(1).toLowerCase()}
                 </option>
               ))}
             </select>

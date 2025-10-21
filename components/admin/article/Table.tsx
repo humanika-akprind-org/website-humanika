@@ -33,8 +33,8 @@ export default function ArticleTable({
 
   const handleStatusFilterChange = (status: string) =>
     (status === "all" ||
-      Object.values(StatusEnum).includes(status as StatusEnum)) &&
-    setStatusFilter(status as Status | "all");
+      Object.values(StatusEnum).includes(status as unknown as StatusEnum)) &&
+    setStatusFilter(status === "all" ? "all" : (status as unknown as Status));
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("id-ID", {
@@ -49,12 +49,12 @@ export default function ArticleTable({
         return "bg-gray-100 text-gray-800";
       case StatusEnum.PENDING:
         return "bg-yellow-100 text-yellow-800";
-      case StatusEnum.APPROVED:
+      case StatusEnum.PUBLISH:
         return "bg-green-100 text-green-800";
-      case StatusEnum.REJECTED:
+      case StatusEnum.PRIVATE:
+        return "bg-blue-100 text-blue-800";
+      case StatusEnum.ARCHIVE:
         return "bg-red-100 text-red-800";
-      case StatusEnum.ARCHIVED:
-        return "bg-gray-100 text-gray-600";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -163,7 +163,7 @@ export default function ArticleTable({
       <ArticleFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
+        statusFilter={statusFilter.toString()}
         onStatusFilterChange={handleStatusFilterChange}
         periodFilter={periodFilter}
         onPeriodFilterChange={setPeriodFilter}

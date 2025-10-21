@@ -87,7 +87,7 @@ async function EditGalleryPage({ params }: { params: { id: string } }) {
           <GalleryForm
             gallery={gallery}
             accessToken={accessToken}
-            events={events as Event[]}
+            events={events as unknown as Event[]}
             onSubmit={handleSubmit}
             isLoading={false}
           />

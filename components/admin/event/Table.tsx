@@ -28,8 +28,8 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
 
   const handleStatusFilterChange = (status: string) =>
     (status === "all" ||
-      Object.values(StatusEnum).includes(status as StatusEnum)) &&
-    setStatusFilter(status as Status | "all");
+      Object.values(StatusEnum).includes(status as unknown as StatusEnum)) &&
+    setStatusFilter(status === "all" ? "all" : (status as unknown as Status));
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("id-ID", {
@@ -52,22 +52,12 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
         return "bg-gray-100 text-gray-800";
       case StatusEnum.PENDING:
         return "bg-yellow-100 text-yellow-800";
-      case StatusEnum.APPROVED:
+      case StatusEnum.PUBLISH:
         return "bg-green-100 text-green-800";
-      case StatusEnum.REJECTED:
-        return "bg-red-100 text-red-800";
-      case StatusEnum.REVISION:
-        return "bg-orange-100 text-orange-800";
-      case StatusEnum.ARCHIVED:
-        return "bg-gray-100 text-gray-600";
-      case StatusEnum.ONGOING:
+      case StatusEnum.PRIVATE:
         return "bg-blue-100 text-blue-800";
-      case StatusEnum.COMPLETED:
-        return "bg-green-100 text-green-800";
-      case StatusEnum.CANCELLED:
+      case StatusEnum.ARCHIVE:
         return "bg-red-100 text-red-800";
-      case StatusEnum.POSTPONED:
-        return "bg-yellow-100 text-yellow-600";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -174,7 +164,7 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
       <EventFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
+        statusFilter={statusFilter.toString()}
         onStatusFilterChange={handleStatusFilterChange}
         periodFilter={periodFilter}
         onPeriodFilterChange={setPeriodFilter}
@@ -310,7 +300,11 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                             alt={event.name}
                             width={48}
                             height={48}
-                            onError={() => setImageErrors(prev => new Set(prev).add(event.id))}
+                            onError={() =>
+                              setImageErrors((prev) =>
+                                new Set(prev).add(event.id)
+                              )
+                            }
                           />
                         ) : (
                           <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -331,8 +325,10 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                       <div className="text-sm text-gray-600 break-words">
                         {event.description
                           ? event.description.length > 50
-                            ? `${event.description.replace(/<[^>]*>/g, '').substring(0, 50)}...`
-                            : event.description.replace(/<[^>]*>/g, '')
+                            ? `${event.description
+                                .replace(/<[^>]*>/g, "")
+                                .substring(0, 50)}...`
+                            : event.description.replace(/<[^>]*>/g, "")
                           : "No description"}
                       </div>
                     </td>
