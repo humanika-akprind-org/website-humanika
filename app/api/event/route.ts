@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const department = searchParams.get("department") as Department;
-    const status = searchParams.get("status") as Status;
+    const status = searchParams.get("status") as unknown as Status;
     const periodId = searchParams.get("periodId");
     const workProgramId = searchParams.get("workProgramId");
     const search = searchParams.get("search");
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const where: Prisma.EventWhereInput = {};
 
     if (department) where.department = { equals: department };
-    if (status) where.status = { equals: status as PrismaStatus };
+    if (status) where.status = { equals: status as unknown as PrismaStatus };
     if (periodId) where.periodId = periodId;
     if (workProgramId) where.workProgramId = workProgramId;
     if (search) {

@@ -23,7 +23,7 @@ export default function Stats({ articles }: StatsProps) {
     (article) => article.status === Status.DRAFT
   ).length;
   const archivedArticles = articles.filter(
-    (article) => article.status === Status.ARCHIVED
+    (article) => article.status === Status.ARCHIVE
   ).length;
 
   const stats = [
