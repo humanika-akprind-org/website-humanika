@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import FinanceCategoryForm from "@/components/admin/finance/category/Form";
-import { createFinanceCategory } from "@/lib/api/finance-category";
+import { createFinanceCategory } from "@/use-cases/api/finance-category";
 import type {
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,

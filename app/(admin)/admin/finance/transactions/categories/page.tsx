@@ -8,7 +8,7 @@ import type { FinanceCategory } from "@/types/finance-category";
 import {
   getFinanceCategories,
   deleteFinanceCategory,
-} from "@/lib/api/finance-category";
+} from "@/use-cases/api/finance-category";
 import { useToast } from "@/hooks/use-toast";
 
 export default function FinanceCategoriesPage() {

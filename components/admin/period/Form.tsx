@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Period, PeriodFormData } from "@/types/period";
-import { createPeriod, updatePeriod } from "@/lib/api/period";
+import { createPeriod, updatePeriod } from "@/use-cases/api/period";
 import { FiFileText, FiCalendar } from "react-icons/fi";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";

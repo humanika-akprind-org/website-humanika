@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { callApi } from "@/lib/api/google-drive";
+import { callApi } from "@/use-cases/api/google-drive";
 import {
   useGoogleDriveFiles,
   useFileOperations,

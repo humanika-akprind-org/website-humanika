@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react";
 import { FiAlertCircle } from "react-icons/fi";
 import WorkProgramForm from "@/components/admin/work/Form";
-import type { CreateWorkProgramInput, UpdateWorkProgramInput } from "@/types/work";
+import type {
+  CreateWorkProgramInput,
+  UpdateWorkProgramInput,
+} from "@/types/work";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
-import { createWorkProgram } from "@/lib/api/work";
-import { getUsers } from "@/lib/api/user";
-import { getPeriods } from "@/lib/api/period";
+import { createWorkProgram } from "@/use-cases/api/work";
+import { getUsers } from "@/use-cases/api/user";
+import { getPeriods } from "@/use-cases/api/period";
 
 export default function AddWorkProgramPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -20,7 +23,9 @@ export default function AddWorkProgramPage() {
     fetchData();
   }, []);
 
-  const handleSubmit = async (data: CreateWorkProgramInput | UpdateWorkProgramInput) => {
+  const handleSubmit = async (
+    data: CreateWorkProgramInput | UpdateWorkProgramInput
+  ) => {
     await createWorkProgram(data as CreateWorkProgramInput);
   };
 
@@ -39,9 +44,7 @@ export default function AddWorkProgramPage() {
       }
       setPeriods(periodsData);
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Failed to fetch data"
-      );
+      setError(error instanceof Error ? error.message : "Failed to fetch data");
     } finally {
       setLoading(false);
     }
@@ -51,7 +54,7 @@ export default function AddWorkProgramPage() {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"/>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
         </div>
       </div>
     );
