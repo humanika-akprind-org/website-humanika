@@ -1,6 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
-import { getGalleries, getGallery, createGallery, updateGallery, deleteGallery } from "@/lib/api/gallery";
-import type { Gallery, CreateGalleryInput, UpdateGalleryInput, GalleryFilter } from "@/types/gallery";
+import {
+  getGalleries,
+  getGallery,
+  createGallery,
+  updateGallery,
+  deleteGallery,
+} from "@/use-cases/api/gallery";
+import type {
+  Gallery,
+  CreateGalleryInput,
+  UpdateGalleryInput,
+  GalleryFilter,
+} from "@/types/gallery";
 
 export const useGalleries = (filter?: GalleryFilter) => {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
@@ -14,7 +25,9 @@ export const useGalleries = (filter?: GalleryFilter) => {
       const data = await getGalleries(filter);
       setGalleries(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch galleries");
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch galleries"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -26,19 +39,22 @@ export const useGalleries = (filter?: GalleryFilter) => {
 
   const create = async (data: CreateGalleryInput): Promise<Gallery> => {
     const newGallery = await createGallery(data);
-    setGalleries(prev => [newGallery, ...prev]);
+    setGalleries((prev) => [newGallery, ...prev]);
     return newGallery;
   };
 
-  const update = async (id: string, data: UpdateGalleryInput): Promise<Gallery> => {
+  const update = async (
+    id: string,
+    data: UpdateGalleryInput
+  ): Promise<Gallery> => {
     const updatedGallery = await updateGallery(id, data);
-    setGalleries(prev => prev.map(g => g.id === id ? updatedGallery : g));
+    setGalleries((prev) => prev.map((g) => (g.id === id ? updatedGallery : g)));
     return updatedGallery;
   };
 
   const remove = async (id: string): Promise<void> => {
     await deleteGallery(id);
-    setGalleries(prev => prev.filter(g => g.id !== id));
+    setGalleries((prev) => prev.filter((g) => g.id !== id));
   };
 
   return {

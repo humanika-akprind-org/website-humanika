@@ -3,8 +3,15 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import FinanceCategoryForm from "@/components/admin/finance/category/Form";
-import { getFinanceCategory, updateFinanceCategory } from "@/lib/api/finance-category";
-import type { FinanceCategory, CreateFinanceCategoryInput, UpdateFinanceCategoryInput } from "@/types/finance-category";
+import {
+  getFinanceCategory,
+  updateFinanceCategory,
+} from "@/use-cases/api/finance-category";
+import type {
+  FinanceCategory,
+  CreateFinanceCategoryInput,
+  UpdateFinanceCategoryInput,
+} from "@/types/finance-category";
 import { useToast } from "@/hooks/use-toast";
 
 export default function EditFinanceCategoryPage() {
@@ -41,10 +48,15 @@ export default function EditFinanceCategoryPage() {
     }
   }, [categoryId, router, toast]);
 
-  const handleSubmit = async (data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput) => {
+  const handleSubmit = async (
+    data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput
+  ) => {
     try {
       setIsLoading(true);
-      await updateFinanceCategory(categoryId, data as UpdateFinanceCategoryInput);
+      await updateFinanceCategory(
+        categoryId,
+        data as UpdateFinanceCategoryInput
+      );
       toast({
         title: "Success",
         description: "Finance category updated successfully",

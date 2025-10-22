@@ -11,9 +11,9 @@ import type {
 } from "@/types/work";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
-import { getWorkProgram, updateWorkProgram } from "@/lib/api/work";
-import { getUsers } from "@/lib/api/user";
-import { getPeriods } from "@/lib/api/period";
+import { getWorkProgram, updateWorkProgram } from "@/use-cases/api/work";
+import { getUsers } from "@/use-cases/api/user";
+import { getPeriods } from "@/use-cases/api/period";
 
 export default function EditWorkProgramPage() {
   const params = useParams();

@@ -4,7 +4,7 @@ import {
   callApi,
   fetchDriveFiles,
   fetchDriveFolders,
-} from "@/lib/api/google-drive";
+} from "@/use-cases/api/google-drive";
 import {
   loadFolderFromLocalStorage,
   saveFolderToLocalStorage,

@@ -6,7 +6,7 @@ import FinanceCategoryForm from "@/components/admin/finance/category/Form";
 import {
   getFinanceCategory,
   updateFinanceCategory,
-} from "@/lib/api/finance-category";
+} from "@/use-cases/api/finance-category";
 import type {
   FinanceCategory,
   CreateFinanceCategoryInput,

@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { FiAlertCircle } from "react-icons/fi";
 import WorkProgramTable from "@/components/admin/work/Table";
 import type { WorkProgram } from "@/types/work";
-import { getWorkPrograms, deleteWorkProgram, deleteWorkPrograms } from "@/lib/api/work";
+import {
+  getWorkPrograms,
+  deleteWorkProgram,
+  deleteWorkPrograms,
+} from "@/use-cases/api/work";
 
 export default function WorkProgramPage() {
   const [workPrograms, setWorkPrograms] = useState<WorkProgram[]>([]);
@@ -42,7 +46,10 @@ export default function WorkProgramPage() {
 
   const handleDeleteMultiple = async (ids: string[]) => {
     try {
-      const validIds = ids.filter((id) => id && typeof id === 'string' && id.trim() !== '' && id !== 'undefined');
+      const validIds = ids.filter(
+        (id) =>
+          id && typeof id === "string" && id.trim() !== "" && id !== "undefined"
+      );
       if (validIds.length > 0) {
         await deleteWorkPrograms(validIds);
         setWorkPrograms((prev) =>
@@ -60,7 +67,7 @@ export default function WorkProgramPage() {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"/>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
         </div>
       </div>
     );

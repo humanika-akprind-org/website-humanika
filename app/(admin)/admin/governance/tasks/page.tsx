@@ -3,10 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
-import { getDepartmentTasks, deleteDepartmentTask } from "@/lib/api/task";
+import { getDepartmentTasks, deleteDepartmentTask } from "@/use-cases/api/task";
 import type { DepartmentTask } from "@/types/task";
 import TaskTable from "@/components/admin/task/Table";
-
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<DepartmentTask[]>([]);

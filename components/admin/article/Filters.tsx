@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { FiSearch, FiFilter, FiTrash2, FiChevronDown } from "react-icons/fi";
 import { Status } from "@/types/enums";
-import { PeriodApi } from "@/lib/api/period";
-import { getArticleCategories } from "@/lib/api/article-category";
+import { PeriodApi } from "@/use-cases/api/period";
+import { getArticleCategories } from "@/use-cases/api/article-category";
 
 interface ArticleFiltersProps {
   searchTerm: string;

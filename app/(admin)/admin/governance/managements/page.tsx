@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ManagementApi } from "@/lib/api/management";
-import { UserApi } from "@/lib/api/user";
-import { PeriodApi } from "@/lib/api/period";
+import { ManagementApi } from "@/use-cases/api/management";
+import { UserApi } from "@/use-cases/api/user";
+import { PeriodApi } from "@/use-cases/api/period";
 import ManagementTable from "@/components/admin/management/Table";
 import PageHeader from "@/components/admin/drive/PageHeader";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";

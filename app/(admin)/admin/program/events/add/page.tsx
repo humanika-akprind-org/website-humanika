@@ -1,5 +1,5 @@
-import { UserApi } from "@/lib/api/user";
-import { PeriodApi } from "@/lib/api/period";
+import { UserApi } from "@/use-cases/api/user";
+import { PeriodApi } from "@/use-cases/api/period";
 import EventForm from "@/components/admin/event/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";

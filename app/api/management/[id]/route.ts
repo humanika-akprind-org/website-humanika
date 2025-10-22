@@ -61,15 +61,20 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const management = await ManagementService.getManagement(params.id);
 
     // Delete the photo from Google Drive if it exists
-    if (management.photo && management.photo.includes("drive.google.com/file/d/")) {
+    if (
+      management.photo &&
+      management.photo.includes("drive.google.com/file/d/")
+    ) {
       const fileIdMatch = management.photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (fileIdMatch) {
         try {
           // Get access token from request headers or body
-          const accessToken = request.headers.get("authorization")?.replace("Bearer ", "");
+          const accessToken = request.headers
+            .get("authorization")
+            ?.replace("Bearer ", "");
 
           if (accessToken) {
-            const { callApi } = await import("@/lib/api/google-drive");
+            const { callApi } = await import("@/use-cases/api/google-drive");
             await callApi({
               action: "delete",
               fileId: fileIdMatch[1],

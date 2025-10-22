@@ -1,9 +1,13 @@
-import { UserApi } from "@/lib/api/user";
-import { PeriodApi } from "@/lib/api/period";
+import { UserApi } from "@/use-cases/api/user";
+import { PeriodApi } from "@/use-cases/api/period";
 import ArticleForm from "@/components/admin/article/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
-import type { CreateArticleInput, UpdateArticleInput, Article } from "@/types/article";
+import type {
+  CreateArticleInput,
+  UpdateArticleInput,
+  Article,
+} from "@/types/article";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -23,7 +27,9 @@ async function AddArticlePage() {
     const users = usersResponse.data?.users || [];
     const periodsData = periods || [];
 
-    const handleSubmit = async (data: CreateArticleInput | UpdateArticleInput) => {
+    const handleSubmit = async (
+      data: CreateArticleInput | UpdateArticleInput
+    ) => {
       "use server";
 
       const user = await getCurrentUser();
@@ -92,7 +98,9 @@ async function AddArticlePage() {
               <FiArrowLeft className="mr-1" />
               Back
             </Link>
-            <h1 className="text-2xl font-bold text-gray-800">Add New Article</h1>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Add New Article
+            </h1>
           </div>
           <ArticleForm
             accessToken={accessToken}

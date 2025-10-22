@@ -9,7 +9,7 @@ import {
 } from "react-icons/fi";
 import type { User } from "@/types/user";
 import { UserRole } from "@/types/enums";
-import { formatEnumValue } from "@/lib/api/user";
+import { formatEnumValue } from "@/use-cases/api/user";
 
 interface UserTableProps {
   users: User[];

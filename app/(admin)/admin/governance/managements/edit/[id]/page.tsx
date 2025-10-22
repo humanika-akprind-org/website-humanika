@@ -1,6 +1,6 @@
-import { UserApi } from "@/lib/api/user";
-import { PeriodApi } from "@/lib/api/period";
-import { ManagementApi } from "@/lib/api/management";
+import { UserApi } from "@/use-cases/api/user";
+import { PeriodApi } from "@/use-cases/api/period";
+import { ManagementApi } from "@/use-cases/api/management";
 import ManagementForm from "@/components/admin/management/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
@@ -28,26 +28,26 @@ async function EditManagementPage({ params }: { params: { id: string } }) {
 
     return (
       <AuthGuard accessToken={accessToken}>
-              <div className="p-6 max-w-4xl min-h-screen mx-auto">
-                <div className="flex items-center mb-6">
-                  <Link
-                    href="/admin/governance/managements"
-                    className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-                  >
-                    <FiArrowLeft className="mr-1" />
-                    Back
-                  </Link>
-                  <h1 className="text-2xl font-bold text-gray-800">
-                    Edit Management
-                  </h1>
-                </div>
-            <ManagementForm
-              accessToken={accessToken}
-              users={users}
-              periods={periods}
-              management={management}
-              onSubmit={handleSubmit}
-            />
+        <div className="p-6 max-w-4xl min-h-screen mx-auto">
+          <div className="flex items-center mb-6">
+            <Link
+              href="/admin/governance/managements"
+              className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
+            >
+              <FiArrowLeft className="mr-1" />
+              Back
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Edit Management
+            </h1>
+          </div>
+          <ManagementForm
+            accessToken={accessToken}
+            users={users}
+            periods={periods}
+            management={management}
+            onSubmit={handleSubmit}
+          />
         </div>
       </AuthGuard>
     );

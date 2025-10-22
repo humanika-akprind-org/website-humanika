@@ -6,6 +6,12 @@ import { getCurrentUser } from "@/lib/auth";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
+  /**
+   * 1. Extract payload --> tempat sendiri
+   * 2. Validasi --> tempat sendiri
+   * 3. Error handling
+   * 4. Response 
+   */
   try {
     const user = await getCurrentUser();
     if (!user) {

@@ -9,9 +9,7 @@ import {
 
 import type { UserRole, Department } from "@/types/enums";
 import type { User } from "@/types/user";
-import {
-  UserApi,
-} from "@/lib/api/user";
+import { UserApi } from "@/use-cases/api/user";
 import Stats from "@/components/admin/user/roles/Stats";
 import Filters from "@/components/admin/user/roles/Filters";
 import Table from "@/components/admin/user/roles/Table";

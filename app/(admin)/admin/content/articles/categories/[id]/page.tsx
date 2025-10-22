@@ -5,8 +5,14 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiArrowLeft } from "react-icons/fi";
 import ArticleCategoryForm from "@/components/admin/article/category/Form";
-import type { ArticleCategory, UpdateArticleCategoryInput } from "@/types/article-category";
-import { getArticleCategory, updateArticleCategory } from "@/lib/api/article-category";
+import type {
+  ArticleCategory,
+  UpdateArticleCategoryInput,
+} from "@/types/article-category";
+import {
+  getArticleCategory,
+  updateArticleCategory,
+} from "@/use-cases/api/article-category";
 import { useToast } from "@/hooks/use-toast";
 
 export default function EditArticleCategoryPage() {

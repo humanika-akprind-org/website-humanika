@@ -8,7 +8,7 @@ import UserFilters from "@/components/admin/user/Filters";
 import UserTable from "@/components/admin/user/Table";
 import DeleteModal from "@/components/admin/user/modal/DeleteModal";
 import PasswordResetModal from "@/components/admin/user/modal/PasswordResetModal";
-import { UserApi } from "@/lib/api/user";
+import { UserApi } from "@/use-cases/api/user";
 import type { User, UserFilters as UserFiltersType } from "@/types/user";
 
 export default function UsersPage() {
@@ -57,7 +57,13 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, currentPage, filters.role, filters.department, filters.isActive]);
+  }, [
+    searchTerm,
+    currentPage,
+    filters.role,
+    filters.department,
+    filters.isActive,
+  ]);
 
   useEffect(() => {
     fetchUsers();

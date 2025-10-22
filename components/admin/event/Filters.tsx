@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FiSearch, FiFilter, FiTrash2, FiChevronDown } from "react-icons/fi";
 import { Department, Status } from "@/types/enums";
-import { PeriodApi } from "@/lib/api/period";
+import { PeriodApi } from "@/use-cases/api/period";
 
 interface EventFiltersProps {
   searchTerm: string;
@@ -41,17 +41,20 @@ export default function EventFilters({
       try {
         setLoading(true);
         const periodData = await PeriodApi.getPeriods();
-        const periodOptions = periodData.map(period => ({ id: period.id, name: period.name }));
+        const periodOptions = periodData.map((period) => ({
+          id: period.id,
+          name: period.name,
+        }));
         setPeriods(periodOptions);
         setError(null);
       } catch (err) {
-        console.error('Error fetching periods:', err);
-        setError('Failed to load periods');
+        console.error("Error fetching periods:", err);
+        setError("Failed to load periods");
         // Fallback to static periods
         setPeriods([
-          { id: 'fallback-2024', name: '2024' },
-          { id: 'fallback-2023', name: '2023' },
-          { id: 'fallback-2022', name: '2022' }
+          { id: "fallback-2024", name: "2024" },
+          { id: "fallback-2023", name: "2023" },
+          { id: "fallback-2022", name: "2022" },
         ]);
       } finally {
         setLoading(false);
@@ -106,7 +109,8 @@ export default function EventFilters({
               <option value="all">Semua Status</option>
               {Object.values(Status).map((status) => (
                 <option key={status} value={status}>
-                  {status.toString().charAt(0).toUpperCase() + status.toString().slice(1).toLowerCase()}
+                  {status.toString().charAt(0).toUpperCase() +
+                    status.toString().slice(1).toLowerCase()}
                 </option>
               ))}
             </select>
@@ -131,9 +135,7 @@ export default function EventFilters({
             {loading && (
               <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
             )}
-            {error && (
-              <p className="text-xs text-red-500 mt-1">{error}</p>
-            )}
+            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
