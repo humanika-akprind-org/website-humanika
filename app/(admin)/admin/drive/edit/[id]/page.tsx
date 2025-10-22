@@ -1,12 +1,10 @@
 import DriveForm from "@/components/admin/drive/Form";
 import PageHeader from "@/components/admin/drive/PageHeader";
-import { getGoogleDriveFile } from "@/lib/server/google-drive";
+import { getGoogleDriveFile } from "@/lib/google-drive-api/google-drive";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 
-async function EditDriveFilePage({
-  params,
-}: { params: { id: string } }) {
+async function EditDriveFilePage({ params }: { params: { id: string } }) {
   const fileId = params.id;
 
   const cookieStore = cookies();

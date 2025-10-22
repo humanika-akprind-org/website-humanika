@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { fetchDriveFolders } from "@/lib/api/google-drive";
+import { fetchDriveFolders } from "@/use-cases/api/google-drive";
 import type { drive_v3 } from "googleapis/build/src/apis/drive/v3";
 import type { UseDriveFoldersReturn } from "@/types/google-drive";
 

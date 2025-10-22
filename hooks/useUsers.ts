@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getUsers } from "@/lib/api/user";
+import { getUsers } from "@/use-cases/api/user";
 import type { User } from "@/types/user";
 
 export function useUsers() {

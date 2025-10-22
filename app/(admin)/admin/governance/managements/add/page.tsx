@@ -1,7 +1,7 @@
-import { UserApi } from "@/lib/api/user";
-import { PeriodApi } from "@/lib/api/period";
+import { UserApi } from "@/use-cases/api/user";
+import { PeriodApi } from "@/use-cases/api/period";
 import ManagementForm from "@/components/admin/management/Form";
-import { ManagementApi } from "@/lib/api/management";
+import { ManagementApi } from "@/use-cases/api/management";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 import type { ManagementServerData } from "@/types/management";

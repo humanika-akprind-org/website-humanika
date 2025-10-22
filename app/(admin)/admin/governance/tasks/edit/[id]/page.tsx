@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getDepartmentTask, updateDepartmentTask } from "@/lib/api/task";
+import { getDepartmentTask, updateDepartmentTask } from "@/use-cases/api/task";
 import TaskForm from "@/components/admin/task/Form";
 import type { DepartmentTask, UpdateDepartmentTaskInput } from "@/types/task";
 import type { User } from "@/types/user";
-import { getUsers } from "@/lib/api/user";
+import { getUsers } from "@/use-cases/api/user";
 
 export default function EditTaskPage() {
   const params = useParams();
@@ -77,10 +77,10 @@ export default function EditTaskPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Edit Department Task</h1>
-        <p className="text-gray-600 mt-1">
-          Update department task details
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Edit Department Task
+        </h1>
+        <p className="text-gray-600 mt-1">Update department task details</p>
       </div>
 
       <TaskForm task={task} onSubmit={handleSubmit} users={users} />

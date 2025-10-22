@@ -1,9 +1,13 @@
-import { UserApi } from "@/lib/api/user";
-import { PeriodApi } from "@/lib/api/period";
+import { UserApi } from "@/use-cases/api/user";
+import { PeriodApi } from "@/use-cases/api/period";
 import ArticleForm from "@/components/admin/article/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
-import type { CreateArticleInput, UpdateArticleInput, Article } from "@/types/article";
+import type {
+  CreateArticleInput,
+  UpdateArticleInput,
+  Article,
+} from "@/types/article";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -45,7 +49,9 @@ async function EditArticlePage({ params }: { params: { id: string } }) {
     const users = usersResponse.data?.users || [];
     const periodsData = periods || [];
 
-    const handleSubmit = async (data: CreateArticleInput | UpdateArticleInput) => {
+    const handleSubmit = async (
+      data: CreateArticleInput | UpdateArticleInput
+    ) => {
       "use server";
 
       const user = await getCurrentUser();

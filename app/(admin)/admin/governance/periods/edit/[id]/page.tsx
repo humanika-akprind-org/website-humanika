@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getPeriod } from "@/lib/api/period";
+import { getPeriod } from "@/use-cases/api/period";
 import PeriodForm from "@/components/admin/period/Form";
 
 interface EditPeriodPageProps {

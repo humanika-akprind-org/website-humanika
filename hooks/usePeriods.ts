@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getPeriods } from "@/lib/api/period";
+import { getPeriods } from "@/use-cases/api/period";
 import type { Period } from "@/types/period";
 
 export function usePeriods() {

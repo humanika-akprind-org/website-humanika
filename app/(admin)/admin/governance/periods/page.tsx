@@ -3,7 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Period } from "@/types/period";
-import { getPeriods, deletePeriod, reorderPeriods } from "@/lib/api/period";
+import {
+  getPeriods,
+  deletePeriod,
+  reorderPeriods,
+} from "@/use-cases/api/period";
 import PeriodStats from "@/components/admin/period/Stats";
 import PeriodFilters from "@/components/admin/period/Filters";
 import PeriodTable from "@/components/admin/period/Table";

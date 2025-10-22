@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createDepartmentTask } from "@/lib/api/task";
+import { createDepartmentTask } from "@/use-cases/api/task";
 import TaskForm from "@/components/admin/task/Form";
-import type { CreateDepartmentTaskInput, UpdateDepartmentTaskInput } from "@/types/task";
+import type {
+  CreateDepartmentTaskInput,
+  UpdateDepartmentTaskInput,
+} from "@/types/task";
 import type { User } from "@/types/user";
-import { getUsers } from "@/lib/api/user";
+import { getUsers } from "@/use-cases/api/user";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function AddTaskPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -36,7 +39,9 @@ export default function AddTaskPage() {
     fetchUsers();
   }, []);
 
-  const handleSubmit = async (data: CreateDepartmentTaskInput | UpdateDepartmentTaskInput) => {
+  const handleSubmit = async (
+    data: CreateDepartmentTaskInput | UpdateDepartmentTaskInput
+  ) => {
     await createDepartmentTask(data as CreateDepartmentTaskInput);
   };
 
@@ -59,10 +64,10 @@ export default function AddTaskPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Add Department Task</h1>
-        <p className="text-gray-600 mt-1">
-          Create a new department task
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Add Department Task
+        </h1>
+        <p className="text-gray-600 mt-1">Create a new department task</p>
       </div>
 
       <TaskForm onSubmit={handleSubmit} users={users} />

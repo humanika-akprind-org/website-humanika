@@ -4,15 +4,20 @@ import { useState } from "react";
 import Link from "next/link";
 import { FiArrowLeft } from "react-icons/fi";
 import ArticleCategoryForm from "@/components/admin/article/category/Form";
-import type { CreateArticleCategoryInput, UpdateArticleCategoryInput } from "@/types/article-category";
-import { createArticleCategory } from "@/lib/api/article-category";
+import type {
+  CreateArticleCategoryInput,
+  UpdateArticleCategoryInput,
+} from "@/types/article-category";
+import { createArticleCategory } from "@/use-cases/api/article-category";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AddArticleCategoryPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (data: CreateArticleCategoryInput | UpdateArticleCategoryInput) => {
+  const handleSubmit = async (
+    data: CreateArticleCategoryInput | UpdateArticleCategoryInput
+  ) => {
     setIsLoading(true);
     try {
       await createArticleCategory(data as CreateArticleCategoryInput);
@@ -46,10 +51,7 @@ export default function AddArticleCategoryPage() {
       </div>
 
       {/* Form */}
-      <ArticleCategoryForm
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-      />
+      <ArticleCategoryForm onSubmit={handleSubmit} isLoading={isLoading} />
     </div>
   );
 }

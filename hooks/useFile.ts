@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { callApi } from "@/lib/api/google-drive";
+import { callApi } from "@/use-cases/api/google-drive";
 
 export function useFile(accessToken: string): {
   isLoading: boolean;

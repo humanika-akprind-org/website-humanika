@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiSearch, FiFilter, FiChevronDown, FiTrash2 } from "react-icons/fi";
 import type { UserFilters as UserFiltersType } from "../../../types/user";
-import { userRoleOptions, departmentOptions } from "@/lib/api/user";
+import { userRoleOptions, departmentOptions } from "@/use-cases/api/user";
 
 interface UserFiltersProps {
   filters: UserFiltersType;

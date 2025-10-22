@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FiSearch, FiFilter, FiTrash2, FiChevronDown } from "react-icons/fi";
 import { Department } from "@/types/enums";
-import { PeriodApi } from "@/lib/api/period";
+import { PeriodApi } from "@/use-cases/api/period";
 
 interface PeriodFiltersProps {
   searchTerm: string;
@@ -41,14 +41,14 @@ export default function PeriodFilters({
       try {
         setLoading(true);
         const periodData = await PeriodApi.getPeriods();
-        const periodNames = periodData.map(period => period.name);
+        const periodNames = periodData.map((period) => period.name);
         setPeriods(periodNames);
         setError(null);
       } catch (err) {
-        console.error('Error fetching periods:', err);
-        setError('Failed to load periods');
+        console.error("Error fetching periods:", err);
+        setError("Failed to load periods");
         // Fallback to static periods
-        setPeriods(['2024', '2023', '2022']);
+        setPeriods(["2024", "2023", "2022"]);
       } finally {
         setLoading(false);
       }
@@ -124,9 +124,7 @@ export default function PeriodFilters({
             {loading && (
               <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
             )}
-            {error && (
-              <p className="text-xs text-red-500 mt-1">{error}</p>
-            )}
+            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">

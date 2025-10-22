@@ -5,7 +5,10 @@ import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
 import ArticleCategoryTable from "@/components/admin/article/category/Table";
 import type { ArticleCategory } from "@/types/article-category";
-import { getArticleCategories, deleteArticleCategory } from "@/lib/api/article-category";
+import {
+  getArticleCategories,
+  deleteArticleCategory,
+} from "@/use-cases/api/article-category";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ArticleCategoriesPage() {
@@ -47,7 +50,8 @@ export default function ArticleCategoriesPage() {
       console.error("Error deleting category:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete category",
+        description:
+          error instanceof Error ? error.message : "Failed to delete category",
         variant: "destructive",
       });
     }
@@ -87,10 +91,7 @@ export default function ArticleCategoriesPage() {
           </div>
         </div>
       ) : (
-        <ArticleCategoryTable
-          categories={categories}
-          onDelete={handleDelete}
-        />
+        <ArticleCategoryTable categories={categories} onDelete={handleDelete} />
       )}
     </div>
   );

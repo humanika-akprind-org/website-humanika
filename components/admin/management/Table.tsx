@@ -6,7 +6,7 @@ import Image from "next/image";
 import type { Management } from "@/types/management";
 import { Department, Position } from "@/types/enums";
 import DeleteModal from "./modal/DeleteModal";
-import { ManagementApi } from "@/lib/api/management";
+import { ManagementApi } from "@/use-cases/api/management";
 import { useFileOperations } from "@/hooks/drive/form/useFileOperations";
 import PeriodFilters from "./Filters";
 import ManagementStats from "./Stats";
@@ -570,9 +570,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
       <DeleteModal
         isOpen={bulkDeleteModal.isOpen}
         managementName={`${bulkDeleteModal.selectedIds.length} selected managements`}
-        onClose={() =>
-          setBulkDeleteModal({ isOpen: false, selectedIds: [] })
-        }
+        onClose={() => setBulkDeleteModal({ isOpen: false, selectedIds: [] })}
         onConfirm={confirmBulkDelete}
         isLoading={isOperating}
       />

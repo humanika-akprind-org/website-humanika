@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getEvents } from "@/lib/api/event";
+import { getEvents } from "@/use-cases/api/event";
 import type { Event, EventFilter } from "@/types/event";
 
 export function useEvents(filter?: EventFilter) {
@@ -36,7 +36,9 @@ export function useEvents(filter?: EventFilter) {
           const data = await getEvents(filter);
           setEvents(data);
         } catch (err) {
-          setError(err instanceof Error ? err.message : "Failed to fetch events");
+          setError(
+            err instanceof Error ? err.message : "Failed to fetch events"
+          );
         } finally {
           setIsLoading(false);
         }
