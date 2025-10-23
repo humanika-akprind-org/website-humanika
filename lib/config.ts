@@ -82,6 +82,19 @@ class AppConfig {
     );
   }
 
+  get structureFolderId(): string {
+    return (
+      process.env.STRUCTURE_FOLDER_ID || "1iyhli_RGSyKFzABF5phpww7XtgixyQLd"
+    );
+  }
+
+  get organizationalStructureFolderId(): string {
+    return (
+      process.env.ORGANIZATIONAL_STRUCTURE_FOLDER_ID ||
+      "16jQ6MqEYTBWejHFxr8iGUmMrKKvJGY4D"
+    );
+  }
+
   // Email
   get resendApiKey(): string {
     return process.env.RESEND_API_KEY || "";
@@ -110,6 +123,8 @@ export const {
   galleryFolderId,
   articleFolderId,
   documentFolderId,
+  structureFolderId,
+  organizationalStructureFolderId,
   resendApiKey,
 } = appConfig;
 

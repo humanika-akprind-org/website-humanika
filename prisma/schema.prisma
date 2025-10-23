@@ -454,7 +454,7 @@ model OrganizationalStructure {
   status   Status   @default(PENDING) // Status struktur organisasi
   periodId String     @db.ObjectId // ID periode struktur organisasi
   decree   String   // URL file Surat Keputusan (SK)
-  structure   String?  // JSX as string
+  structure   String?  // URL file struktur organisasi
   createdAt DateTime @default(now()) // Waktu pembuatan struktur
   updatedAt DateTime @updatedAt // Waktu terakhir update
 
