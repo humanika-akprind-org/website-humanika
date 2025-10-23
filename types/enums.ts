@@ -62,11 +62,11 @@ export enum DocumentType {
 // PRIVATE: Hanya dapat diakses oleh pihak tertentu
 // ARCHIVE: Diarsipkan, tidak aktif
 export enum Status {
- DRAFT,   // Draft
- PENDING, // Menunggu persetujuan
- PUBLISH, // Sudah dipublikasikan
- PRIVATE, // Hanya untuk pihak tertentu
- ARCHIVE  // Diarsipkan
+  DRAFT = "DRAFT", // Draft
+  PENDING = "PENDING", // Menunggu persetujuan
+  PUBLISH = "PUBLISH", // Sudah dipublikasikan
+  PRIVATE = "PRIVATE", // Hanya untuk pihak tertentu
+  ARCHIVE = "ARCHIVE", // Diarsipkan
 }
 
 // Enum Letter Type

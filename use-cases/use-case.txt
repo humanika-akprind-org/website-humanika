@@ -1,1 +1,0 @@
-Semua logic dari api

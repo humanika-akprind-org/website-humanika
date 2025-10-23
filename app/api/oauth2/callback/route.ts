@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { oauth2Client } from "@/lib/google-oauth";
+import { oauth2Client } from "@/lib/google-oauth/google-oauth";
 import { cookies } from "next/headers";
 import { isProduction } from "@/lib/config";
 
