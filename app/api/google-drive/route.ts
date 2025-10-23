@@ -17,6 +17,16 @@ export async function POST(request: NextRequest) {
       const folderId = formData.get("folderId") as string;
       const fileName = formData.get("fileName") as string;
 
+      if (!accessToken) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Access token is required",
+          },
+          { status: 401 }
+        );
+      }
+
       if (action !== "upload" || !file) {
         throw new Error("Invalid upload request");
       }
@@ -63,7 +73,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle other actions (rename, delete, etc.)
-    const { action, fileId, fileName, accessToken, permission } = await request.json();
+    const { action, fileId, fileName, accessToken, permission } =
+      await request.json();
+
+    if (!accessToken) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Access token is required",
+        },
+        { status: 401 }
+      );
+    }
 
     const drive = google.drive({
       version: "v3",
