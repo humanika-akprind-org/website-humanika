@@ -76,6 +76,12 @@ class AppConfig {
     return process.env.ARTICLE_FOLDER_ID || "1TF3amcf7AJDMtsK7PzKpjyoCGhrrgrI1";
   }
 
+  get documentFolderId(): string {
+    return (
+      process.env.DOCUMENT_FOLDER_ID || "19H6acPYsoS8bYj0XfWzkl-N_pC8ttZ-t"
+    );
+  }
+
   // Email
   get resendApiKey(): string {
     return process.env.RESEND_API_KEY || "";
@@ -103,6 +109,7 @@ export const {
   eventThumbnailFolderId,
   galleryFolderId,
   articleFolderId,
+  documentFolderId,
   resendApiKey,
 } = appConfig;
 
