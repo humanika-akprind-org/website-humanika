@@ -2,46 +2,34 @@
 
 import { useState, useEffect } from "react";
 import { FiSearch, FiFilter, FiTrash2, FiChevronDown } from "react-icons/fi";
-import { Department, Status } from "@/types/enums";
+import { Status } from "@/types/enums";
 import { PeriodApi } from "@/use-cases/api/period";
-import { useWorkPrograms } from "@/hooks/useWorkPrograms";
 
-interface EventFiltersProps {
+interface StructureFiltersProps {
   searchTerm: string;
   onSearchChange: (term: string) => void;
   statusFilter: string;
   onStatusFilterChange: (status: string) => void;
   periodFilter: string;
   onPeriodFilterChange: (period: string) => void;
-  departmentFilter: string;
-  onDepartmentFilterChange: (department: string) => void;
-  workProgramFilter: string;
-  onWorkProgramFilterChange: (workProgram: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
 }
 
-export default function EventFilters({
+export default function StructureFilters({
   searchTerm,
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
   periodFilter,
   onPeriodFilterChange,
-  departmentFilter,
-  onDepartmentFilterChange,
-  workProgramFilter,
-  onWorkProgramFilterChange,
   selectedCount,
   onDeleteSelected,
-}: EventFiltersProps) {
+}: StructureFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Fetch work programs
-  const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
 
   // Fetch periods on component mount
   useEffect(() => {
@@ -81,7 +69,7 @@ export default function EventFilters({
           </div>
           <input
             type="text"
-            placeholder="Cari event..."
+            placeholder="Cari struktur organisasi..."
             className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -104,7 +92,7 @@ export default function EventFilters({
 
       {/* Advanced Filters */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Status
@@ -144,48 +132,6 @@ export default function EventFilters({
               <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
             )}
             {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Department
-            </label>
-            <select
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={departmentFilter}
-              onChange={(e) =>
-                onDepartmentFilterChange(e.target.value as Department | "all")
-              }
-            >
-              <option value="all">All Departments</option>
-              {Object.values(Department).map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Work Program
-            </label>
-            <select
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={workProgramFilter}
-              onChange={(e) => onWorkProgramFilterChange(e.target.value)}
-              disabled={workProgramsLoading}
-            >
-              <option value="all">Semua Work Program</option>
-              {workPrograms.map((workProgram) => (
-                <option key={workProgram.id} value={workProgram.id}>
-                  {workProgram.name}
-                </option>
-              ))}
-            </select>
-            {workProgramsLoading && (
-              <p className="text-xs text-gray-500 mt-1">
-                Loading work programs...
-              </p>
-            )}
           </div>
           <div className="flex items-end">
             <button
