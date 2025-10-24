@@ -9,6 +9,7 @@ import FinanceTable from "@/components/admin/finance/transaction/Table";
 import DeleteModal from "@/components/admin/finance/modal/DeleteModal";
 import type { Finance } from "@/types/finance";
 import { useToast } from "@/hooks/use-toast";
+import { useFile } from "@/hooks/useFile";
 
 export default function FinanceTransactionsPage() {
   const [_finances, setFinances] = useState<Finance[]>([]);
@@ -21,6 +22,7 @@ export default function FinanceTransactionsPage() {
   });
 
   const { toast } = useToast();
+  const { deleteFile } = useFile("");
 
   const fetchFinances = useCallback(async () => {
     try {
@@ -56,6 +58,24 @@ export default function FinanceTransactionsPage() {
 
   const handleDelete = async (financeId: string) => {
     try {
+      // First, get the finance to check if it has a file
+      const financeResponse = await fetch(`/api/finance/${financeId}`);
+      if (!financeResponse.ok) {
+        throw new Error("Failed to fetch finance details");
+      }
+      const finance = await financeResponse.json();
+
+      // Delete the file from Google Drive if it exists
+      if (finance.fileId) {
+        const fileDeleted = await deleteFile(finance.fileId);
+        if (!fileDeleted) {
+          console.warn(
+            "Failed to delete file from Google Drive, but continuing with database deletion"
+          );
+        }
+      }
+
+      // Delete from database
       const response = await fetch(`/api/finance/${financeId}`, {
         method: "DELETE",
       });
@@ -80,8 +100,6 @@ export default function FinanceTransactionsPage() {
         description: "Failed to delete transaction",
         variant: "destructive",
       });
-    } finally {
-      setDeleteModal({ isOpen: false, financeId: "", financeName: "" });
     }
   };
 
@@ -146,7 +164,11 @@ export default function FinanceTransactionsPage() {
           </div>
         </div>
       ) : (
-        <FinanceTable finances={filteredFinances} onDelete={handleDelete} />
+        <FinanceTable
+          finances={filteredFinances}
+          onDelete={handleDelete}
+          accessToken={undefined}
+        />
       )}
 
       {/* Delete Modal */}

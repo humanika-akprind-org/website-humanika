@@ -60,12 +60,12 @@ export default function UserTable({
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     return (
-      date.toLocaleDateString() +
+      dateObj.toLocaleDateString() +
       " " +
-      date.toLocaleTimeString([], {
+      dateObj.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       })

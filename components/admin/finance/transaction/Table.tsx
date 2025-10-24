@@ -21,6 +21,7 @@ import type { Finance } from "@/types/finance";
 interface FinanceTableProps {
   finances: Finance[];
   onDelete: (id: string) => void;
+  accessToken?: string;
 }
 
 export default function FinanceTable({
@@ -123,13 +124,15 @@ export default function FinanceTable({
   };
 
   // Execute deletion
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (currentFinance) {
       // Delete single finance
-      onDelete(currentFinance.id);
+      await onDelete(currentFinance.id);
     } else if (selectedFinances.length > 0) {
       // Delete multiple finances
-      selectedFinances.forEach((id) => onDelete(id));
+      for (const id of selectedFinances) {
+        await onDelete(id);
+      }
       setSelectedFinances([]);
     }
     setShowDeleteModal(false);

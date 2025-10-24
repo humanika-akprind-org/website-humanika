@@ -14,7 +14,17 @@ export interface Event {
     id: string;
     name: string;
     email: string;
+    username: string;
+    role: UserRole;
     department: Department | null;
+    position: Position | null;
+    isActive: boolean;
+    verifiedAccount: boolean;
+    attemptLogin: number;
+    blockExpires: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+    avatarColor: string;
   };
   goal: string;
   department: Department;

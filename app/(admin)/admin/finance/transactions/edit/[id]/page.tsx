@@ -5,7 +5,13 @@ import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceCategory } from "@/types/finance-category";
 import type { Period } from "@/types/period";
 import type { Event } from "@/types/event";
-import type { Department, Status, FinanceType, UserRole } from "@/types/enums";
+import type {
+  Department,
+  Status,
+  FinanceType,
+  UserRole,
+  Position,
+} from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
@@ -125,6 +131,17 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
               id: true,
               name: true,
               email: true,
+              username: true,
+              role: true,
+              department: true,
+              position: true,
+              isActive: true,
+              verifiedAccount: true,
+              attemptLogin: true,
+              blockExpires: true,
+              createdAt: true,
+              updatedAt: true,
+              avatarColor: true,
             },
           },
         },
@@ -293,7 +310,22 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
             updatedAt: finance.event.updatedAt,
           }
         : undefined,
-      user: finance.user,
+      user: {
+        id: finance.user.id,
+        name: finance.user.name,
+        email: finance.user.email,
+        username: finance.user.username,
+        role: finance.user.role as UserRole,
+        department: finance.user.department as Department | null,
+        position: finance.user.position as Position | null,
+        isActive: finance.user.isActive,
+        verifiedAccount: finance.user.verifiedAccount,
+        attemptLogin: finance.user.attemptLogin,
+        blockExpires: finance.user.blockExpires,
+        createdAt: finance.user.createdAt,
+        updatedAt: finance.user.updatedAt,
+        avatarColor: finance.user.avatarColor,
+      },
       createdAt: finance.createdAt,
       updatedAt: finance.updatedAt,
     };
@@ -443,7 +475,9 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
         // Re-throw redirect errors to allow Next.js to handle them
         if (
           error instanceof Error &&
-          (error as any).digest?.startsWith("NEXT_REDIRECT")
+          (error as Error & { digest?: string }).digest?.startsWith(
+            "NEXT_REDIRECT"
+          )
         ) {
           throw error;
         }
