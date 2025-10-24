@@ -17,20 +17,19 @@ export default function LetterFilters({
   const [filters, setFilters] = useState<LetterFilter>({});
   const [showFilters, setShowFilters] = useState(false);
 
-  const handleFilterChange = (
-    key: keyof LetterFilter,
-    value: string | undefined
+  const handleFilterChange = <K extends keyof LetterFilter>(
+    key: K,
+    value: LetterFilter[K] | undefined
   ) => {
     const newFilters = { ...filters };
     if (value === "" || value === undefined) {
       delete newFilters[key];
     } else {
-      (newFilters as any)[key] = value;
+      newFilters[key] = value;
     }
     setFilters(newFilters);
     onFilter(newFilters);
   };
-
   const clearFilters = () => {
     setFilters({});
     onFilter({});

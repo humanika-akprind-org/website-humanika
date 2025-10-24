@@ -63,9 +63,9 @@ export default function LetterForm({
 
   const [isLoadingState, setIsLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [existingLetter, setExistingLetter] = useState<
-    string | null | undefined
-  >(letter?.letter);
+  const [existingLetter, setExistingLetter] = useState<string | undefined>(
+    letter?.letter || undefined
+  );
   const [removedLetter, setRemovedLetter] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -97,7 +97,7 @@ export default function LetterForm({
         periodId: letter.periodId || "",
         eventId: letter.eventId || "",
       });
-      setExistingLetter(letter.letter);
+      setExistingLetter(letter.letter || undefined);
     }
   }, [letter]);
 
@@ -136,8 +136,12 @@ export default function LetterForm({
     }
 
     // Clear form state
-    setFormData((prev) => ({ ...prev, letterFile: undefined }));
-    setExistingLetter(null);
+    setFormData((prev) => ({
+      ...prev,
+      letterFile: undefined,
+      letter: "",
+    }));
+    setExistingLetter(undefined);
   };
 
   const validateForm = () => {
@@ -185,22 +189,29 @@ export default function LetterForm({
       }
 
       // Handle letter deletion if marked for removal
-      let letterUrl: string | null | undefined = existingLetter;
+      let letterUrl: string | undefined = undefined;
 
       if (removedLetter) {
-        // Delete from Google Drive and set letterUrl to null
+        // Delete file from Google Drive if it exists
         if (letter?.letter) {
           const fileId = getFileIdFromLetter(letter.letter);
           if (fileId) {
             try {
               await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete letter:", deleteError);
-              // Continue with submission even if delete fails
+            } catch (error) {
+              const deleteError = error as { status?: number };
+              // Ignore 404 errors (file already deleted)
+              if (!deleteError.status || deleteError.status !== 404) {
+                console.warn("Failed to delete letter file:", deleteError);
+              }
+              // Continue with submission regardless of error
             }
           }
         }
-        letterUrl = null;
+        // Keep letterUrl as undefined to ensure removal from database
+      } else {
+        // If not removing, keep existing letter
+        letterUrl = existingLetter || undefined;
       }
 
       if (formData.letterFile) {
@@ -210,9 +221,13 @@ export default function LetterForm({
           if (fileId) {
             try {
               await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old letter:", deleteError);
-              // Continue with upload even if delete fails
+            } catch (error) {
+              const deleteError = error as { status?: number };
+              // Only log non-404 errors (404 means file is already gone)
+              if (!deleteError.status || deleteError.status !== 404) {
+                console.warn("Failed to delete old letter:", deleteError);
+              }
+              // Continue with upload regardless of error
             }
           }
         }
@@ -249,12 +264,16 @@ export default function LetterForm({
       }
 
       // Submit form data with letter URL (exclude letterFile for server action)
-      const { letterFile: _, ...dataToSend } = formData;
+      const { letterFile: _, letter: __, ...dataToSend } = formData; // Exclude both letterFile and letter field
 
       // Prepare data to send
       const submitData = {
         ...dataToSend,
-        letter: letterUrl || undefined,
+        letter: removedLetter
+          ? undefined
+          : formData.letterFile
+          ? letterUrl
+          : existingLetter, // Set to undefined when removed, new url when uploading, or keep existing
         date: new Date(formData.date).toISOString(),
         periodId: formData.periodId || undefined,
         eventId: formData.eventId || undefined,
