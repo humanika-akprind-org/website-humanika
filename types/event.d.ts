@@ -14,7 +14,7 @@ export interface Event {
     id: string;
     name: string;
     email: string;
-    department?: Department | null;
+    department: Department | null;
   };
   goal: string;
   department: Department;
