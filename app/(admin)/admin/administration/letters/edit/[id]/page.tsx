@@ -1,116 +1,133 @@
-"use client";
+import LetterForm from "@/components/admin/letter/Form";
+import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
+import { cookies } from "next/headers";
+import type {
+  CreateLetterInput,
+  UpdateLetterInput,
+  Letter,
+} from "@/types/letter";
 
-import React, { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { getLetter, updateLetter } from "@/use-cases/api/letter";
+import { FiArrowLeft } from "react-icons/fi";
+import Link from "next/link";
+import prisma from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getPeriods } from "@/use-cases/api/period";
 import { getEvents } from "@/use-cases/api/event";
-import type { Letter, UpdateLetterInput } from "@/types/letter";
-import type { Period } from "@/types/period";
-import type { Event } from "@/types/event";
-import LetterForm from "@/components/admin/letter/Form";
 
-export default function EditLetterPage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
+async function EditLetterPage({ params }: { params: { id: string } }) {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("google_access_token")?.value || "";
 
-  const [letter, setLetter] = useState<Letter | undefined>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingData, setIsLoadingData] = useState(true);
-  const [periods, setPeriods] = useState<Period[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [accessToken, setAccessToken] = useState<string>("");
+  try {
+    // Fetch letter data and related data
+    const [letter, periodsResponse, eventsResponse] = await Promise.all([
+      prisma.letter.findUnique({
+        where: { id: params.id },
+        include: {
+          createdBy: true,
+          approvedBy: true,
+          period: true,
+          event: true,
+          attachments: true,
+          approvals: true,
+        },
+      }),
+      getPeriods(),
+      getEvents(),
+    ]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoadingData(true);
+    if (!letter) {
+      notFound();
+    }
 
-        // Fetch letter data
-        const letterData = await getLetter(id);
-        setLetter(letterData);
+    // Transform letter data to match Letter type
+    const transformedLetter = letter as unknown as Letter;
+    const periods = periodsResponse || [];
+    const events = eventsResponse || [];
 
-        // Fetch periods
-        const periodsData = await getPeriods();
-        setPeriods(periodsData);
+    const handleSubmit = async (
+      data: CreateLetterInput | UpdateLetterInput
+    ) => {
+      "use server";
 
-        // Fetch events
-        const eventsData = await getEvents();
-        setEvents(eventsData);
-
-        // Get access token
-        const token = localStorage.getItem("accessToken") || "";
-        setAccessToken(token);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-        router.push("/admin/administration/letters");
-      } finally {
-        setIsLoadingData(false);
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
       }
+
+      // Cast data to UpdateLetterInput since this is the edit page
+      const letterData = data as UpdateLetterInput;
+
+      if (!letterData.regarding || !letterData.number || !letterData.date) {
+        throw new Error("Missing required fields");
+      }
+
+      // Prepare data to send
+      const submitData = {
+        regarding: letterData.regarding,
+        number: letterData.number,
+        date: new Date(letterData.date),
+        type: letterData.type,
+        priority: letterData.priority,
+        origin: letterData.origin,
+        destination: letterData.destination,
+        body: letterData.body,
+        letter: letterData.letter,
+        notes: letterData.notes,
+        // status: letterData.status || Status.DRAFT, // Status is not in UpdateLetterInput
+        approvedById: letterData.approvedById,
+        periodId: letterData.periodId,
+        eventId: letterData.eventId,
+      };
+
+      await prisma.letter.update({
+        where: { id: params.id },
+        data: submitData,
+      });
+
+      redirect("/admin/administration/letters");
     };
 
-    if (id) {
-      fetchData();
-    }
-  }, [id, router]);
-
-  const handleSubmit = async (data: UpdateLetterInput) => {
-    setIsLoading(true);
-    try {
-      await updateLetter(id, data);
-      router.push("/admin/administration/letters");
-    } catch (error) {
-      console.error("Failed to update letter:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (isLoadingData) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        <span className="ml-2 text-gray-600">Loading letter...</span>
-      </div>
+      <AuthGuard accessToken={accessToken}>
+        <div className="p-6 max-w-4xl min-h-screen mx-auto">
+          <div className="flex items-center mb-6">
+            <Link
+              href="/admin/administration/letters"
+              className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
+            >
+              <FiArrowLeft className="mr-1" />
+              Back
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-800">Edit Letter</h1>
+          </div>
+          <LetterForm
+            letter={transformedLetter}
+            accessToken={accessToken}
+            events={events}
+            periods={periods}
+            onSubmit={handleSubmit}
+          />
+        </div>
+      </AuthGuard>
     );
-  }
-
-  if (!letter) {
+  } catch (error) {
+    console.error("Error loading form data:", error);
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <h3 className="text-lg font-medium text-gray-900">
-            Letter not found
-          </h3>
-          <p className="text-gray-600">
-            The letter you&apos;re looking for doesn&apos;t exist.
-          </p>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="text-center text-red-500">
+              <h2 className="text-xl font-semibold mb-4">Error Loading Form</h2>
+              <p>{error instanceof Error ? error.message : "Unknown error"}</p>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Edit Letter</h1>
-          <p className="text-gray-600">Update letter information and details</p>
-        </div>
-      </div>
-
-      {/* Form */}
-      <LetterForm
-        letter={letter}
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-        accessToken={accessToken}
-        periods={periods}
-        events={events}
-      />
-    </div>
-  );
 }
+
+export default EditLetterPage;

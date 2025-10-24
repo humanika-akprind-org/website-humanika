@@ -103,13 +103,6 @@ class AppConfig {
     return process.env.LETTER_FOLDER_ID || "1ut1OpVtAxHCC62N_rai-EunNqbnXd80_";
   }
 
-  get letterAttachmentFolderId(): string {
-    return (
-      process.env.LETTER_ATTACHMENT_FOLDER_ID ||
-      "1ut1OpVtAxHCC62N_rai-EunNqbnXd80_"
-    );
-  }
-
   // Email
   get resendApiKey(): string {
     return process.env.RESEND_API_KEY || "";
