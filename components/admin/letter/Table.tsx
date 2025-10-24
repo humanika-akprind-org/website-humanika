@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { FiFileText, FiUser } from "react-icons/fi";
 import type { Letter } from "@/types/letter";
+import type { Status } from "@/types/enums";
 import {
-  Status,
   LetterType,
   LetterPriority,
   Status as StatusEnum,
@@ -22,35 +22,10 @@ interface LetterTableProps {
 
 export default function LetterTable({ letters, onDelete }: LetterTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
-  const [typeFilter, setTypeFilter] = useState<LetterType | "all">("all");
-  const [priorityFilter, setPriorityFilter] = useState<LetterPriority | "all">(
-    "all"
-  );
-  const [userFilter, setUserFilter] = useState<string>("all");
   const [selectedLetters, setSelectedLetters] = useState<string[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [letterToDelete, setLetterToDelete] = useState<Letter | null>(null);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
-
-  const handleStatusFilterChange = (status: string) =>
-    (status === "all" ||
-      Object.values(StatusEnum).includes(status as unknown as StatusEnum)) &&
-    setStatusFilter(status === "all" ? "all" : (status as unknown as Status));
-
-  const handleTypeFilterChange = (type: string) =>
-    (type === "all" ||
-      Object.values(LetterType).includes(type as unknown as LetterType)) &&
-    setTypeFilter(type === "all" ? "all" : (type as unknown as LetterType));
-
-  const handlePriorityFilterChange = (priority: string) =>
-    (priority === "all" ||
-      Object.values(LetterPriority).includes(
-        priority as unknown as LetterPriority
-      )) &&
-    setPriorityFilter(
-      priority === "all" ? "all" : (priority as unknown as LetterPriority)
-    );
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("id-ID", {
@@ -123,7 +98,7 @@ export default function LetterTable({ letters, onDelete }: LetterTableProps) {
     setIsBulkDelete(false);
   };
 
-  // Filter letters based on search term and filters
+  // Filter letters based on search term
   const filteredLetters = letters.filter((letter) => {
     const matchesSearch =
       letter.regarding.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -131,24 +106,7 @@ export default function LetterTable({ letters, onDelete }: LetterTableProps) {
       letter.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
       letter.destination.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === "all" || letter.status === statusFilter;
-
-    const matchesType = typeFilter === "all" || letter.type === typeFilter;
-
-    const matchesPriority =
-      priorityFilter === "all" || letter.priority === priorityFilter;
-
-    const matchesUser =
-      userFilter === "all" || letter.createdBy.id === userFilter;
-
-    return (
-      matchesSearch &&
-      matchesStatus &&
-      matchesType &&
-      matchesPriority &&
-      matchesUser
-    );
+    return matchesSearch;
   });
 
   // Toggle letter selection
@@ -189,8 +147,6 @@ export default function LetterTable({ letters, onDelete }: LetterTableProps) {
       <LetterFilters
         onFilter={(filter) => {
           setSearchTerm(filter.search || "");
-          if (filter.type) handleTypeFilterChange(filter.type);
-          if (filter.priority) handlePriorityFilterChange(filter.priority);
         }}
         isLoading={false}
       />
