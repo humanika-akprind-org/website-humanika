@@ -15,7 +15,22 @@ export interface WorkProgram {
   periodId: string;
   period: Period;
   responsibleId: string;
-  responsible: User;
+  responsible: {
+    id: string;
+    name: string;
+    email: string;
+    username: string;
+    role: UserRole;
+    department: Department | null;
+    position: Position | null;
+    isActive: boolean;
+    verifiedAccount: boolean;
+    attemptLogin: number;
+    blockExpires: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+    avatarColor: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

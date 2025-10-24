@@ -7,6 +7,7 @@ import StructureTable from "@/components/admin/structure/Table";
 import DeleteModal from "@/components/admin/structure/modal/DeleteModal";
 import type { OrganizationalStructure } from "@/types/structure";
 import { useToast } from "@/hooks/use-toast";
+import { useFile } from "@/hooks/useFile";
 
 export default function StructuresPage() {
   const [_structures, setStructures] = useState<OrganizationalStructure[]>([]);
@@ -18,9 +19,11 @@ export default function StructuresPage() {
     isOpen: false,
     structureId: "",
     structureName: "",
+    fileId: "",
   });
 
   const { toast } = useToast();
+  const { deleteFile } = useFile("");
 
   const fetchStructures = useCallback(async () => {
     try {
@@ -56,6 +59,24 @@ export default function StructuresPage() {
 
   const handleDelete = async (structureId: string) => {
     try {
+      // First, get the structure to check if it has a file
+      const structureResponse = await fetch(`/api/structure/${structureId}`);
+      if (!structureResponse.ok) {
+        throw new Error("Failed to fetch structure details");
+      }
+      const structure = await structureResponse.json();
+
+      // Delete the file from Google Drive if it exists
+      if (structure.fileId) {
+        const fileDeleted = await deleteFile(structure.fileId);
+        if (!fileDeleted) {
+          console.warn(
+            "Failed to delete file from Google Drive, but continuing with database deletion"
+          );
+        }
+      }
+
+      // Delete from database
       const response = await fetch(`/api/structure/${structureId}`, {
         method: "DELETE",
       });
@@ -81,12 +102,22 @@ export default function StructuresPage() {
         variant: "destructive",
       });
     } finally {
-      setDeleteModal({ isOpen: false, structureId: "", structureName: "" });
+      setDeleteModal({
+        isOpen: false,
+        structureId: "",
+        structureName: "",
+        fileId: "",
+      });
     }
   };
 
   const closeDeleteModal = () => {
-    setDeleteModal({ isOpen: false, structureId: "", structureName: "" });
+    setDeleteModal({
+      isOpen: false,
+      structureId: "",
+      structureName: "",
+      fileId: "",
+    });
   };
 
   return (

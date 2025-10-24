@@ -95,6 +95,10 @@ class AppConfig {
     );
   }
 
+  get financeFolderId(): string {
+    return process.env.FINANCE_FOLDER_ID || "1OVBwEbKC7ymWBYU0c-g009P1PTUBivQI";
+  }
+
   // Email
   get resendApiKey(): string {
     return process.env.RESEND_API_KEY || "";
@@ -125,6 +129,7 @@ export const {
   documentFolderId,
   structureFolderId,
   organizationalStructureFolderId,
+  financeFolderId,
   resendApiKey,
 } = appConfig;
 
