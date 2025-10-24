@@ -202,6 +202,7 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
       updatedAt: cat.updatedAt,
     }));
 
+    // Transform data to match expected types
     const transformedEvents: Event[] = eventsData.map((event) => ({
       id: event.id,
       name: event.name,
