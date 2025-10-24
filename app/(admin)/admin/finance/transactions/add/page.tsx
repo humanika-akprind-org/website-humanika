@@ -5,7 +5,13 @@ import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceCategory } from "@/types/finance-category";
 import type { Period } from "@/types/period";
 import type { Event } from "@/types/event";
-import type { Department, Status, FinanceType } from "@/types/enums";
+import type {
+  Department,
+  Status,
+  FinanceType,
+  UserRole,
+  Position,
+} from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
@@ -81,7 +87,12 @@ async function AddFinancePage() {
             },
           },
           period: true,
-          workProgram: true,
+          workProgram: {
+            include: {
+              period: true,
+              responsible: true,
+            },
+          },
         },
       }),
     ]);
@@ -121,7 +132,27 @@ async function AddFinancePage() {
       remainingFunds: event.remainingFunds,
       status: event.status as Status,
       workProgramId: event.workProgramId,
-      workProgram: event.workProgram,
+      workProgram: event.workProgram
+        ? {
+            ...event.workProgram,
+            department: event.workProgram.department as Department,
+            status: event.workProgram.status as Status,
+            responsible: {
+              ...event.workProgram.responsible,
+              role: event.workProgram.responsible.role as UserRole,
+              department: event.workProgram.responsible.department as
+                | Department
+                | undefined,
+              position: event.workProgram.responsible.position as
+                | Position
+                | undefined,
+              blockExpires:
+                event.workProgram.responsible.blockExpires?.toISOString(),
+              createdAt: event.workProgram.responsible.createdAt.toISOString(),
+              updatedAt: event.workProgram.responsible.updatedAt.toISOString(),
+            },
+          }
+        : null,
       createdAt: event.createdAt,
       updatedAt: event.updatedAt,
     }));
@@ -187,7 +218,9 @@ async function AddFinancePage() {
         // Re-throw redirect errors to allow Next.js to handle them
         if (
           error instanceof Error &&
-          error.digest?.startsWith("NEXT_REDIRECT")
+          "digest" in error &&
+          typeof error.digest === "string" &&
+          error.digest.startsWith("NEXT_REDIRECT")
         ) {
           throw error;
         }
