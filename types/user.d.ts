@@ -6,14 +6,14 @@ export interface User {
   email: string;
   username: string;
   role: UserRole;
-  department?: Department;
-  position?: Position;
+  department: Department | null;
+  position: Position | null;
   isActive: boolean;
   verifiedAccount: boolean;
   attemptLogin: number;
-  blockExpires?: string;
-  createdAt: string;
-  updatedAt: string;
+  blockExpires: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
   avatarColor: string;
 }
 

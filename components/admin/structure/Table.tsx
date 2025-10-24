@@ -58,6 +58,8 @@ export default function StructureTable({
   const handleDelete = (structure: OrganizationalStructure) => {
     setStructureToDelete(structure);
     setIsDeleteModalOpen(true);
+    // Note: The actual deletion logic is handled in the parent component
+    // which will call onDelete with the structure ID
   };
 
   const handleConfirmDelete = () => {
