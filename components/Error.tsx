@@ -1,4 +1,10 @@
-export default function Error({ error }: { error: Error }) {
+export default function Error({
+  error,
+  message,
+}: {
+  error?: Error;
+  message?: string;
+}) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
@@ -21,7 +27,9 @@ export default function Error({ error }: { error: Error }) {
         <h2 className="text-2xl font-bold mb-2 text-gray-800">
           Error Occurred
         </h2>
-        <p className="text-gray-600 mb-6">{error.message}</p>
+        <p className="text-gray-600 mb-6">
+          {message || error?.message || "An error occurred"}
+        </p>
         <a
           href="/"
           className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium inline-block"

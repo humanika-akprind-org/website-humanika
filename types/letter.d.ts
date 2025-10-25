@@ -27,6 +27,46 @@ export interface Letter {
   approvals: Approval[];
 }
 
+export interface CreateLetterInput {
+  number?: string;
+  regarding: string;
+  origin: string;
+  destination: string;
+  date: string | Date;
+  type: LetterType;
+  priority: LetterPriority;
+  body?: string;
+  letter?: string;
+  notes?: string;
+  periodId?: string;
+  eventId?: string;
+}
+
+export interface UpdateLetterInput {
+  number?: string;
+  regarding?: string;
+  origin?: string;
+  destination?: string;
+  date?: string | Date;
+  type?: LetterType;
+  priority?: LetterPriority;
+  body?: string;
+  letter?: string;
+  notes?: string;
+
+  approvedById?: string;
+  periodId?: string;
+  eventId?: string;
+}
+
+export interface LetterFilter {
+  type?: LetterType;
+  priority?: LetterPriority;
+  periodId?: string;
+  eventId?: string;
+  search?: string;
+}
+
 // Placeholder interfaces for relations
 interface User {
   id: string;

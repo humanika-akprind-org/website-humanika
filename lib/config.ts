@@ -99,6 +99,10 @@ class AppConfig {
     return process.env.FINANCE_FOLDER_ID || "1OVBwEbKC7ymWBYU0c-g009P1PTUBivQI";
   }
 
+  get letterFolderId(): string {
+    return process.env.LETTER_FOLDER_ID || "1ut1OpVtAxHCC62N_rai-EunNqbnXd80_";
+  }
+
   // Email
   get resendApiKey(): string {
     return process.env.RESEND_API_KEY || "";
@@ -130,6 +134,7 @@ export const {
   structureFolderId,
   organizationalStructureFolderId,
   financeFolderId,
+  letterFolderId,
   resendApiKey,
 } = appConfig;
 
