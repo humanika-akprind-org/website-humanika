@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import type { CreateArticleInput } from "@/types/article";
 import type { Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
@@ -110,6 +112,24 @@ export async function POST(request: NextRequest) {
         },
         category: true,
         period: true,
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "Article",
+      entityId: article.id,
+      description: `Created article: ${article.title}`,
+      metadata: {
+        oldData: null,
+        newData: {
+          title: article.title,
+          slug: article.slug,
+          categoryId: article.categoryId,
+          authorId: article.authorId,
+        },
       },
     });
 

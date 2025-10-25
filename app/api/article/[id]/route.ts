@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { UpdateArticleInput } from "@/types/article";
 import { getCurrentUser } from "@/lib/auth";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -102,6 +104,29 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "Article",
+      entityId: article.id,
+      description: `Updated article: ${article.title}`,
+      metadata: {
+        oldData: {
+          title: existingArticle.title,
+          slug: existingArticle.slug,
+          categoryId: existingArticle.categoryId,
+          authorId: existingArticle.authorId,
+        },
+        newData: {
+          title: article.title,
+          slug: article.slug,
+          categoryId: article.categoryId,
+          authorId: article.authorId,
+        },
+      },
+    });
+
     return NextResponse.json(article);
   } catch (error) {
     console.error("Error updating article:", error);
@@ -113,7 +138,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -133,6 +158,24 @@ export async function DELETE(
 
     await prisma.article.delete({
       where: { id: params.id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "Article",
+      entityId: params.id,
+      description: `Deleted article: ${existingArticle.title}`,
+      metadata: {
+        oldData: {
+          title: existingArticle.title,
+          slug: existingArticle.slug,
+          categoryId: existingArticle.categoryId,
+          authorId: existingArticle.authorId,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "Article deleted successfully" });

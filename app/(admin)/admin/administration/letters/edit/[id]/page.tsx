@@ -74,7 +74,7 @@ async function EditLetterPage({ params }: { params: { id: string } }) {
         origin: letterData.origin,
         destination: letterData.destination,
         body: letterData.body,
-        letter: letterData.letter,
+        letter: letterData.letter === undefined ? null : letterData.letter,
         notes: letterData.notes,
         // status: letterData.status || Status.DRAFT, // Status is not in UpdateLetterInput
         approvedById: letterData.approvedById,
