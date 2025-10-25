@@ -13,6 +13,8 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { logActivity } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 async function AddArticlePage() {
   const cookieStore = cookies();
@@ -80,8 +82,26 @@ async function AddArticlePage() {
         articlePayload.periodId = articleData.periodId;
       }
 
-      await prisma.article.create({
+      const createdArticle = await prisma.article.create({
         data: articlePayload,
+      });
+
+      // Log activity
+      await logActivity({
+        userId: user.id,
+        activityType: ActivityType.CREATE,
+        entityType: "Article",
+        entityId: createdArticle.id,
+        description: `Created article: ${createdArticle.title}`,
+        metadata: {
+          oldData: null,
+          newData: {
+            title: createdArticle.title,
+            slug: createdArticle.slug,
+            categoryId: createdArticle.categoryId,
+            authorId: createdArticle.authorId,
+          },
+        },
       });
 
       redirect("/admin/content/articles");

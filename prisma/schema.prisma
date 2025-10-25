@@ -193,6 +193,7 @@ model User {
   updatedAt     DateTime   @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan pengguna
+  activityLogs     ActivityLog[]  // Log aktivitas pengguna
   linkHubs         LinkHub[]      // Link hubs yang dibuat pengguna
   approvals        Approval[]     // Persetujuan yang diberikan pengguna
   managements      Management[]   // Jabatan manajemen pengguna
@@ -588,6 +589,40 @@ model Letter {
 
   @@index([type, priority, status, createdById, periodId])
   @@map("letters")
+}
+
+// Enum untuk tipe aktivitas dalam sistem
+enum ActivityType {
+  CREATE    // Membuat data baru
+  UPDATE    // Mengubah data
+  DELETE    // Menghapus data
+  LOGIN     // Login ke sistem
+  LOGOUT    // Logout dari sistem
+  APPROVE   // Menyetujui sesuatu
+  REJECT    // Menolak sesuatu
+  UPLOAD    // Mengunggah file
+  DOWNLOAD  // Mengunduh file
+  OTHER     // Aktivitas lainnya
+}
+
+// Model untuk mencatat aktivitas pengguna dalam sistem
+model ActivityLog {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String       @db.ObjectId         // ID pengguna yang melakukan aktivitas
+  activityType ActivityType                     // Tipe aktivitas
+  entityType  String                           // Tipe entitas yang dipengaruhi (contoh: "User", "Article", dll)
+  entityId    String?      @db.ObjectId         // ID entitas yang dipengaruhi
+  description String                            // Deskripsi aktivitas
+  metadata    Json?                             // Data tambahan dalam format JSON (opsional)
+  ipAddress   String?                           // Alamat IP pengguna
+  userAgent   String?                           // User agent browser
+  createdAt   DateTime     @default(now())      // Waktu aktivitas tercatat
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, activityType, entityType, createdAt])
+  @@map("activityLogs")
 }
 
 // Unified Approval Model dengan relasi yang benar - Model terpadu untuk semua jenis persetujuan

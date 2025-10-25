@@ -1,5 +1,10 @@
 import { UserApi } from "@/use-cases/api/user";
+// Fetch events/letters directly from the database (server-side) to avoid
+// depending on the HTTP API from server components which may fail due to
+// network/auth constraints.
 import DocumentForm from "@/components/admin/document/Form";
+import type { Event } from "@/types/event";
+import type { Letter } from "@/types/letter";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 import type {
@@ -19,9 +24,28 @@ async function AddDocumentPage() {
   const accessToken = cookieStore.get("google_access_token")?.value || "";
 
   try {
+    // Fetch users first (this is used to assign ownership).
     const usersResponse = await UserApi.getUsers({ limit: 50 });
-
     const users = usersResponse.data?.users || [];
+
+    // Fetch events and letters directly from the database; use allSettled
+    // so that a failure in one doesn't block rendering the form.
+    const [eventsSettled, lettersSettled] = await Promise.allSettled([
+      prisma.event.findMany({ orderBy: { name: "asc" } }),
+      prisma.letter.findMany({ orderBy: { date: "desc" } }),
+    ]);
+
+    const events =
+      eventsSettled.status === "fulfilled" ? eventsSettled.value : [];
+    if (eventsSettled.status === "rejected") {
+      console.error("Failed to load events from DB:", eventsSettled.reason);
+    }
+
+    const letters =
+      lettersSettled.status === "fulfilled" ? lettersSettled.value : [];
+    if (lettersSettled.status === "rejected") {
+      console.error("Failed to load letters from DB:", lettersSettled.reason);
+    }
 
     const handleSubmit = async (
       data: CreateDocumentInput | UpdateDocumentInput
@@ -90,8 +114,19 @@ async function AddDocumentPage() {
           <DocumentForm
             accessToken={accessToken}
             users={users}
-            events={[]} // TODO: Add events API
-            letters={[]} // TODO: Add letters API
+            events={
+              events.map((ev) => ({
+                id: ev.id,
+                name: ev.name,
+              })) as unknown as Event[]
+            }
+            letters={
+              letters.map((l) => ({
+                id: l.id,
+                number: l.number,
+                regarding: l.regarding,
+              })) as unknown as Letter[]
+            }
             onSubmit={handleSubmit}
           />
         </div>
