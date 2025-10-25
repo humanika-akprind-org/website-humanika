@@ -14,6 +14,8 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
+import { logActivity } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 async function EditArticlePage({ params }: { params: { id: string } }) {
   const cookieStore = cookies();
@@ -71,6 +73,15 @@ async function EditArticlePage({ params }: { params: { id: string } }) {
         throw new Error("Missing required fields");
       }
 
+      // Get existing article for logging
+      const existingArticle = await prisma.article.findUnique({
+        where: { id: params.id },
+      });
+
+      if (!existingArticle) {
+        throw new Error("Article not found");
+      }
+
       // Generate slug from title
       const slug = articleData.title
         .toLowerCase()
@@ -102,9 +113,32 @@ async function EditArticlePage({ params }: { params: { id: string } }) {
         articlePayload.periodId = articleData.periodId;
       }
 
-      await prisma.article.update({
+      const updatedArticle = await prisma.article.update({
         where: { id: params.id },
         data: articlePayload,
+      });
+
+      // Log activity
+      await logActivity({
+        userId: user.id,
+        activityType: ActivityType.UPDATE,
+        entityType: "Article",
+        entityId: updatedArticle.id,
+        description: `Updated article: ${updatedArticle.title}`,
+        metadata: {
+          oldData: {
+            title: existingArticle.title,
+            slug: existingArticle.slug,
+            categoryId: existingArticle.categoryId,
+            authorId: existingArticle.authorId,
+          },
+          newData: {
+            title: updatedArticle.title,
+            slug: updatedArticle.slug,
+            categoryId: updatedArticle.categoryId,
+            authorId: updatedArticle.authorId,
+          },
+        },
       });
 
       redirect("/admin/content/articles");

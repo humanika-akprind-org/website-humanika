@@ -1,13 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth.config";
+import { getCurrentUser } from "@/lib/auth";
 import { ActivityType } from "@/types/enums";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -92,8 +91,8 @@ export async function GET(req: NextRequest) {
 // Function to log activity
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    const user = await getCurrentUser();
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -119,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     const activity = await prisma.activityLog.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         activityType,
         entityType,
         entityId,
