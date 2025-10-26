@@ -20,7 +20,6 @@ export interface Approval {
   event?: any;
   finance?: any;
   document?: any;
-  article?: any;
   letter?: any;
 }
 

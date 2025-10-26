@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { StatusApproval } from "@/types/approval-enums"
+import { StatusApproval } from "@/types/approval-enums";
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -31,7 +31,7 @@ export async function PUT(
         event: true,
         finance: true,
         document: true,
-        article: true,
+
         letter: true,
       },
     });
@@ -93,14 +93,7 @@ export async function PUT(
             status: true,
           },
         },
-        article: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-            isPublished: true,
-          },
-        },
+
         letter: {
           select: {
             id: true,
@@ -174,7 +167,7 @@ async function updateEntityStatus(
     event?: { id: string } | null;
     finance?: { id: string } | null;
     document?: { id: string } | null;
-    article?: { id: string } | null;
+
     letter?: { id: string } | null;
   },
   approvalStatus: StatusApproval
@@ -222,22 +215,6 @@ async function updateEntityStatus(
         await prisma.document.update({
           where: { id: entityId },
           data: { status: newStatus },
-        });
-      }
-      break;
-
-    case "ARTICLE":
-      if (approval.article) {
-        const newStatus =
-          approvalStatus === StatusApproval.APPROVED ? "PUBLISH" : "DRAFT";
-        await prisma.article.update({
-          where: { id: entityId },
-          data: {
-            status: newStatus,
-            isPublished: approvalStatus === StatusApproval.APPROVED,
-            publishedAt:
-              approvalStatus === StatusApproval.APPROVED ? new Date() : null,
-          },
         });
       }
       break;

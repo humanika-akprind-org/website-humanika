@@ -149,27 +149,13 @@ enum LetterPriority {
 // EVENT: Kegiatan/acara
 // FINANCE: Transaksi keuangan
 // DOCUMENT: Dokumen
-// ARTICLE: Artikel
 // LETTER: Surat
-// SHORT_LINK: Short link
-// LINK_HUB: Link hub
-// LINK_HUB_DETAIL: Detail link hub
-// LINK_HUB_THEME: Tema link hub
-// ORGANIZATIONAL_STRUCTURE: Struktur organisasi
-// DEPARTMENT_TASK: Tugas departemen
 enum ApprovalType {
   WORK_PROGRAM           // Program kerja
   EVENT                  // Kegiatan/acara
   FINANCE                // Transaksi keuangan
   DOCUMENT               // Dokumen
-  ARTICLE                // Artikel
   LETTER                 // Surat
-  SHORT_LINK             // Short link
-  LINK_HUB               // Link hub
-  LINK_HUB_DETAIL        // Detail link hub
-  LINK_HUB_THEME         // Tema link hub
-  ORGANIZATIONAL_STRUCTURE // Struktur organisasi
-  DEPARTMENT_TASK        // Tugas departemen
 }
 
 // Model untuk data pengguna sistem
@@ -388,7 +374,7 @@ model Article {
   author   User            @relation(fields: [authorId], references: [id], onDelete: Cascade) // Penulis artikel
   category ArticleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori artikel
   period   Period?         @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode terkait
-  approvals Approval[]     @relation("ArticleApprovals") // Persetujuan untuk artikel
+  // approvals Approval[]     @relation("ArticleApprovals") // Persetujuan untuk artikel
 
   @@index([isPublished, authorId, categoryId, status])
   @@map("articles")
@@ -460,7 +446,7 @@ model OrganizationalStructure {
 
   // Relations - Data yang terkait dengan struktur organisasi
   period      Period           @relation(fields: [periodId], references: [id], onDelete: Cascade, name: "OrganizationalStructurePeriod") // Periode struktur organisasi
-  approvals Approval[] @relation("OrganizationalStructureApprovals") // Persetujuan untuk struktur organisasi
+  // approvals Approval[] @relation("OrganizationalStructureApprovals") // Persetujuan untuk struktur organisasi
 
   @@index([status])
   @@map("organizationalStructures")
@@ -477,7 +463,7 @@ model DepartmentTask {
 
   // Relations - Data yang terkait dengan tugas departemen
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull) // Pengguna yang ditugaskan
-  approvals Approval[] @relation("DepartmentTaskApprovals") // Persetujuan untuk tugas departemen
+  // approvals Approval[] @relation("DepartmentTaskApprovals") // Persetujuan untuk tugas departemen
 
   @@index([department, userId, status])
   @@map("departmentTasks")
@@ -496,7 +482,7 @@ model LinkHub {
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade) // Pemilik link hub
   theme     LinkHubTheme? @relation(fields: [themeId], references: [id], onDelete: SetNull) // Tema link hub
   details   LinkHubDetail[] // Detail link dalam hub
-  approvals Approval[]   @relation("LinkHubApprovals") // Persetujuan link hub
+  // approvals Approval[]   @relation("LinkHubApprovals") // Persetujuan link hub
 
   @@index([userId, status])
   @@map("linkHubs")
@@ -515,7 +501,7 @@ model LinkHubDetail {
 
   // Relations - Data yang terkait dengan detail link hub
   linkHub   LinkHub @relation(fields: [linkHubId], references: [id], onDelete: Cascade) // Link hub induk
-  approvals Approval[] @relation("LinkHubDetailApprovals") // Persetujuan detail link
+  // approvals Approval[] @relation("LinkHubDetailApprovals") // Persetujuan detail link
 
   @@index([linkHubId, status])
   @@map("linkHubDetails")
@@ -534,7 +520,7 @@ model LinkHubTheme {
   // Relations - Data yang terkait dengan tema link hub
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat tema
   linkHubs LinkHub[] // Link hubs yang menggunakan tema ini
-  approvals Approval[] @relation("LinkHubThemeApprovals") // Persetujuan tema
+  // approvals Approval[] @relation("LinkHubThemeApprovals") // Persetujuan tema
 
   @@index([isActive, userId, status])
   @@map("linkHubThemes")
@@ -552,7 +538,7 @@ model ShortLink {
 
   // Relations - Data yang terkait dengan short link
   user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat short link
-  approvals Approval[] @relation("ShortLinkApprovals") // Persetujuan short link
+  // approvals Approval[] @relation("ShortLinkApprovals") // Persetujuan short link
 
   @@index([userId, status])
   @@map("shortLinks")
@@ -643,14 +629,7 @@ model Approval {
   event                Event?                @relation("EventApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan kegiatan
   finance              Finance?              @relation("FinanceApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan transaksi keuangan
   document             Document?             @relation("DocumentApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan dokumen
-  article              Article?              @relation("ArticleApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan artikel
   letter               Letter?               @relation("LetterApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan surat
-  shortLink            ShortLink?            @relation("ShortLinkApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan short link
-  linkHub              LinkHub?              @relation("LinkHubApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan link hub
-  linkHubDetail        LinkHubDetail?        @relation("LinkHubDetailApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan detail link hub
-  linkHubTheme         LinkHubTheme?         @relation("LinkHubThemeApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan tema link hub
-  organizationalStructure OrganizationalStructure? @relation("OrganizationalStructureApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan struktur organisasi
-  departmentTask       DepartmentTask?       @relation("DepartmentTaskApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan tugas departemen
 
   @@index([entityType, entityId, userId, status])
   @@map("approvals")
