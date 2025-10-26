@@ -112,19 +112,18 @@ enum DocumentType {
 // PRIVATE: Hanya dapat diakses oleh pihak tertentu
 // ARCHIVE: Diarsipkan, tidak aktif
 enum Status {
- DRAFT   // Draft
- PENDING // Menunggu persetujuan
- PUBLISH // Sudah dipublikasikan
- PRIVATE // Hanya untuk pihak tertentu
- ARCHIVE // Diarsipkan
+  DRAFT     // Draft awal, bisa edit dan ajukan approval
+  PENDING   // Sedang menunggu persetujuan (dengan StatusApproval.PENDING)
+  PUBLISH   // Konten publik dan aktif
+  PRIVATE   // Konten tidak publik tapi masih aktif
+  ARCHIVE    // Konten diarsipkan, tidak bisa langsung publish
 }
 
-// Enum untuk status persetujuan pada berbagai entitas
-// APPROVED: Disetujui
-// REJECTED: Ditolak
 enum StatusApproval {
-  APPROVED // Disetujui
-  REJECTED // Ditolak
+  PENDING   // Default saat pertama diajukan
+  APPROVED  // Disetujui, status utama bisa ke PUBLISH/PRIVATE/ARCHIVE
+  REJECTED  // Ditolak, kembali ke DRAFT
+  CANCELLED  // Dibatalkan oleh pengguna
 }
 
 // Enum untuk jenis surat
@@ -631,7 +630,7 @@ model Approval {
   entityType   ApprovalType       // Tipe entitas yang memerlukan persetujuan
   entityId     String             @db.ObjectId // ID entitas yang memerlukan persetujuan
   userId       String             @db.ObjectId // ID pengguna yang memberikan persetujuan
-  status       StatusApproval     // Status persetujuan (APPROVED/REJECTED)
+  status       StatusApproval     // Status persetujuan
   note         String?            // Catatan tambahan untuk persetujuan
   createdAt    DateTime           @default(now()) // Waktu pembuatan persetujuan
   updatedAt    DateTime           @updatedAt // Waktu terakhir update
