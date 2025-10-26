@@ -82,14 +82,7 @@ export async function GET(request: NextRequest) {
             status: true,
           },
         },
-        article: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-            isPublished: true,
-          },
-        },
+
         letter: {
           select: {
             id: true,

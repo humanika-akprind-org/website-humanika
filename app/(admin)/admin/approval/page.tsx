@@ -55,8 +55,7 @@ const getEntityName = (approval: Approval) => {
       return approval.finance?.name || "Finance";
     case "DOCUMENT":
       return approval.document?.name || "Document";
-    case "ARTICLE":
-      return approval.article?.title || "Article";
+
     case "LETTER":
       return approval.letter?.regarding || "Letter";
     default:
@@ -273,7 +272,7 @@ export default function ApprovalPage() {
                 <option value="EVENT">Event</option>
                 <option value="FINANCE">Finance</option>
                 <option value="DOCUMENT">Document</option>
-                <option value="ARTICLE">Article</option>
+
                 <option value="LETTER">Letter</option>
               </select>
             </div>
