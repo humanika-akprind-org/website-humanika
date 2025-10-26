@@ -29,6 +29,12 @@ export default function AddWorkProgramPage() {
     await createWorkProgram(data as CreateWorkProgramInput);
   };
 
+  const handleSubmitForApproval = async (
+    data: CreateWorkProgramInput | UpdateWorkProgramInput
+  ) => {
+    await createWorkProgram(data as CreateWorkProgramInput);
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -82,6 +88,7 @@ export default function AddWorkProgramPage() {
       users={users}
       periods={periods}
       onSubmit={handleSubmit}
+      onSubmitForApproval={handleSubmitForApproval}
       isEditing={false}
     />
   );

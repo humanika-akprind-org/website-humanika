@@ -27,6 +27,17 @@ export async function GET(
             department: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -62,6 +73,20 @@ export async function PUT(
 
     const updateData = { ...body } as Prisma.WorkProgramUpdateInput;
 
+    // Handle status change to PENDING - create approval record
+    if (body.status === "PENDING") {
+      // Create approval record for the work program
+      await prisma.approval.create({
+        data: {
+          entityType: "WORK_PROGRAM",
+          entityId: params.id,
+          userId: user.id, // Current user submitting for approval
+          status: "PENDING",
+          note: "Work program submitted for approval",
+        },
+      });
+    }
+
     // Calculate remaining funds if funds or usedFunds is updated
     if (body.funds !== undefined || body.usedFunds !== undefined) {
       const currentProgram = await prisma.workProgram.findUnique({
@@ -92,6 +117,17 @@ export async function PUT(
             department: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -117,8 +153,11 @@ export async function DELETE(
     }
 
     // Validate ID parameter
-    if (!params.id || params.id === 'undefined' || params.id.trim() === '') {
-      return NextResponse.json({ error: "Invalid work program ID" }, { status: 400 });
+    if (!params.id || params.id === "undefined" || params.id.trim() === "") {
+      return NextResponse.json(
+        { error: "Invalid work program ID" },
+        { status: 400 }
+      );
     }
 
     await prisma.workProgram.delete({
