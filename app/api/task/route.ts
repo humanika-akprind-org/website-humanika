@@ -39,11 +39,6 @@ export async function GET(request: NextRequest) {
             email: true,
           },
         },
-        _count: {
-          select: {
-            approvals: true,
-          },
-        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -89,11 +84,6 @@ export async function POST(request: NextRequest) {
             id: true,
             name: true,
             email: true,
-          },
-        },
-        _count: {
-          select: {
-            approvals: true,
           },
         },
       },

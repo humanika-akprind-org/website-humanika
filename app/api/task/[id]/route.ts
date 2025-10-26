@@ -30,16 +30,14 @@ export async function GET(
             email: true,
           },
         },
-        _count: {
-          select: {
-            approvals: true,
-          },
-        },
       },
     });
 
     if (!departmentTask) {
-      return NextResponse.json({ error: "Department task not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Department task not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(departmentTask);
@@ -70,7 +68,12 @@ export async function PUT(
 
     const body: UpdateDepartmentTaskInput = await request.json();
 
-    if (!body.note && !body.department && body.userId === undefined && !body.status) {
+    if (
+      !body.note &&
+      !body.department &&
+      body.userId === undefined &&
+      !body.status
+    ) {
       return NextResponse.json(
         { error: "At least one field must be provided for update" },
         { status: 400 }
@@ -92,11 +95,6 @@ export async function PUT(
             id: true,
             name: true,
             email: true,
-          },
-        },
-        _count: {
-          select: {
-            approvals: true,
           },
         },
       },
@@ -134,22 +132,19 @@ export async function DELETE(
     });
 
     if (!departmentTask) {
-      return NextResponse.json({ error: "Department task not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Department task not found" },
+        { status: 404 }
+      );
     }
-
-    // Delete related approvals first (cascade handled by Prisma, but explicit for safety)
-    await prisma.approval.deleteMany({
-      where: {
-        entityType: "DEPARTMENT_TASK",
-        entityId: id,
-      },
-    });
 
     await prisma.departmentTask.delete({
       where: { id },
     });
 
-    return NextResponse.json({ message: "Department task deleted successfully" });
+    return NextResponse.json({
+      message: "Department task deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting department task:", error);
     return NextResponse.json(
