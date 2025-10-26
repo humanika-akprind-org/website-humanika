@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { StatusApproval } from "@/types/approval-enums";
-
+import { StatusApproval } from "@/types/approval-enums"
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
