@@ -1,6 +1,7 @@
 import { Department, Status } from "./enums";
 import { User } from "./user";
 import { Period } from "./period";
+import { Approval } from "./approval";
 
 export interface WorkProgram {
   id: string;
@@ -31,6 +32,7 @@ export interface WorkProgram {
     updatedAt: Date;
     avatarColor: string;
   };
+  approvals?: Approval[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -44,6 +46,7 @@ export interface CreateWorkProgramInput {
   goal: string;
   periodId: string;
   responsibleId: string;
+  status?: Status;
 }
 
 export interface UpdateWorkProgramInput
