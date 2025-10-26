@@ -221,13 +221,19 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Approvals
+                  Created
                 </th>
                 <th
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Created
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Updated
                 </th>
                 <th
                   scope="col"
@@ -285,10 +291,10 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {task._count?.approvals || 0}
+                      {formatDate(task.createdAt)}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(task.createdAt)}
+                      {formatDate(task.updatedAt)}
                     </td>
                     <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
@@ -343,7 +349,7 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center">
+                  <td colSpan={9} className="px-6 py-12 text-center">
                     <FiCheckCircle className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-4 text-sm font-medium text-gray-900">
                       No tasks found

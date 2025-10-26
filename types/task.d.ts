@@ -14,9 +14,6 @@ export interface DepartmentTask {
     name: string;
     email: string;
   };
-  _count?: {
-    approvals: number;
-  };
 }
 
 export interface CreateDepartmentTaskInput {
@@ -26,7 +23,8 @@ export interface CreateDepartmentTaskInput {
   status?: Prisma.Status;
 }
 
-export interface UpdateDepartmentTaskInput extends Partial<CreateDepartmentTaskInput> {}
+export interface UpdateDepartmentTaskInput
+  extends Partial<CreateDepartmentTaskInput> {}
 
 export interface DepartmentTaskFilter {
   department?: Department;

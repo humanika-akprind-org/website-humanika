@@ -58,6 +58,12 @@ export default function EditWorkProgramPage() {
     await updateWorkProgram(id, data as UpdateWorkProgramInput);
   };
 
+  const handleSubmitForApproval = async (
+    data: CreateWorkProgramInput | UpdateWorkProgramInput
+  ) => {
+    await updateWorkProgram(id, data as UpdateWorkProgramInput);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -104,6 +110,7 @@ export default function EditWorkProgramPage() {
       users={users}
       periods={periods}
       onSubmit={handleSubmit}
+      onSubmitForApproval={handleSubmitForApproval}
       isEditing={true}
     />
   );

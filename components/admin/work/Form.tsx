@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Department } from "@/types/enums";
+import { Department, Status } from "@/types/enums";
 import type {
   WorkProgram,
   CreateWorkProgramInput,
@@ -18,6 +18,7 @@ import {
   FiTrendingUp,
   FiTrendingDown,
   FiUser,
+  FiSend,
 } from "react-icons/fi";
 
 interface FormData {
@@ -39,6 +40,9 @@ interface WorkProgramFormProps {
   onSubmit: (
     data: CreateWorkProgramInput | UpdateWorkProgramInput
   ) => Promise<void>;
+  onSubmitForApproval?: (
+    data: CreateWorkProgramInput | UpdateWorkProgramInput
+  ) => Promise<void>;
   isEditing?: boolean;
 }
 
@@ -47,6 +51,7 @@ export default function WorkProgramForm({
   users,
   periods,
   onSubmit,
+  onSubmitForApproval,
   isEditing = false,
 }: WorkProgramFormProps) {
   const router = useRouter();
@@ -89,7 +94,16 @@ export default function WorkProgramForm({
     setLoading(true);
 
     try {
-      await onSubmit(formData);
+      // Run both submit functions simultaneously
+      const promises = [onSubmit(formData)];
+
+      if (onSubmitForApproval) {
+        promises.push(
+          onSubmitForApproval({ ...formData, status: Status.PENDING })
+        );
+      }
+
+      await Promise.all(promises);
       router.push("/admin/program/works");
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -318,10 +332,11 @@ export default function WorkProgramForm({
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
+            <FiSend className="mr-2" />
             {loading
-              ? "Saving..."
+              ? "Submitting..."
               : isEditing
               ? "Update Program"
               : "Create Program"}

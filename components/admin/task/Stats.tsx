@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  FiCheckCircle,
-  FiClock,
-  FiTrendingUp,
-  FiUsers,
-} from "react-icons/fi";
+import { FiCheckCircle, FiClock, FiTrendingUp } from "react-icons/fi";
 import type { DepartmentTask } from "@/types/task";
 import { Status } from "@/types/enums";
 
@@ -22,11 +17,6 @@ export default function Stats({ tasks }: StatsProps) {
   const completedTasks = tasks.filter(
     (task) => task.status === Status.PUBLISH
   ).length;
-  const totalApprovals = tasks.reduce(
-    (sum, task) => sum + (task._count?.approvals || 0),
-    0
-  );
-
   const stats = [
     {
       title: "Total Tasks",
@@ -48,13 +38,6 @@ export default function Stats({ tasks }: StatsProps) {
       icon: FiTrendingUp,
       color: "text-green-600",
       bgColor: "bg-green-100",
-    },
-    {
-      title: "Total Approvals",
-      value: totalApprovals.toString(),
-      icon: FiUsers,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100",
     },
   ];
 
