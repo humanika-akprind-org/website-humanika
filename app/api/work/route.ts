@@ -42,6 +42,17 @@ export async function GET(request: NextRequest) {
             department: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -97,6 +108,17 @@ export async function POST(request: NextRequest) {
             name: true,
             email: true,
             department: true,
+          },
+        },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
           },
         },
       },
