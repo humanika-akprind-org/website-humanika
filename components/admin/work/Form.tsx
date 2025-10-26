@@ -94,28 +94,20 @@ export default function WorkProgramForm({
     setLoading(true);
 
     try {
-      await onSubmit(formData);
+      // Run both submit functions simultaneously
+      const promises = [onSubmit(formData)];
+
+      if (onSubmitForApproval) {
+        promises.push(
+          onSubmitForApproval({ ...formData, status: Status.PENDING })
+        );
+      }
+
+      await Promise.all(promises);
       router.push("/admin/program/works");
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Failed to submit form. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmitForApproval = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!onSubmitForApproval) return;
-
-    setLoading(true);
-
-    try {
-      await onSubmitForApproval({ ...formData, status: Status.PENDING });
-      router.push("/admin/program/works");
-    } catch (error) {
-      console.error("Error submitting for approval:", error);
-      alert("Failed to submit for approval. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -337,24 +329,14 @@ export default function WorkProgramForm({
           >
             Cancel
           </button>
-          {onSubmitForApproval && (
-            <button
-              type="button"
-              onClick={handleSubmitForApproval}
-              disabled={loading}
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              <FiSend className="mr-2" />
-              {loading ? "Submitting..." : "Submit for Approval"}
-            </button>
-          )}
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
+            <FiSend className="mr-2" />
             {loading
-              ? "Saving..."
+              ? "Submitting..."
               : isEditing
               ? "Update Program"
               : "Create Program"}
