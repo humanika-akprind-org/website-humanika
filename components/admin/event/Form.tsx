@@ -10,6 +10,7 @@ import { useWorkPrograms } from "@/hooks/useWorkPrograms";
 import { eventThumbnailFolderId } from "@/lib/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
+import { FiSend } from "react-icons/fi";
 import DescriptionEditor from "../ui/TextEditor";
 
 // Helper function to check if HTML content is empty
@@ -98,6 +99,7 @@ export default function EventForm({
   accessToken,
   users,
   periods,
+  isEditing = false,
 }: EventFormProps) {
   const router = useRouter();
   const {
@@ -208,10 +210,7 @@ export default function EventForm({
     setExistingThumbnail(null);
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent,
-    submitType: "save" | "approval" = "save"
-  ) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoadingState(true);
     setError(null);
@@ -326,10 +325,7 @@ export default function EventForm({
             : undefined,
       };
 
-      if (submitType === "approval") {
-        if (!onSubmitForApproval) {
-          throw new Error("Submit for approval is not available");
-        }
+      if (onSubmitForApproval) {
         await onSubmitForApproval({ ...submitData, status: Status.PENDING });
       } else {
         await onSubmit(submitData);
@@ -636,74 +632,21 @@ export default function EventForm({
           >
             Batal
           </button>
-          {onSubmitForApproval && (
-            <button
-              type="button"
-              onClick={(e) => handleSubmit(e, "approval")}
-              disabled={isLoadingState || photoLoading}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 flex items-center"
-            >
-              {isLoadingState ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Mengajukan...
-                </>
-              ) : (
-                "Ajukan Persetujuan"
-              )}
-            </button>
-          )}
           <button
             type="submit"
             disabled={isLoadingState || photoLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
-            {isLoadingState ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Menyimpan...
-              </>
-            ) : (
-              "Simpan"
-            )}
+            <FiSend className="mr-2" />
+            {isLoadingState
+              ? onSubmitForApproval
+                ? "Mengajukan..."
+                : "Menyimpan..."
+              : onSubmitForApproval
+              ? "Ajukan Persetujuan"
+              : isEditing
+              ? "Update Event"
+              : "Create Event"}
           </button>
         </div>
       </form>
