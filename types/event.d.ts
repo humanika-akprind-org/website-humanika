@@ -2,6 +2,7 @@ import { Department, Status } from "./enums";
 import { User } from "./user";
 import { Period } from "./period";
 import { WorkProgram } from "./work";
+import { Approval } from "./approval";
 
 export interface Event {
   id: string;
@@ -38,6 +39,7 @@ export interface Event {
   status: Status;
   workProgramId?: string | null;
   workProgram?: WorkProgram | null;
+  approvals?: Approval[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -60,6 +60,7 @@ async function AddEventPage() {
         | "status"
         | "createdAt"
         | "updatedAt"
+        | "approvals"
       > = {
         name: eventData.name,
         slug,
@@ -88,6 +89,106 @@ async function AddEventPage() {
       redirect("/admin/program/events");
     };
 
+    const handleSubmitForApproval = async (
+      data: CreateEventInput | UpdateEventInput
+    ) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      // Cast data to CreateEventInput since this is the add page
+      const eventData = data as CreateEventInput;
+
+      if (
+        !eventData.name ||
+        !eventData.department ||
+        !eventData.periodId ||
+        !eventData.responsibleId ||
+        !eventData.startDate ||
+        !eventData.endDate
+      ) {
+        throw new Error("Missing required fields");
+      }
+
+      // Generate slug from name
+      const slug = eventData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+
+      const eventPayload: Omit<
+        Event,
+        | "id"
+        | "responsible"
+        | "period"
+        | "workProgram"
+        | "status"
+        | "createdAt"
+        | "updatedAt"
+        | "approvals"
+      > = {
+        name: eventData.name,
+        slug,
+        thumbnail: eventData.thumbnail,
+        description: eventData.description || "",
+        goal: eventData.goal || "",
+        department: eventData.department,
+        periodId: eventData.periodId,
+        responsibleId: eventData.responsibleId,
+        startDate: new Date(eventData.startDate),
+        endDate: new Date(eventData.endDate),
+        funds: parseFloat(String(eventData.funds)) || 0,
+        usedFunds: 0,
+        remainingFunds: parseFloat(String(eventData.funds)) || 0,
+      };
+
+      // Only include workProgramId if it's provided and not empty
+      if (eventData.workProgramId && eventData.workProgramId.trim() !== "") {
+        eventPayload.workProgramId = eventData.workProgramId;
+      }
+
+      // Create the event with PENDING status
+      const event = await prisma.event.create({
+        data: {
+          ...eventPayload,
+          status: "PENDING",
+        },
+      });
+
+      // Check if approval already exists for this event
+      const existingApproval = await prisma.approval.findFirst({
+        where: {
+          entityType: "EVENT",
+          entityId: event.id,
+        },
+      });
+
+      if (!existingApproval) {
+        // Create approval record for the event if it doesn't exist
+        await prisma.approval.create({
+          data: {
+            entityType: "EVENT",
+            entityId: event.id,
+            userId: user.id,
+            status: "PENDING",
+          },
+        });
+      } else {
+        // Update existing approval status to PENDING
+        await prisma.approval.update({
+          where: { id: existingApproval.id },
+          data: {
+            status: "PENDING",
+          },
+        });
+      }
+
+      redirect("/admin/program/events");
+    };
+
     return (
       <AuthGuard accessToken={accessToken}>
         <div className="p-6 max-w-4xl min-h-screen mx-auto">
@@ -106,6 +207,7 @@ async function AddEventPage() {
             users={users}
             periods={periodsData}
             onSubmit={handleSubmit}
+            onSubmitForApproval={handleSubmitForApproval}
           />
         </div>
       </AuthGuard>
