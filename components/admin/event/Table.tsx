@@ -1,7 +1,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FiCalendar, FiUser, FiImage } from "react-icons/fi";
+import {
+  FiCalendar,
+  FiUser,
+  FiImage,
+  FiCheckCircle,
+  FiXCircle,
+  FiClock,
+} from "react-icons/fi";
 import type { Event } from "@/types/event";
 import type { Status } from "@/types/enums";
 import { Status as StatusEnum } from "@/types/enums";
@@ -267,6 +274,12 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                  Approval
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Date Range
                 </th>
                 <th
@@ -357,6 +370,43 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                         {event.status}
                       </span>
                     </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {event.approvals && event.approvals.length > 0 ? (
+                        (() => {
+                          const latestApproval = event.approvals.sort(
+                            (a, b) =>
+                              new Date(b.updatedAt).getTime() -
+                              new Date(a.updatedAt).getTime()
+                          )[0];
+                          return (
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${
+                                latestApproval.status === "APPROVED"
+                                  ? "bg-green-100 text-green-800"
+                                  : latestApproval.status === "REJECTED"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              {latestApproval.status === "APPROVED" && (
+                                <FiCheckCircle className="mr-1" />
+                              )}
+                              {latestApproval.status === "REJECTED" && (
+                                <FiXCircle className="mr-1" />
+                              )}
+                              {latestApproval.status === "PENDING" && (
+                                <FiClock className="mr-1" />
+                              )}
+                              {latestApproval.status}
+                            </span>
+                          );
+                        })()
+                      ) : (
+                        <span className="text-xs text-gray-400">
+                          No approvals
+                        </span>
+                      )}
+                    </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(event.startDate)} -{" "}
                       {formatDate(event.endDate)}
@@ -416,7 +466,7 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={10} className="px-6 py-12 text-center">
+                  <td colSpan={11} className="px-6 py-12 text-center">
                     <FiCalendar className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-4 text-sm font-medium text-gray-900">
                       No events found

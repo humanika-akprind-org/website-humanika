@@ -23,16 +23,14 @@ export default function AddWorkProgramPage() {
     fetchData();
   }, []);
 
-  const handleSubmit = async (
-    data: CreateWorkProgramInput | UpdateWorkProgramInput
-  ) => {
+  const handleSubmit = async (data: CreateWorkProgramInput | UpdateWorkProgramInput) => {
     await createWorkProgram(data as CreateWorkProgramInput);
   };
 
   const handleSubmitForApproval = async (
     data: CreateWorkProgramInput | UpdateWorkProgramInput
   ) => {
-    await createWorkProgram(data as CreateWorkProgramInput);
+    await createWorkProgram({ ...data, status: "PENDING" } as CreateWorkProgramInput);
   };
 
   const fetchData = async () => {

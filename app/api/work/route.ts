@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
         name: body.name,
         department: body.department,
         schedule: body.schedule || "",
+        status: body.status || "DRAFT",
         funds: body.funds || 0,
         usedFunds: body.usedFunds || 0,
         remainingFunds: (body.funds || 0) - (body.usedFunds || 0),
@@ -123,6 +124,20 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Handle status change to PENDING - create approval record
+    if (body.status === "PENDING") {
+      // Create approval record for the work program
+      await prisma.approval.create({
+        data: {
+          entityType: "WORK_PROGRAM",
+          entityId: workProgram.id,
+          userId: user.id, // Current user submitting for approval
+          status: "PENDING",
+          note: "Work program submitted for approval",
+        },
+      });
+    }
 
     return NextResponse.json(workProgram, { status: 201 });
   } catch (error) {
