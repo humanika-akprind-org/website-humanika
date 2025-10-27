@@ -65,6 +65,17 @@ export async function GET(request: NextRequest) {
             name: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { startDate: "desc" },
     });
@@ -151,6 +162,17 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             name: true,
+          },
+        },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
           },
         },
       },

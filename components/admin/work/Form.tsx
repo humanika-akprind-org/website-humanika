@@ -94,16 +94,12 @@ export default function WorkProgramForm({
     setLoading(true);
 
     try {
-      // Run both submit functions simultaneously
-      const promises = [onSubmit(formData)];
-
       if (onSubmitForApproval) {
-        promises.push(
-          onSubmitForApproval({ ...formData, status: Status.PENDING })
-        );
+        await onSubmitForApproval({ ...formData, status: Status.PENDING });
+      } else {
+        await onSubmit(formData);
       }
 
-      await Promise.all(promises);
       router.push("/admin/program/works");
     } catch (error) {
       console.error("Error submitting form:", error);
