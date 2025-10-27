@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { callApi } from "@/use-cases/api/google-drive";
 
-export function useFile(accessToken: string): {
+export function useFile(accessToken?: string): {
   isLoading: boolean;
   error: string | null;
   uploadFile: (
@@ -21,6 +21,11 @@ export function useFile(accessToken: string): {
     fileName: string,
     folderId: string
   ): Promise<string | null> => {
+    if (!accessToken) {
+      setError("Access token is required for file upload");
+      return null;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -59,6 +64,11 @@ export function useFile(accessToken: string): {
   };
 
   const deleteFile = async (fileId: string): Promise<boolean> => {
+    if (!accessToken) {
+      setError("Access token is required for file deletion");
+      return false;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -84,6 +94,11 @@ export function useFile(accessToken: string): {
     fileId: string,
     newName: string
   ): Promise<boolean> => {
+    if (!accessToken) {
+      setError("Access token is required for file rename");
+      return false;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -107,6 +122,11 @@ export function useFile(accessToken: string): {
   };
 
   const setPublicAccess = async (fileId: string): Promise<boolean> => {
+    if (!accessToken) {
+      setError("Access token is required for setting public access");
+      return false;
+    }
+
     setIsLoading(true);
     setError(null);
 
