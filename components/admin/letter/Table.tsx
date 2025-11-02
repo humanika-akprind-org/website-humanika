@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FiFileText, FiUser } from "react-icons/fi";
+import {
+  FiFileText,
+  FiUser,
+  FiCheckCircle,
+  FiXCircle,
+  FiClock,
+} from "react-icons/fi";
 import type { Letter } from "@/types/letter";
 import type { Status } from "@/types/enums";
 import {
@@ -230,6 +236,12 @@ export default function LetterTable({ letters, onDelete }: LetterTableProps) {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                  Approval
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   User
                 </th>
                 <th
@@ -307,6 +319,43 @@ export default function LetterTable({ letters, onDelete }: LetterTableProps) {
                       >
                         {letter.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {letter.approvals && letter.approvals.length > 0 ? (
+                        (() => {
+                          const latestApproval = letter.approvals.sort(
+                            (a, b) =>
+                              new Date(b.updatedAt).getTime() -
+                              new Date(a.updatedAt).getTime()
+                          )[0];
+                          return (
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${
+                                latestApproval.status === "APPROVED"
+                                  ? "bg-green-100 text-green-800"
+                                  : latestApproval.status === "REJECTED"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              {latestApproval.status === "APPROVED" && (
+                                <FiCheckCircle className="mr-1" />
+                              )}
+                              {latestApproval.status === "REJECTED" && (
+                                <FiXCircle className="mr-1" />
+                              )}
+                              {latestApproval.status === "PENDING" && (
+                                <FiClock className="mr-1" />
+                              )}
+                              {latestApproval.status}
+                            </span>
+                          );
+                        })()
+                      ) : (
+                        <span className="text-xs text-gray-400">
+                          No approvals
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                       <div className="flex items-center">
@@ -388,7 +437,7 @@ export default function LetterTable({ letters, onDelete }: LetterTableProps) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center">
+                  <td colSpan={9} className="px-6 py-12 text-center">
                     <FiFileText className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-4 text-sm font-medium text-gray-900">
                       No letters found
