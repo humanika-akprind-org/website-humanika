@@ -36,6 +36,19 @@ export async function GET(
             regarding: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                department: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -89,6 +102,38 @@ export async function PUT(
     if (body.document !== undefined) updateData.document = body.document;
     if (body.status) updateData.status = body.status;
 
+    // Handle status change to PENDING - create approval record
+    if (body.status === "PENDING") {
+      // Check if approval already exists for this document
+      const existingApproval = await prisma.approval.findFirst({
+        where: {
+          entityType: "DOCUMENT",
+          entityId: params.id,
+        },
+      });
+
+      if (!existingApproval) {
+        // Create approval record for the document if it doesn't exist
+        await prisma.approval.create({
+          data: {
+            entityType: "DOCUMENT",
+            entityId: params.id,
+            userId: user.id,
+            status: "PENDING",
+            note: "Document submitted for approval",
+          },
+        });
+      } else {
+        // Update existing approval status to PENDING
+        await prisma.approval.update({
+          where: { id: existingApproval.id },
+          data: {
+            status: "PENDING",
+          },
+        });
+      }
+    }
+
     const document = await prisma.document.update({
       where: { id: params.id },
       data: updateData,
@@ -111,6 +156,19 @@ export async function PUT(
             id: true,
             number: true,
             regarding: true,
+          },
+        },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                department: true,
+              },
+            },
           },
         },
       },

@@ -12,7 +12,8 @@ import type {
   UpdateDocumentInput,
   Document,
 } from "@/types/document";
-import { Status } from "@/types/enums";
+import { Status, ApprovalType } from "@/types/enums";
+import { StatusApproval } from "@/types/approval-enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -96,6 +97,66 @@ async function AddDocumentPage() {
       redirect("/admin/administration/documents");
     };
 
+    const handleSubmitForApproval = async (
+      data: CreateDocumentInput | UpdateDocumentInput
+    ) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      // Cast data to CreateDocumentInput since this is the add page
+      const documentData = data as CreateDocumentInput;
+
+      if (!documentData.name || !documentData.type) {
+        throw new Error("Missing required fields");
+      }
+
+      // Prepare data to send
+      const submitData: Omit<
+        Document,
+        | "id"
+        | "user"
+        | "event"
+        | "letter"
+        | "version"
+        | "parentId"
+        | "isCurrent"
+        | "createdAt"
+        | "updatedAt"
+        | "previousVersion"
+        | "nextVersions"
+        | "approvals"
+      > = {
+        name: documentData.name,
+        type: documentData.type,
+        status: Status.PENDING,
+        document: documentData.document,
+        userId: user.id,
+        eventId: documentData.eventId,
+        letterId: documentData.letterId,
+      };
+
+      // Create the document with PENDING status
+      const document = await prisma.document.create({
+        data: submitData,
+      });
+
+      // Create approval record for the document
+      await prisma.approval.create({
+        data: {
+          entityType: ApprovalType.DOCUMENT,
+          entityId: document.id,
+          userId: user.id,
+          status: StatusApproval.PENDING,
+        },
+      });
+
+      redirect("/admin/administration/documents");
+    };
+
     return (
       <AuthGuard accessToken={accessToken}>
         <div className="p-6 max-w-4xl min-h-screen mx-auto">
@@ -128,6 +189,7 @@ async function AddDocumentPage() {
               })) as unknown as Letter[]
             }
             onSubmit={handleSubmit}
+            onSubmitForApproval={handleSubmitForApproval}
           />
         </div>
       </AuthGuard>

@@ -2,7 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { CreateDocumentInput } from "@/types/document";
 import type { Status, DocumentType } from "@/types/enums";
+import { ApprovalType } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
+import { StatusApproval } from "@/types/approval-enums";
 import type {
   Prisma,
   Status as PrismaStatus,
@@ -58,6 +60,20 @@ export async function GET(request: NextRequest) {
             regarding: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                department: true,
+              },
+            },
+          },
+          orderBy: { updatedAt: "desc" },
+        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -91,6 +107,7 @@ export async function POST(request: NextRequest) {
     const documentData: Prisma.DocumentCreateInput = {
       name: body.name,
       type: body.type as unknown as PrismaDocumentType,
+      status: (body.status as unknown as PrismaStatus) || "DRAFT",
       document: body.document,
       user: { connect: { id: user.id } },
     };
@@ -126,8 +143,34 @@ export async function POST(request: NextRequest) {
             regarding: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                department: true,
+              },
+            },
+          },
+        },
       },
     });
+
+    // Create initial approval request for the document if status is PENDING
+    if (body.status === "PENDING") {
+      await prisma.approval.create({
+        data: {
+          entityType: ApprovalType.DOCUMENT,
+          entityId: document.id,
+          userId: user.id,
+          status: StatusApproval.PENDING,
+          note: "Document submitted for approval",
+        },
+      });
+    }
 
     return NextResponse.json(document, { status: 201 });
   } catch (error) {
