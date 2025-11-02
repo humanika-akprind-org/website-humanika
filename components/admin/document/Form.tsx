@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FiFile } from "react-icons/fi";
+import { FiFile, FiSend } from "react-icons/fi";
 import type {
   Document,
   CreateDocumentInput,
@@ -18,6 +18,9 @@ import type { Letter } from "@/types/letter";
 interface DocumentFormProps {
   document?: Document;
   onSubmit: (data: CreateDocumentInput | UpdateDocumentInput) => Promise<void>;
+  onSubmitForApproval?: (
+    data: CreateDocumentInput | UpdateDocumentInput
+  ) => Promise<void>;
   isLoading?: boolean;
   accessToken: string;
   users?: User[];
@@ -28,6 +31,7 @@ interface DocumentFormProps {
 export default function DocumentForm({
   document,
   onSubmit,
+  onSubmitForApproval,
   accessToken,
   users: _users,
   events,
@@ -105,7 +109,9 @@ export default function DocumentForm({
     setExistingDocument(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent,
+  ) => {
     e.preventDefault();
     setIsLoadingState(true);
     setError(null);
@@ -198,7 +204,11 @@ export default function DocumentForm({
         letterId: formData.letterId || undefined,
       };
 
-      await onSubmit(submitData);
+      if (onSubmitForApproval) {
+        await onSubmitForApproval({ ...submitData, status: Status.PENDING });
+      } else {
+        await onSubmit(submitData);
+      }
 
       // Reset form state after successful submission
       setRemovedDocument(false);
@@ -394,35 +404,18 @@ export default function DocumentForm({
           <button
             type="submit"
             disabled={isLoadingState || fileLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
-            {isLoadingState ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Menyimpan...
-              </>
-            ) : (
-              "Simpan"
-            )}
+            <FiSend className="mr-2" />
+            {isLoadingState
+              ? onSubmitForApproval
+                ? "Mengajukan..."
+                : "Menyimpan..."
+              : onSubmitForApproval
+              ? "Simpan"
+              : document
+              ? "Update Document"
+              : "Create Document"}
           </button>
         </div>
       </form>
