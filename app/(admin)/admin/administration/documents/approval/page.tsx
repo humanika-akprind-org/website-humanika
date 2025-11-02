@@ -10,9 +10,6 @@ import {
   FiMail,
   FiEye,
   FiChevronDown,
-  FiFileText,
-  FiUser,
-  FiCheckCircle,
 } from "react-icons/fi";
 import { ApprovalApi } from "use-cases/api/approval";
 import type { Approval } from "types/approval";

@@ -2,7 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { CreateFinanceInput } from "@/types/finance";
 import type { FinanceType, Status } from "@/types/enums";
+import { ApprovalType } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
+import { StatusApproval } from "@/types/approval-enums";
 import type {
   Prisma,
   Status as PrismaStatus,
@@ -62,6 +64,20 @@ export async function GET(request: NextRequest) {
             name: true,
             email: true,
           },
+        },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                department: true,
+              },
+            },
+          },
+          orderBy: { updatedAt: "desc" },
         },
       },
       orderBy: { date: "desc" },
@@ -135,8 +151,34 @@ export async function POST(request: NextRequest) {
             email: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                department: true,
+              },
+            },
+          },
+        },
       },
     });
+
+    // Create initial approval request for the finance if status is PENDING
+    if (financeData.status === "PENDING") {
+      await prisma.approval.create({
+        data: {
+          entityType: ApprovalType.FINANCE,
+          entityId: finance.id,
+          userId: user.id,
+          status: StatusApproval.PENDING,
+          note: "Finance transaction submitted for approval",
+        },
+      });
+    }
 
     return NextResponse.json(finance, { status: 201 });
   } catch (error) {
