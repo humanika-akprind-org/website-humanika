@@ -3,6 +3,7 @@ import { User } from "./user";
 import { Period } from "./period";
 import { Event } from "./event";
 import { FinanceCategory } from "./finance-category";
+import { Approval } from "./approval";
 
 export interface Finance {
   id: string;
@@ -24,6 +25,7 @@ export interface Finance {
   period: Period;
   event?: Event | null;
   user: User;
+  approvals?: Approval[];
 }
 
 export interface CreateFinanceInput {
