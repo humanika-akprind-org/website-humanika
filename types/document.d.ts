@@ -2,6 +2,7 @@ import { DocumentType, Status } from "./enums";
 import { User } from "./user";
 import { Event } from "./event";
 import { Letter } from "./letter";
+import { Approval } from "./approval";
 
 export interface Document {
   id: string;
@@ -30,6 +31,7 @@ export interface CreateDocumentInput {
   eventId?: string;
   letterId?: string;
   type: DocumentType;
+  status?: Status;
   document?: string | null;
 }
 
@@ -44,10 +46,4 @@ export interface DocumentFilter {
   eventId?: string;
   letterId?: string;
   search?: string;
-}
-
-// Assuming Approval is defined elsewhere, but for now, placeholder
-interface Approval {
-  id: string;
-  // other fields
 }

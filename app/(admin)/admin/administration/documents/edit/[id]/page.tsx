@@ -9,7 +9,8 @@ import type {
   UpdateDocumentInput,
   Document,
 } from "@/types/document";
-import { Status } from "@/types/enums";
+import { Status, ApprovalType } from "@/types/enums";
+import { StatusApproval } from "@/types/approval-enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -111,6 +112,67 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
       redirect("/admin/administration/documents");
     };
 
+    const handleSubmitForApproval = async (
+      data: CreateDocumentInput | UpdateDocumentInput
+    ) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      // Cast data to UpdateDocumentInput since this is the edit page
+      const documentData = data as UpdateDocumentInput;
+
+      if (!documentData.name || !documentData.type) {
+        throw new Error("Missing required fields");
+      }
+
+      // Prepare data to send
+      const submitData: Omit<
+        Document,
+        | "id"
+        | "user"
+        | "event"
+        | "letter"
+        | "version"
+        | "parentId"
+        | "isCurrent"
+        | "createdAt"
+        | "updatedAt"
+        | "previousVersion"
+        | "nextVersions"
+        | "approvals"
+      > = {
+        name: documentData.name,
+        type: documentData.type,
+        status: Status.PENDING,
+        document: documentData.document,
+        userId: user.id,
+        eventId: documentData.eventId,
+        letterId: documentData.letterId,
+      };
+
+      // Update the document with PENDING status
+      await prisma.document.update({
+        where: { id: params.id },
+        data: submitData,
+      });
+
+      // Create approval record for the document
+      await prisma.approval.create({
+        data: {
+          entityType: ApprovalType.DOCUMENT,
+          entityId: params.id,
+          userId: user.id,
+          status: StatusApproval.PENDING,
+        },
+      });
+
+      redirect("/admin/administration/documents");
+    };
+
     return (
       <AuthGuard accessToken={accessToken}>
         <div className="p-6 max-w-4xl min-h-screen mx-auto">
@@ -142,6 +204,7 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
               })) as unknown as Letter[]
             }
             onSubmit={handleSubmit}
+            onSubmitForApproval={handleSubmitForApproval}
           />
         </div>
       </AuthGuard>

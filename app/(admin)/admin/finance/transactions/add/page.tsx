@@ -7,11 +7,13 @@ import type { Period } from "@/types/period";
 import type { Event } from "@/types/event";
 import type {
   Department,
-  Status,
   FinanceType,
   UserRole,
   Position,
 } from "@/types/enums";
+import { Status } from "@/types/enums";
+import { ApprovalType } from "@/types/enums";
+import { StatusApproval } from "@/types/approval-enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
@@ -253,6 +255,80 @@ async function AddFinancePage() {
       }
     };
 
+    const handleSubmitForApproval = async (
+      data: CreateFinanceInput | UpdateFinanceInput
+    ) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      // Cast data to CreateFinanceInput since this is the add page
+      const financeData = data as CreateFinanceInput;
+
+      if (
+        !financeData.name ||
+        !financeData.amount ||
+        !financeData.categoryId ||
+        !financeData.type ||
+        !financeData.periodId ||
+        !financeData.date
+      ) {
+        throw new Error("Missing required fields");
+      }
+
+      try {
+        // Create finance with PENDING status directly using Prisma
+        const financeDataPrisma = {
+          name: financeData.name,
+          amount: parseFloat(financeData.amount.toString()),
+          description: financeData.description || "",
+          date: new Date(financeData.date),
+          categoryId: financeData.categoryId,
+          type: financeData.type,
+          periodId: financeData.periodId,
+          userId: user.id,
+          status: Status.PENDING,
+          proof: financeData.proof,
+          ...(financeData.eventId &&
+            financeData.eventId.trim() !== "" && {
+              eventId: financeData.eventId,
+            }),
+        };
+
+        // Create the finance with PENDING status
+        const finance = await prisma.finance.create({
+          data: financeDataPrisma,
+        });
+
+        // Create approval record for the finance
+        await prisma.approval.create({
+          data: {
+            entityType: ApprovalType.FINANCE,
+            entityId: finance.id,
+            userId: user.id,
+            status: StatusApproval.PENDING,
+          },
+        });
+
+        redirect("/admin/finance/transactions");
+      } catch (error) {
+        // Re-throw redirect errors to allow Next.js to handle them
+        if (
+          error instanceof Error &&
+          "digest" in error &&
+          typeof error.digest === "string" &&
+          error.digest.startsWith("NEXT_REDIRECT")
+        ) {
+          throw error;
+        }
+        console.error("Error creating finance for approval:", error);
+        throw new Error("Failed to create finance transaction for approval");
+      }
+    };
+
     return (
       <AuthGuard accessToken={accessToken}>
         <div className="p-6 max-w-4xl min-h-screen mx-auto">
@@ -275,6 +351,7 @@ async function AddFinancePage() {
             periods={transformedPeriods}
             events={transformedEvents}
             onSubmit={handleSubmit}
+            onSubmitForApproval={handleSubmitForApproval}
           />
         </div>
       </AuthGuard>

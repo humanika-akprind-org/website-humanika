@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { UpdateFinanceInput } from "@/types/finance";
 import { getCurrentUser } from "@/lib/auth";
+import { ApprovalType } from "@/types/enums";
+import { StatusApproval } from "@/types/approval-enums";
 
 export async function GET(
   _request: NextRequest,
@@ -30,6 +32,20 @@ export async function GET(
             name: true,
             email: true,
           },
+        },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                department: true,
+              },
+            },
+          },
+          orderBy: { updatedAt: "desc" },
         },
       },
     });
@@ -106,8 +122,35 @@ export async function PUT(
             email: true,
           },
         },
+        approvals: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                department: true,
+              },
+            },
+          },
+          orderBy: { updatedAt: "desc" },
+        },
       },
     });
+
+    // Create approval request if status is changed to PENDING
+    if (body.status === "PENDING" && existingFinance.status !== "PENDING") {
+      await prisma.approval.create({
+        data: {
+          entityType: ApprovalType.FINANCE,
+          entityId: finance.id,
+          userId: user.id,
+          status: StatusApproval.PENDING,
+          note: "Finance transaction submitted for approval",
+        },
+      });
+    }
 
     return NextResponse.json(finance);
   } catch (error) {

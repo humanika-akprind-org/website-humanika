@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FiFile } from "react-icons/fi";
-import type { Letter, CreateLetterInput } from "@/types/letter";
+import type {
+  Letter,
+  CreateLetterInput,
+  UpdateLetterInput,
+} from "@/types/letter";
 import { LetterType, LetterPriority } from "@/types/enums";
 import type { Period } from "@/types/period";
 import type { Event } from "@/types/event";
@@ -13,11 +17,15 @@ import TextEditor from "@/components/admin/ui/TextEditor";
 
 interface LetterFormProps {
   letter?: Letter;
-  onSubmit: (data: CreateLetterInput) => Promise<void>;
+  onSubmit: (data: CreateLetterInput | UpdateLetterInput) => Promise<void>;
+  onSubmitForApproval?: (
+    data: CreateLetterInput | UpdateLetterInput
+  ) => Promise<void>;
   isLoading?: boolean;
   accessToken?: string;
   periods?: Period[];
   events?: Event[];
+  isEditing?: boolean;
 }
 
 interface LetterFormData {
@@ -39,10 +47,12 @@ interface LetterFormData {
 export default function LetterForm({
   letter,
   onSubmit,
+  onSubmitForApproval,
   isLoading = false,
   accessToken,
   periods = [],
   events = [],
+  isEditing = false,
 }: LetterFormProps) {
   const router = useRouter();
 
@@ -279,7 +289,11 @@ export default function LetterForm({
         eventId: formData.eventId || undefined,
       };
 
-      await onSubmit(submitData);
+      if (onSubmitForApproval) {
+        await onSubmitForApproval(submitData);
+      } else {
+        await onSubmit(submitData);
+      }
 
       // Reset form state after successful submission
       setRemovedLetter(false);
@@ -604,10 +618,14 @@ export default function LetterForm({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Menyimpan...
+                {onSubmitForApproval ? "Mengajukan..." : "Menyimpan..."}
               </>
+            ) : onSubmitForApproval ? (
+              "Ajukan Persetujuan"
+            ) : isEditing ? (
+              "Update Letter"
             ) : (
-              "Simpan"
+              "Create Letter"
             )}
           </button>
         </div>

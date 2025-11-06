@@ -84,6 +84,9 @@ const getFileIdFromProof = (
 interface FinanceFormProps {
   finance?: Finance;
   onSubmit: (data: CreateFinanceInput | UpdateFinanceInput) => Promise<void>;
+  onSubmitForApproval?: (
+    data: CreateFinanceInput | UpdateFinanceInput
+  ) => Promise<void>;
   isLoading?: boolean;
   accessToken: string;
   users: User[];
@@ -95,6 +98,7 @@ interface FinanceFormProps {
 export default function FinanceForm({
   finance,
   onSubmit,
+  onSubmitForApproval,
   accessToken,
   users: _users,
   periods,
@@ -310,7 +314,11 @@ export default function FinanceForm({
             : undefined,
       };
 
-      await onSubmit(submitData);
+      if (onSubmitForApproval) {
+        await onSubmitForApproval({ ...submitData, status: Status.PENDING });
+      } else {
+        await onSubmit(submitData);
+      }
 
       // Reset form state after successful submission
       setRemovedProof(false);
@@ -624,10 +632,20 @@ export default function FinanceForm({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Menyimpan...
+                {isLoadingState
+                  ? onSubmitForApproval
+                    ? "Mengajukan..."
+                    : "Menyimpan..."
+                  : onSubmitForApproval
+                  ? "Simpan"
+                  : finance
+                  ? "Update Transaction"
+                  : "Create Transaction"}
               </>
+            ) : finance ? (
+              "Update Transaction"
             ) : (
-              "Simpan"
+              "Create Transaction"
             )}
           </button>
         </div>

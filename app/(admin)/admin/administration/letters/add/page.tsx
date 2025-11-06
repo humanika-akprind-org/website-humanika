@@ -2,7 +2,8 @@ import LetterForm from "@/components/admin/letter/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 import type { CreateLetterInput, UpdateLetterInput } from "@/types/letter";
-import { Status } from "@/types/enums";
+import { Status, ApprovalType } from "@/types/enums";
+import { StatusApproval } from "@/types/approval-enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -66,6 +67,77 @@ async function AddLetterPage() {
       redirect("/admin/administration/letters");
     };
 
+    const handleSubmitForApproval = async (
+      data: CreateLetterInput | UpdateLetterInput
+    ) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      // Cast data to CreateLetterInput since this is the add page
+      const letterData = data as CreateLetterInput;
+
+      if (!letterData.regarding || !letterData.number || !letterData.date) {
+        throw new Error("Missing required fields");
+      }
+
+      // Prepare data to send
+      const submitData = {
+        regarding: letterData.regarding,
+        number: letterData.number,
+        date: new Date(letterData.date),
+        type: letterData.type,
+        priority: letterData.priority,
+        origin: letterData.origin,
+        destination: letterData.destination,
+        body: letterData.body,
+        letter: letterData.letter,
+        notes: letterData.notes,
+        status: Status.PENDING,
+        createdById: user.id,
+        periodId: letterData.periodId,
+        eventId: letterData.eventId,
+      };
+
+      const letter = await prisma.letter.create({
+        data: submitData,
+      });
+
+      // Check if approval already exists for this letter
+      const existingApproval = await prisma.approval.findFirst({
+        where: {
+          entityType: ApprovalType.LETTER,
+          entityId: letter.id,
+        },
+      });
+
+      if (!existingApproval) {
+        // Create approval record for the letter if it doesn't exist
+        await prisma.approval.create({
+          data: {
+            entityType: ApprovalType.LETTER,
+            entityId: letter.id,
+            userId: user.id,
+            status: StatusApproval.PENDING,
+            note: "Letter submitted for approval",
+          },
+        });
+      } else {
+        // Update existing approval status to PENDING
+        await prisma.approval.update({
+          where: { id: existingApproval.id },
+          data: {
+            status: StatusApproval.PENDING,
+          },
+        });
+      }
+
+      redirect("/admin/administration/letters");
+    };
+
     return (
       <AuthGuard accessToken={accessToken}>
         <div className="p-6 max-w-4xl min-h-screen mx-auto">
@@ -84,6 +156,7 @@ async function AddLetterPage() {
             events={events}
             periods={periods}
             onSubmit={handleSubmit}
+            onSubmitForApproval={handleSubmitForApproval}
           />
         </div>
       </AuthGuard>

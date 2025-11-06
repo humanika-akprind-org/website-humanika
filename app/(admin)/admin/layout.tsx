@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import AuthProvider from "@/components/admin/auth/AuthProvider";
 import Sidebar from "@/components/admin/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
-import "@/app/globals.css";
+import "./admin.css";
 import { cookies } from "next/headers";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/components/admin/layout/UserInfo";

@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { UpdateLetterInput } from "@/types/letter";
 import { getCurrentUser } from "@/lib/auth";
+import { ApprovalType } from "@/types/enums";
+import { StatusApproval } from "@/types/approval-enums";
 import type { Prisma } from "@prisma/client";
 
 export async function GET(
@@ -114,6 +116,39 @@ export async function PUT(
       updateData.event = body.eventId
         ? { connect: { id: body.eventId } }
         : { disconnect: true };
+    }
+    if (body.status !== undefined) updateData.status = body.status;
+
+    // Handle status change to PENDING - create approval record
+    if (body.status === "PENDING") {
+      // Check if approval already exists for this letter
+      const existingApproval = await prisma.approval.findFirst({
+        where: {
+          entityType: ApprovalType.LETTER,
+          entityId: params.id,
+        },
+      });
+
+      if (!existingApproval) {
+        // Create approval record for the letter if it doesn't exist
+        await prisma.approval.create({
+          data: {
+            entityType: ApprovalType.LETTER,
+            entityId: params.id,
+            userId: user.id,
+            status: StatusApproval.PENDING,
+            note: "Letter submitted for approval",
+          },
+        });
+      } else {
+        // Update existing approval status to PENDING
+        await prisma.approval.update({
+          where: { id: existingApproval.id },
+          data: {
+            status: StatusApproval.PENDING,
+          },
+        });
+      }
     }
 
     const letter = await prisma.letter.update({

@@ -15,6 +15,9 @@ import {
   FiTrendingUp,
   FiTrendingDown,
   FiCalendar,
+  FiCheckCircle,
+  FiXCircle,
+  FiClock,
 } from "react-icons/fi";
 import type { Finance } from "@/types/finance";
 
@@ -277,6 +280,12 @@ export default function FinanceTable({
                 </th>
                 <th
                   scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Approval
+                </th>
+                <th
+                  scope="col"
                   className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   Aksi
@@ -378,6 +387,43 @@ export default function FinanceTable({
                         ? "Ditolak"
                         : "Diarsipkan"}
                     </span>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {finance.approvals && finance.approvals.length > 0 ? (
+                      (() => {
+                        const latestApproval = finance.approvals.sort(
+                          (a, b) =>
+                            new Date(b.updatedAt).getTime() -
+                            new Date(a.updatedAt).getTime()
+                        )[0];
+                        return (
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${
+                              latestApproval.status === "APPROVED"
+                                ? "bg-green-100 text-green-800"
+                                : latestApproval.status === "REJECTED"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {latestApproval.status === "APPROVED" && (
+                              <FiCheckCircle className="mr-1" />
+                            )}
+                            {latestApproval.status === "REJECTED" && (
+                              <FiXCircle className="mr-1" />
+                            )}
+                            {latestApproval.status === "PENDING" && (
+                              <FiClock className="mr-1" />
+                            )}
+                            {latestApproval.status}
+                          </span>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-xs text-gray-400">
+                        No approvals
+                      </span>
+                    )}
                   </td>
                   <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">

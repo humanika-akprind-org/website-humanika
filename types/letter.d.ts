@@ -1,4 +1,5 @@
 import { LetterType, LetterPriority, Status } from "./enums";
+import { Approval } from "./approval";
 
 export interface Letter {
   id: string;
@@ -38,6 +39,7 @@ export interface CreateLetterInput {
   body?: string;
   letter?: string;
   notes?: string;
+  status?: Status;
   periodId?: string;
   eventId?: string;
 }
@@ -53,6 +55,7 @@ export interface UpdateLetterInput {
   body?: string;
   letter?: string;
   notes?: string;
+  status?: Status;
 
   approvedById?: string;
   periodId?: string;
@@ -87,8 +90,4 @@ interface Event {
 interface Document {
   id: string;
   name: string;
-}
-
-interface Approval {
-  id: string;
 }
