@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { UpdateFinanceCategoryInput } from "@/types/finance-category";
 import { getCurrentUser } from "@/lib/auth";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -25,7 +27,10 @@ export async function GET(
     });
 
     if (!financeCategory) {
-      return NextResponse.json({ error: "Finance category not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Finance category not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(financeCategory);
@@ -56,7 +61,10 @@ export async function PUT(
     });
 
     if (!existingFinanceCategory) {
-      return NextResponse.json({ error: "Finance category not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Finance category not found" },
+        { status: 404 }
+      );
     }
 
     const updateData: Record<string, unknown> = {};
@@ -74,6 +82,29 @@ export async function PUT(
           select: {
             finances: true,
           },
+        },
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "FinanceCategory",
+      entityId: financeCategory.id,
+      description: `Updated finance category: ${financeCategory.name}`,
+      metadata: {
+        oldData: {
+          name: existingFinanceCategory.name,
+          description: existingFinanceCategory.description,
+          type: existingFinanceCategory.type,
+          isActive: existingFinanceCategory.isActive,
+        },
+        newData: {
+          name: financeCategory.name,
+          description: financeCategory.description,
+          type: financeCategory.type,
+          isActive: financeCategory.isActive,
         },
       },
     });
@@ -110,14 +141,37 @@ export async function DELETE(
     });
 
     if (!existingFinanceCategory) {
-      return NextResponse.json({ error: "Finance category not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Finance category not found" },
+        { status: 404 }
+      );
     }
 
     await prisma.financeCategory.delete({
       where: { id: params.id },
     });
 
-    return NextResponse.json({ message: "Finance category deleted successfully" });
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "FinanceCategory",
+      entityId: params.id,
+      description: `Deleted finance category: ${existingFinanceCategory.name}`,
+      metadata: {
+        oldData: {
+          name: existingFinanceCategory.name,
+          description: existingFinanceCategory.description,
+          type: existingFinanceCategory.type,
+          isActive: existingFinanceCategory.isActive,
+        },
+        newData: null,
+      },
+    });
+
+    return NextResponse.json({
+      message: "Finance category deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting finance category:", error);
     return NextResponse.json(

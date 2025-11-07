@@ -10,6 +10,8 @@ import type {
   Status as PrismaStatus,
   DocumentType as PrismaDocumentType,
 } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -171,6 +173,24 @@ export async function POST(request: NextRequest) {
         },
       });
     }
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "Document",
+      entityId: document.id,
+      description: `Created document: ${document.name}`,
+      metadata: {
+        newData: {
+          name: document.name,
+          type: document.type,
+          status: document.status,
+          eventId: document.eventId,
+          letterId: document.letterId,
+        },
+      },
+    });
 
     return NextResponse.json(document, { status: 201 });
   } catch (error) {

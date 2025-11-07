@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { comparePasswords, generateToken, setAuthCookie } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { logActivity } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function POST(request: Request) {
   try {
@@ -90,6 +92,21 @@ export async function POST(request: Request) {
     await prisma.user.update({
       where: { id: user.id },
       data: { attemptLogin: 0, blockExpires: null },
+    });
+
+    // Log activity
+    await logActivity({
+      userId: user.id,
+      activityType: ActivityType.LOGIN,
+      entityType: "User",
+      entityId: user.id,
+      description: `Admin login: ${user.name} (${user.email})`,
+      metadata: {
+        details: {
+          role: user.role,
+          loginMethod: "admin",
+        },
+      },
     });
 
     const token = generateToken(user.id);

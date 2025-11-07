@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { UpdateDocumentInput } from "@/types/document";
 import { getCurrentUser } from "@/lib/auth";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -174,6 +176,31 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "Document",
+      entityId: document.id,
+      description: `Updated document: ${document.name}`,
+      metadata: {
+        oldData: {
+          name: existingDocument.name,
+          type: existingDocument.type,
+          status: existingDocument.status,
+          eventId: existingDocument.eventId,
+          letterId: existingDocument.letterId,
+        },
+        newData: {
+          name: document.name,
+          type: document.type,
+          status: document.status,
+          eventId: document.eventId,
+          letterId: document.letterId,
+        },
+      },
+    });
+
     return NextResponse.json(document);
   } catch (error) {
     console.error("Error updating document:", error);
@@ -208,6 +235,25 @@ export async function DELETE(
 
     await prisma.document.delete({
       where: { id: params.id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "Document",
+      entityId: params.id,
+      description: `Deleted document: ${existingDocument.name}`,
+      metadata: {
+        oldData: {
+          name: existingDocument.name,
+          type: existingDocument.type,
+          status: existingDocument.status,
+          eventId: existingDocument.eventId,
+          letterId: existingDocument.letterId,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "Document deleted successfully" });

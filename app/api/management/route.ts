@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { ManagementService } from "@/lib/services/management";
 import type { ManagementServerData } from "@/types/management";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET() {
   try {
@@ -29,6 +31,23 @@ export async function POST(request: NextRequest) {
   try {
     const formData: ManagementServerData = await request.json();
     const management = await ManagementService.createManagement(formData);
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: management.userId,
+      activityType: ActivityType.CREATE,
+      entityType: "Management",
+      entityId: management.id,
+      description: `Created management: ${management.user?.name || "Unknown"}`,
+      metadata: {
+        newData: {
+          userId: management.userId,
+          position: management.position,
+          periodId: management.periodId,
+          photo: management.photo,
+        },
+      },
+    });
 
     return NextResponse.json({
       success: true,

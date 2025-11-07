@@ -4,6 +4,8 @@ import type { UpdateFinanceInput } from "@/types/finance";
 import { getCurrentUser } from "@/lib/auth";
 import { ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/approval-enums";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -139,6 +141,43 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "Finance",
+      entityId: finance.id,
+      description: `Updated finance transaction: ${finance.name}`,
+      metadata: {
+        oldData: {
+          name: existingFinance.name,
+          amount: existingFinance.amount,
+          description: existingFinance.description,
+          date: existingFinance.date,
+          categoryId: existingFinance.categoryId,
+          type: existingFinance.type,
+          periodId: existingFinance.periodId,
+          eventId: existingFinance.eventId,
+          userId: existingFinance.userId,
+          proof: existingFinance.proof,
+          status: existingFinance.status,
+        },
+        newData: {
+          name: finance.name,
+          amount: finance.amount,
+          description: finance.description,
+          date: finance.date,
+          categoryId: finance.categoryId,
+          type: finance.type,
+          periodId: finance.periodId,
+          eventId: finance.eventId,
+          userId: finance.userId,
+          proof: finance.proof,
+          status: finance.status,
+        },
+      },
+    });
+
     // Create approval request if status is changed to PENDING
     if (body.status === "PENDING" && existingFinance.status !== "PENDING") {
       await prisma.approval.create({
@@ -183,6 +222,31 @@ export async function DELETE(
 
     await prisma.finance.delete({
       where: { id: params.id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "Finance",
+      entityId: params.id,
+      description: `Deleted finance transaction: ${existingFinance.name}`,
+      metadata: {
+        oldData: {
+          name: existingFinance.name,
+          amount: existingFinance.amount,
+          description: existingFinance.description,
+          date: existingFinance.date,
+          categoryId: existingFinance.categoryId,
+          type: existingFinance.type,
+          periodId: existingFinance.periodId,
+          eventId: existingFinance.eventId,
+          userId: existingFinance.userId,
+          proof: existingFinance.proof,
+          status: existingFinance.status,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "Finance deleted successfully" });

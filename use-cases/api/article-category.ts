@@ -9,7 +9,7 @@ import { apiUrl } from "@/lib/config";
 const API_URL = apiUrl;
 
 export const getArticleCategories = async (): Promise<ArticleCategory[]> => {
-  const response = await fetch(`${API_URL}/article-categories`, {
+  const response = await fetch(`${API_URL}/article/category`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -25,8 +25,10 @@ export const getArticleCategories = async (): Promise<ArticleCategory[]> => {
   return response.json();
 };
 
-export const getArticleCategory = async (id: string): Promise<ArticleCategory> => {
-  const response = await fetch(`${API_URL}/article-categories/${id}`, {
+export const getArticleCategory = async (
+  id: string
+): Promise<ArticleCategory> => {
+  const response = await fetch(`${API_URL}/article/category/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +47,7 @@ export const getArticleCategory = async (id: string): Promise<ArticleCategory> =
 export const createArticleCategory = async (
   data: CreateArticleCategoryInput
 ): Promise<ArticleCategory> => {
-  const response = await fetch(`${API_URL}/article-categories`, {
+  const response = await fetch(`${API_URL}/article/category`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -67,7 +69,7 @@ export const createArticleCategory = async (
       status: response.status,
       statusText: response.statusText,
       errorMessage,
-      data
+      data,
     });
     throw new Error(errorMessage);
   }
@@ -79,7 +81,7 @@ export const updateArticleCategory = async (
   id: string,
   data: UpdateArticleCategoryInput
 ): Promise<ArticleCategory> => {
-  const response = await fetch(`${API_URL}/article-categories/${id}`, {
+  const response = await fetch(`${API_URL}/article/category/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -96,7 +98,7 @@ export const updateArticleCategory = async (
 };
 
 export const deleteArticleCategory = async (id: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/article-categories/${id}`, {
+  const response = await fetch(`${API_URL}/article/category/${id}`, {
     method: "DELETE",
     credentials: "include",
   });

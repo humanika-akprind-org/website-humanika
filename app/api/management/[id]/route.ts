@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { ManagementService } from "@/lib/services/management";
 import type { ManagementServerData } from "@/types/management";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 interface RouteParams {
   params: { id: string };
@@ -29,11 +31,37 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
+    // Get existing management for logging
+    const existingManagement = await ManagementService.getManagement(params.id);
+
     const formData: ManagementServerData = await request.json();
     const management = await ManagementService.updateManagement(
       params.id,
       formData
     );
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: management.userId,
+      activityType: ActivityType.UPDATE,
+      entityType: "Management",
+      entityId: management.id,
+      description: `Updated management: ${management.user?.name || "Unknown"}`,
+      metadata: {
+        oldData: {
+          userId: existingManagement.userId,
+          position: existingManagement.position,
+          periodId: existingManagement.periodId,
+          photo: existingManagement.photo,
+        },
+        newData: {
+          userId: management.userId,
+          position: management.position,
+          periodId: management.periodId,
+          photo: management.photo,
+        },
+      },
+    });
 
     return NextResponse.json({
       success: true,
@@ -90,6 +118,24 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     // Delete the management record
     await ManagementService.deleteManagement(params.id);
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: management.userId,
+      activityType: ActivityType.DELETE,
+      entityType: "Management",
+      entityId: params.id,
+      description: `Deleted management: ${management.user?.name || "Unknown"}`,
+      metadata: {
+        oldData: {
+          userId: management.userId,
+          position: management.position,
+          periodId: management.periodId,
+          photo: management.photo,
+        },
+        newData: null,
+      },
+    });
 
     return NextResponse.json({
       success: true,

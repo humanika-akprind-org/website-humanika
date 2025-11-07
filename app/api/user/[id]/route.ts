@@ -1,12 +1,10 @@
 // app/api/user/[id]/route.ts
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import {
-  type UserRole,
-  type Department,
-  type Position,
-} from "@prisma/client";
+import { type UserRole, type Department, type Position } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 // GET - Get user by ID
 export async function GET(
@@ -142,6 +140,37 @@ export async function PUT(
       },
     });
 
+    // Log activity - Note: This is an admin operation, so we use "system" as userId
+    await logActivityFromRequest(request, {
+      userId: "system", // Since this is user update, no authenticated user context
+      activityType: ActivityType.UPDATE,
+      entityType: "User",
+      entityId: updatedUser.id,
+      description: `Updated user: ${updatedUser.name}`,
+      metadata: {
+        oldData: {
+          name: existingUser.name,
+          email: existingUser.email,
+          username: existingUser.username,
+          role: existingUser.role,
+          department: existingUser.department,
+          position: existingUser.position,
+          isActive: existingUser.isActive,
+          verifiedAccount: existingUser.verifiedAccount,
+        },
+        newData: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          username: updatedUser.username,
+          role: updatedUser.role,
+          department: updatedUser.department,
+          position: updatedUser.position,
+          isActive: updatedUser.isActive,
+          verifiedAccount: updatedUser.verifiedAccount,
+        },
+      },
+    });
+
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Error updating user:", error);
@@ -171,6 +200,28 @@ export async function DELETE(
 
     await prisma.user.delete({
       where: { id },
+    });
+
+    // Log activity - Note: This is an admin operation, so we use "system" as userId
+    await logActivityFromRequest(_request, {
+      userId: "system", // Since this is user deletion, no authenticated user context
+      activityType: ActivityType.DELETE,
+      entityType: "User",
+      entityId: id,
+      description: `Deleted user: ${user.name}`,
+      metadata: {
+        oldData: {
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          department: user.department,
+          position: user.position,
+          isActive: user.isActive,
+          verifiedAccount: user.verifiedAccount,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "User deleted successfully" });

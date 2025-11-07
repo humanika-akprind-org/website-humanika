@@ -10,6 +10,8 @@ import type {
   Status as PrismaStatus,
   FinanceType as PrismaFinanceType,
 } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -163,6 +165,30 @@ export async function POST(request: NextRequest) {
               },
             },
           },
+        },
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "Finance",
+      entityId: finance.id,
+      description: `Created finance transaction: ${finance.name}`,
+      metadata: {
+        newData: {
+          name: finance.name,
+          amount: finance.amount,
+          description: finance.description,
+          date: finance.date,
+          categoryId: finance.categoryId,
+          type: finance.type,
+          periodId: finance.periodId,
+          eventId: finance.eventId,
+          userId: finance.userId,
+          proof: finance.proof,
+          status: finance.status,
         },
       },
     });

@@ -4,6 +4,8 @@ import type { CreateFinanceCategoryInput } from "@/types/finance-category";
 import type { FinanceType } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
 import type { Prisma } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -79,6 +81,23 @@ export async function POST(request: NextRequest) {
           select: {
             finances: true,
           },
+        },
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "FinanceCategory",
+      entityId: financeCategory.id,
+      description: `Created finance category: ${financeCategory.name}`,
+      metadata: {
+        newData: {
+          name: financeCategory.name,
+          description: financeCategory.description,
+          type: financeCategory.type,
+          isActive: financeCategory.isActive,
         },
       },
     });

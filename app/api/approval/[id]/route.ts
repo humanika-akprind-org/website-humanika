@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { StatusApproval } from "@/types/approval-enums";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -105,6 +107,25 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "Approval",
+      entityId: updatedApproval.id,
+      description: `Updated approval status to ${status} for ${existingApproval.entityType} entity`,
+      metadata: {
+        oldData: {
+          status: existingApproval.status,
+          note: existingApproval.note,
+        },
+        newData: {
+          status: updatedApproval.status,
+          note: updatedApproval.note,
+        },
+      },
+    });
+
     // If approval is approved, update the related entity's status
     if (status === StatusApproval.APPROVED) {
       await updateEntityStatus(existingApproval, StatusApproval.APPROVED);
@@ -147,6 +168,25 @@ export async function DELETE(
 
     await prisma.approval.delete({
       where: { id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "Approval",
+      entityId: id,
+      description: `Deleted approval for ${approval.entityType} entity`,
+      metadata: {
+        oldData: {
+          entityType: approval.entityType,
+          entityId: approval.entityId,
+          userId: approval.userId,
+          status: approval.status,
+          note: approval.note,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "Approval deleted successfully" });

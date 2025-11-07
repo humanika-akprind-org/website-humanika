@@ -1,11 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { CreateLetterInput } from "@/types/letter";
-import type {
-  LetterType,
-  LetterPriority,
-  Status,
-} from "@/types/enums";
+import type { LetterType, LetterPriority, Status } from "@/types/enums";
 import { ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/approval-enums";
 import { getCurrentUser } from "@/lib/auth";
@@ -15,6 +11,8 @@ import type {
   LetterPriority as PrismaLetterPriority,
   Status as PrismaStatus,
 } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -193,6 +191,28 @@ export async function POST(request: NextRequest) {
         },
       });
     }
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "Letter",
+      entityId: letter.id,
+      description: `Created letter: ${letter.regarding}`,
+      metadata: {
+        newData: {
+          regarding: letter.regarding,
+          number: letter.number,
+          origin: letter.origin,
+          destination: letter.destination,
+          type: letter.type,
+          priority: letter.priority,
+          status: letter.status,
+          periodId: letter.periodId,
+          eventId: letter.eventId,
+        },
+      },
+    });
 
     return NextResponse.json(letter, { status: 201 });
   } catch (error) {
