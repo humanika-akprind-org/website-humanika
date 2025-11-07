@@ -4,6 +4,8 @@ import type { CreateOrganizationalStructureInput } from "@/types/structure";
 import type { Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,6 +72,23 @@ export async function POST(request: NextRequest) {
       data: structureData,
       include: {
         period: true,
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "OrganizationalStructure",
+      entityId: structure.id,
+      description: `Created organizational structure: ${structure.name}`,
+      metadata: {
+        newData: {
+          name: structure.name,
+          periodId: structure.periodId,
+          decree: structure.decree,
+          structure: structure.structure,
+        },
       },
     });
 

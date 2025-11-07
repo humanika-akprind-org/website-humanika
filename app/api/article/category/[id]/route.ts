@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { UpdateArticleCategoryInput } from "@/types/article-category";
 import { getCurrentUser } from "@/lib/auth";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -13,22 +15,18 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const articleCategory = await prisma.articleCategory.findUnique({
+    const category = await prisma.articleCategory.findUnique({
       where: { id: params.id },
-      include: {
-        _count: {
-          select: {
-            articles: true,
-          },
-        },
-      },
     });
 
-    if (!articleCategory) {
-      return NextResponse.json({ error: "Article category not found" }, { status: 404 });
+    if (!category) {
+      return NextResponse.json(
+        { error: "Article category not found" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json(articleCategory);
+    return NextResponse.json(category);
   } catch (error) {
     console.error("Error fetching article category:", error);
     return NextResponse.json(
@@ -50,46 +48,47 @@ export async function PUT(
 
     const body: UpdateArticleCategoryInput = await request.json();
 
-    // Check if article category exists
+    // Check if category exists
     const existingCategory = await prisma.articleCategory.findUnique({
       where: { id: params.id },
     });
 
     if (!existingCategory) {
-      return NextResponse.json({ error: "Article category not found" }, { status: 404 });
-    }
-
-    // Check if new name conflicts with existing category (if name is being updated)
-    if (body.name && body.name.trim() !== existingCategory.name) {
-      const nameConflict = await prisma.articleCategory.findUnique({
-        where: { name: body.name.trim() },
-      });
-
-      if (nameConflict) {
-        return NextResponse.json(
-          { error: "Category name already exists" },
-          { status: 400 }
-        );
-      }
+      return NextResponse.json(
+        { error: "Article category not found" },
+        { status: 404 }
+      );
     }
 
     const updateData: Record<string, unknown> = {};
 
-    if (body.name !== undefined) updateData.name = body.name.trim();
+    if (body.name && body.name.trim()) {
+      updateData.name = body.name.trim();
+    }
 
-    const articleCategory = await prisma.articleCategory.update({
+    const category = await prisma.articleCategory.update({
       where: { id: params.id },
       data: updateData,
-      include: {
-        _count: {
-          select: {
-            articles: true,
-          },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "ArticleCategory",
+      entityId: category.id,
+      description: `Updated article category: ${category.name}`,
+      metadata: {
+        oldData: {
+          name: existingCategory.name,
+        },
+        newData: {
+          name: category.name,
         },
       },
     });
 
-    return NextResponse.json(articleCategory);
+    return NextResponse.json(category);
   } catch (error) {
     console.error("Error updating article category:", error);
     return NextResponse.json(
@@ -109,26 +108,26 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if article category exists
+    // Check if category exists
     const existingCategory = await prisma.articleCategory.findUnique({
       where: { id: params.id },
-      include: {
-        _count: {
-          select: {
-            articles: true,
-          },
-        },
-      },
     });
 
     if (!existingCategory) {
-      return NextResponse.json({ error: "Article category not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Article category not found" },
+        { status: 404 }
+      );
     }
 
-    // Check if category has articles
-    if (existingCategory._count?.articles && existingCategory._count.articles > 0) {
+    // Check if category is being used by any articles
+    const articlesCount = await prisma.article.count({
+      where: { categoryId: params.id },
+    });
+
+    if (articlesCount > 0) {
       return NextResponse.json(
-        { error: "Cannot delete category that contains articles" },
+        { error: "Cannot delete category that is being used by articles" },
         { status: 400 }
       );
     }
@@ -137,7 +136,24 @@ export async function DELETE(
       where: { id: params.id },
     });
 
-    return NextResponse.json({ message: "Article category deleted successfully" });
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "ArticleCategory",
+      entityId: params.id,
+      description: `Deleted article category: ${existingCategory.name}`,
+      metadata: {
+        oldData: {
+          name: existingCategory.name,
+        },
+        newData: null,
+      },
+    });
+
+    return NextResponse.json({
+      message: "Article category deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting article category:", error);
     return NextResponse.json(

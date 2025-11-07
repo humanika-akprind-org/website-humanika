@@ -4,6 +4,8 @@ import type { CreateWorkProgramInput } from "@/types/work";
 import type { Status, Department } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -125,6 +127,29 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "WorkProgram",
+      entityId: workProgram.id,
+      description: `Created work program: ${workProgram.name}`,
+      metadata: {
+        newData: {
+          name: workProgram.name,
+          department: workProgram.department,
+          schedule: workProgram.schedule,
+          status: workProgram.status,
+          funds: workProgram.funds,
+          usedFunds: workProgram.usedFunds,
+          remainingFunds: workProgram.remainingFunds,
+          goal: workProgram.goal,
+          periodId: workProgram.periodId,
+          responsibleId: workProgram.responsibleId,
+        },
+      },
+    });
+
     // Handle status change to PENDING - create approval record
     if (body.status === "PENDING") {
       // Create approval record for the work program
@@ -177,6 +202,28 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // Get work programs before deletion for logging
+    const workProgramsToDelete = await prisma.workProgram.findMany({
+      where: {
+        id: {
+          in: validIds,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        department: true,
+        schedule: true,
+        status: true,
+        funds: true,
+        usedFunds: true,
+        remainingFunds: true,
+        goal: true,
+        periodId: true,
+        responsibleId: true,
+      },
+    });
+
     // Delete work programs
     const deleteResult = await prisma.workProgram.deleteMany({
       where: {
@@ -185,6 +232,32 @@ export async function DELETE(request: NextRequest) {
         },
       },
     });
+
+    // Log activity for each deleted work program
+    for (const workProgram of workProgramsToDelete) {
+      await logActivityFromRequest(request, {
+        userId: user.id,
+        activityType: ActivityType.DELETE,
+        entityType: "WorkProgram",
+        entityId: workProgram.id,
+        description: `Deleted work program: ${workProgram.name}`,
+        metadata: {
+          oldData: {
+            name: workProgram.name,
+            department: workProgram.department,
+            schedule: workProgram.schedule,
+            status: workProgram.status,
+            funds: workProgram.funds,
+            usedFunds: workProgram.usedFunds,
+            remainingFunds: workProgram.remainingFunds,
+            goal: workProgram.goal,
+            periodId: workProgram.periodId,
+            responsibleId: workProgram.responsibleId,
+          },
+          newData: null,
+        },
+      });
+    }
 
     return NextResponse.json({
       message: `Successfully deleted ${deleteResult.count} work programs`,

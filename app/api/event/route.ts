@@ -4,6 +4,8 @@ import type { CreateEventInput } from "@/types/event";
 import type { Status, Department } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   /**
@@ -174,6 +176,26 @@ export async function POST(request: NextRequest) {
               },
             },
           },
+        },
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "Event",
+      entityId: event.id,
+      description: `Created event: ${event.name}`,
+      metadata: {
+        newData: {
+          name: event.name,
+          department: event.department,
+          periodId: event.periodId,
+          responsibleId: event.responsibleId,
+          startDate: event.startDate,
+          endDate: event.endDate,
+          funds: event.funds,
         },
       },
     });

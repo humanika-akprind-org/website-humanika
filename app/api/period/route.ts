@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { PeriodApiResponse } from "@/types/period";
 import prisma from "@/lib/prisma";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(): Promise<NextResponse<PeriodApiResponse>> {
   try {
@@ -69,6 +71,23 @@ export async function POST(
         startYear,
         endYear,
         isActive,
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: "system", // Since there's no user context in this API
+      activityType: ActivityType.CREATE,
+      entityType: "Period",
+      entityId: period.id,
+      description: `Created period: ${period.name}`,
+      metadata: {
+        newData: {
+          name: period.name,
+          startYear: period.startYear,
+          endYear: period.endYear,
+          isActive: period.isActive,
+        },
       },
     });
 

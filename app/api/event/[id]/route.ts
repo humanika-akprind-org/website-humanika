@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import type { UpdateEventInput } from "@/types/event";
 import { getCurrentUser } from "@/lib/auth";
 import type { Prisma } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -71,6 +73,15 @@ export async function PUT(
     }
 
     const body: UpdateEventInput = await request.json();
+
+    // Get existing event for logging
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existingEvent) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
 
     const updateData = { ...body } as Prisma.EventUpdateInput;
 
@@ -150,6 +161,35 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "Event",
+      entityId: event.id,
+      description: `Updated event: ${event.name}`,
+      metadata: {
+        oldData: {
+          name: existingEvent.name,
+          department: existingEvent.department,
+          status: existingEvent.status,
+          startDate: existingEvent.startDate,
+          endDate: existingEvent.endDate,
+          funds: existingEvent.funds,
+          usedFunds: existingEvent.usedFunds,
+        },
+        newData: {
+          name: event.name,
+          department: event.department,
+          status: event.status,
+          startDate: event.startDate,
+          endDate: event.endDate,
+          funds: event.funds,
+          usedFunds: event.usedFunds,
+        },
+      },
+    });
+
     return NextResponse.json(event);
   } catch (error) {
     console.error("Error updating event:", error);
@@ -181,6 +221,27 @@ export async function DELETE(
 
     await prisma.event.delete({
       where: { id: params.id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "Event",
+      entityId: params.id,
+      description: `Deleted event: ${existingEvent.name}`,
+      metadata: {
+        oldData: {
+          name: existingEvent.name,
+          department: existingEvent.department,
+          status: existingEvent.status,
+          startDate: existingEvent.startDate,
+          endDate: existingEvent.endDate,
+          funds: existingEvent.funds,
+          usedFunds: existingEvent.usedFunds,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "Event deleted successfully" });

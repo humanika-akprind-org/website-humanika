@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import type { UpdateDepartmentTaskInput } from "@/types/task";
 import type { Prisma } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -86,6 +88,11 @@ export async function PUT(
     if (body.userId !== undefined) departmentTaskData.userId = body.userId;
     if (body.status !== undefined) departmentTaskData.status = body.status;
 
+    // Get existing task for logging
+    const existingTask = await prisma.departmentTask.findUnique({
+      where: { id },
+    });
+
     const departmentTask = await prisma.departmentTask.update({
       where: { id },
       data: departmentTaskData,
@@ -96,6 +103,29 @@ export async function PUT(
             name: true,
             email: true,
           },
+        },
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "DepartmentTask",
+      entityId: departmentTask.id,
+      description: `Updated department task: ${departmentTask.note}`,
+      metadata: {
+        oldData: {
+          note: existingTask?.note,
+          department: existingTask?.department,
+          userId: existingTask?.userId,
+          status: existingTask?.status,
+        },
+        newData: {
+          note: departmentTask.note,
+          department: departmentTask.department,
+          userId: departmentTask.userId,
+          status: departmentTask.status,
         },
       },
     });
@@ -140,6 +170,24 @@ export async function DELETE(
 
     await prisma.departmentTask.delete({
       where: { id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "DepartmentTask",
+      entityId: id,
+      description: `Deleted department task: ${departmentTask.note}`,
+      metadata: {
+        oldData: {
+          note: departmentTask.note,
+          department: departmentTask.department,
+          userId: departmentTask.userId,
+          status: departmentTask.status,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({

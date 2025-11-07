@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { UpdateOrganizationalStructureInput } from "@/types/structure";
 import { getCurrentUser } from "@/lib/auth";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -77,6 +79,31 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "OrganizationalStructure",
+      entityId: structure.id,
+      description: `Updated organizational structure: ${structure.name}`,
+      metadata: {
+        oldData: {
+          name: existingStructure.name,
+          periodId: existingStructure.periodId,
+          decree: existingStructure.decree,
+          structure: existingStructure.structure,
+          status: existingStructure.status,
+        },
+        newData: {
+          name: structure.name,
+          periodId: structure.periodId,
+          decree: structure.decree,
+          structure: structure.structure,
+          status: structure.status,
+        },
+      },
+    });
+
     return NextResponse.json(structure);
   } catch (error) {
     console.error("Error updating organizational structure:", error);
@@ -111,6 +138,25 @@ export async function DELETE(
 
     await prisma.organizationalStructure.delete({
       where: { id: params.id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "OrganizationalStructure",
+      entityId: params.id,
+      description: `Deleted organizational structure: ${existingStructure.name}`,
+      metadata: {
+        oldData: {
+          name: existingStructure.name,
+          periodId: existingStructure.periodId,
+          decree: existingStructure.decree,
+          structure: existingStructure.structure,
+          status: existingStructure.status,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({

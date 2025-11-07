@@ -3,6 +3,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { type ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/approval-enums";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -164,6 +166,24 @@ export async function POST(request: NextRequest) {
             role: true,
             department: true,
           },
+        },
+      },
+    });
+
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "Approval",
+      entityId: approval.id,
+      description: `Created approval for ${entityType} entity`,
+      metadata: {
+        newData: {
+          entityType,
+          entityId,
+          userId,
+          status: approval.status,
+          note,
         },
       },
     });

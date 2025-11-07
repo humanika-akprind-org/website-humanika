@@ -5,6 +5,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/approval-enums";
 import type { Prisma } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -81,6 +83,15 @@ export async function PUT(
     }
 
     const body: UpdateLetterInput = await request.json();
+
+    // Get existing letter for logging
+    const existingLetter = await prisma.letter.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existingLetter) {
+      return NextResponse.json({ error: "Letter not found" }, { status: 404 });
+    }
 
     const updateData: Prisma.LetterUpdateInput = {};
 
@@ -192,6 +203,39 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "Letter",
+      entityId: letter.id,
+      description: `Updated letter: ${letter.regarding}`,
+      metadata: {
+        oldData: {
+          regarding: existingLetter.regarding,
+          number: existingLetter.number,
+          origin: existingLetter.origin,
+          destination: existingLetter.destination,
+          type: existingLetter.type,
+          priority: existingLetter.priority,
+          status: existingLetter.status,
+          periodId: existingLetter.periodId,
+          eventId: existingLetter.eventId,
+        },
+        newData: {
+          regarding: letter.regarding,
+          number: letter.number,
+          origin: letter.origin,
+          destination: letter.destination,
+          type: letter.type,
+          priority: letter.priority,
+          status: letter.status,
+          periodId: letter.periodId,
+          eventId: letter.eventId,
+        },
+      },
+    });
+
     return NextResponse.json(letter);
   } catch (error) {
     console.error("Error updating letter:", error);
@@ -212,8 +256,40 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Fetch existing letter for logging
+    const existingLetter = await prisma.letter.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existingLetter) {
+      return NextResponse.json({ error: "Letter not found" }, { status: 404 });
+    }
+
     await prisma.letter.delete({
       where: { id: params.id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "Letter",
+      entityId: params.id,
+      description: `Deleted letter: ${existingLetter.regarding}`,
+      metadata: {
+        oldData: {
+          regarding: existingLetter.regarding,
+          number: existingLetter.number,
+          origin: existingLetter.origin,
+          destination: existingLetter.destination,
+          type: existingLetter.type,
+          priority: existingLetter.priority,
+          status: existingLetter.status,
+          periodId: existingLetter.periodId,
+          eventId: existingLetter.eventId,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "Letter deleted successfully" });

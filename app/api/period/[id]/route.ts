@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import type { PeriodApiResponse } from "@/types/period";
 import prisma from "@/lib/prisma";
 import { ObjectId } from "mongodb";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 interface Context {
   params: { id: string };
@@ -121,6 +123,29 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: "system", // Since there's no user context in this API
+      activityType: ActivityType.UPDATE,
+      entityType: "Period",
+      entityId: period.id,
+      description: `Updated period: ${period.name}`,
+      metadata: {
+        oldData: {
+          name: existingPeriod.name,
+          startYear: existingPeriod.startYear,
+          endYear: existingPeriod.endYear,
+          isActive: existingPeriod.isActive,
+        },
+        newData: {
+          name: period.name,
+          startYear: period.startYear,
+          endYear: period.endYear,
+          isActive: period.isActive,
+        },
+      },
+    });
+
     return NextResponse.json({
       success: true,
       data: period,
@@ -200,6 +225,24 @@ export async function DELETE(
 
     await prisma.period.delete({
       where: { id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: "system", // Since there's no user context in this API
+      activityType: ActivityType.DELETE,
+      entityType: "Period",
+      entityId: id,
+      description: `Deleted period: ${existingPeriod.name}`,
+      metadata: {
+        oldData: {
+          name: existingPeriod.name,
+          startYear: existingPeriod.startYear,
+          endYear: existingPeriod.endYear,
+          isActive: existingPeriod.isActive,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({

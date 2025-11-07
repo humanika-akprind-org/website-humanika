@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function GET(
   _request: NextRequest,
@@ -68,6 +70,27 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "Gallery",
+      entityId: gallery.id,
+      description: `Updated gallery: ${gallery.title}`,
+      metadata: {
+        oldData: {
+          title: existingGallery.title,
+          eventId: existingGallery.eventId,
+          image: existingGallery.image,
+        },
+        newData: {
+          title: gallery.title,
+          eventId: gallery.eventId,
+          image: gallery.image,
+        },
+      },
+    });
+
     return NextResponse.json(gallery);
   } catch (error) {
     console.error("Error updating gallery:", error);
@@ -99,6 +122,23 @@ export async function DELETE(
 
     await prisma.gallery.delete({
       where: { id: params.id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "Gallery",
+      entityId: params.id,
+      description: `Deleted gallery: ${existingGallery.title}`,
+      metadata: {
+        oldData: {
+          title: existingGallery.title,
+          eventId: existingGallery.eventId,
+          image: existingGallery.image,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "Gallery deleted successfully" });

@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import type { UpdateWorkProgramInput } from "@/types/work";
 import { getCurrentUser } from "@/lib/auth";
 import type { Prisma } from "@prisma/client";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 // GET work program by ID
 export async function GET(
@@ -71,6 +73,18 @@ export async function PUT(
 
     const body: UpdateWorkProgramInput = await request.json();
 
+    // Fetch existing work program for logging
+    const existingWorkProgram = await prisma.workProgram.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existingWorkProgram) {
+      return NextResponse.json(
+        { error: "Work program not found" },
+        { status: 404 }
+      );
+    }
+
     const updateData = { ...body } as Prisma.WorkProgramUpdateInput;
 
     // Handle status change to PENDING - create approval record
@@ -131,6 +145,41 @@ export async function PUT(
       },
     });
 
+    // Log activity
+    await logActivityFromRequest(request, {
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "WorkProgram",
+      entityId: workProgram.id,
+      description: `Updated work program: ${workProgram.name}`,
+      metadata: {
+        oldData: {
+          name: existingWorkProgram.name,
+          department: existingWorkProgram.department,
+          schedule: existingWorkProgram.schedule,
+          status: existingWorkProgram.status,
+          funds: existingWorkProgram.funds,
+          usedFunds: existingWorkProgram.usedFunds,
+          remainingFunds: existingWorkProgram.remainingFunds,
+          goal: existingWorkProgram.goal,
+          periodId: existingWorkProgram.periodId,
+          responsibleId: existingWorkProgram.responsibleId,
+        },
+        newData: {
+          name: workProgram.name,
+          department: workProgram.department,
+          schedule: workProgram.schedule,
+          status: workProgram.status,
+          funds: workProgram.funds,
+          usedFunds: workProgram.usedFunds,
+          remainingFunds: workProgram.remainingFunds,
+          goal: workProgram.goal,
+          periodId: workProgram.periodId,
+          responsibleId: workProgram.responsibleId,
+        },
+      },
+    });
+
     return NextResponse.json(workProgram);
   } catch (error) {
     console.error("Error updating work program:", error);
@@ -160,8 +209,44 @@ export async function DELETE(
       );
     }
 
+    // Fetch existing work program for logging
+    const existingWorkProgram = await prisma.workProgram.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existingWorkProgram) {
+      return NextResponse.json(
+        { error: "Work program not found" },
+        { status: 404 }
+      );
+    }
+
     await prisma.workProgram.delete({
       where: { id: params.id },
+    });
+
+    // Log activity
+    await logActivityFromRequest(_request, {
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "WorkProgram",
+      entityId: params.id,
+      description: `Deleted work program: ${existingWorkProgram.name}`,
+      metadata: {
+        oldData: {
+          name: existingWorkProgram.name,
+          department: existingWorkProgram.department,
+          schedule: existingWorkProgram.schedule,
+          status: existingWorkProgram.status,
+          funds: existingWorkProgram.funds,
+          usedFunds: existingWorkProgram.usedFunds,
+          remainingFunds: existingWorkProgram.remainingFunds,
+          goal: existingWorkProgram.goal,
+          periodId: existingWorkProgram.periodId,
+          responsibleId: existingWorkProgram.responsibleId,
+        },
+        newData: null,
+      },
     });
 
     return NextResponse.json({ message: "Work program deleted successfully" });

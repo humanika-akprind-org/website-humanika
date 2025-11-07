@@ -4,6 +4,8 @@ import prisma from "@/lib/prisma";
 import { type UserRole, type Department, type Position } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { randomColor } from "@/lib/randomColor";
+import { logActivityFromRequest } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 // GET - Get all users
 export async function GET(request: NextRequest) {
@@ -170,6 +172,27 @@ export async function POST(request: NextRequest) {
         verifiedAccount: true,
         createdAt: true,
         avatarColor: true,
+      },
+    });
+
+    // Log activity - Note: This is a system operation, so we use "system" as userId
+    await logActivityFromRequest(request, {
+      userId: "system", // Since this is user creation, no authenticated user context
+      activityType: ActivityType.CREATE,
+      entityType: "User",
+      entityId: user.id,
+      description: `Created user: ${user.name}`,
+      metadata: {
+        newData: {
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          department: user.department,
+          position: user.position,
+          isActive: user.isActive,
+          verifiedAccount: user.verifiedAccount,
+        },
       },
     });
 

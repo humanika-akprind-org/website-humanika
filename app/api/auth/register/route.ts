@@ -3,11 +3,12 @@ import { hashPassword } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { randomColor } from "@/lib/randomColor";
+import { logActivity } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, username, password } =
-      await request.json();
+    const { name, email, username, password } = await request.json();
 
     // Input validation
     if (
@@ -67,11 +68,29 @@ export async function POST(request: Request) {
       },
     });
 
+    // Log activity
+    await logActivity({
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "User",
+      entityId: user.id,
+      description: `User registered: ${user.name} (${user.email})`,
+      metadata: {
+        newData: {
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        },
+      },
+    });
+
     // Create response without password
     const { password: _, ...userWithoutPassword } = user;
     const response = NextResponse.json({
       success: true,
-      message: "Registration successful. Please wait for admin verification before logging in.",
+      message:
+        "Registration successful. Please wait for admin verification before logging in.",
       user: userWithoutPassword,
     });
 
