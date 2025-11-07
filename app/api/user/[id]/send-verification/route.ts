@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { appConfig } from "@/lib/config";
+import { appConfig } from "@/lib/config/config";
 import { Resend } from "resend";
 
 // Initialize Resend only if API key is available

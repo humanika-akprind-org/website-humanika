@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import type { User } from "@/types/user";
 import { UserRole } from "@/types/enums";
-import { nodeEnv, isProduction, jwtSecret } from "@/lib/config";
+import { nodeEnv, isProduction, jwtSecret } from "@/lib/config/config";
 
 // Use the singleton pattern for Prisma to avoid multiple instances
 const globalForPrisma = globalThis as unknown as {

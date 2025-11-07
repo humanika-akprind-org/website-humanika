@@ -1,6 +1,6 @@
 import DriveForm from "@/components/admin/drive/Form";
 import PageHeader from "@/components/admin/drive/PageHeader";
-import { getGoogleDriveFile } from "@/lib/google-drive-api/google-drive";
+import { getGoogleDriveFile } from "@/lib/google-drive/google-drive";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 

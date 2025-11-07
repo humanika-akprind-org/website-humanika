@@ -4,7 +4,7 @@ import type {
   UpdateWorkProgramInput,
   WorkProgramFilter,
 } from "@/types/work";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 
@@ -97,7 +97,9 @@ export const deleteWorkProgram = async (id: string): Promise<void> => {
   }
 };
 
-export const deleteWorkPrograms = async (ids: string[]): Promise<{ deletedCount: number }> => {
+export const deleteWorkPrograms = async (
+  ids: string[]
+): Promise<{ deletedCount: number }> => {
   const response = await fetch(`${API_URL}/work`, {
     method: "DELETE",
     headers: {

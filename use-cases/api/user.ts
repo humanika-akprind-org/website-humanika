@@ -7,7 +7,7 @@ import type {
   UsersResponse,
   ApiResponse,
 } from "@/types/user";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_BASE_URL = apiUrl;
 

@@ -1,5 +1,9 @@
 import { google } from "googleapis";
-import { googleClientId, googleClientSecret, googleRedirectUri } from "@/lib/config";
+import {
+  googleClientId,
+  googleClientSecret,
+  googleRedirectUri,
+} from "@/lib/config/config";
 
 export const oauth2Client = new google.auth.OAuth2(
   googleClientId,

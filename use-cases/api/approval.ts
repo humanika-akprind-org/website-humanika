@@ -1,4 +1,4 @@
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 import type {
   Approval,
   ApprovalsResponse,

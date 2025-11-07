@@ -7,7 +7,7 @@ import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
 import { Department as DepartmentEnum, Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { useWorkPrograms } from "@/hooks/useWorkPrograms";
-import { eventThumbnailFolderId } from "@/lib/config";
+import { eventThumbnailFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 import { FiSend } from "react-icons/fi";

@@ -12,7 +12,7 @@ import { LetterType, LetterPriority } from "@/types/enums";
 import type { Period } from "@/types/period";
 import type { Event } from "@/types/event";
 import { useFile } from "@/hooks/useFile";
-import { appConfig } from "@/lib/config";
+import { appConfig } from "@/lib/config/config";
 import TextEditor from "@/components/admin/ui/TextEditor";
 
 interface LetterFormProps {

@@ -1,5 +1,5 @@
 import GoogleDriveConnect from "@/components/admin/google-drive/GoogleDriveConnect";
-import { getGoogleDriveFiles } from "@/lib/google-drive-api/google-drive";
+import { getGoogleDriveFiles } from "@/lib/google-drive/google-drive";
 import { getCurrentUser } from "@/lib/auth";
 import { type AuthGuardProps } from "@/types/google-drive";
 

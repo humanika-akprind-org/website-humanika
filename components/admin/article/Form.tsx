@@ -10,7 +10,7 @@ import type {
 } from "@/types/article";
 import { Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
-import { articleFolderId } from "@/lib/config";
+import { articleFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 import { getArticleCategories } from "@/use-cases/api/article-category";

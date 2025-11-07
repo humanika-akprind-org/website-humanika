@@ -4,7 +4,7 @@ import type {
   UpdateFinanceInput,
   FinanceFilter,
 } from "@/types/finance";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 

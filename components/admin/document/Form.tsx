@@ -10,7 +10,7 @@ import type {
 } from "@/types/document";
 import { DocumentType as DocumentTypeEnum, Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
-import { documentFolderId } from "@/lib/config";
+import { documentFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
@@ -109,9 +109,7 @@ export default function DocumentForm({
     setExistingDocument(null);
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent,
-  ) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoadingState(true);
     setError(null);

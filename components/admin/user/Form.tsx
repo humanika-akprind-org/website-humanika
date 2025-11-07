@@ -1,17 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  FiUser,
-  FiMail,
-  FiKey,
-  FiUsers,
-  FiLock,
-  FiSave,
-} from "react-icons/fi";
+import { FiUser, FiMail, FiKey, FiUsers, FiLock, FiSave } from "react-icons/fi";
 import { UserRole, Department, Position } from "@/types/enums";
 import { formatEnumValue } from "@/lib/utils";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 interface CreateUserData {
   name: string;

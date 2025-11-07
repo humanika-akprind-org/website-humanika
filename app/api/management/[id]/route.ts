@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { ManagementService } from "@/lib/services/management";
+import { ManagementService } from "@/lib/services/management/management.service";
 import type { ManagementServerData } from "@/types/management";
 import { logActivityFromRequest } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";

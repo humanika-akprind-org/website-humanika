@@ -1,5 +1,5 @@
 import type { Period, PeriodFormData, PeriodApiResponse } from "@/types/period";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_BASE_URL = apiUrl;
 

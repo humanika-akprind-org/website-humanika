@@ -4,7 +4,7 @@ import type {
   UpdateGalleryInput,
   GalleryFilter,
 } from "@/types/gallery";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 
@@ -55,9 +55,9 @@ export const createGallery = async (
   const formData = new FormData();
   formData.append("title", data.title);
   formData.append("eventId", data.eventId);
-      if (data.file) {
-        formData.append("file", data.file);
-      }
+  if (data.file) {
+    formData.append("file", data.file);
+  }
 
   const response = await fetch(`${API_URL}/gallery`, {
     method: "POST",
@@ -78,7 +78,7 @@ export const createGallery = async (
       status: response.status,
       statusText: response.statusText,
       errorMessage,
-      data
+      data,
     });
     throw new Error(errorMessage);
   }
