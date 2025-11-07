@@ -1,9 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { CreateArticleCategoryInput } from "@/types/article-category";
 import { getCurrentUser } from "@/lib/auth";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getArticleCategories,
+  createArticleCategory,
+} from "@/lib/services/article/article-category.service";
 
 export async function GET(_request: NextRequest) {
   try {
@@ -12,9 +13,7 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const categories = await prisma.articleCategory.findMany({
-      orderBy: { name: "asc" },
-    });
+    const categories = await getArticleCategories();
 
     return NextResponse.json(categories);
   } catch (error) {
@@ -42,25 +41,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const category = await prisma.articleCategory.create({
-      data: {
-        name: body.name.trim(),
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.CREATE,
-      entityType: "ArticleCategory",
-      entityId: category.id,
-      description: `Created article category: ${category.name}`,
-      metadata: {
-        newData: {
-          name: category.name,
-        },
-      },
-    });
+    const category = await createArticleCategory(body, user.id, request);
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {

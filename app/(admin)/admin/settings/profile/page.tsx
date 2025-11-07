@@ -165,8 +165,7 @@ export default function ProfilePage() {
 
     if (!formData.name?.trim()) errors.name = "Name is required";
     if (!formData.email?.trim()) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      errors.email = "Email is invalid";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
     if (!formData.username?.trim()) errors.username = "Username is required";
 
     setFormErrors(errors);

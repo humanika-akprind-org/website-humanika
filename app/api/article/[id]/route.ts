@@ -1,9 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { UpdateArticleInput } from "@/types/article";
 import { getCurrentUser } from "@/lib/auth";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getArticleById,
+  updateArticle,
+  deleteArticle,
+} from "@/lib/services/article/article.service";
 
 export async function GET(
   _request: NextRequest,
@@ -15,20 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const article = await prisma.article.findUnique({
-      where: { id: params.id },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
-      },
-    });
+    const article = await getArticleById(params.id);
 
     if (!article) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
@@ -56,79 +45,13 @@ export async function PUT(
 
     const body: UpdateArticleInput = await request.json();
 
-    // Check if article exists
-    const existingArticle = await prisma.article.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingArticle) {
-      return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    }
-
-    const updateData: Record<string, unknown> = {};
-
-    if (body.title) {
-      updateData.title = body.title;
-      updateData.slug = body.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-    }
-    if (body.thumbnail !== undefined) updateData.thumbnail = body.thumbnail;
-    if (body.content !== undefined) updateData.content = body.content;
-    if (body.authorId) updateData.authorId = body.authorId;
-    if (body.categoryId) updateData.categoryId = body.categoryId;
-    if (body.periodId !== undefined && body.periodId.trim() !== "") {
-      updateData.periodId = body.periodId;
-    } else if (body.periodId === "") {
-      // If empty string is provided, set to null to clear the relation
-      updateData.periodId = null;
-    }
-    if (body.isPublished !== undefined) updateData.isPublished = body.isPublished;
-    if (body.publishedAt !== undefined) updateData.publishedAt = body.publishedAt;
-    if (body.status) updateData.status = body.status;
-
-    const article = await prisma.article.update({
-      where: { id: params.id },
-      data: updateData,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "Article",
-      entityId: article.id,
-      description: `Updated article: ${article.title}`,
-      metadata: {
-        oldData: {
-          title: existingArticle.title,
-          slug: existingArticle.slug,
-          categoryId: existingArticle.categoryId,
-          authorId: existingArticle.authorId,
-        },
-        newData: {
-          title: article.title,
-          slug: article.slug,
-          categoryId: article.categoryId,
-          authorId: article.authorId,
-        },
-      },
-    });
+    const article = await updateArticle(params.id, body, user.id, request);
 
     return NextResponse.json(article);
   } catch (error) {
+    if (error instanceof Error && error.message === "Article not found") {
+      return NextResponse.json({ error: "Article not found" }, { status: 404 });
+    }
     console.error("Error updating article:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -147,39 +70,13 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if article exists
-    const existingArticle = await prisma.article.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingArticle) {
-      return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    }
-
-    await prisma.article.delete({
-      where: { id: params.id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "Article",
-      entityId: params.id,
-      description: `Deleted article: ${existingArticle.title}`,
-      metadata: {
-        oldData: {
-          title: existingArticle.title,
-          slug: existingArticle.slug,
-          categoryId: existingArticle.categoryId,
-          authorId: existingArticle.authorId,
-        },
-        newData: null,
-      },
-    });
+    await deleteArticle(params.id, user.id, request);
 
     return NextResponse.json({ message: "Article deleted successfully" });
   } catch (error) {
+    if (error instanceof Error && error.message === "Article not found") {
+      return NextResponse.json({ error: "Article not found" }, { status: 404 });
+    }
     console.error("Error deleting article:", error);
     return NextResponse.json(
       { error: "Internal server error" },

@@ -203,11 +203,9 @@ export default function UserEditForm({
 
     if (!formData.name?.trim()) errors.name = "Name is required";
     if (!formData.email?.trim()) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      errors.email = "Email is invalid";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
     if (!formData.username?.trim()) errors.username = "Username is required";
-    if (formData.password && formData.password.length < 6)
-      errors.password = "Password must be at least 6 characters";
+    if (formData.password && formData.password.length < 6) errors.password = "Password must be at least 6 characters";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
