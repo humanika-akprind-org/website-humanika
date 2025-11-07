@@ -1,9 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { UpdateArticleCategoryInput } from "@/types/article-category";
 import { getCurrentUser } from "@/lib/auth";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getArticleCategoryById,
+  updateArticleCategory,
+  deleteArticleCategory,
+} from "@/lib/services/article/article-category.service";
 
 export async function GET(
   _request: NextRequest,
@@ -15,9 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const category = await prisma.articleCategory.findUnique({
-      where: { id: params.id },
-    });
+    const category = await getArticleCategoryById(params.id);
 
     if (!category) {
       return NextResponse.json(
@@ -48,49 +48,21 @@ export async function PUT(
 
     const body: UpdateArticleCategoryInput = await request.json();
 
-    // Check if category exists
-    const existingCategory = await prisma.articleCategory.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingCategory) {
-      return NextResponse.json(
-        { error: "Article category not found" },
-        { status: 404 }
-      );
-    }
-
-    const updateData: Record<string, unknown> = {};
-
-    if (body.name && body.name.trim()) {
-      updateData.name = body.name.trim();
-    }
-
-    const category = await prisma.articleCategory.update({
-      where: { id: params.id },
-      data: updateData,
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "ArticleCategory",
-      entityId: category.id,
-      description: `Updated article category: ${category.name}`,
-      metadata: {
-        oldData: {
-          name: existingCategory.name,
-        },
-        newData: {
-          name: category.name,
-        },
-      },
-    });
+    const category = await updateArticleCategory(
+      params.id,
+      body,
+      user.id,
+      request
+    );
 
     return NextResponse.json(category);
   } catch (error) {
     console.error("Error updating article category:", error);
+    if (error instanceof Error) {
+      if (error.message === "Article category not found") {
+        return NextResponse.json({ error: error.message }, { status: 404 });
+      }
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -99,7 +71,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -108,54 +80,24 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if category exists
-    const existingCategory = await prisma.articleCategory.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingCategory) {
-      return NextResponse.json(
-        { error: "Article category not found" },
-        { status: 404 }
-      );
-    }
-
-    // Check if category is being used by any articles
-    const articlesCount = await prisma.article.count({
-      where: { categoryId: params.id },
-    });
-
-    if (articlesCount > 0) {
-      return NextResponse.json(
-        { error: "Cannot delete category that is being used by articles" },
-        { status: 400 }
-      );
-    }
-
-    await prisma.articleCategory.delete({
-      where: { id: params.id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(_request, {
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "ArticleCategory",
-      entityId: params.id,
-      description: `Deleted article category: ${existingCategory.name}`,
-      metadata: {
-        oldData: {
-          name: existingCategory.name,
-        },
-        newData: null,
-      },
-    });
+    await deleteArticleCategory(params.id, user.id, request);
 
     return NextResponse.json({
       message: "Article category deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting article category:", error);
+    if (error instanceof Error) {
+      if (error.message === "Article category not found") {
+        return NextResponse.json({ error: error.message }, { status: 404 });
+      }
+      if (
+        error.message ===
+        "Cannot delete category that is being used by articles"
+      ) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
