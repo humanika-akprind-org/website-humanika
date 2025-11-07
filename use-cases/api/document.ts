@@ -4,7 +4,7 @@ import type {
   UpdateDocumentInput,
   DocumentFilter,
 } from "@/types/document";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 

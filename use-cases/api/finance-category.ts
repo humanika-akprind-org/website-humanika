@@ -4,7 +4,7 @@ import type {
   UpdateFinanceCategoryInput,
   FinanceCategoryFilter,
 } from "@/types/finance-category";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 
@@ -17,14 +17,17 @@ export const getFinanceCategories = async (
   if (filter?.isActive !== undefined) params.append("isActive", filter.isActive.toString());
   if (filter?.search) params.append("search", filter.search);
 
-  const response = await fetch(`${API_URL}/finance/category?${params.toString()}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `${API_URL}/finance/category?${params.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      cache: "no-store",
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Failed to fetch finance categories");
@@ -33,7 +36,9 @@ export const getFinanceCategories = async (
   return response.json();
 };
 
-export const getFinanceCategory = async (id: string): Promise<FinanceCategory> => {
+export const getFinanceCategory = async (
+  id: string
+): Promise<FinanceCategory> => {
   const response = await fetch(`${API_URL}/finance/category/${id}`, {
     method: "GET",
     headers: {
@@ -74,7 +79,7 @@ export const createFinanceCategory = async (
       status: response.status,
       statusText: response.statusText,
       errorMessage,
-      data
+      data,
     });
     throw new Error(errorMessage);
   }

@@ -3,16 +3,18 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import type { Gallery, CreateGalleryInput, UpdateGalleryInput } from "@/types/gallery";
+import type {
+  Gallery,
+  CreateGalleryInput,
+  UpdateGalleryInput,
+} from "@/types/gallery";
 import type { Event } from "@/types/event";
 import { useEvents } from "@/hooks/useEvents";
 import { useFile } from "@/hooks/useFile";
-import { galleryFolderId } from "@/lib/config";
+import { galleryFolderId } from "@/lib/config/config";
 
 // Helper function to check if image is from Google Drive (either URL or file ID)
-const isGoogleDriveImage = (
-  image: string | null | undefined
-): boolean => {
+const isGoogleDriveImage = (image: string | null | undefined): boolean => {
   if (!image) return false;
   return (
     image.includes("drive.google.com") ||
@@ -43,7 +45,13 @@ interface GalleryFormProps {
   events?: Event[];
 }
 
-export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken, events: propEvents }: GalleryFormProps) {
+export default function GalleryForm({
+  gallery,
+  onSubmit,
+  isLoading,
+  accessToken,
+  events: propEvents,
+}: GalleryFormProps) {
   const router = useRouter();
   const { events: hookEvents, isLoading: eventsLoading } = useEvents();
   const events = propEvents || hookEvents;
@@ -62,7 +70,9 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(gallery?.image || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    gallery?.image || null
+  );
   const [removedFile, setRemovedFile] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
@@ -73,11 +83,13 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
     }
   }, [photoError]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, name: "" }));
+      setErrors((prev) => ({ ...prev, name: "" }));
     }
   };
 
@@ -87,13 +99,16 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      setErrors(prev => ({ ...prev, file: "File must be an image" }));
+      setErrors((prev) => ({ ...prev, file: "File must be an image" }));
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setErrors(prev => ({ ...prev, file: "File size must be less than 5MB" }));
+      setErrors((prev) => ({
+        ...prev,
+        file: "File size must be less than 5MB",
+      }));
       return;
     }
 
@@ -101,7 +116,7 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
     setPreviewUrl(URL.createObjectURL(file));
     setRemovedFile(false);
     if (errors.file) {
-      setErrors(prev => ({ ...prev, file: "" }));
+      setErrors((prev) => ({ ...prev, file: "" }));
     }
   };
 
@@ -198,7 +213,9 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
 
       await onSubmit(submitData);
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Failed to save gallery");
+      setError(
+        error instanceof Error ? error.message : "Failed to save gallery"
+      );
     }
   };
 
@@ -247,7 +264,10 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700"
+          >
             Title *
           </label>
           <input
@@ -259,12 +279,17 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter gallery title"
           />
-          {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+          {errors.title && (
+            <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+          )}
         </div>
 
         {/* Event */}
         <div>
-          <label htmlFor="eventId" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="eventId"
+            className="block text-sm font-medium text-gray-700"
+          >
             Event *
           </label>
           <select
@@ -282,7 +307,9 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
               </option>
             ))}
           </select>
-          {errors.eventId && <p className="mt-1 text-sm text-red-600">{errors.eventId}</p>}
+          {errors.eventId && (
+            <p className="mt-1 text-sm text-red-600">{errors.eventId}</p>
+          )}
         </div>
 
         {/* File Upload */}
@@ -301,13 +328,13 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
                     controls
                   />
                 ) : (
-          <Image
-            src={getPreviewUrl(previewUrl)}
-            alt="Preview"
-            width={128}
-            height={128}
-            className="w-32 h-32 object-cover rounded-lg border"
-          />
+                  <Image
+                    src={getPreviewUrl(previewUrl)}
+                    alt="Preview"
+                    width={128}
+                    height={128}
+                    className="w-32 h-32 object-cover rounded-lg border"
+                  />
                 )}
                 <button
                   type="button"
@@ -315,8 +342,18 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
                   className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                   title="Remove file"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -342,7 +379,9 @@ export default function GalleryForm({ gallery, onSubmit, isLoading, accessToken,
               )}
             </div>
           </div>
-          {errors.file && <p className="mt-1 text-sm text-red-600">{errors.file}</p>}
+          {errors.file && (
+            <p className="mt-1 text-sm text-red-600">{errors.file}</p>
+          )}
         </div>
 
         {/* Submit Buttons */}

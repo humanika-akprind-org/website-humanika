@@ -1,8 +1,8 @@
-import { oauth2Client } from "@/lib/google-oauth/google-oauth";
+import { oauth2Client } from "@/lib/google-drive/google-oauth";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { isProduction } from "@/lib/config";
-import { googleClientId, googleClientSecret } from "@/lib/config";
+import { isProduction } from "@/lib/config/config";
+import { googleClientId, googleClientSecret } from "@/lib/config/config";
 
 export async function GET() {
   try {

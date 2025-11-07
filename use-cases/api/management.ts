@@ -4,7 +4,7 @@ import type {
   ManagementApiResponse,
 } from "@/types/management";
 // import { ApiResponseStatus } from "@/types/enums";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_BASE_URL = apiUrl;
 
@@ -86,7 +86,10 @@ export const ManagementApi = {
     }
   },
 
-  async deleteManagement(id: string, accessToken?: string | null): Promise<void> {
+  async deleteManagement(
+    id: string,
+    accessToken?: string | null
+  ): Promise<void> {
     try {
       const headers: Record<string, string> = {};
 

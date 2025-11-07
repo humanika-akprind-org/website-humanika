@@ -4,13 +4,11 @@ import type {
   UpdateEventInput,
   EventFilter,
 } from "@/types/event";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 
-export const getEvents = async (
-  filter?: EventFilter
-): Promise<Event[]> => {
+export const getEvents = async (filter?: EventFilter): Promise<Event[]> => {
   const params = new URLSearchParams();
 
   if (filter?.department) params.append("department", filter.department);
@@ -54,9 +52,7 @@ export const getEvent = async (id: string): Promise<Event> => {
   return response.json();
 };
 
-export const createEvent = async (
-  data: CreateEventInput
-): Promise<Event> => {
+export const createEvent = async (data: CreateEventInput): Promise<Event> => {
   const response = await fetch(`${API_URL}/event`, {
     method: "POST",
     headers: {
@@ -79,7 +75,7 @@ export const createEvent = async (
       status: response.status,
       statusText: response.statusText,
       errorMessage,
-      data
+      data,
     });
     throw new Error(errorMessage);
   }

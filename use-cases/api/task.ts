@@ -4,7 +4,7 @@ import type {
   UpdateDepartmentTaskInput,
   DepartmentTaskFilter,
 } from "@/types/task";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 
@@ -34,7 +34,9 @@ export const getDepartmentTasks = async (
   return response.json();
 };
 
-export const getDepartmentTask = async (id: string): Promise<DepartmentTask> => {
+export const getDepartmentTask = async (
+  id: string
+): Promise<DepartmentTask> => {
   const response = await fetch(`${API_URL}/task/${id}`, {
     method: "GET",
     headers: {
@@ -75,7 +77,7 @@ export const createDepartmentTask = async (
       status: response.status,
       statusText: response.statusText,
       errorMessage,
-      data
+      data,
     });
     throw new Error(errorMessage);
   }

@@ -4,7 +4,7 @@ import type {
   UpdateArticleInput,
   ArticleFilter,
 } from "@/types/article";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 
@@ -78,7 +78,7 @@ export const createArticle = async (
       status: response.status,
       statusText: response.statusText,
       errorMessage,
-      data
+      data,
     });
     throw new Error(errorMessage);
   }

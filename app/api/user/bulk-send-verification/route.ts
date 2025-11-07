@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { appConfig } from "@/lib/config";
+import { appConfig } from "@/lib/config/config";
 import { Resend } from "resend";
 
 // Initialize Resend only if API key is available
@@ -10,7 +10,10 @@ if (appConfig.resendApiKey) {
 }
 
 // Helper function to send emails in batches to avoid rate limits
-async function sendEmailsInBatches(users: Array<{ id: string; email: string; name: string }>, batchSize: number = 10) {
+async function sendEmailsInBatches(
+  users: Array<{ id: string; email: string; name: string }>,
+  batchSize: number = 10
+) {
   const results = [];
   const batches = [];
 
@@ -22,7 +25,9 @@ async function sendEmailsInBatches(users: Array<{ id: string; email: string; nam
   // Process each batch with delay
   for (let i = 0; i < batches.length; i++) {
     const batch = batches[i];
-    console.log(`Processing batch ${i + 1}/${batches.length} with ${batch.length} emails`);
+    console.log(
+      `Processing batch ${i + 1}/${batches.length} with ${batch.length} emails`
+    );
 
     const batchPromises = batch.map(async (user) => {
       try {
@@ -48,7 +53,12 @@ async function sendEmailsInBatches(users: Array<{ id: string; email: string; nam
 
         if (error) {
           console.error(`Failed to send email to ${user.email}:`, error);
-          return { userId: user.id, email: user.email, success: false, error: error.message };
+          return {
+            userId: user.id,
+            email: user.email,
+            success: false,
+            error: error.message,
+          };
         }
 
         console.log(`Email sent successfully to ${user.email}:`, data);
@@ -59,7 +69,7 @@ async function sendEmailsInBatches(users: Array<{ id: string; email: string; nam
           userId: user.id,
           email: user.email,
           success: false,
-          error: (error instanceof Error) ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error),
         };
       }
     });
@@ -71,7 +81,7 @@ async function sendEmailsInBatches(users: Array<{ id: string; email: string; nam
     // Add delay between batches (except for the last batch)
     if (i < batches.length - 1) {
       console.log(`Waiting 2 seconds before next batch...`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
 
@@ -112,20 +122,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         count: users.length,
         message: `Users found but emails not sent - API key not configured`,
-        users: users.map(u => ({ id: u.id, email: u.email }))
+        users: users.map((u) => ({ id: u.id, email: u.email })),
       });
     }
 
-    console.log(`Starting bulk email send to ${users.length} users in batches of ${batchSize}`);
+    console.log(
+      `Starting bulk email send to ${users.length} users in batches of ${batchSize}`
+    );
 
     // Send emails in batches to handle rate limits and organizational domain restrictions
     const results = await sendEmailsInBatches(users, batchSize);
 
     // Count successful sends
-    const successful = results.filter(r => r.success).length;
-    const failed = results.filter(r => !r.success).length;
+    const successful = results.filter((r) => r.success).length;
+    const failed = results.filter((r) => !r.success).length;
 
-    console.log(`Bulk email send completed: ${successful} successful, ${failed} failed`);
+    console.log(
+      `Bulk email send completed: ${successful} successful, ${failed} failed`
+    );
 
     return NextResponse.json({
       count: users.length,
@@ -133,7 +147,7 @@ export async function POST(request: NextRequest) {
       failed,
       batchSize,
       message: `Emails sent: ${successful} successful, ${failed} failed`,
-      results
+      results,
     });
   } catch (error) {
     console.error("Error bulk sending verification emails:", error);

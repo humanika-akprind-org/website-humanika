@@ -4,7 +4,7 @@ import type {
   UpdateOrganizationalStructureInput,
   OrganizationalStructureFilter,
 } from "@/types/structure";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 

@@ -4,7 +4,7 @@ import type {
   UpdateLetterInput,
   LetterFilter,
 } from "@/types/letter";
-import { apiUrl } from "@/lib/config";
+import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
 

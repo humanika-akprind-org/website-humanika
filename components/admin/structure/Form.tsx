@@ -13,7 +13,7 @@ import { useFile } from "@/hooks/useFile";
 import {
   structureFolderId,
   organizationalStructureFolderId,
-} from "@/lib/config";
+} from "@/lib/config/config";
 import type { Period } from "@/types/period";
 import { FiFile } from "react-icons/fi";
 

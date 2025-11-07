@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { type UserRole, type Department, type Position } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { randomColor } from "@/lib/randomColor";
+import { randomColor } from "@/lib/random-color";
 import { logActivityFromRequest } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 

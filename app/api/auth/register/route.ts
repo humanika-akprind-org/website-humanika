@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { hashPassword } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
-import { randomColor } from "@/lib/randomColor";
+import { randomColor } from "@/lib/random-color";
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 

@@ -1,14 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  FiUser,
-  FiMail,
-  FiUsers,
-  FiSave,
-  FiEdit3,
-} from "react-icons/fi";
-import { apiUrl } from "@/lib/config";
+import { FiUser, FiMail, FiUsers, FiSave, FiEdit3 } from "react-icons/fi";
+import { apiUrl } from "@/lib/config/config";
 import { useToast } from "@/hooks/use-toast";
 
 // Enum values from Prisma
@@ -171,7 +165,8 @@ export default function ProfilePage() {
 
     if (!formData.name?.trim()) errors.name = "Name is required";
     if (!formData.email?.trim()) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      errors.email = "Email is invalid";
     if (!formData.username?.trim()) errors.username = "Username is required";
 
     setFormErrors(errors);
@@ -230,7 +225,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"/>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -239,8 +234,12 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Profile Not Found</h1>
-          <p className="text-gray-600">Unable to load your profile information.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Profile Not Found
+          </h1>
+          <p className="text-gray-600">
+            Unable to load your profile information.
+          </p>
         </div>
       </div>
     );
@@ -252,7 +251,9 @@ export default function ProfilePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
-          <p className="text-gray-600 mt-1">Manage your account information and preferences</p>
+          <p className="text-gray-600 mt-1">
+            Manage your account information and preferences
+          </p>
         </div>
         {!isEditing && (
           <button
@@ -282,7 +283,9 @@ export default function ProfilePage() {
             </div>
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-semibold text-gray-900">{user.name}</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">
+              {user.name}
+            </h2>
             <p className="text-gray-600">{user.email}</p>
             <div className="flex items-center space-x-4 mt-2">
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
@@ -308,7 +311,9 @@ export default function ProfilePage() {
 
       {/* Personal Information */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Personal Information</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-6">
+          Personal Information
+        </h3>
 
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -355,7 +360,9 @@ export default function ProfilePage() {
                   />
                 </div>
                 {formErrors.email && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formErrors.email}
+                  </p>
                 )}
               </div>
 
@@ -378,7 +385,9 @@ export default function ProfilePage() {
                   />
                 </div>
                 {formErrors.username && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.username}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formErrors.username}
+                  </p>
                 )}
               </div>
 
@@ -455,8 +464,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-
-
             </div>
 
             <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
@@ -512,7 +519,9 @@ export default function ProfilePage() {
                 Department
               </label>
               <p className="text-gray-900">
-                {user.department ? formatEnumValue(user.department) : "Not specified"}
+                {user.department
+                  ? formatEnumValue(user.department)
+                  : "Not specified"}
               </p>
             </div>
 
@@ -521,7 +530,9 @@ export default function ProfilePage() {
                 Position
               </label>
               <p className="text-gray-900">
-                {user.position ? formatEnumValue(user.position) : "Not specified"}
+                {user.position
+                  ? formatEnumValue(user.position)
+                  : "Not specified"}
               </p>
             </div>
           </div>
@@ -530,30 +541,40 @@ export default function ProfilePage() {
 
       {/* Account Status */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Account Status</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-6">
+          Account Status
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex items-center space-x-3">
-            <div className={`w-3 h-3 rounded-full ${user.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+            <div
+              className={`w-3 h-3 rounded-full ${
+                user.isActive ? "bg-green-500" : "bg-red-500"
+              }`}
+            />
             <div>
               <p className="font-medium text-gray-900">Account Status</p>
               <p className="text-sm text-gray-600">
-                {user.isActive ? 'Active' : 'Inactive'}
+                {user.isActive ? "Active" : "Inactive"}
               </p>
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className={`w-3 h-3 rounded-full ${user.verifiedAccount ? 'bg-green-500' : 'bg-yellow-500'}`} />
+            <div
+              className={`w-3 h-3 rounded-full ${
+                user.verifiedAccount ? "bg-green-500" : "bg-yellow-500"
+              }`}
+            />
             <div>
               <p className="font-medium text-gray-900">Email Verification</p>
               <p className="text-sm text-gray-600">
-                {user.verifiedAccount ? 'Verified' : 'Unverified'}
+                {user.verifiedAccount ? "Verified" : "Unverified"}
               </p>
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 rounded-full bg-blue-500"/>
+            <div className="w-3 h-3 rounded-full bg-blue-500" />
             <div>
               <p className="font-medium text-gray-900">Member Since</p>
               <p className="text-sm text-gray-600">

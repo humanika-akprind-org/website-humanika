@@ -14,7 +14,7 @@ import type { Period } from "@/types/period";
 import { useFile } from "@/hooks/useFile";
 import DeleteModal from "./modal/DeleteModal";
 import { formatEnumValue } from "@/lib/utils";
-import { photoManagementFolderId } from "@/lib/config";
+import { photoManagementFolderId } from "@/lib/config/config";
 import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";
 
 // Helper function to extract file ID from various Google Drive URL formats
@@ -44,7 +44,10 @@ const extractFileId = (url: string): string | null => {
 };
 
 // Helper function to get preview URL from photo (file ID or URL)
-const getPreviewUrl = (photo: string | null | undefined, accessToken: string): string | null => {
+const getPreviewUrl = (
+  photo: string | null | undefined,
+  accessToken: string
+): string | null => {
   if (!photo) return null;
 
   if (isGoogleDrivePhoto(photo)) {
@@ -52,7 +55,9 @@ const getPreviewUrl = (photo: string | null | undefined, accessToken: string): s
     const fileId = extractFileId(photo);
     if (!fileId) return null;
 
-    return `/api/drive-image?fileId=${fileId}${accessToken ? `&accessToken=${accessToken}` : ""}`;
+    return `/api/drive-image?fileId=${fileId}${
+      accessToken ? `&accessToken=${accessToken}` : ""
+    }`;
   } else {
     // It's a direct URL or other format
     return photo;
@@ -467,7 +472,8 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
                   }
                 })()}
               </div>
-              {(previewUrl || (existingPhoto && existingPhoto.trim() !== "")) && (
+              {(previewUrl ||
+                (existingPhoto && existingPhoto.trim() !== "")) && (
                 <div className="flex gap-2 mt-2">
                   <button
                     type="button"

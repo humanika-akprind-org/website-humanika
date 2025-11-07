@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { StatusApproval } from "@/types/approval-enums";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  updateApproval,
+  deleteApproval,
+} from "@/lib/services/approval/approval.service";
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -25,117 +25,19 @@ export async function PUT(
       );
     }
 
-    // Get the approval to check current status and entity type
-    const existingApproval = await prisma.approval.findUnique({
-      where: { id },
-      include: {
-        workProgram: true,
-        event: true,
-        finance: true,
-        document: true,
-
-        letter: true,
-      },
-    });
-
-    if (!existingApproval) {
-      return NextResponse.json(
-        { error: "Approval not found" },
-        { status: 404 }
-      );
-    }
-
-    // Update the approval
-    const updatedApproval = await prisma.approval.update({
-      where: { id },
-      data: {
-        status: status as StatusApproval,
-        note,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-            department: true,
-            status: true,
-          },
-        },
-        event: {
-          select: {
-            id: true,
-            name: true,
-            department: true,
-            status: true,
-          },
-        },
-        finance: {
-          select: {
-            id: true,
-            name: true,
-            amount: true,
-            type: true,
-            status: true,
-          },
-        },
-        document: {
-          select: {
-            id: true,
-            name: true,
-            type: true,
-            status: true,
-          },
-        },
-
-        letter: {
-          select: {
-            id: true,
-            regarding: true,
-            type: true,
-            status: true,
-          },
-        },
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "Approval",
-      entityId: updatedApproval.id,
-      description: `Updated approval status to ${status} for ${existingApproval.entityType} entity`,
-      metadata: {
-        oldData: {
-          status: existingApproval.status,
-          note: existingApproval.note,
-        },
-        newData: {
-          status: updatedApproval.status,
-          note: updatedApproval.note,
-        },
-      },
-    });
-
-    // If approval is approved, update the related entity's status
-    if (status === StatusApproval.APPROVED) {
-      await updateEntityStatus(existingApproval, StatusApproval.APPROVED);
-    } else if (status === StatusApproval.REJECTED) {
-      await updateEntityStatus(existingApproval, StatusApproval.REJECTED);
-    }
+    const updatedApproval = await updateApproval(
+      id,
+      { status, note },
+      user.id,
+      request
+    );
 
     return NextResponse.json(updatedApproval);
   } catch (error) {
     console.error("Error updating approval:", error);
+    if (error instanceof Error && error.message === "Approval not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -144,7 +46,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -155,122 +57,17 @@ export async function DELETE(
 
     const { id } = params;
 
-    const approval = await prisma.approval.findUnique({
-      where: { id },
-    });
-
-    if (!approval) {
-      return NextResponse.json(
-        { error: "Approval not found" },
-        { status: 404 }
-      );
-    }
-
-    await prisma.approval.delete({
-      where: { id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(_request, {
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "Approval",
-      entityId: id,
-      description: `Deleted approval for ${approval.entityType} entity`,
-      metadata: {
-        oldData: {
-          entityType: approval.entityType,
-          entityId: approval.entityId,
-          userId: approval.userId,
-          status: approval.status,
-          note: approval.note,
-        },
-        newData: null,
-      },
-    });
+    await deleteApproval(id, user.id, request);
 
     return NextResponse.json({ message: "Approval deleted successfully" });
   } catch (error) {
     console.error("Error deleting approval:", error);
+    if (error instanceof Error && error.message === "Approval not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );
-  }
-}
-
-async function updateEntityStatus(
-  approval: {
-    entityType: string;
-    entityId: string;
-    workProgram?: { id: string } | null;
-    event?: { id: string } | null;
-    finance?: { id: string } | null;
-    document?: { id: string } | null;
-
-    letter?: { id: string } | null;
-  },
-  approvalStatus: StatusApproval
-) {
-  const { entityType, entityId } = approval;
-
-  switch (entityType) {
-    case "WORK_PROGRAM":
-      if (approval.workProgram) {
-        const newStatus =
-          approvalStatus === StatusApproval.APPROVED ? "PUBLISH" : "DRAFT";
-        await prisma.workProgram.update({
-          where: { id: entityId },
-          data: { status: newStatus },
-        });
-      }
-      break;
-
-    case "EVENT":
-      if (approval.event) {
-        const newStatus =
-          approvalStatus === StatusApproval.APPROVED ? "PUBLISH" : "DRAFT";
-        await prisma.event.update({
-          where: { id: entityId },
-          data: { status: newStatus },
-        });
-      }
-      break;
-
-    case "FINANCE":
-      if (approval.finance) {
-        const newStatus =
-          approvalStatus === StatusApproval.APPROVED ? "PUBLISH" : "DRAFT";
-        await prisma.finance.update({
-          where: { id: entityId },
-          data: { status: newStatus },
-        });
-      }
-      break;
-
-    case "DOCUMENT":
-      if (approval.document) {
-        const newStatus =
-          approvalStatus === StatusApproval.APPROVED ? "PUBLISH" : "DRAFT";
-        await prisma.document.update({
-          where: { id: entityId },
-          data: { status: newStatus },
-        });
-      }
-      break;
-
-    case "LETTER":
-      if (approval.letter) {
-        const newStatus =
-          approvalStatus === StatusApproval.APPROVED ? "PUBLISH" : "DRAFT";
-        await prisma.letter.update({
-          where: { id: entityId },
-          data: { status: newStatus },
-        });
-      }
-      break;
-
-    default:
-      console.log(`No status update logic for entity type: ${entityType}`);
   }
 }

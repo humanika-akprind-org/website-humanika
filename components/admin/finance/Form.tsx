@@ -10,7 +10,7 @@ import type {
 } from "@/types/finance";
 import { FinanceType, Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
-import { financeFolderId } from "@/lib/config";
+import { financeFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 import type { FinanceCategory } from "@/types/finance-category";
