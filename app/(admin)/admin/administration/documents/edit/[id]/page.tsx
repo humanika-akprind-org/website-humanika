@@ -8,7 +8,7 @@ import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { fetchDocumentFormData } from "@/hooks/useDocumentFormData";
+import { fetchDocumentFormData } from "@/hooks/document/useDocumentFormData";
 import {
   handleDocumentSubmit,
   handleDocumentSubmitForApproval,

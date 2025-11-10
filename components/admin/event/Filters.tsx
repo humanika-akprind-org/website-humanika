@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { FiSearch, FiFilter, FiTrash2, FiChevronDown } from "react-icons/fi";
 import { Department, Status } from "@/types/enums";
 import { PeriodApi } from "@/use-cases/api/period";
-import { useWorkPrograms } from "@/hooks/useWorkPrograms";
+import { useWorkPrograms } from "@/hooks/work-program/useWorkPrograms";
 
 interface EventFiltersProps {
   searchTerm: string;

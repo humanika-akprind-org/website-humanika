@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
 import DocumentTable from "@/components/admin/document/Table";
 import DeleteModal from "@/components/admin/document/modal/DeleteModal";
-import { useDocuments } from "@/hooks/useDocuments";
+import { useDocuments } from "@/hooks/document/useDocuments";
 
 export default function DocumentsPage() {
   const {
