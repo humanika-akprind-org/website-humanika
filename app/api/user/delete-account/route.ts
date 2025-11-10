@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { getCurrentUser, logoutUser } from "@/lib/auth";
+import { deleteAccount } from "@/lib/services/user/user.service";
 
 export async function DELETE(_request: NextRequest) {
   try {
@@ -9,22 +9,7 @@ export async function DELETE(_request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Find the user to delete
-    const user = await prisma.user.findUnique({
-      where: { email: currentUser.email },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    // Delete the user
-    await prisma.user.delete({
-      where: { email: currentUser.email },
-    });
+    await deleteAccount(currentUser.id);
 
     // Log out the user after deletion
     await logoutUser();
@@ -32,6 +17,9 @@ export async function DELETE(_request: NextRequest) {
     return NextResponse.json({ message: "Account deleted successfully" });
   } catch (error) {
     console.error("Error deleting account:", error);
+    if (error instanceof Error && error.message === "User not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

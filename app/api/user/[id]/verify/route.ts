@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { verifyUser } from "@/lib/services/user/user.service";
 
 // PATCH - Verify user account
 export async function PATCH(
@@ -9,38 +9,14 @@ export async function PATCH(
   try {
     const { id } = params;
 
-    // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Verify user account
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: {
-        verifiedAccount: true,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        username: true,
-        role: true,
-        department: true,
-        position: true,
-        isActive: true,
-        verifiedAccount: true,
-        updatedAt: true,
-      },
-    });
+    const updatedUser = await verifyUser(id);
 
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Error verifying user:", error);
+    if (error instanceof Error && error.message === "User not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
