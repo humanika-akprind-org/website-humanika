@@ -1,9 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { PeriodApiResponse } from "@/types/period";
-import prisma from "@/lib/prisma";
 import { ObjectId } from "mongodb";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getPeriod,
+  updatePeriod,
+  deletePeriod,
+} from "@/lib/services/period/period.service";
 
 interface Context {
   params: { id: string };
@@ -26,19 +28,7 @@ export async function GET(
       );
     }
 
-    const period = await prisma.period.findUnique({
-      where: { id },
-    });
-
-    if (!period) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Period not found",
-        },
-        { status: 404 }
-      );
-    }
+    const period = await getPeriod(id);
 
     return NextResponse.json({
       success: true,
@@ -63,8 +53,6 @@ export async function PUT(
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
     const { id } = context.params;
-    const body = await request.json();
-    const { name, startYear, endYear, isActive } = body;
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -76,23 +64,14 @@ export async function PUT(
       );
     }
 
-    // Check if period exists
-    const existingPeriod = await prisma.period.findUnique({
-      where: { id },
-    });
-
-    if (!existingPeriod) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Period not found",
-        },
-        { status: 404 }
-      );
-    }
+    const body = await request.json();
 
     // Validation
-    if (startYear >= endYear) {
+    if (
+      body.startYear !== undefined &&
+      body.endYear !== undefined &&
+      body.startYear >= body.endYear
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -102,49 +81,7 @@ export async function PUT(
       );
     }
 
-    // If setting this period as active, deactivate all others
-    if (isActive) {
-      await prisma.period.updateMany({
-        where: {
-          isActive: true,
-          id: { not: id },
-        },
-        data: { isActive: false },
-      });
-    }
-
-    const period = await prisma.period.update({
-      where: { id },
-      data: {
-        name,
-        startYear,
-        endYear,
-        isActive,
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: "system", // Since there's no user context in this API
-      activityType: ActivityType.UPDATE,
-      entityType: "Period",
-      entityId: period.id,
-      description: `Updated period: ${period.name}`,
-      metadata: {
-        oldData: {
-          name: existingPeriod.name,
-          startYear: existingPeriod.startYear,
-          endYear: existingPeriod.endYear,
-          isActive: existingPeriod.isActive,
-        },
-        newData: {
-          name: period.name,
-          startYear: period.startYear,
-          endYear: period.endYear,
-          isActive: period.isActive,
-        },
-      },
-    });
+    const period = await updatePeriod(id, body);
 
     return NextResponse.json({
       success: true,
@@ -153,6 +90,15 @@ export async function PUT(
     });
   } catch (error) {
     console.error("Error updating period:", error);
+    if (error instanceof Error && error.message === "Period not found") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
       {
         success: false,
@@ -181,69 +127,7 @@ export async function DELETE(
       );
     }
 
-    // Check if period exists
-    const existingPeriod = await prisma.period.findUnique({
-      where: { id },
-      include: {
-        managements: true,
-        finances: true,
-        letters: true,
-        workPrograms: true,
-        events: true,
-        articles: true,
-      },
-    });
-
-    if (!existingPeriod) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Period not found",
-        },
-        { status: 404 }
-      );
-    }
-
-    // Check if period has related data
-    const hasRelatedData =
-      existingPeriod.managements.length > 0 ||
-      existingPeriod.finances.length > 0 ||
-      existingPeriod.letters.length > 0 ||
-      existingPeriod.workPrograms.length > 0 ||
-      existingPeriod.events.length > 0 ||
-      existingPeriod.articles.length > 0;
-
-    if (hasRelatedData) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Cannot delete period with related data",
-        },
-        { status: 400 }
-      );
-    }
-
-    await prisma.period.delete({
-      where: { id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(_request, {
-      userId: "system", // Since there's no user context in this API
-      activityType: ActivityType.DELETE,
-      entityType: "Period",
-      entityId: id,
-      description: `Deleted period: ${existingPeriod.name}`,
-      metadata: {
-        oldData: {
-          name: existingPeriod.name,
-          startYear: existingPeriod.startYear,
-          endYear: existingPeriod.endYear,
-          isActive: existingPeriod.isActive,
-        },
-        newData: null,
-      },
-    });
+    await deletePeriod(id);
 
     return NextResponse.json({
       success: true,
@@ -251,6 +135,27 @@ export async function DELETE(
     });
   } catch (error) {
     console.error("Error deleting period:", error);
+    if (error instanceof Error && error.message === "Period not found") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        { status: 404 }
+      );
+    }
+    if (
+      error instanceof Error &&
+      error.message === "Cannot delete period with related data"
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       {
         success: false,

@@ -1,17 +1,34 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { PeriodApiResponse } from "@/types/period";
-import prisma from "@/lib/prisma";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import { getPeriods, createPeriod } from "@/lib/services/period/period.service";
+
+// Extract payload functions
+async function extractCreatePeriodBody(request: NextRequest) {
+  return await request.json();
+}
+
+// Validation functions
+function validateCreatePeriodInput(body: {
+  name?: string;
+  startYear?: number;
+  endYear?: number;
+  isActive?: boolean;
+}) {
+  if (!body.name || !body.startYear || !body.endYear) {
+    return { isValid: false, error: "Missing required fields" };
+  }
+  if (body.startYear >= body.endYear) {
+    return { isValid: false, error: "Start year must be less than end year" };
+  }
+  return { isValid: true };
+}
 
 export async function GET(): Promise<NextResponse<PeriodApiResponse>> {
   try {
-    const periods = await prisma.period.findMany({
-      orderBy: {
-        startYear: "desc",
-      },
-    });
+    // 1. Business logic
+    const periods = await getPeriods();
 
+    // 2. Response
     return NextResponse.json({
       success: true,
       data: periods,
@@ -33,64 +50,25 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
-    const body = await request.json();
-    const { name, startYear, endYear, isActive = false } = body;
+    // 1. Extract payload
+    const body = await extractCreatePeriodBody(request);
 
-    // Validation
-    if (!name || !startYear || !endYear) {
+    // 2. Validasi
+    const validation = validateCreatePeriodInput(body);
+    if (!validation.isValid) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required fields",
+          error: validation.error,
         },
         { status: 400 }
       );
     }
 
-    if (startYear >= endYear) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Start year must be less than end year",
-        },
-        { status: 400 }
-      );
-    }
+    // 3. Business logic
+    const period = await createPeriod(body);
 
-    // If setting this period as active, deactivate all others
-    if (isActive) {
-      await prisma.period.updateMany({
-        where: { isActive: true },
-        data: { isActive: false },
-      });
-    }
-
-    const period = await prisma.period.create({
-      data: {
-        name,
-        startYear,
-        endYear,
-        isActive,
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: "system", // Since there's no user context in this API
-      activityType: ActivityType.CREATE,
-      entityType: "Period",
-      entityId: period.id,
-      description: `Created period: ${period.name}`,
-      metadata: {
-        newData: {
-          name: period.name,
-          startYear: period.startYear,
-          endYear: period.endYear,
-          isActive: period.isActive,
-        },
-      },
-    });
-
+    // 4. Response
     return NextResponse.json({
       success: true,
       data: period,
