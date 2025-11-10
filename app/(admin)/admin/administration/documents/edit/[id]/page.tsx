@@ -10,7 +10,7 @@ import type {
   Document,
 } from "@/types/document";
 import { Status, ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/approval-enums";
+import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";

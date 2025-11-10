@@ -7,7 +7,7 @@ import type {
   Letter,
 } from "@/types/letter";
 import { Status, ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/approval-enums";
+import { StatusApproval } from "@/types/enums";
 
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";

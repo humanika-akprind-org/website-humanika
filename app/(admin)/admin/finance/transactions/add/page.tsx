@@ -13,7 +13,7 @@ import type {
 } from "@/types/enums";
 import { Status } from "@/types/enums";
 import { ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/approval-enums";
+import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
