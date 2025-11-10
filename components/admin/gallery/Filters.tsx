@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FiSearch, FiFilter, FiTrash2, FiChevronDown } from "react-icons/fi";
-import { useEvents } from "@/hooks/useEvents";
+import { useEvents } from "@/hooks/event/useEvents";
 
 interface GalleryFiltersProps {
   searchTerm: string;

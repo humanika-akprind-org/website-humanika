@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ActivityType } from "@/types/enums";
-import { useActivityLog } from "@/hooks/useActivityLog";
+import { useActivityLog } from "@/hooks/activity-log/useActivityLog";
 import Loading from "@/components/Loading";
 import Error from "@/components/Error";
 

@@ -9,7 +9,7 @@ import type {
   UpdateGalleryInput,
 } from "@/types/gallery";
 import type { Event } from "@/types/event";
-import { useEvents } from "@/hooks/useEvents";
+import { useEvents } from "@/hooks/event/useEvents";
 import { useFile } from "@/hooks/useFile";
 import { galleryFolderId } from "@/lib/config/config";
 

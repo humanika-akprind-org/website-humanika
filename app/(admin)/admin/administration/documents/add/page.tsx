@@ -5,7 +5,7 @@ import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
-import { fetchDocumentFormData } from "@/hooks/useDocumentFormData";
+import { fetchDocumentFormData } from "@/hooks/document/useDocumentFormData";
 import {
   handleDocumentSubmit,
   handleDocumentSubmitForApproval,

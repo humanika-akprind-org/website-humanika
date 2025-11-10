@@ -10,7 +10,7 @@ import {
   FiEye,
   FiChevronDown,
 } from "react-icons/fi";
-import { useDocumentApprovals } from "@/hooks/useDocumentApprovals";
+import { useDocumentApprovals } from "@/hooks/document/useDocumentApprovals";
 import type { Approval } from "@/types/approval";
 
 // Helper function to format enum values for display
