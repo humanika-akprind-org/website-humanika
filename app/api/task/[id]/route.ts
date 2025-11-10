@@ -1,10 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { UpdateDepartmentTaskInput } from "@/types/task";
-import type { Prisma } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getDepartmentTask,
+  updateDepartmentTask,
+  deleteDepartmentTask,
+} from "@/lib/services/task/task.service";
 
 export async function GET(
   _request: NextRequest,
@@ -22,25 +23,7 @@ export async function GET(
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    const departmentTask = await prisma.departmentTask.findUnique({
-      where: { id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    if (!departmentTask) {
-      return NextResponse.json(
-        { error: "Department task not found" },
-        { status: 404 }
-      );
-    }
+    const departmentTask = await getDepartmentTask(id);
 
     return NextResponse.json(departmentTask);
   } catch (error) {
@@ -82,53 +65,7 @@ export async function PUT(
       );
     }
 
-    const departmentTaskData: Prisma.DepartmentTaskUncheckedUpdateInput = {};
-    if (body.note !== undefined) departmentTaskData.note = body.note;
-    if (body.department !== undefined) departmentTaskData.department = body.department;
-    if (body.userId !== undefined) departmentTaskData.userId = body.userId;
-    if (body.status !== undefined) departmentTaskData.status = body.status;
-
-    // Get existing task for logging
-    const existingTask = await prisma.departmentTask.findUnique({
-      where: { id },
-    });
-
-    const departmentTask = await prisma.departmentTask.update({
-      where: { id },
-      data: departmentTaskData,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "DepartmentTask",
-      entityId: departmentTask.id,
-      description: `Updated department task: ${departmentTask.note}`,
-      metadata: {
-        oldData: {
-          note: existingTask?.note,
-          department: existingTask?.department,
-          userId: existingTask?.userId,
-          status: existingTask?.status,
-        },
-        newData: {
-          note: departmentTask.note,
-          department: departmentTask.department,
-          userId: departmentTask.userId,
-          status: departmentTask.status,
-        },
-      },
-    });
+    const departmentTask = await updateDepartmentTask(id, body, user);
 
     return NextResponse.json(departmentTask);
   } catch (error) {
@@ -156,39 +93,7 @@ export async function DELETE(
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    // Check if task exists
-    const departmentTask = await prisma.departmentTask.findUnique({
-      where: { id },
-    });
-
-    if (!departmentTask) {
-      return NextResponse.json(
-        { error: "Department task not found" },
-        { status: 404 }
-      );
-    }
-
-    await prisma.departmentTask.delete({
-      where: { id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(_request, {
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "DepartmentTask",
-      entityId: id,
-      description: `Deleted department task: ${departmentTask.note}`,
-      metadata: {
-        oldData: {
-          note: departmentTask.note,
-          department: departmentTask.department,
-          userId: departmentTask.userId,
-          status: departmentTask.status,
-        },
-        newData: null,
-      },
-    });
+    await deleteDepartmentTask(id, user);
 
     return NextResponse.json({
       message: "Department task deleted successfully",
