@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { bulkVerifyUsers } from "@/lib/services/user/user.service";
 
 // POST - Bulk verify users
 export async function POST(request: NextRequest) {
@@ -7,27 +7,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userIds } = body;
 
-    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-      return NextResponse.json(
-        { error: "userIds array is required" },
-        { status: 400 }
-      );
-    }
-
-    // Verify all users
-    const result = await prisma.user.updateMany({
-      where: {
-        id: { in: userIds },
-      },
-      data: { verifiedAccount: true },
-    });
+    const result = await bulkVerifyUsers(userIds);
 
     return NextResponse.json({
       count: result.count,
-      message: `${result.count} users verified successfully`
+      message: `${result.count} users verified successfully`,
     });
   } catch (error) {
     console.error("Error bulk verifying users:", error);
+    if (
+      error instanceof Error &&
+      error.message === "userIds array is required"
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -1,11 +1,7 @@
 // app/api/user/route.ts
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { type UserRole, type Department, type Position } from "@prisma/client";
-import bcrypt from "bcryptjs";
-import { randomColor } from "@/lib/random-color";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import { getUsers, createUser } from "@/lib/services/user/user.service";
 
 // GET - Get all users
 export async function GET(request: NextRequest) {
@@ -17,85 +13,19 @@ export async function GET(request: NextRequest) {
     const role = searchParams.get("role") || "";
     const department = searchParams.get("department") || "";
     const isActive = searchParams.get("isActive");
-
-    const skip = (page - 1) * limit;
-
     const verifiedAccount = searchParams.get("verifiedAccount");
 
-    const where: {
-      OR?: Array<{
-        name?: { contains: string; mode: "insensitive" };
-        email?: { contains: string; mode: "insensitive" };
-        username?: { contains: string; mode: "insensitive" };
-      }>;
-      role?: UserRole;
-      department?: Department;
-      isActive?: boolean;
-      verifiedAccount?: boolean;
-    } = {};
-
-    // Default to showing only verified accounts
-    where.verifiedAccount = true;
-
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { email: { contains: search, mode: "insensitive" } },
-        { username: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    if (role) {
-      where.role = role as UserRole;
-    }
-
-    if (department) {
-      where.department = department as Department;
-    }
-
-    if (isActive !== null && isActive !== undefined) {
-      where.isActive = isActive === "true";
-    }
-
-    if (verifiedAccount !== null && verifiedAccount !== undefined) {
-      where.verifiedAccount = verifiedAccount === "true";
-    }
-
-    const [users, total] = await Promise.all([
-      prisma.user.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          username: true,
-          role: true,
-          department: true,
-          position: true,
-          isActive: true,
-          verifiedAccount: true,
-          attemptLogin: true,
-          blockExpires: true,
-          createdAt: true,
-          updatedAt: true,
-          avatarColor: true,
-        },
-      }),
-      prisma.user.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      users,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+    const result = await getUsers({
+      page,
+      limit,
+      search: search || undefined,
+      role: (role as UserRole) || undefined,
+      department: (department as Department) || undefined,
+      isActive: isActive ? isActive === "true" : undefined,
+      verifiedAccount: verifiedAccount ? verifiedAccount === "true" : undefined,
     });
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
@@ -129,76 +59,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "User with this email or username already exists" },
-        { status: 409 }
-      );
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        username,
-        password: hashedPassword,
-        role: (role || "ANGGOTA") as UserRole,
-        department: department ? (department as Department) : null,
-        position: position ? (position as Position) : null,
-        isActive: isActive !== undefined ? isActive : true,
-        verifiedAccount:
-          verifiedAccount !== undefined ? verifiedAccount : false,
-        avatarColor: randomColor,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        username: true,
-        role: true,
-        department: true,
-        position: true,
-        isActive: true,
-        verifiedAccount: true,
-        createdAt: true,
-        avatarColor: true,
-      },
-    });
-
-    // Log activity - Note: This is a system operation, so we use "system" as userId
-    await logActivityFromRequest(request, {
-      userId: "system", // Since this is user creation, no authenticated user context
-      activityType: ActivityType.CREATE,
-      entityType: "User",
-      entityId: user.id,
-      description: `Created user: ${user.name}`,
-      metadata: {
-        newData: {
-          name: user.name,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-          department: user.department,
-          position: user.position,
-          isActive: user.isActive,
-          verifiedAccount: user.verifiedAccount,
-        },
-      },
+    const user = await createUser({
+      name,
+      email,
+      username,
+      password,
+      role: role as UserRole,
+      department: department as Department,
+      position: position as Position,
+      isActive,
+      verifiedAccount,
     });
 
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
     console.error("Error creating user:", error);
+    if (error instanceof Error && error.message.includes("already exists")) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

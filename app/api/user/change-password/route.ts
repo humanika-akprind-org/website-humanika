@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 import { getCurrentUser } from "@/lib/auth";
+import { changePassword } from "@/lib/services/user/user.service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,44 +19,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: currentUser.email },
-      select: {
-        id: true,
-        email: true,
-        password: true,
-      },
-    });
-
-    if (!user || !user.password) {
-      return NextResponse.json(
-        { error: "User not found or password not set" },
-        { status: 404 }
-      );
-    }
-
-    const isCurrentPasswordValid = await bcrypt.compare(
-      currentPassword,
-      user.password
-    );
-
-    if (!isCurrentPasswordValid) {
-      return NextResponse.json(
-        { error: "Current password is incorrect" },
-        { status: 403 }
-      );
-    }
-
-    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
-
-    await prisma.user.update({
-      where: { email: currentUser.email },
-      data: { password: hashedNewPassword },
-    });
+    await changePassword(currentUser.id, currentPassword, newPassword);
 
     return NextResponse.json({ message: "Password changed successfully" });
   } catch (error) {
     console.error("Error changing password:", error);
+    if (
+      error instanceof Error &&
+      error.message === "User not found or password not set"
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+    if (
+      error instanceof Error &&
+      error.message === "Current password is incorrect"
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 403 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
