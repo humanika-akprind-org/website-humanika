@@ -1,91 +1,20 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
 import DocumentTable from "@/components/admin/document/Table";
 import DeleteModal from "@/components/admin/document/modal/DeleteModal";
-import type { Document } from "@/types/document";
-import { useToast } from "@/hooks/use-toast";
+import { useDocuments } from "@/hooks/useDocuments";
 
 export default function DocumentsPage() {
-  const [_documents, setDocuments] = useState<Document[]>([]);
-  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    documentId: "",
-    documentName: "",
-  });
-
-  const { toast } = useToast();
-
-  const fetchDocuments = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/document");
-      if (response.ok) {
-        const data = await response.json();
-        setDocuments(data || []);
-        setFilteredDocuments(data || []);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch documents",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch documents",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
-  // Fetch documents
-  useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
-
-  const handleDelete = async (documentId: string) => {
-    try {
-      const response = await fetch(`/api/document/${documentId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Document deleted successfully",
-        });
-        fetchDocuments(); // Refresh the list
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to delete document",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting document:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete document",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteModal({ isOpen: false, documentId: "", documentName: "" });
-    }
-  };
-
-  const closeDeleteModal = () => {
-    setDeleteModal({ isOpen: false, documentId: "", documentName: "" });
-  };
+  const {
+    filteredDocuments,
+    isLoading,
+    deleteModal,
+    handleDelete,
+    closeDeleteModal,
+    openDeleteModal,
+  } = useDocuments();
 
   return (
     <div className="space-y-6">
@@ -121,7 +50,10 @@ export default function DocumentsPage() {
           </div>
         </div>
       ) : (
-        <DocumentTable documents={filteredDocuments} onDelete={handleDelete} />
+        <DocumentTable
+          documents={filteredDocuments}
+          onDelete={(id, name) => openDeleteModal(id, name)}
+        />
       )}
 
       {/* Delete Modal */}
@@ -130,6 +62,8 @@ export default function DocumentsPage() {
         onClose={closeDeleteModal}
         onConfirm={() => handleDelete(deleteModal.documentId)}
         documentName={deleteModal.documentName}
+        count={1}
+        isLoading={false}
       />
     </div>
   );
