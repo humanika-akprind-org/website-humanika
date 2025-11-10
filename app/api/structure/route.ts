@@ -1,11 +1,26 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { CreateOrganizationalStructureInput } from "@/types/structure";
 import type { Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
-import type { Prisma, Status as PrismaStatus } from "@prisma/client";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getStructures,
+  createStructure,
+} from "@/lib/services/structure/structure.service";
+
+// Extract payload functions
+async function extractCreateStructureBody(request: NextRequest) {
+  return await request.json();
+}
+
+// Validation functions
+function validateCreateStructureInput(
+  body: CreateOrganizationalStructureInput
+) {
+  if (!body.name || !body.periodId || !body.decree) {
+    return { isValid: false, error: "Missing required fields" };
+  }
+  return { isValid: true };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,22 +34,14 @@ export async function GET(request: NextRequest) {
     const periodId = searchParams.get("periodId");
     const search = searchParams.get("search");
 
-    const where: Prisma.OrganizationalStructureWhereInput = {};
-
-    if (status) where.status = { equals: status as unknown as PrismaStatus };
-    if (periodId) where.periodId = periodId;
-    if (search) {
-      where.OR = [{ name: { contains: search, mode: "insensitive" } }];
-    }
-
-    const structures = await prisma.organizationalStructure.findMany({
-      where,
-      include: {
-        period: true,
-      },
-      orderBy: { createdAt: "desc" },
+    // 1. Business logic
+    const structures = await getStructures({
+      status,
+      periodId: periodId || undefined,
+      search: search || undefined,
     });
 
+    // 2. Response
     return NextResponse.json(structures);
   } catch (error) {
     console.error("Error fetching organizational structures:", error);
@@ -52,46 +59,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body: CreateOrganizationalStructureInput = await request.json();
+    // 1. Extract payload
+    const body = await extractCreateStructureBody(request);
 
-    if (!body.name || !body.periodId || !body.decree) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    // 2. Validation
+    const validation = validateCreateStructureInput(body);
+    if (!validation.isValid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const structureData: Prisma.OrganizationalStructureCreateInput = {
-      name: body.name,
-      period: { connect: { id: body.periodId } },
-      decree: body.decree,
-      structure: body.structure,
-    };
+    // 3. Business logic
+    const structure = await createStructure(body, user);
 
-    const structure = await prisma.organizationalStructure.create({
-      data: structureData,
-      include: {
-        period: true,
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.CREATE,
-      entityType: "OrganizationalStructure",
-      entityId: structure.id,
-      description: `Created organizational structure: ${structure.name}`,
-      metadata: {
-        newData: {
-          name: structure.name,
-          periodId: structure.periodId,
-          decree: structure.decree,
-          structure: structure.structure,
-        },
-      },
-    });
-
+    // 4. Response
     return NextResponse.json(structure, { status: 201 });
   } catch (error) {
     console.error("Error creating organizational structure:", error);
