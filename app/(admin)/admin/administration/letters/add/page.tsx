@@ -3,7 +3,7 @@ import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
 import type { CreateLetterInput, UpdateLetterInput } from "@/types/letter";
 import { Status, ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/approval-enums";
+import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";

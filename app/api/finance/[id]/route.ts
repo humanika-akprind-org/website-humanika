@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import type { UpdateFinanceInput } from "@/types/finance";
 import { getCurrentUser } from "@/lib/auth";
 import { ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/approval-enums";
+import { StatusApproval } from "@/types/enums";
 import { logActivityFromRequest } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 
@@ -91,7 +91,8 @@ export async function PUT(
 
     if (body.name !== undefined) updateData.name = body.name;
     if (body.amount !== undefined) updateData.amount = body.amount;
-    if (body.description !== undefined) updateData.description = body.description;
+    if (body.description !== undefined)
+      updateData.description = body.description;
     if (body.date !== undefined) updateData.date = new Date(body.date);
     if (body.categoryId !== undefined) updateData.categoryId = body.categoryId;
     if (body.type !== undefined) updateData.type = body.type;

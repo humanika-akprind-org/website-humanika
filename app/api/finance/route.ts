@@ -4,7 +4,7 @@ import type { CreateFinanceInput } from "@/types/finance";
 import type { FinanceType, Status } from "@/types/enums";
 import { ApprovalType } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
-import { StatusApproval } from "@/types/approval-enums";
+import { StatusApproval } from "@/types/enums";
 import type {
   Prisma,
   Status as PrismaStatus,

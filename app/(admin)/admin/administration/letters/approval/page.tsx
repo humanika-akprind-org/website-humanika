@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import { ApprovalApi } from "@/use-cases/api/approval";
 import type { Approval } from "@/types/approval";
-import { StatusApproval } from "@/types/approval-enums";
+import { StatusApproval } from "@/types/enums";
 
 // Helper function to format enum values for display
 const formatEnumValue = (value: string) =>

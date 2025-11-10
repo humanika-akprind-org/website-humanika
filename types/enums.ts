@@ -107,3 +107,10 @@ export enum ActivityType {
   DOWNLOAD = "DOWNLOAD", // Mengunduh file
   OTHER = "OTHER", // Aktivitas lainnya
 }
+
+export enum StatusApproval {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  CANCELLED = "CANCELLED",
+}

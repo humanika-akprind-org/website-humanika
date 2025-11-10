@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import type { UpdateLetterInput } from "@/types/letter";
 import { getCurrentUser } from "@/lib/auth";
 import { ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/approval-enums";
+import { StatusApproval } from "@/types/enums";
 import type { Prisma } from "@prisma/client";
 import { logActivityFromRequest } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
