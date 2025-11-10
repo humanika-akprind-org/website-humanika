@@ -259,6 +259,10 @@ export default function StructureForm({
       let decreeUrl: string | null | undefined = existingDecree;
       let structureImageUrl: string | null | undefined = existingStructureImage;
 
+      if (!decreeUrl && !formData.decreeFile) {
+        throw new Error("Please upload a decree file");
+      }
+
       // Handle decree deletion
       if (removedDecree) {
         if (structure?.decree && isGoogleDriveDecree(structure.decree)) {
@@ -392,7 +396,7 @@ export default function StructureForm({
       const { decreeFile: _, structureImage: __, ...dataToSend } = formData;
       const submitData = {
         ...dataToSend,
-        decree: decreeUrl,
+        decree: decreeUrl || "",
         structure: structureImageUrl,
       };
 
