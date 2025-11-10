@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import type { Management, ManagementServerData } from "@/types/management";
-// import { UserApi } from "@/lib/api/user";
-// import { PeriodApi } from "@/lib/api/period";
+import { logActivity } from "@/lib/activity-log";
+import { ActivityType } from "@/types/enums";
+import type { User } from "@/types/user";
+
+type UserWithId = Pick<User, "id">;
 
 // Folder ID khusus untuk foto management (bisa disimpan di environment variables)
 // const MANAGEMENT_PHOTOS_FOLDER_ID =
@@ -38,14 +41,11 @@ export const ManagementService = {
     return management as Management;
   },
 
-  async createManagement(formData: ManagementServerData): Promise<Management> {
-    const {
-      userId,
-      periodId,
-      position,
-      department,
-      photo,
-    } = formData;
+  async createManagement(
+    formData: ManagementServerData,
+    user: UserWithId
+  ): Promise<Management> {
+    const { userId, periodId, position, department, photo } = formData;
 
     // Check if user already has a management position in this period
     const existingManagement = await prisma.management.findFirst({
@@ -88,13 +88,40 @@ export const ManagementService = {
       },
     });
 
+    // Log activity
+    await logActivity({
+      userId: user.id,
+      activityType: ActivityType.CREATE,
+      entityType: "Management",
+      entityId: management.id,
+      description: `Created management: ${management.user?.name || "Unknown"}`,
+      metadata: {
+        newData: {
+          userId: management.userId,
+          position: management.position,
+          periodId: management.periodId,
+          photo: management.photo,
+        },
+      },
+    });
+
     return management as Management;
   },
 
   async updateManagement(
     id: string,
-    formData: ManagementServerData
+    formData: ManagementServerData,
+    user: UserWithId
   ): Promise<Management> {
+    // Check if management exists
+    const existingManagement = await prisma.management.findUnique({
+      where: { id },
+    });
+
+    if (!existingManagement) {
+      throw new Error("Management not found");
+    }
+
     const { userId, periodId, position, department, photo } = formData;
 
     // Check for conflicts (excluding current management)
@@ -140,6 +167,29 @@ export const ManagementService = {
       },
     });
 
+    // Log activity
+    await logActivity({
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "Management",
+      entityId: management.id,
+      description: `Updated management: ${management.user?.name || "Unknown"}`,
+      metadata: {
+        oldData: {
+          userId: existingManagement.userId,
+          position: existingManagement.position,
+          periodId: existingManagement.periodId,
+          photo: existingManagement.photo,
+        },
+        newData: {
+          userId: management.userId,
+          position: management.position,
+          periodId: management.periodId,
+          photo: management.photo,
+        },
+      },
+    });
+
     return management as Management;
   },
 
@@ -159,9 +209,41 @@ export const ManagementService = {
     return management as Management;
   },
 
-  async deleteManagement(id: string): Promise<void> {
+  async deleteManagement(id: string, user: UserWithId): Promise<void> {
+    // Check if management exists
+    const existingManagement = await prisma.management.findUnique({
+      where: { id },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!existingManagement) {
+      throw new Error("Management not found");
+    }
+
     await prisma.management.delete({
       where: { id },
+    });
+
+    // Log activity
+    await logActivity({
+      userId: user.id,
+      activityType: ActivityType.DELETE,
+      entityType: "Management",
+      entityId: id,
+      description: `Deleted management: ${
+        existingManagement.user?.name || "Unknown"
+      }`,
+      metadata: {
+        oldData: {
+          userId: existingManagement.userId,
+          position: existingManagement.position,
+          periodId: existingManagement.periodId,
+          photo: existingManagement.photo,
+        },
+        newData: null,
+      },
     });
   },
 };
