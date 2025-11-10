@@ -10,7 +10,6 @@ import {
   BookOpen,
   DollarSign,
   Camera,
-  LinkIcon,
   BarChart3,
   Activity,
   User,
@@ -18,7 +17,6 @@ import {
   Shield,
   FolderOpen,
   Mail,
-  PieChart,
 } from "lucide-react";
 import { LogoutButton } from "@/components/admin/auth/LogoutButton";
 import Image from "next/image";
@@ -114,9 +112,6 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/governance/tasks/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/governance/tasks/approval">
-            Approval
-          </NavDropdownItem>
         </NavDropdown>
 
         {/* People & Access Section */}
@@ -155,9 +150,6 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/program/works/approval">
             Approval
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/program/works/reports">
-            Reports
-          </NavDropdownItem>
         </NavDropdown>
 
         <NavDropdown icon={Calendar} title="Events">
@@ -169,9 +161,6 @@ export default function Sidebar() {
           </NavDropdownItem>
           <NavDropdownItem href="/admin/program/events/approval">
             Approval
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/program/events/reports">
-            Reports
           </NavDropdownItem>
         </NavDropdown>
 
@@ -192,12 +181,6 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/administration/documents/approval">
             Approval
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/documents/templates">
-            Templates
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/documents/reports">
-            Reports
-          </NavDropdownItem>
         </NavDropdown>
 
         <NavDropdown icon={Mail} title="Letter">
@@ -209,12 +192,6 @@ export default function Sidebar() {
           </NavDropdownItem>
           <NavDropdownItem href="/admin/administration/letters/approval">
             Approval
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/letters/templates">
-            Templates
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/letters/reports">
-            Reports
           </NavDropdownItem>
         </NavDropdown>
 
@@ -246,21 +223,6 @@ export default function Sidebar() {
           </NavDropdownItem>
           <NavDropdownItem href="/admin/content/galleries/add">
             Add New
-          </NavDropdownItem>
-        </NavDropdown>
-
-        <NavDropdown icon={LinkIcon} title="Links">
-          <NavDropdownItem href="/admin/content/links/short">
-            Short Links
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/links/hubs">
-            Link Hubs
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/links/themes">
-            Hub Themes
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/content/links/approval">
-            Approval
           </NavDropdownItem>
         </NavDropdown>
 
@@ -299,9 +261,6 @@ export default function Sidebar() {
         <NavLink href="/admin/system/activity" icon={Activity}>
           Activity Log
         </NavLink>
-        <NavLink href="/admin/system/settings" icon={Settings}>
-          System Settings
-        </NavLink>
 
         {/* Settings Section */}
         <div className="mt-6 mb-2">
@@ -315,9 +274,6 @@ export default function Sidebar() {
         </NavLink>
         <NavLink href="/admin/settings/account" icon={Settings}>
           Account
-        </NavLink>
-        <NavLink href="/admin/settings/preferences" icon={PieChart}>
-          Preferences
         </NavLink>
       </nav>
 
