@@ -116,3 +116,11 @@ export const deleteArticle = async (id: string): Promise<void> => {
     throw new Error("Failed to delete article");
   }
 };
+
+export const ArticleApi = {
+  getArticles,
+  getArticle,
+  createArticle,
+  updateArticle,
+  deleteArticle,
+};

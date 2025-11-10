@@ -1,97 +1,251 @@
 // app/dashboard/activity/page.tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  Plus,
+  Edit,
+  Trash,
+  Lock,
+  LogOut,
+  Check,
+  X,
+  Upload,
+  Download,
+  FileText,
+  BarChart3,
+  RefreshCw,
+  User,
+} from "lucide-react";
+
+import type { ActivityLog } from "@/types/activity-log";
+
 export default function ActivityPage() {
-  const activities = [
-    {
-      id: 1,
-      user: "John Doe",
-      action: "Updated organizational structure",
-      service: "Organizational Structure",
-      time: "2 hours ago",
-      icon: "🏢",
-      priority: "high",
-    },
-    {
-      id: 2,
-      user: "Alice Smith",
-      action: "Published new article: Quarterly Report",
-      service: "Article",
-      time: "5 hours ago",
-      icon: "📝",
-      priority: "medium",
-    },
-    {
-      id: 3,
-      user: "Bob Johnson",
-      action: "Uploaded financial documents for review",
-      service: "Documents",
-      time: "Yesterday",
-      icon: "📊",
-      priority: "high",
-    },
-    {
-      id: 4,
-      user: "Emma Wilson",
-      action: "Created new work program: Community Outreach",
-      service: "Work Programs",
-      time: "2 days ago",
-      icon: "📅",
-      priority: "medium",
-    },
-    {
-      id: 5,
-      user: "Michael Brown",
-      action: "Processed incoming official letter",
-      service: "Letter",
-      time: "3 days ago",
-      icon: "✉️",
-      priority: "medium",
-    },
-    {
-      id: 6,
-      user: "Sarah Davis",
-      action: "Added new event: Annual Conference",
-      service: "Events",
-      time: "3 days ago",
-      icon: "🎉",
-      priority: "low",
-    },
-    {
-      id: 7,
-      user: "Robert Wilson",
-      action: "Uploaded gallery images from last event",
-      service: "Gallery",
-      time: "4 days ago",
-      icon: "🖼️",
-      priority: "low",
-    },
-    {
-      id: 8,
-      user: "Lisa Anderson",
-      action: "Updated financial records for Q2",
-      service: "Finance",
-      time: "4 days ago",
-      icon: "💰",
-      priority: "high",
-    },
-    {
-      id: 9,
-      user: "David Miller",
-      action: "Added new external resource link",
-      service: "Links",
-      time: "5 days ago",
-      icon: "🔗",
-      priority: "low",
-    },
-    {
-      id: 10,
-      user: "Admin User",
-      action: "Modified user permissions and roles",
-      service: "Users",
-      time: "1 week ago",
-      icon: "👥",
-      priority: "high",
-    },
-  ];
+  const [activities, setActivities] = useState<ActivityLog[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<ActivityLog[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState("All");
+  const [selectedTimeFilter, setSelectedTimeFilter] =
+    useState("All Activities");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchActivities = async (page = 1, append = false) => {
+    try {
+      const response = await fetch(
+        `/api/system/activity?page=${page}&limit=20`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch activities");
+      }
+
+      const result = await response.json();
+      const newActivities = result.activities || [];
+
+      if (append) {
+        setActivities((prev) => [...prev, ...newActivities]);
+      } else {
+        setActivities(newActivities);
+      }
+
+      setHasMore(page < result.pagination.totalPages);
+      setCurrentPage(page);
+
+      if (!append) {
+        setFilteredActivities(newActivities);
+      }
+    } catch (err) {
+      setError("Failed to load activities");
+      console.error("Error fetching activities:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchActivities();
+    setLoading(false);
+  }, []);
+
+  // Apply filters
+  useEffect(() => {
+    let filtered = activities;
+
+    // Service filter
+    if (selectedService !== "All") {
+      filtered = filtered.filter(
+        (activity) => getServiceName(activity.entityType) === selectedService
+      );
+    }
+
+    // Time filter
+    if (selectedTimeFilter !== "All Activities") {
+      const now = new Date();
+      let startDate: Date;
+
+      switch (selectedTimeFilter) {
+        case "Today":
+          startDate = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+          );
+          break;
+        case "This Week":
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case "This Month":
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          break;
+        default:
+          startDate = new Date(0); // All time
+      }
+
+      filtered = filtered.filter(
+        (activity) => new Date(activity.createdAt) >= startDate
+      );
+    }
+
+    setFilteredActivities(filtered);
+  }, [activities, selectedService, selectedTimeFilter]);
+
+  const handleLoadMore = async () => {
+    if (loadingMore || !hasMore) return;
+
+    setLoadingMore(true);
+    try {
+      await fetchActivities(currentPage + 1, true);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const getActivityIcon = (activityType: string) => {
+    switch (activityType) {
+      case "CREATE":
+        return <Plus className="h-5 w-5 text-green-500" />;
+      case "UPDATE":
+        return <Edit className="h-5 w-5 text-blue-500" />;
+      case "DELETE":
+        return <Trash className="h-5 w-5 text-red-500" />;
+      case "LOGIN":
+        return <Lock className="h-5 w-5 text-purple-500" />;
+      case "LOGOUT":
+        return <LogOut className="h-5 w-5 text-gray-500" />;
+      case "APPROVE":
+        return <Check className="h-5 w-5 text-green-500" />;
+      case "REJECT":
+        return <X className="h-5 w-5 text-red-500" />;
+      case "UPLOAD":
+        return <Upload className="h-5 w-5 text-blue-500" />;
+      case "DOWNLOAD":
+        return <Download className="h-5 w-5 text-blue-500" />;
+      default:
+        return <FileText className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
+  const getServiceName = (entityType: string) => {
+    switch (entityType) {
+      case "USER":
+        return "Users";
+      case "WORK_PROGRAM":
+        return "Work Programs";
+      case "EVENT":
+        return "Events";
+      case "DOCUMENT":
+        return "Documents";
+      case "LETTER":
+        return "Letter";
+      case "ARTICLE":
+        return "Article";
+      case "GALLERY":
+        return "Gallery";
+      case "FINANCE":
+        return "Finance";
+      case "APPROVAL":
+        return "Approvals";
+      case "PERIOD":
+        return "Period";
+      case "STRUCTURE":
+        return "Structure";
+      case "TASK":
+        return "Task";
+      default:
+        return entityType;
+    }
+  };
+
+  const getPriority = (activityType: string) => {
+    switch (activityType) {
+      case "DELETE":
+      case "APPROVE":
+      case "REJECT":
+        return "high";
+      case "CREATE":
+      case "UPDATE":
+        return "medium";
+      default:
+        return "low";
+    }
+  };
+
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor(
+      (now.getTime() - new Date(date).getTime()) / 1000
+    );
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    }
+    if (diffInSeconds < 3600) {
+      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    }
+    if (diffInSeconds < 86400) {
+      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    }
+    if (diffInSeconds < 604800) {
+      return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    }
+    return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-300 rounded mb-6" />
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-16 bg-gray-300 rounded" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-700">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   const serviceFilters = [
     "All",
@@ -111,7 +265,11 @@ export default function ActivityPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Activity Log</h1>
         <div className="flex items-center space-x-4">
-          <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select
+            value={selectedTimeFilter}
+            onChange={(e) => setSelectedTimeFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <option>All Activities</option>
             <option>Today</option>
             <option>This Week</option>
@@ -132,7 +290,12 @@ export default function ActivityPage() {
           {serviceFilters.map((service) => (
             <button
               key={service}
-              className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
+              onClick={() => setSelectedService(service)}
+              className={`px-3 py-1 rounded-full transition-colors ${
+                selectedService === service
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700"
+              }`}
             >
               {service}
             </button>
@@ -147,30 +310,68 @@ export default function ActivityPage() {
             <h3 className="text-sm font-medium text-gray-600">
               Total Activities
             </h3>
-            <span className="text-lg">📊</span>
+            <BarChart3 className="h-6 w-6 text-blue-500" />
           </div>
-          <p className="text-2xl font-bold text-gray-800">247</p>
+          <p className="text-2xl font-bold text-gray-800">
+            {filteredActivities.length}
+          </p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-medium text-gray-600">This Week</h3>
-            <span className="text-lg">🔄</span>
+            <RefreshCw className="h-6 w-6 text-green-500" />
           </div>
-          <p className="text-2xl font-bold text-gray-800">42</p>
+          <p className="text-2xl font-bold text-gray-800">
+            {
+              activities.filter((activity) => {
+                const activityDate = new Date(activity.createdAt);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                return activityDate >= weekAgo;
+              }).length
+            }
+          </p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-medium text-gray-600">Most Active</h3>
-            <span className="text-lg">👤</span>
+            <User className="h-6 w-6 text-purple-500" />
           </div>
-          <p className="text-xl font-bold text-gray-800">John Doe</p>
+          <p className="text-xl font-bold text-gray-800">
+            {(() => {
+              const userCounts = filteredActivities.reduce((acc, activity) => {
+                const userName = activity.user?.name || "Unknown";
+                acc[userName] = (acc[userName] || 0) + 1;
+                return acc;
+              }, {} as Record<string, number>);
+              const mostActive = Object.entries(userCounts).sort(
+                ([, a], [, b]) => b - a
+              )[0];
+              return mostActive ? mostActive[0] : "No data";
+            })()}
+          </p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-medium text-gray-600">Top Service</h3>
-            <span className="text-lg">📝</span>
+            <FileText className="h-6 w-6 text-orange-500" />
           </div>
-          <p className="text-xl font-bold text-gray-800">Documents</p>
+          <p className="text-xl font-bold text-gray-800">
+            {(() => {
+              const serviceCounts = filteredActivities.reduce(
+                (acc, activity) => {
+                  const serviceName = getServiceName(activity.entityType);
+                  acc[serviceName] = (acc[serviceName] || 0) + 1;
+                  return acc;
+                },
+                {} as Record<string, number>
+              );
+              const topService = Object.entries(serviceCounts).sort(
+                ([, a], [, b]) => b - a
+              )[0];
+              return topService ? topService[0] : "No data";
+            })()}
+          </p>
         </div>
       </div>
 
@@ -183,35 +384,35 @@ export default function ActivityPage() {
           <div className="text-sm text-gray-500">Last 30 days</div>
         </div>
         <ul className="divide-y divide-gray-200">
-          {activities.map((activity) => (
+          {filteredActivities.map((activity) => (
             <li
               key={activity.id}
               className="p-6 hover:bg-gray-50 transition-colors duration-150"
             >
               <div className="flex items-start">
                 <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-lg">
-                  {activity.icon}
+                  {getActivityIcon(activity.activityType)}
                 </div>
                 <div className="ml-4 flex-1">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {activity.user}
+                        {activity.user?.name || "Unknown User"}
                         <span className="ml-2 text-xs font-normal px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                          {activity.service}
+                          {getServiceName(activity.entityType)}
                         </span>
-                        {activity.priority === "high" && (
+                        {getPriority(activity.activityType) === "high" && (
                           <span className="ml-2 text-xs font-normal px-2 py-0.5 bg-red-100 text-red-600 rounded-full">
                             Important
                           </span>
                         )}
                       </p>
                       <p className="text-sm text-gray-600 mt-1">
-                        {activity.action}
+                        {activity.description}
                       </p>
                     </div>
                     <span className="text-sm text-gray-500">
-                      {activity.time}
+                      {formatTimeAgo(activity.createdAt)}
                     </span>
                   </div>
                 </div>
@@ -220,9 +421,24 @@ export default function ActivityPage() {
           ))}
         </ul>
         <div className="p-4 border-t border-gray-200 bg-gray-50 text-center">
-          <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-            Load More Activities
-          </button>
+          {hasMore ? (
+            <button
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loadingMore ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Load More Activities"
+              )}
+            </button>
+          ) : (
+            <p className="text-gray-500 text-sm">No more activities to load</p>
+          )}
         </div>
       </div>
     </div>

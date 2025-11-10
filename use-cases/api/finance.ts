@@ -118,3 +118,11 @@ export const deleteFinance = async (id: string): Promise<void> => {
     throw new Error("Failed to delete finance");
   }
 };
+
+export const FinanceApi = {
+  getFinances,
+  getFinance,
+  createFinance,
+  updateFinance,
+  deleteFinance,
+};
