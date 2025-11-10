@@ -12,7 +12,6 @@ import {
   BookOpen,
   DollarSign,
   Camera,
-  LinkIcon,
   BarChart3,
   Activity,
   User,
@@ -20,7 +19,6 @@ import {
   Shield,
   FolderOpen,
   Mail,
-  PieChart,
   Menu,
   X,
 } from "lucide-react";
@@ -168,9 +166,6 @@ export default function SidebarMobile() {
             <NavDropdownItem href="/admin/governance/tasks/add">
               Add New
             </NavDropdownItem>
-            <NavDropdownItem href="/admin/governance/tasks/approval">
-              Approval
-            </NavDropdownItem>
           </NavDropdown>
 
           {/* People & Access Section */}
@@ -209,9 +204,6 @@ export default function SidebarMobile() {
             <NavDropdownItem href="/admin/program/works/approval">
               Approval
             </NavDropdownItem>
-            <NavDropdownItem href="/admin/program/works/reports">
-              Reports
-            </NavDropdownItem>
           </NavDropdown>
 
           <NavDropdown icon={Calendar} title="Events">
@@ -223,9 +215,6 @@ export default function SidebarMobile() {
             </NavDropdownItem>
             <NavDropdownItem href="/admin/program/events/approval">
               Approval
-            </NavDropdownItem>
-            <NavDropdownItem href="/admin/program/events/reports">
-              Reports
             </NavDropdownItem>
           </NavDropdown>
 
@@ -246,12 +235,6 @@ export default function SidebarMobile() {
             <NavDropdownItem href="/admin/administration/documents/approval">
               Approval
             </NavDropdownItem>
-            <NavDropdownItem href="/admin/administration/documents/templates">
-              Templates
-            </NavDropdownItem>
-            <NavDropdownItem href="/admin/administration/documents/reports">
-              Reports
-            </NavDropdownItem>
           </NavDropdown>
 
           <NavDropdown icon={Mail} title="Letter">
@@ -263,12 +246,6 @@ export default function SidebarMobile() {
             </NavDropdownItem>
             <NavDropdownItem href="/admin/administration/letters/approval">
               Approval
-            </NavDropdownItem>
-            <NavDropdownItem href="/admin/administration/letters/templates">
-              Templates
-            </NavDropdownItem>
-            <NavDropdownItem href="/admin/administration/letters/reports">
-              Reports
             </NavDropdownItem>
           </NavDropdown>
 
@@ -300,21 +277,6 @@ export default function SidebarMobile() {
             </NavDropdownItem>
             <NavDropdownItem href="/admin/content/galleries/add">
               Add New
-            </NavDropdownItem>
-          </NavDropdown>
-
-          <NavDropdown icon={LinkIcon} title="Links">
-            <NavDropdownItem href="/admin/content/links/short">
-              Short Links
-            </NavDropdownItem>
-            <NavDropdownItem href="/admin/content/links/hubs">
-              Link Hubs
-            </NavDropdownItem>
-            <NavDropdownItem href="/admin/content/links/themes">
-              Hub Themes
-            </NavDropdownItem>
-            <NavDropdownItem href="/admin/content/links/approval">
-              Approval
             </NavDropdownItem>
           </NavDropdown>
 
@@ -353,9 +315,6 @@ export default function SidebarMobile() {
           <NavLink href="/admin/system/activity" icon={Activity}>
             Activity Log
           </NavLink>
-          <NavLink href="/admin/system/settings" icon={Settings}>
-            System Settings
-          </NavLink>
 
           {/* Settings Section */}
           <div className="mt-6 mb-2">
@@ -369,9 +328,6 @@ export default function SidebarMobile() {
           </NavLink>
           <NavLink href="/admin/settings/account" icon={Settings}>
             Account
-          </NavLink>
-          <NavLink href="/admin/settings/preferences" icon={PieChart}>
-            Preferences
           </NavLink>
         </nav>
 
