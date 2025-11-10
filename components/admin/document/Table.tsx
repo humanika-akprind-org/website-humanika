@@ -17,7 +17,7 @@ import DeleteModal from "./modal/DeleteModal";
 
 interface DocumentTableProps {
   documents: Document[];
-  onDelete: (id: string) => void;
+  onDelete: (id: string, name: string) => void;
   accessToken?: string;
 }
 
@@ -77,10 +77,13 @@ export default function DocumentTable({
 
   const handleConfirmDelete = () => {
     if (isBulkDelete) {
-      selectedDocuments.forEach((id) => onDelete(id));
+      selectedDocuments.forEach((id) => {
+        const doc = documents.find((d) => d.id === id);
+        if (doc) onDelete(id, doc.name);
+      });
       setSelectedDocuments([]);
     } else if (documentToDelete) {
-      onDelete(documentToDelete.id);
+      onDelete(documentToDelete.id, documentToDelete.name);
     }
     setIsDeleteModalOpen(false);
     setDocumentToDelete(null);

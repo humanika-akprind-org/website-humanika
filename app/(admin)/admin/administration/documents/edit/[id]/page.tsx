@@ -1,22 +1,18 @@
-import { UserApi } from "@/use-cases/api/user";
 import DocumentForm from "@/components/admin/document/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
+import type { Document } from "@/types/document";
 import { cookies } from "next/headers";
-import type {
-  CreateDocumentInput,
-  UpdateDocumentInput,
-  Document,
-} from "@/types/document";
-import { Status, ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
+import { fetchDocumentFormData } from "@/hooks/useDocumentFormData";
+import {
+  handleDocumentSubmit,
+  handleDocumentSubmitForApproval,
+} from "@/lib/actions/documentActions";
 
 async function EditDocumentPage({ params }: { params: { id: string } }) {
   const cookieStore = cookies();
@@ -40,138 +36,7 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
     // Transform document data to match Document type
     const transformedDocument = document as unknown as Document;
 
-    // Fetch users first (this is used to assign ownership / show user list).
-    const usersResponse = await UserApi.getUsers({ limit: 50 });
-    const users = usersResponse.data?.users || [];
-
-    // Fetch events and letters from DB (resiliently)
-    const [eventsSettled, lettersSettled] = await Promise.allSettled([
-      prisma.event.findMany({ orderBy: { name: "asc" } }),
-      prisma.letter.findMany({ orderBy: { date: "desc" } }),
-    ]);
-
-    const events =
-      eventsSettled.status === "fulfilled" ? eventsSettled.value : [];
-    if (eventsSettled.status === "rejected") {
-      console.error("Failed to load events from DB:", eventsSettled.reason);
-    }
-
-    const letters =
-      lettersSettled.status === "fulfilled" ? lettersSettled.value : [];
-    if (lettersSettled.status === "rejected") {
-      console.error("Failed to load letters from DB:", lettersSettled.reason);
-    }
-
-    const handleSubmit = async (
-      data: CreateDocumentInput | UpdateDocumentInput
-    ) => {
-      "use server";
-
-      const user = await getCurrentUser();
-      if (!user) {
-        throw new Error("Unauthorized");
-      }
-
-      // Cast data to UpdateDocumentInput since this is the edit page
-      const documentData = data as UpdateDocumentInput;
-
-      if (!documentData.name || !documentData.type) {
-        throw new Error("Missing required fields");
-      }
-
-      // Prepare data to send
-      const submitData: Omit<
-        Document,
-        | "id"
-        | "user"
-        | "event"
-        | "letter"
-        | "version"
-        | "parentId"
-        | "isCurrent"
-        | "createdAt"
-        | "updatedAt"
-        | "previousVersion"
-        | "nextVersions"
-        | "approvals"
-      > = {
-        name: documentData.name,
-        type: documentData.type,
-        status: documentData.status || Status.DRAFT,
-        document: documentData.document,
-        userId: user.id,
-        eventId: documentData.eventId,
-        letterId: documentData.letterId,
-      };
-
-      await prisma.document.update({
-        where: { id: params.id },
-        data: submitData,
-      });
-
-      redirect("/admin/administration/documents");
-    };
-
-    const handleSubmitForApproval = async (
-      data: CreateDocumentInput | UpdateDocumentInput
-    ) => {
-      "use server";
-
-      const user = await getCurrentUser();
-      if (!user) {
-        throw new Error("Unauthorized");
-      }
-
-      // Cast data to UpdateDocumentInput since this is the edit page
-      const documentData = data as UpdateDocumentInput;
-
-      if (!documentData.name || !documentData.type) {
-        throw new Error("Missing required fields");
-      }
-
-      // Prepare data to send
-      const submitData: Omit<
-        Document,
-        | "id"
-        | "user"
-        | "event"
-        | "letter"
-        | "version"
-        | "parentId"
-        | "isCurrent"
-        | "createdAt"
-        | "updatedAt"
-        | "previousVersion"
-        | "nextVersions"
-        | "approvals"
-      > = {
-        name: documentData.name,
-        type: documentData.type,
-        status: Status.PENDING,
-        document: documentData.document,
-        userId: user.id,
-        eventId: documentData.eventId,
-        letterId: documentData.letterId,
-      };
-
-      // Update the document with PENDING status
-      await prisma.document.update({
-        where: { id: params.id },
-        data: submitData,
-      });
-
-      // Create approval record for the document
-      await prisma.approval.create({
-        data: {
-          entityType: ApprovalType.DOCUMENT,
-          entityId: params.id,
-          userId: user.id,
-          status: StatusApproval.PENDING,
-        },
-      });
-
-      redirect("/admin/administration/documents");
-    };
+    const { users, events, letters } = await fetchDocumentFormData();
 
     return (
       <AuthGuard accessToken={accessToken}>
@@ -190,21 +55,12 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
             document={transformedDocument}
             accessToken={accessToken}
             users={users}
-            events={
-              events.map((ev) => ({
-                id: ev.id,
-                name: ev.name,
-              })) as unknown as Event[]
+            events={events as unknown as Event[]}
+            letters={letters as unknown as Letter[]}
+            onSubmit={(data) => handleDocumentSubmit(data, true, params.id)}
+            onSubmitForApproval={(data) =>
+              handleDocumentSubmitForApproval(data, true, params.id)
             }
-            letters={
-              letters.map((l) => ({
-                id: l.id,
-                number: l.number,
-                regarding: l.regarding,
-              })) as unknown as Letter[]
-            }
-            onSubmit={handleSubmit}
-            onSubmitForApproval={handleSubmitForApproval}
           />
         </div>
       </AuthGuard>
