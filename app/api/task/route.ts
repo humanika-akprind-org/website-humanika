@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { CreateDepartmentTaskInput } from "@/types/task";
-import type { Department } from "@/types/enums";
+import type { Department, Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
-import type { Prisma } from "@prisma/client";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  createDepartmentTask,
+  getDepartmentTasks,
+} from "@/lib/services/task/task.service";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,33 +16,15 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const department = searchParams.get("department") as Department;
-    const statusParam = searchParams.get("status");
+    const statusParam = searchParams.get("status") as Status | null;
     const userId = searchParams.get("userId");
     const search = searchParams.get("search");
 
-    const where: Prisma.DepartmentTaskWhereInput = {};
-
-    if (department) where.department = department;
-    if (statusParam) {
-      where.status = statusParam as Prisma.EnumStatusFilter<"DepartmentTask">;
-    }
-    if (userId) where.userId = userId;
-    if (search) {
-      where.OR = [{ note: { contains: search, mode: "insensitive" } }];
-    }
-
-    const departmentTasks = await prisma.departmentTask.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
+    const departmentTasks = await getDepartmentTasks({
+      department,
+      status: statusParam || undefined,
+      userId: userId || undefined,
+      search: search || undefined,
     });
 
     return NextResponse.json(departmentTasks);
@@ -71,42 +53,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const departmentTaskData: Prisma.DepartmentTaskCreateInput = {
-      note: body.note,
-      department: body.department,
-      ...(body.userId && { user: { connect: { id: body.userId } } }),
-      status: body.status || "PENDING",
-    };
-
-    const departmentTask = await prisma.departmentTask.create({
-      data: departmentTaskData,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.CREATE,
-      entityType: "DepartmentTask",
-      entityId: departmentTask.id,
-      description: `Created department task: ${departmentTask.note}`,
-      metadata: {
-        newData: {
-          note: departmentTask.note,
-          department: departmentTask.department,
-          userId: departmentTask.userId,
-          status: departmentTask.status,
-        },
-      },
-    });
+    const departmentTask = await createDepartmentTask(body, user);
 
     return NextResponse.json(departmentTask, { status: 201 });
   } catch (error) {
