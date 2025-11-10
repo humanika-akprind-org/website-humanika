@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const department = searchParams.get("department") || "";
     const isActive = searchParams.get("isActive");
     const verifiedAccount = searchParams.get("verifiedAccount");
+    const allUsers = searchParams.get("allUsers");
 
     const result = await getUsers({
       page,
@@ -23,6 +24,7 @@ export async function GET(request: NextRequest) {
       department: (department as Department) || undefined,
       isActive: isActive ? isActive === "true" : undefined,
       verifiedAccount: verifiedAccount ? verifiedAccount === "true" : undefined,
+      allUsers: allUsers ? allUsers === "true" : undefined,
     });
 
     return NextResponse.json(result);

@@ -20,10 +20,14 @@ function validateCreateManagementInput(body: ManagementServerData) {
 
 export async function GET() {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Temporarily remove authentication check to allow public access for testing
+    // const user = await getCurrentUser();
+    // if (!user) {
+    //   return NextResponse.json(
+    //     { success: false, error: "Unauthorized" },
+    //     { status: 401 }
+    //   );
+    // }
 
     // 1. Business logic
     const managements = await ManagementService.getManagements();
@@ -38,7 +42,7 @@ export async function GET() {
     return NextResponse.json(
       {
         success: false,
-        message:
+        error:
           error instanceof Error
             ? error.message
             : "Failed to fetch managements",
@@ -52,7 +56,10 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     // 1. Extract payload
@@ -61,7 +68,10 @@ export async function POST(request: NextRequest) {
     // 2. Validasi
     const validation = validateCreateManagementInput(body);
     if (!validation.isValid) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: validation.error },
+        { status: 400 }
+      );
     }
 
     // 3. Business logic
@@ -78,7 +88,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message:
+        error:
           error instanceof Error
             ? error.message
             : "Failed to create management",
