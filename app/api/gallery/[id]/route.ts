@@ -1,8 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getGallery,
+  updateGallery,
+  deleteGallery,
+  type UpdateGalleryInput,
+} from "@/lib/services/gallery/gallery.service";
 
 export async function GET(
   _request: NextRequest,
@@ -14,12 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const gallery = await prisma.gallery.findUnique({
-      where: { id: params.id },
-      include: {
-        event: true,
-      },
-    });
+    const gallery = await getGallery(params.id);
 
     if (!gallery) {
       return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
@@ -45,55 +43,16 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body: UpdateGalleryInput = await request.json();
 
-    // Check if gallery exists
-    const existingGallery = await prisma.gallery.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingGallery) {
-      return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
-    }
-
-    const updateData: Record<string, unknown> = {};
-
-    if (body.title) updateData.title = body.title;
-    if (body.eventId) updateData.eventId = body.eventId;
-    if (body.image) updateData.image = body.image;
-
-    const gallery = await prisma.gallery.update({
-      where: { id: params.id },
-      data: updateData,
-      include: {
-        event: true,
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "Gallery",
-      entityId: gallery.id,
-      description: `Updated gallery: ${gallery.title}`,
-      metadata: {
-        oldData: {
-          title: existingGallery.title,
-          eventId: existingGallery.eventId,
-          image: existingGallery.image,
-        },
-        newData: {
-          title: gallery.title,
-          eventId: gallery.eventId,
-          image: gallery.image,
-        },
-      },
-    });
+    const gallery = await updateGallery(params.id, body, user);
 
     return NextResponse.json(gallery);
   } catch (error) {
     console.error("Error updating gallery:", error);
+    if (error instanceof Error && error.message === "Gallery not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -111,39 +70,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if gallery exists
-    const existingGallery = await prisma.gallery.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingGallery) {
-      return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
-    }
-
-    await prisma.gallery.delete({
-      where: { id: params.id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(_request, {
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "Gallery",
-      entityId: params.id,
-      description: `Deleted gallery: ${existingGallery.title}`,
-      metadata: {
-        oldData: {
-          title: existingGallery.title,
-          eventId: existingGallery.eventId,
-          image: existingGallery.image,
-        },
-        newData: null,
-      },
-    });
+    await deleteGallery(params.id, user);
 
     return NextResponse.json({ message: "Gallery deleted successfully" });
   } catch (error) {
     console.error("Error deleting gallery:", error);
+    if (error instanceof Error && error.message === "Gallery not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
