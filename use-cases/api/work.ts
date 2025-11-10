@@ -114,3 +114,12 @@ export const deleteWorkPrograms = async (
 
   return response.json();
 };
+
+export const WorkApi = {
+  getWorkPrograms,
+  getWorkProgram,
+  createWorkProgram,
+  updateWorkProgram,
+  deleteWorkProgram,
+  deleteWorkPrograms,
+};

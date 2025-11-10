@@ -116,3 +116,11 @@ export const deleteDocument = async (id: string): Promise<void> => {
     throw new Error("Failed to delete document");
   }
 };
+
+export const DocumentApi = {
+  getDocuments,
+  getDocument,
+  createDocument,
+  updateDocument,
+  deleteDocument,
+};

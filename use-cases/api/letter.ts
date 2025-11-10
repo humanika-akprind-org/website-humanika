@@ -113,3 +113,11 @@ export const deleteLetter = async (id: string): Promise<void> => {
     throw new Error("Failed to delete letter");
   }
 };
+
+export const LetterApi = {
+  getLetters,
+  getLetter,
+  createLetter,
+  updateLetter,
+  deleteLetter,
+};

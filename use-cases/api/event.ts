@@ -113,3 +113,11 @@ export const deleteEvent = async (id: string): Promise<void> => {
     throw new Error("Failed to delete event");
   }
 };
+
+export const EventApi = {
+  getEvents,
+  getEvent,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+};
