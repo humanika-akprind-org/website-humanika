@@ -1,12 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { UpdateLetterInput } from "@/types/letter";
 import { getCurrentUser } from "@/lib/auth";
-import { ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/enums";
-import type { Prisma } from "@prisma/client";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getLetter,
+  updateLetter,
+  deleteLetter,
+} from "@/lib/services/letter/letter.service";
 
 export async function GET(
   _request: NextRequest,
@@ -18,45 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const letter = await prisma.letter.findUnique({
-      where: { id: params.id },
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const letter = await getLetter(params.id);
 
     if (!letter) {
       return NextResponse.json({ error: "Letter not found" }, { status: 404 });
@@ -84,161 +45,14 @@ export async function PUT(
 
     const body: UpdateLetterInput = await request.json();
 
-    // Get existing letter for logging
-    const existingLetter = await prisma.letter.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingLetter) {
-      return NextResponse.json({ error: "Letter not found" }, { status: 404 });
-    }
-
-    const updateData: Prisma.LetterUpdateInput = {};
-
-    if (body.number !== undefined) updateData.number = body.number;
-    if (body.regarding !== undefined) updateData.regarding = body.regarding;
-    if (body.origin !== undefined) updateData.origin = body.origin;
-    if (body.destination !== undefined) {
-      updateData.destination = body.destination;
-    }
-    if (body.date !== undefined) {
-      updateData.date = new Date(body.date);
-    }
-    if (body.type !== undefined) {
-      updateData.type = body.type;
-    }
-    if (body.priority !== undefined) {
-      updateData.priority = body.priority;
-    }
-    if (body.body !== undefined) updateData.body = body.body;
-    if (body.letter !== undefined) updateData.letter = body.letter;
-    if (body.notes !== undefined) updateData.notes = body.notes;
-    if (body.approvedById !== undefined) {
-      updateData.approvedBy = body.approvedById
-        ? { connect: { id: body.approvedById } }
-        : { disconnect: true };
-    }
-    if (body.periodId !== undefined) {
-      updateData.period = body.periodId
-        ? { connect: { id: body.periodId } }
-        : { disconnect: true };
-    }
-    if (body.eventId !== undefined) {
-      updateData.event = body.eventId
-        ? { connect: { id: body.eventId } }
-        : { disconnect: true };
-    }
-    if (body.status !== undefined) updateData.status = body.status;
-
-    // Handle status change to PENDING - create approval record
-    if (body.status === "PENDING") {
-      // Check if approval already exists for this letter
-      const existingApproval = await prisma.approval.findFirst({
-        where: {
-          entityType: ApprovalType.LETTER,
-          entityId: params.id,
-        },
-      });
-
-      if (!existingApproval) {
-        // Create approval record for the letter if it doesn't exist
-        await prisma.approval.create({
-          data: {
-            entityType: ApprovalType.LETTER,
-            entityId: params.id,
-            userId: user.id,
-            status: StatusApproval.PENDING,
-            note: "Letter submitted for approval",
-          },
-        });
-      } else {
-        // Update existing approval status to PENDING
-        await prisma.approval.update({
-          where: { id: existingApproval.id },
-          data: {
-            status: StatusApproval.PENDING,
-          },
-        });
-      }
-    }
-
-    const letter = await prisma.letter.update({
-      where: { id: params.id },
-      data: updateData,
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "Letter",
-      entityId: letter.id,
-      description: `Updated letter: ${letter.regarding}`,
-      metadata: {
-        oldData: {
-          regarding: existingLetter.regarding,
-          number: existingLetter.number,
-          origin: existingLetter.origin,
-          destination: existingLetter.destination,
-          type: existingLetter.type,
-          priority: existingLetter.priority,
-          status: existingLetter.status,
-          periodId: existingLetter.periodId,
-          eventId: existingLetter.eventId,
-        },
-        newData: {
-          regarding: letter.regarding,
-          number: letter.number,
-          origin: letter.origin,
-          destination: letter.destination,
-          type: letter.type,
-          priority: letter.priority,
-          status: letter.status,
-          periodId: letter.periodId,
-          eventId: letter.eventId,
-        },
-      },
-    });
+    const letter = await updateLetter(params.id, body, user);
 
     return NextResponse.json(letter);
   } catch (error) {
     console.error("Error updating letter:", error);
+    if (error instanceof Error && error.message === "Letter not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -256,45 +70,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch existing letter for logging
-    const existingLetter = await prisma.letter.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingLetter) {
-      return NextResponse.json({ error: "Letter not found" }, { status: 404 });
-    }
-
-    await prisma.letter.delete({
-      where: { id: params.id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(_request, {
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "Letter",
-      entityId: params.id,
-      description: `Deleted letter: ${existingLetter.regarding}`,
-      metadata: {
-        oldData: {
-          regarding: existingLetter.regarding,
-          number: existingLetter.number,
-          origin: existingLetter.origin,
-          destination: existingLetter.destination,
-          type: existingLetter.type,
-          priority: existingLetter.priority,
-          status: existingLetter.status,
-          periodId: existingLetter.periodId,
-          eventId: existingLetter.eventId,
-        },
-        newData: null,
-      },
-    });
+    await deleteLetter(params.id, user);
 
     return NextResponse.json({ message: "Letter deleted successfully" });
   } catch (error) {
     console.error("Error deleting letter:", error);
+    if (error instanceof Error && error.message === "Letter not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
