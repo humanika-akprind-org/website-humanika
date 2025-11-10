@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
 import { ManagementService } from "@/lib/services/management/management.service";
 import type { ManagementServerData } from "@/types/management";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
 
 interface RouteParams {
   params: { id: string };
@@ -10,6 +9,11 @@ interface RouteParams {
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const management = await ManagementService.getManagement(params.id);
 
     return NextResponse.json({
@@ -31,37 +35,18 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    // Get existing management for logging
-    const existingManagement = await ManagementService.getManagement(params.id);
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const formData: ManagementServerData = await request.json();
+
     const management = await ManagementService.updateManagement(
       params.id,
-      formData
+      formData,
+      user
     );
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: management.userId,
-      activityType: ActivityType.UPDATE,
-      entityType: "Management",
-      entityId: management.id,
-      description: `Updated management: ${management.user?.name || "Unknown"}`,
-      metadata: {
-        oldData: {
-          userId: existingManagement.userId,
-          position: existingManagement.position,
-          periodId: existingManagement.periodId,
-          photo: existingManagement.photo,
-        },
-        newData: {
-          userId: management.userId,
-          position: management.position,
-          periodId: management.periodId,
-          photo: management.photo,
-        },
-      },
-    });
 
     return NextResponse.json({
       success: true,
@@ -70,6 +55,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error("Error updating management:", error);
+    if (error instanceof Error && error.message === "Management not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       {
         success: false,
@@ -85,6 +73,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     // Get the management record first to access the photo URL
     const management = await ManagementService.getManagement(params.id);
 
@@ -117,25 +110,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Delete the management record
-    await ManagementService.deleteManagement(params.id);
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: management.userId,
-      activityType: ActivityType.DELETE,
-      entityType: "Management",
-      entityId: params.id,
-      description: `Deleted management: ${management.user?.name || "Unknown"}`,
-      metadata: {
-        oldData: {
-          userId: management.userId,
-          position: management.position,
-          periodId: management.periodId,
-          photo: management.photo,
-        },
-        newData: null,
-      },
-    });
+    await ManagementService.deleteManagement(params.id, user);
 
     return NextResponse.json({
       success: true,
@@ -143,6 +118,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error("Error deleting management:", error);
+    if (error instanceof Error && error.message === "Management not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       {
         success: false,
