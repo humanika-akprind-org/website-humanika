@@ -1,9 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { UpdateDocumentInput } from "@/types/document";
 import { getCurrentUser } from "@/lib/auth";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getDocument,
+  updateDocument,
+  deleteDocument,
+} from "@/lib/services/document/document.service";
 
 export async function GET(
   _request: NextRequest,
@@ -15,44 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const document = await prisma.document.findUnique({
-      where: { id: params.id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        event: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        letter: {
-          select: {
-            id: true,
-            number: true,
-            regarding: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                department: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const document = await getDocument(params.id);
 
     if (!document) {
       return NextResponse.json(
@@ -83,127 +48,14 @@ export async function PUT(
 
     const body: UpdateDocumentInput = await request.json();
 
-    // Check if document exists
-    const existingDocument = await prisma.document.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingDocument) {
-      return NextResponse.json(
-        { error: "Document not found" },
-        { status: 404 }
-      );
-    }
-
-    const updateData: Record<string, unknown> = {};
-
-    if (body.name !== undefined) updateData.name = body.name;
-    if (body.eventId !== undefined) updateData.eventId = body.eventId;
-    if (body.letterId !== undefined) updateData.letterId = body.letterId;
-    if (body.type) updateData.type = body.type;
-    if (body.document !== undefined) updateData.document = body.document;
-    if (body.status) updateData.status = body.status;
-
-    // Handle status change to PENDING - create approval record
-    if (body.status === "PENDING") {
-      // Check if approval already exists for this document
-      const existingApproval = await prisma.approval.findFirst({
-        where: {
-          entityType: "DOCUMENT",
-          entityId: params.id,
-        },
-      });
-
-      if (!existingApproval) {
-        // Create approval record for the document if it doesn't exist
-        await prisma.approval.create({
-          data: {
-            entityType: "DOCUMENT",
-            entityId: params.id,
-            userId: user.id,
-            status: "PENDING",
-            note: "Document submitted for approval",
-          },
-        });
-      } else {
-        // Update existing approval status to PENDING
-        await prisma.approval.update({
-          where: { id: existingApproval.id },
-          data: {
-            status: "PENDING",
-          },
-        });
-      }
-    }
-
-    const document = await prisma.document.update({
-      where: { id: params.id },
-      data: updateData,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        event: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        letter: {
-          select: {
-            id: true,
-            number: true,
-            regarding: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                department: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "Document",
-      entityId: document.id,
-      description: `Updated document: ${document.name}`,
-      metadata: {
-        oldData: {
-          name: existingDocument.name,
-          type: existingDocument.type,
-          status: existingDocument.status,
-          eventId: existingDocument.eventId,
-          letterId: existingDocument.letterId,
-        },
-        newData: {
-          name: document.name,
-          type: document.type,
-          status: document.status,
-          eventId: document.eventId,
-          letterId: document.letterId,
-        },
-      },
-    });
+    const document = await updateDocument(params.id, body, user);
 
     return NextResponse.json(document);
   } catch (error) {
     console.error("Error updating document:", error);
+    if (error instanceof Error && error.message === "Document not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -221,44 +73,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if document exists
-    const existingDocument = await prisma.document.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingDocument) {
-      return NextResponse.json(
-        { error: "Document not found" },
-        { status: 404 }
-      );
-    }
-
-    await prisma.document.delete({
-      where: { id: params.id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(_request, {
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "Document",
-      entityId: params.id,
-      description: `Deleted document: ${existingDocument.name}`,
-      metadata: {
-        oldData: {
-          name: existingDocument.name,
-          type: existingDocument.type,
-          status: existingDocument.status,
-          eventId: existingDocument.eventId,
-          letterId: existingDocument.letterId,
-        },
-        newData: null,
-      },
-    });
+    await deleteDocument(params.id, user);
 
     return NextResponse.json({ message: "Document deleted successfully" });
   } catch (error) {
     console.error("Error deleting document:", error);
+    if (error instanceof Error && error.message === "Document not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
