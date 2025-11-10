@@ -1,104 +1,26 @@
 import { NextResponse } from "next/server";
-import { comparePasswords, generateToken, setAuthCookie } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { setAuthCookie } from "@/lib/auth";
+import { login } from "@/lib/services/auth/login.service";
 
 export async function POST(request: Request) {
   try {
     const { usernameOrEmail, password } = await request.json();
 
-    if (!usernameOrEmail?.trim() || !password?.trim()) {
+    const result = await login(usernameOrEmail, password);
+
+    if (!result.success) {
       return NextResponse.json(
-        { success: false, error: "Username/email and password are required" },
-        { status: 400 }
+        { success: result.success, error: result.error },
+        { status: result.status }
       );
     }
 
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { username: usernameOrEmail.trim() },
-          { email: usernameOrEmail.trim() },
-        ],
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    if (!["ANGGOTA"].includes(user.role)) {
-      return NextResponse.json(
-        { success: false, error: "Access denied. ANGGOTA only." },
-        { status: 403 }
-      );
-    }
-
-    // Check if account is verified
-    if (!user.verifiedAccount) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Account not verified. Please wait for admin verification.",
-        },
-        { status: 401 }
-      );
-    }
-
-    // Check if account is active
-    if (!user.isActive) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Account is inactive. Please contact administrator.",
-        },
-        { status: 401 }
-      );
-    }
-
-    // Check if account is blocked
-    if (user.blockExpires && user.blockExpires > new Date()) {
-      return NextResponse.json(
-        { success: false, error: "Account is temporarily blocked" },
-        { status: 401 }
-      );
-    }
-
-    const isPasswordValid = await comparePasswords(password, user.password);
-    if (!isPasswordValid) {
-      const attemptLogin = user.attemptLogin + 1;
-      let blockExpires = null;
-
-      if (attemptLogin >= 5) {
-        blockExpires = new Date(Date.now() + 30 * 60 * 1000);
-      }
-
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { attemptLogin, blockExpires },
-      });
-
-      return NextResponse.json(
-        { success: false, error: "Invalid credentials" },
-        { status: 401 }
-      );
-    }
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { attemptLogin: 0, blockExpires: null },
-    });
-
-    const token = generateToken(user.id);
-    const { password: _, ...userWithoutPassword } = user;
     const response = NextResponse.json({
-      success: true,
-      user: userWithoutPassword,
+      success: result.success,
+      user: result.user,
     });
 
-    return setAuthCookie(response, token);
+    return setAuthCookie(response, result.token!);
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
