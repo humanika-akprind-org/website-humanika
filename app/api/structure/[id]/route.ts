@@ -1,9 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import type { UpdateOrganizationalStructureInput } from "@/types/structure";
 import { getCurrentUser } from "@/lib/auth";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getStructure,
+  updateStructure,
+  deleteStructure,
+} from "@/lib/services/structure/structure.service";
 
 export async function GET(
   _request: NextRequest,
@@ -15,23 +17,17 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const structure = await prisma.organizationalStructure.findUnique({
-      where: { id: params.id },
-      include: {
-        period: true,
-      },
-    });
-
-    if (!structure) {
-      return NextResponse.json(
-        { error: "Organizational structure not found" },
-        { status: 404 }
-      );
-    }
+    const structure = await getStructure(params.id);
 
     return NextResponse.json(structure);
   } catch (error) {
     console.error("Error fetching organizational structure:", error);
+    if (
+      error instanceof Error &&
+      error.message === "Organizational structure not found"
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -51,62 +47,17 @@ export async function PUT(
 
     const body: UpdateOrganizationalStructureInput = await request.json();
 
-    // Check if structure exists
-    const existingStructure = await prisma.organizationalStructure.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingStructure) {
-      return NextResponse.json(
-        { error: "Organizational structure not found" },
-        { status: 404 }
-      );
-    }
-
-    const updateData: Record<string, unknown> = {};
-
-    if (body.name !== undefined) updateData.name = body.name;
-    if (body.periodId !== undefined) updateData.periodId = body.periodId;
-    if (body.decree !== undefined) updateData.decree = body.decree;
-    if (body.structure !== undefined) updateData.structure = body.structure;
-    if (body.status !== undefined) updateData.status = body.status;
-
-    const structure = await prisma.organizationalStructure.update({
-      where: { id: params.id },
-      data: updateData,
-      include: {
-        period: true,
-      },
-    });
-
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "OrganizationalStructure",
-      entityId: structure.id,
-      description: `Updated organizational structure: ${structure.name}`,
-      metadata: {
-        oldData: {
-          name: existingStructure.name,
-          periodId: existingStructure.periodId,
-          decree: existingStructure.decree,
-          structure: existingStructure.structure,
-          status: existingStructure.status,
-        },
-        newData: {
-          name: structure.name,
-          periodId: structure.periodId,
-          decree: structure.decree,
-          structure: structure.structure,
-          status: structure.status,
-        },
-      },
-    });
+    const structure = await updateStructure(params.id, body, user);
 
     return NextResponse.json(structure);
   } catch (error) {
     console.error("Error updating organizational structure:", error);
+    if (
+      error instanceof Error &&
+      error.message === "Organizational structure not found"
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -124,46 +75,19 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if structure exists
-    const existingStructure = await prisma.organizationalStructure.findUnique({
-      where: { id: params.id },
-    });
-
-    if (!existingStructure) {
-      return NextResponse.json(
-        { error: "Organizational structure not found" },
-        { status: 404 }
-      );
-    }
-
-    await prisma.organizationalStructure.delete({
-      where: { id: params.id },
-    });
-
-    // Log activity
-    await logActivityFromRequest(_request, {
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "OrganizationalStructure",
-      entityId: params.id,
-      description: `Deleted organizational structure: ${existingStructure.name}`,
-      metadata: {
-        oldData: {
-          name: existingStructure.name,
-          periodId: existingStructure.periodId,
-          decree: existingStructure.decree,
-          structure: existingStructure.structure,
-          status: existingStructure.status,
-        },
-        newData: null,
-      },
-    });
+    await deleteStructure(params.id, user);
 
     return NextResponse.json({
       message: "Organizational structure deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting organizational structure:", error);
+    if (
+      error instanceof Error &&
+      error.message === "Organizational structure not found"
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
