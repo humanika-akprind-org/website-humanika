@@ -1,9 +1,33 @@
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import type { Prisma } from "@prisma/client";
-import { logActivityFromRequest } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import {
+  getGalleries,
+  createGallery,
+  type CreateGalleryInput,
+} from "@/lib/services/gallery/gallery.service";
+
+// Extract payload functions
+function extractGalleryQueryParams(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  return {
+    eventId: searchParams.get("eventId") || undefined,
+    search: searchParams.get("search") || undefined,
+  };
+}
+
+async function extractCreateGalleryBody(
+  request: NextRequest
+): Promise<CreateGalleryInput> {
+  return await request.json();
+}
+
+// Validation functions
+function validateCreateGalleryInput(body: CreateGalleryInput) {
+  if (!body.title || !body.eventId || !body.image) {
+    return { isValid: false, error: "Missing required fields" };
+  }
+  return { isValid: true };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,28 +36,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const eventId = searchParams.get("eventId");
-    const search = searchParams.get("search");
+    // 1. Extract payload
+    const queryParams = extractGalleryQueryParams(request);
 
-    const where: Prisma.GalleryWhereInput = {};
+    // 2. Validasi - no validation needed for GET request
 
-    if (eventId) where.eventId = eventId;
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { event: { name: { contains: search, mode: "insensitive" } } },
-      ];
-    }
+    // 3. Business logic
+    const galleries = await getGalleries(queryParams);
 
-    const galleries = await prisma.gallery.findMany({
-      where,
-      include: {
-        event: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
+    // 4. Response
     return NextResponse.json(galleries);
   } catch (error) {
     console.error("Error fetching galleries:", error);
@@ -51,43 +62,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { title, eventId, image } = body;
+    // 1. Extract payload
+    const body = await extractCreateGalleryBody(request);
 
-    if (!title || !eventId || !image) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    // 2. Validasi
+    const validation = validateCreateGalleryInput(body);
+    if (!validation.isValid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const gallery = await prisma.gallery.create({
-      data: {
-        title,
-        eventId,
-        image, // This is the Google Drive file ID
-      },
-      include: {
-        event: true,
-      },
-    });
+    // 3. Business logic
+    const gallery = await createGallery(body, user);
 
-    // Log activity
-    await logActivityFromRequest(request, {
-      userId: user.id,
-      activityType: ActivityType.CREATE,
-      entityType: "Gallery",
-      entityId: gallery.id,
-      description: `Created gallery: ${gallery.title}`,
-      metadata: {
-        newData: {
-          title: gallery.title,
-          eventId: gallery.eventId,
-          image: gallery.image,
-        },
-      },
-    });
-
+    // 4. Response
     return NextResponse.json(gallery, { status: 201 });
   } catch (error) {
     console.error("Error creating gallery:", error);
