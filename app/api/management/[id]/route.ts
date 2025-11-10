@@ -82,14 +82,37 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const management = await ManagementService.getManagement(params.id);
 
     // Delete the photo from Google Drive if it exists
-    if (
-      management.photo &&
-      management.photo.includes("drive.google.com/file/d/")
-    ) {
-      const fileIdMatch = management.photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (fileIdMatch) {
+    if (management.photo) {
+      // Extract file ID from various formats (URL or direct ID)
+      let fileId: string | null = null;
+
+      // Handle direct file IDs (33 characters, alphanumeric with underscores/hyphens)
+      if (
+        management.photo.length === 33 &&
+        /^[a-zA-Z0-9_-]+$/.test(management.photo)
+      ) {
+        fileId = management.photo;
+      } else {
+        // Handle Google Drive URLs
+        const patterns = [
+          /[?&]id=([a-zA-Z0-9_-]+)/,
+          /\/file\/d\/([a-zA-Z0-9_-]+)/,
+          /\/d\/([a-zA-Z0-9_-]+)/,
+          /uc\?export=view&id=([a-zA-Z0-9_-]+)/,
+        ];
+
+        for (const pattern of patterns) {
+          const match = management.photo.match(pattern);
+          if (match && match[1]) {
+            fileId = match[1];
+            break;
+          }
+        }
+      }
+
+      if (fileId) {
         try {
-          // Get access token from request headers or body
+          // Get access token from request headers
           const accessToken = request.headers
             .get("authorization")
             ?.replace("Bearer ", "");
@@ -98,9 +121,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             const { callApi } = await import("@/use-cases/api/google-drive");
             await callApi({
               action: "delete",
-              fileId: fileIdMatch[1],
+              fileId,
               accessToken,
             });
+            console.log(
+              `Successfully deleted photo file ${fileId} from Google Drive`
+            );
+          } else {
+            console.warn("No access token available for photo deletion");
           }
         } catch (deleteError) {
           console.warn("Failed to delete photo from Drive:", deleteError);

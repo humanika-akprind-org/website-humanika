@@ -13,6 +13,7 @@ export const getUsers = async (filter: {
   department?: Department;
   isActive?: boolean;
   verifiedAccount?: boolean;
+  allUsers?: boolean;
 }) => {
   const page = filter.page || 1;
   const limit = filter.limit || 10;
@@ -30,8 +31,10 @@ export const getUsers = async (filter: {
     verifiedAccount?: boolean;
   } = {};
 
-  // Default to showing only verified accounts
-  where.verifiedAccount = true;
+  // Default to showing only verified accounts unless allUsers is true
+  if (!filter.allUsers) {
+    where.verifiedAccount = true;
+  }
 
   if (filter.search) {
     where.OR = [

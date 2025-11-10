@@ -46,6 +46,7 @@ export async function getUsers(params?: {
   department?: Department | string;
   isActive?: boolean;
   verifiedAccount?: boolean;
+  allUsers?: boolean;
 }): Promise<ApiResponse<UsersResponse>> {
   const queryParams = new URLSearchParams();
 
@@ -54,8 +55,15 @@ export async function getUsers(params?: {
   if (params?.search) queryParams.append("search", params.search);
   if (params?.role) queryParams.append("role", params.role);
   if (params?.department) queryParams.append("department", params.department);
-  if (params?.isActive !== undefined) queryParams.append("isActive", params.isActive.toString());
-  if (params?.verifiedAccount !== undefined) queryParams.append("verifiedAccount", params.verifiedAccount.toString());
+  if (params?.isActive !== undefined) {
+    queryParams.append("isActive", params.isActive.toString());
+  }
+  if (params?.verifiedAccount !== undefined) {
+    queryParams.append("verifiedAccount", params.verifiedAccount.toString());
+  }
+  if (params?.allUsers !== undefined) {
+    queryParams.append("allUsers", params.allUsers.toString());
+  }
 
   const queryString = queryParams.toString();
   const endpoint = `/user${queryString ? `?${queryString}` : ""}`;

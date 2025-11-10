@@ -469,6 +469,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                               }}
                               disabled={isOperating}
                               className="px-3 py-1 text-sm bg-orange-50 text-orange-700 rounded hover:bg-orange-100 border border-orange-200 disabled:opacity-50"
+                              type="button"
                             >
                               Hapus Foto
                             </button>
@@ -477,6 +478,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                             onClick={() => handleDelete(management)}
                             disabled={isOperating}
                             className="px-3 py-1 text-sm bg-red-50 text-red-700 rounded hover:bg-red-100 border border-red-200 disabled:opacity-50"
+                            type="button"
                           >
                             Hapus
                           </button>
