@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFile } from "@/hooks/useFile";
 
 export default function FinanceTransactionsPage() {
-  const [_finances, setFinances] = useState<Finance[]>([]);
+  const [finances, setFinances] = useState<Finance[]>([]);
   const [filteredFinances, setFilteredFinances] = useState<Finance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState({
@@ -20,6 +20,15 @@ export default function FinanceTransactionsPage() {
     financeId: "",
     financeName: "",
   });
+
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedFinances, setSelectedFinances] = useState<string[]>([]);
 
   const { toast } = useToast();
   const { deleteFile } = useFile("");
@@ -55,6 +64,53 @@ export default function FinanceTransactionsPage() {
   useEffect(() => {
     fetchFinances();
   }, [fetchFinances]);
+
+  // Apply filters
+  useEffect(() => {
+    let filtered = finances;
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (finance) =>
+          finance.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          finance.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((finance) => finance.status === statusFilter);
+    }
+
+    // Type filter
+    if (typeFilter !== "all") {
+      filtered = filtered.filter((finance) => finance.type === typeFilter);
+    }
+
+    // Category filter
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter(
+        (finance) => finance.category.id === categoryFilter
+      );
+    }
+
+    // Period filter
+    if (periodFilter !== "all") {
+      filtered = filtered.filter(
+        (finance) => finance.period.id === periodFilter
+      );
+    }
+
+    setFilteredFinances(filtered);
+  }, [
+    finances,
+    searchTerm,
+    statusFilter,
+    typeFilter,
+    categoryFilter,
+    periodFilter,
+  ]);
 
   const handleDelete = async (financeId: string) => {
     try {
@@ -107,6 +163,48 @@ export default function FinanceTransactionsPage() {
     setDeleteModal({ isOpen: false, financeId: "", financeName: "" });
   };
 
+  const handleDeleteSelected = async () => {
+    if (selectedFinances.length === 0) return;
+
+    try {
+      for (const financeId of selectedFinances) {
+        // First, get the finance to check if it has a file
+        const financeResponse = await fetch(`/api/finance/${financeId}`);
+        if (!financeResponse.ok) continue;
+        const finance = await financeResponse.json();
+
+        // Delete the file from Google Drive if it exists
+        if (finance.fileId) {
+          const fileDeleted = await deleteFile(finance.fileId);
+          if (!fileDeleted) {
+            console.warn(
+              "Failed to delete file from Google Drive, but continuing with database deletion"
+            );
+          }
+        }
+
+        // Delete from database
+        await fetch(`/api/finance/${financeId}`, {
+          method: "DELETE",
+        });
+      }
+
+      toast({
+        title: "Success",
+        description: `${selectedFinances.length} transactions deleted successfully`,
+      });
+      setSelectedFinances([]);
+      fetchFinances(); // Refresh the list
+    } catch (error) {
+      console.error("Error deleting selected transactions:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete selected transactions",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -135,20 +233,20 @@ export default function FinanceTransactionsPage() {
 
       {/* Filters */}
       <Filters
-        searchTerm=""
-        onSearchChange={() => {}}
-        statusFilter="all"
-        onStatusFilterChange={() => {}}
-        typeFilter="all"
-        onTypeFilterChange={() => {}}
-        categoryFilter="all"
-        onCategoryFilterChange={() => {}}
-        periodFilter="all"
-        onPeriodFilterChange={() => {}}
-        isFilterOpen={false}
-        setIsFilterOpen={() => {}}
-        selectedCount={0}
-        onDeleteSelected={() => {}}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        typeFilter={typeFilter}
+        onTypeFilterChange={setTypeFilter}
+        categoryFilter={categoryFilter}
+        onCategoryFilterChange={setCategoryFilter}
+        periodFilter={periodFilter}
+        onPeriodFilterChange={setPeriodFilter}
+        isFilterOpen={isFilterOpen}
+        setIsFilterOpen={setIsFilterOpen}
+        selectedCount={selectedFinances.length}
+        onDeleteSelected={handleDeleteSelected}
       />
 
       {/* Finances Table */}

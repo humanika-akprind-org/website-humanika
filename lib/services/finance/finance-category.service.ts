@@ -19,7 +19,7 @@ export const getFinanceCategories = async (filter: {
   const where: Prisma.FinanceCategoryWhereInput = {};
 
   if (filter.type) where.type = { equals: filter.type };
-  if (filter.isActive !== null) where.isActive = { equals: filter.isActive === "true" };
+  if (filter.isActive !== undefined)  where.isActive = { equals: filter.isActive === "true" };
   if (filter.search) {
     where.OR = [
       { name: { contains: filter.search, mode: "insensitive" } },
