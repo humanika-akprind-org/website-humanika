@@ -1,22 +1,161 @@
+import { UserApi } from "@/use-cases/api/user";
+// Fetch events/letters directly from the database (server-side) to avoid
+// depending on the HTTP API from server components which may fail due to
+// network/auth constraints.
 import DocumentForm from "@/components/admin/document/Form";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
+import type {
+  CreateDocumentInput,
+  UpdateDocumentInput,
+  Document,
+} from "@/types/document";
+import { Status, ApprovalType } from "@/types/enums";
+import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
-import { fetchDocumentFormData } from "@/hooks/document/useDocumentFormData";
-import {
-  handleDocumentSubmit,
-  handleDocumentSubmitForApproval,
-} from "@/lib/actions/documentActions";
+import prisma from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 async function AddDocumentPage() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("google_access_token")?.value || "";
 
   try {
-    const { users, events, letters } = await fetchDocumentFormData();
+    // Fetch users first (this is used to assign ownership).
+    const usersResponse = await UserApi.getUsers({ limit: 50 });
+    const users = usersResponse.data?.users || [];
+
+    // Fetch events and letters directly from the database; use allSettled
+    // so that a failure in one doesn't block rendering the form.
+    const [eventsSettled, lettersSettled] = await Promise.allSettled([
+      prisma.event.findMany({ orderBy: { name: "asc" } }),
+      prisma.letter.findMany({ orderBy: { date: "desc" } }),
+    ]);
+
+    const events =
+      eventsSettled.status === "fulfilled" ? eventsSettled.value : [];
+    if (eventsSettled.status === "rejected") {
+      console.error("Failed to load events from DB:", eventsSettled.reason);
+    }
+
+    const letters =
+      lettersSettled.status === "fulfilled" ? lettersSettled.value : [];
+    if (lettersSettled.status === "rejected") {
+      console.error("Failed to load letters from DB:", lettersSettled.reason);
+    }
+
+    const handleSubmit = async (
+      data: CreateDocumentInput | UpdateDocumentInput
+    ) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      // Cast data to CreateDocumentInput since this is the add page
+      const documentData = data as CreateDocumentInput;
+
+      if (!documentData.name || !documentData.type) {
+        throw new Error("Missing required fields");
+      }
+
+      // Prepare data to send
+      const submitData: Omit<
+        Document,
+        | "id"
+        | "user"
+        | "event"
+        | "letter"
+        | "version"
+        | "parentId"
+        | "isCurrent"
+        | "createdAt"
+        | "updatedAt"
+        | "previousVersion"
+        | "nextVersions"
+        | "approvals"
+      > = {
+        name: documentData.name,
+        type: documentData.type,
+        status: Status.DRAFT,
+        document: documentData.document,
+        userId: user.id,
+        eventId: documentData.eventId,
+        letterId: documentData.letterId,
+      };
+
+      await prisma.document.create({
+        data: submitData,
+      });
+
+      redirect("/admin/administration/documents");
+    };
+
+    const handleSubmitForApproval = async (
+      data: CreateDocumentInput | UpdateDocumentInput
+    ) => {
+      "use server";
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      // Cast data to CreateDocumentInput since this is the add page
+      const documentData = data as CreateDocumentInput;
+
+      if (!documentData.name || !documentData.type) {
+        throw new Error("Missing required fields");
+      }
+
+      // Prepare data to send
+      const submitData: Omit<
+        Document,
+        | "id"
+        | "user"
+        | "event"
+        | "letter"
+        | "version"
+        | "parentId"
+        | "isCurrent"
+        | "createdAt"
+        | "updatedAt"
+        | "previousVersion"
+        | "nextVersions"
+        | "approvals"
+      > = {
+        name: documentData.name,
+        type: documentData.type,
+        status: Status.PENDING,
+        document: documentData.document,
+        userId: user.id,
+        eventId: documentData.eventId,
+        letterId: documentData.letterId,
+      };
+
+      // Create the document with PENDING status
+      const document = await prisma.document.create({
+        data: submitData,
+      });
+
+      // Create approval record for the document
+      await prisma.approval.create({
+        data: {
+          entityType: ApprovalType.DOCUMENT,
+          entityId: document.id,
+          userId: user.id,
+          status: StatusApproval.PENDING,
+        },
+      });
+
+      redirect("/admin/administration/documents");
+    };
 
     return (
       <AuthGuard accessToken={accessToken}>
@@ -36,10 +175,21 @@ async function AddDocumentPage() {
           <DocumentForm
             accessToken={accessToken}
             users={users}
-            events={events as unknown as Event[]}
-            letters={letters as unknown as Letter[]}
-            onSubmit={handleDocumentSubmit}
-            onSubmitForApproval={handleDocumentSubmitForApproval}
+            events={
+              events.map((ev) => ({
+                id: ev.id,
+                name: ev.name,
+              })) as unknown as Event[]
+            }
+            letters={
+              letters.map((l) => ({
+                id: l.id,
+                number: l.number,
+                regarding: l.regarding,
+              })) as unknown as Letter[]
+            }
+            onSubmit={handleSubmit}
+            onSubmitForApproval={handleSubmitForApproval}
           />
         </div>
       </AuthGuard>

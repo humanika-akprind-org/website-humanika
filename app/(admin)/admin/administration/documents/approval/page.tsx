@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import {
   FiSearch,
   FiFilter,
@@ -10,8 +11,15 @@ import {
   FiEye,
   FiChevronDown,
 } from "react-icons/fi";
-import { useDocumentApprovals } from "@/hooks/document/useDocumentApprovals";
-import type { Approval } from "@/types/approval";
+import { ApprovalApi } from "use-cases/api/approval";
+import type { Approval } from "types/approval";
+
+enum StatusApproval {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  CANCELLED = "CANCELLED",
+}
 
 // Helper function to format enum values for display
 const formatEnumValue = (value: string) =>
@@ -55,25 +63,123 @@ const getEntityName = (approval: Approval) => {
 };
 
 export default function DocumentApprovalPage() {
-  const {
-    approvals,
-    loading,
-    error,
-    success,
-    searchTerm,
-    setSearchTerm,
-    filters,
-    isFilterOpen,
-    setIsFilterOpen,
-    currentPage,
-    setCurrentPage,
-    totalPages,
-    handleApprove,
-    handleReject,
-    handleRequestRevision,
-    handleFilterChange,
-    clearFilters,
-  } = useDocumentApprovals();
+  const [approvals, setApprovals] = useState<Approval[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    status: "",
+    entityType: "DOCUMENT", // Fixed to documents only
+  });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchApprovals = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await ApprovalApi.getApprovals({
+        status: filters.status,
+        entityType: filters.entityType,
+        page: currentPage,
+        limit: 10,
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else if (response.data) {
+        setApprovals(response.data.approvals);
+        setTotalPages(response.data.pagination.pages);
+      }
+    } catch (_error) {
+      setError("Failed to fetch approvals");
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, currentPage]);
+
+  useEffect(() => {
+    fetchApprovals();
+  }, [fetchApprovals]);
+
+  const handleApprove = async (approvalId: string) => {
+    try {
+      const response = await ApprovalApi.updateApproval(approvalId, {
+        status: StatusApproval.APPROVED,
+        note: "Approved by admin",
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Document approval updated successfully");
+        fetchApprovals();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to update approval");
+    }
+  };
+
+  const handleReject = async (approvalId: string) => {
+    try {
+      const response = await ApprovalApi.updateApproval(approvalId, {
+        status: StatusApproval.REJECTED,
+        note: "Rejected by admin",
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Document approval updated successfully");
+        fetchApprovals();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to update approval");
+    }
+  };
+
+  const handleRequestRevision = async (approvalId: string) => {
+    try {
+      const response = await ApprovalApi.updateApproval(approvalId, {
+        status: StatusApproval.CANCELLED,
+        note: "Please revise and resubmit",
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Document approval updated successfully");
+        fetchApprovals();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to update approval");
+    }
+  };
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setFilters({ status: "", entityType: "DOCUMENT" });
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const filteredApprovals = approvals.filter((approval) => {
+    const matchesSearch =
+      approval.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      approval.user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getEntityName(approval).toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesSearch;
+  });
 
   return (
     <div className="p-6">
@@ -168,7 +274,7 @@ export default function DocumentApprovalPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
             <p className="mt-2 text-gray-600">Loading document approvals...</p>
           </div>
-        ) : approvals.length === 0 ? (
+        ) : filteredApprovals.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-gray-400 mb-2">
               <FiMail size={48} className="mx-auto" />
@@ -205,7 +311,7 @@ export default function DocumentApprovalPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {approvals.map((approval) => (
+                {filteredApprovals.map((approval) => (
                   <tr key={approval.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
@@ -288,8 +394,10 @@ export default function DocumentApprovalPage() {
               <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
                 <p className="text-sm text-gray-700 mb-4 sm:mb-0">
                   Showing{" "}
-                  <span className="font-medium">{approvals.length}</span> of{" "}
-                  <span className="font-medium">{approvals.length}</span>{" "}
+                  <span className="font-medium">
+                    {filteredApprovals.length}
+                  </span>{" "}
+                  of <span className="font-medium">{approvals.length}</span>{" "}
                   document approvals
                 </p>
                 <div className="flex space-x-2">

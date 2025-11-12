@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Link from "next/link";
 import {
   FiFileText,
@@ -13,11 +14,10 @@ import { Status as StatusEnum, DocumentType } from "@/types/enums";
 import DocumentStats from "./Stats";
 import DocumentFilters from "./Filters";
 import DeleteModal from "./modal/DeleteModal";
-import { useDocumentTable } from "@/hooks/document/useDocumentTable";
 
 interface DocumentTableProps {
   documents: Document[];
-  onDelete: (id: string, name: string) => void;
+  onDelete: (id: string) => void;
   accessToken?: string;
 }
 
@@ -25,28 +25,16 @@ export default function DocumentTable({
   documents,
   onDelete,
 }: DocumentTableProps) {
-  const {
-    searchTerm,
-    setSearchTerm,
-    statusFilter,
-    setStatusFilter,
-    typeFilter,
-    setTypeFilter,
-    userFilter,
-    setUserFilter,
-    selectedDocuments,
-    toggleDocumentSelection,
-    selectAllDocuments,
-    clearSelection,
-    isDeleteModalOpen,
-    documentToDelete,
-    isBulkDelete,
-    filteredDocuments,
-    handleDelete,
-    handleBulkDelete,
-    handleConfirmDelete,
-    handleCloseDeleteModal,
-  } = useDocumentTable({ documents, onDelete });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
+  const [typeFilter, setTypeFilter] = useState<DocumentType | "all">("all");
+  const [userFilter, setUserFilter] = useState<string>("all");
+  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
+    null
+  );
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
 
   const handleStatusFilterChange = (status: string) =>
     (status === "all" ||
@@ -80,6 +68,62 @@ export default function DocumentTable({
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const handleDelete = (document: Document) => {
+    setDocumentToDelete(document);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (isBulkDelete) {
+      selectedDocuments.forEach((id) => onDelete(id));
+      setSelectedDocuments([]);
+    } else if (documentToDelete) {
+      onDelete(documentToDelete.id);
+    }
+    setIsDeleteModalOpen(false);
+    setDocumentToDelete(null);
+    setIsBulkDelete(false);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDocumentToDelete(null);
+    setIsBulkDelete(false);
+  };
+
+  // Filter documents based on search term and filters
+  const filteredDocuments = documents.filter((document) => {
+    const matchesSearch = document.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || document.status === statusFilter;
+
+    const matchesType = typeFilter === "all" || document.type === typeFilter;
+
+    const matchesUser = userFilter === "all" || document.user.id === userFilter;
+
+    return matchesSearch && matchesStatus && matchesType && matchesUser;
+  });
+
+  // Toggle document selection
+  const toggleDocumentSelection = (id: string) => {
+    setSelectedDocuments((prev) =>
+      prev.includes(id)
+        ? prev.filter((documentId) => documentId !== id)
+        : [...prev, id]
+    );
+  };
+
+  // Handle bulk delete
+  const handleBulkDelete = () => {
+    if (selectedDocuments.length === 0) return;
+
+    setIsBulkDelete(true);
+    setIsDeleteModalOpen(true);
   };
 
   if (documents.length === 0) {
@@ -150,9 +194,11 @@ export default function DocumentTable({
                       if (
                         selectedDocuments.length === filteredDocuments.length
                       ) {
-                        clearSelection();
+                        setSelectedDocuments([]);
                       } else {
-                        selectAllDocuments();
+                        setSelectedDocuments(
+                          filteredDocuments.map((document) => document.id)
+                        );
                       }
                     }}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
