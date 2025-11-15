@@ -6,7 +6,10 @@ export async function GET(request: NextRequest) {
   const accessToken = searchParams.get("accessToken");
 
   if (!fileId) {
-    return NextResponse.json({ error: "Missing fileId parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing fileId parameter" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -30,7 +33,36 @@ export async function GET(request: NextRequest) {
     }
 
     if (!response.ok) {
-      throw new Error("Failed to fetch image");
+      console.error(`Google Drive API response status: ${response.status}`);
+      console.error(
+        `Response headers:`,
+        Object.fromEntries(response.headers.entries())
+      );
+
+      // If file not found (404), return a default placeholder image
+      if (response.status === 404) {
+        // Return a simple SVG placeholder as a data URL
+        const placeholderSvg = `
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#E5E7EB"/>
+            <circle cx="32" cy="24" r="8" fill="#9CA3AF"/>
+            <path d="M16 48c0-8.8 7.2-16 16-16s16 7.2 16 16" fill="#9CA3AF"/>
+          </svg>
+        `;
+        const svgBuffer = Buffer.from(placeholderSvg);
+
+        return new NextResponse(svgBuffer, {
+          status: 200,
+          headers: {
+            "Content-Type": "image/svg+xml",
+            "Cache-Control": "public, max-age=86400",
+          },
+        });
+      }
+
+      throw new Error(
+        `Failed to fetch image: ${response.status} ${response.statusText}`
+      );
     }
 
     const imageBuffer = await response.arrayBuffer();
