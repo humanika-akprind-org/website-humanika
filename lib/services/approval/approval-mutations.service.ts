@@ -6,7 +6,7 @@ import type {
   CreateApprovalData,
   UpdateApprovalData,
   ApprovalWithRelations,
-} from "@/lib/types/approval.type";
+} from "@/types/approval";
 import {
   findApprovalByEntity,
   createApprovalRecord,

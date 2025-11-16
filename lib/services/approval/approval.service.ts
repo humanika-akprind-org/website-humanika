@@ -11,4 +11,4 @@ export type {
   ApprovalFilters,
   ApprovalWithRelations,
   ApprovalsResponse,
-} from "../../types/approval.type";
+} from "@/types/approval";
