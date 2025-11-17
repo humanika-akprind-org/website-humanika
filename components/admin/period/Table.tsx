@@ -114,7 +114,7 @@ export default function PeriodTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {periods.map((period, index) => (
+            {periods.map((period) => (
               <tr
                 key={period.id}
                 className="hover:bg-gray-50 transition-colors"
