@@ -65,7 +65,7 @@ export default function WorkProgramPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
         </div>
@@ -75,7 +75,7 @@ export default function WorkProgramPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center">
             <div className="text-red-400 mr-2">

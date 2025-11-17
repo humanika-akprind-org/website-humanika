@@ -2,13 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import type { Period } from "@/types/period";
-import {
-  FiEdit,
-  FiTrash2,
-  FiArrowUp,
-  FiArrowDown,
-  FiFile,
-} from "react-icons/fi";
+import { FiEdit, FiTrash2, FiArrowUp, FiArrowDown, FiFile } from "react-icons/fi";
 
 interface PeriodTableProps {
   periods: Period[];
@@ -16,7 +10,6 @@ interface PeriodTableProps {
   onSelectPeriod: (id: string) => void;
   onSelectAll: () => void;
   onDelete: (period?: Period) => void;
-  onReorder: (id: string, direction: "up" | "down") => void;
   sortField: string;
   sortDirection: "asc" | "desc";
   onSort: (field: string) => void;
@@ -28,7 +21,6 @@ export default function PeriodTable({
   onSelectPeriod,
   onSelectAll,
   onDelete,
-  onReorder,
   sortField,
   sortDirection,
   onSort,
@@ -173,24 +165,6 @@ export default function PeriodTable({
                     >
                       <FiTrash2 size={16} />
                     </button>
-                    <div className="flex flex-col">
-                      <button
-                        className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors"
-                        onClick={() => onReorder(period.id, "up")}
-                        disabled={index === 0}
-                        title="Pindah ke atas"
-                      >
-                        <FiArrowUp size={12} />
-                      </button>
-                      <button
-                        className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors"
-                        onClick={() => onReorder(period.id, "down")}
-                        disabled={index === periods.length - 1}
-                        title="Pindah ke bawah"
-                      >
-                        <FiArrowDown size={12} />
-                      </button>
-                    </div>
                   </div>
                 </td>
               </tr>

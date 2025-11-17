@@ -1,6 +1,11 @@
 "use client";
 
-import { FiCheckCircle, FiClock, FiTrendingUp } from "react-icons/fi";
+import {
+  FiCheckCircle,
+  FiClock,
+  FiTrendingUp,
+  FiFileText,
+} from "react-icons/fi";
 import type { DepartmentTask } from "@/types/task";
 import { Status } from "@/types/enums";
 
@@ -16,6 +21,9 @@ export default function Stats({ tasks }: StatsProps) {
   ).length;
   const completedTasks = tasks.filter(
     (task) => task.status === Status.PUBLISH
+  ).length;
+  const draftTasks = tasks.filter(
+    (task) => task.status === Status.DRAFT
   ).length;
   const stats = [
     {
@@ -38,6 +46,13 @@ export default function Stats({ tasks }: StatsProps) {
       icon: FiTrendingUp,
       color: "text-green-600",
       bgColor: "bg-green-100",
+    },
+    {
+      title: "Draft Tasks",
+      value: draftTasks.toString(),
+      icon: FiFileText,
+      color: "text-gray-600",
+      bgColor: "bg-gray-100",
     },
   ];
 
