@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import {
   getDocuments,
   createDocument,
-} from "@/lib/services/document/document.service";
+} from "@/services/document/document.service";
 
 export async function GET(request: NextRequest) {
   try {

@@ -5,7 +5,7 @@ import {
   getEvent,
   updateEvent,
   deleteEvent,
-} from "@/lib/services/event/event.service";
+} from "@/services/event/event.service";
 
 export async function GET(
   _request: NextRequest,

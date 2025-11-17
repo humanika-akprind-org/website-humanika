@@ -5,7 +5,7 @@ import {
   updateGallery,
   deleteGallery,
   type UpdateGalleryInput,
-} from "@/lib/services/gallery/gallery.service";
+} from "@/services/gallery/gallery.service";
 
 export async function GET(
   _request: NextRequest,

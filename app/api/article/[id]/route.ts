@@ -5,7 +5,7 @@ import {
   getArticleById,
   updateArticle,
   deleteArticle,
-} from "@/lib/services/article/article.service";
+} from "@/services/article/article.service";
 
 export async function GET(
   _request: NextRequest,

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { ManagementService } from "@/lib/services/management/management.service";
+import { ManagementService } from "@/services/management/management.service";
 import type { ManagementServerData } from "@/types/management";
 
 // Extract payload functions

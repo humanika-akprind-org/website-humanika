@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import {
   getFinanceCategories,
   createFinanceCategory,
-} from "@/lib/services/finance/finance-category.service";
+} from "@/services/finance/finance-category.service";
 
 function extractFinanceCategoryQueryParams(request: NextRequest) {
   const { searchParams } = new URL(request.url);
