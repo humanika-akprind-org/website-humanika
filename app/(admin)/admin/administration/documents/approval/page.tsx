@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import {
   FiSearch,
   FiFilter,
@@ -273,7 +274,7 @@ export default function DocumentApprovalPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
             <p className="mt-2 text-gray-600">Loading document approvals...</p>
           </div>
-        ) : approvals.length === 0 ? (
+        ) : filteredApprovals.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-gray-400 mb-2">
               <FiMail size={48} className="mx-auto" />
@@ -310,7 +311,7 @@ export default function DocumentApprovalPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {approvals.map((approval) => (
+                {filteredApprovals.map((approval) => (
                   <tr key={approval.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
@@ -393,8 +394,10 @@ export default function DocumentApprovalPage() {
               <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
                 <p className="text-sm text-gray-700 mb-4 sm:mb-0">
                   Showing{" "}
-                  <span className="font-medium">{approvals.length}</span> of{" "}
-                  <span className="font-medium">{approvals.length}</span>{" "}
+                  <span className="font-medium">
+                    {filteredApprovals.length}
+                  </span>{" "}
+                  of <span className="font-medium">{approvals.length}</span>{" "}
                   document approvals
                 </p>
                 <div className="flex space-x-2">
