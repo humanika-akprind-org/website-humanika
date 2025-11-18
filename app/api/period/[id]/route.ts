@@ -5,7 +5,7 @@ import {
   getPeriod,
   updatePeriod,
   deletePeriod,
-} from "@/lib/services/period/period.service";
+} from "@/services/period/period.service";
 
 interface Context {
   params: { id: string };

@@ -263,9 +263,6 @@ export default function SidebarMobile() {
             <NavDropdownItem href="/admin/content/articles/add">
               Add New
             </NavDropdownItem>
-            <NavDropdownItem href="/admin/content/articles/approval">
-              Approval
-            </NavDropdownItem>
             <NavDropdownItem href="/admin/content/articles/categories">
               Categories
             </NavDropdownItem>

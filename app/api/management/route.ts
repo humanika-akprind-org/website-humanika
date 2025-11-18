@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { ManagementService } from "@/lib/services/management/management.service";
+import { ManagementService } from "@/services/management/management.service";
 import type { ManagementServerData } from "@/types/management";
 
 // Extract payload functions
@@ -20,15 +20,6 @@ function validateCreateManagementInput(body: ManagementServerData) {
 
 export async function GET() {
   try {
-    // Temporarily remove authentication check to allow public access for testing
-    // const user = await getCurrentUser();
-    // if (!user) {
-    //   return NextResponse.json(
-    //     { success: false, error: "Unauthorized" },
-    //     { status: 401 }
-    //   );
-    // }
-
     // 1. Business logic
     const managements = await ManagementService.getManagements();
 

@@ -5,7 +5,7 @@ import {
   getFinanceCategory,
   updateFinanceCategory,
   deleteFinanceCategory,
-} from "@/lib/services/finance/finance-category.service";
+} from "@/services/finance/finance-category.service";
 
 export async function GET(
   _request: NextRequest,

@@ -5,7 +5,7 @@ import {
   getLetter,
   updateLetter,
   deleteLetter,
-} from "@/lib/services/letter/letter.service";
+} from "@/services/letter/letter.service";
 
 export async function GET(
   _request: NextRequest,

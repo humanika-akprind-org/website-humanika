@@ -12,7 +12,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { ApprovalApi } from "@/use-cases/api/approval";
-import type { Approval } from "@/types/approval";
+import type { ApprovalWithRelations } from "@/types/approval";
 
 enum StatusApproval {
   PENDING = "PENDING",
@@ -45,7 +45,7 @@ const getStatusClass = (status: string) => {
 };
 
 // Helper function to get entity name
-const getEntityName = (approval: Approval) => {
+const getEntityName = (approval: ApprovalWithRelations) => {
   switch (approval.entityType) {
     case "WORK_PROGRAM":
       return approval.workProgram?.name || "Work Program";
@@ -64,7 +64,7 @@ const getEntityName = (approval: Approval) => {
 };
 
 export default function ApprovalPage() {
-  const [approvals, setApprovals] = useState<Approval[]>([]);
+  const [approvals, setApprovals] = useState<ApprovalWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -183,7 +183,7 @@ export default function ApprovalPage() {
   });
 
   return (
-    <div className="p-6">
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
@@ -314,22 +314,22 @@ export default function ApprovalPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Entity
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Requester
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Type
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>

@@ -1,11 +1,7 @@
 // app/api/user/[id]/route.ts
 import { type NextRequest, NextResponse } from "next/server";
 import { type UserRole, type Department, type Position } from "@prisma/client";
-import {
-  getUser,
-  updateUser,
-  deleteUser,
-} from "@/lib/services/user/user.service";
+import { getUser, updateUser, deleteUser } from "@/services/user/user.service";
 
 // GET - Get user by ID
 export async function GET(

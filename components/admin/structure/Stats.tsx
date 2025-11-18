@@ -1,6 +1,11 @@
 "use client";
 
-import { FiFileText, FiTrendingUp, FiCheckCircle } from "react-icons/fi";
+import {
+  FiFileText,
+  FiTrendingUp,
+  FiCheckCircle,
+  FiEdit,
+} from "react-icons/fi";
 import type { OrganizationalStructure } from "@/types/structure";
 import { Status } from "@/types/enums";
 
@@ -16,6 +21,9 @@ export default function Stats({ structures }: StatsProps) {
   ).length;
   const pendingStructures = structures.filter(
     (structure) => structure.status === Status.PENDING
+  ).length;
+  const draftStructures = structures.filter(
+    (structure) => structure.status === Status.DRAFT
   ).length;
 
   const stats = [
@@ -40,10 +48,17 @@ export default function Stats({ structures }: StatsProps) {
       color: "text-orange-600",
       bgColor: "bg-orange-100",
     },
+    {
+      title: "Draft",
+      value: draftStructures.toString(),
+      icon: FiEdit,
+      color: "text-gray-600",
+      bgColor: "bg-gray-100",
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       {stats.map((stat, index) => (
         <div
           key={index}

@@ -1,7 +1,7 @@
 // app/api/user/route.ts
 import { type NextRequest, NextResponse } from "next/server";
 import { type UserRole, type Department, type Position } from "@prisma/client";
-import { getUsers, createUser } from "@/lib/services/user/user.service";
+import { getUsers, createUser } from "@/services/user/user.service";
 
 // GET - Get all users
 export async function GET(request: NextRequest) {

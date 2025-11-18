@@ -6,7 +6,7 @@ import {
   getWorkPrograms,
   createWorkProgram,
   bulkDeleteWorkPrograms,
-} from "@/lib/services/work/work.service";
+} from "@/services/work/work.service";
 
 export async function GET(request: NextRequest) {
   try {

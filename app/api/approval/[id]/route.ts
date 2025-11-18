@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import {
   updateApproval,
   deleteApproval,
-} from "@/lib/services/approval/approval.service";
+} from "@/services/approval/approval.service";
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }

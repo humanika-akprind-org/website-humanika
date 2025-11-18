@@ -5,7 +5,7 @@ import {
   getStructure,
   updateStructure,
   deleteStructure,
-} from "@/lib/services/structure/structure.service";
+} from "@/services/structure/structure.service";
 
 export async function GET(
   _request: NextRequest,

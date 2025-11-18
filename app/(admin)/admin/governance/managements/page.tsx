@@ -35,7 +35,7 @@ async function ManagementsPage() {
     return (
       <AuthGuard accessToken={accessToken}>
         <div className="min-h-screen">
-          <main className="p-6 space-y-6">
+          <main className="space-y-6">
             <PageHeader
               title="Struktur Management"
               showAddButton={true}

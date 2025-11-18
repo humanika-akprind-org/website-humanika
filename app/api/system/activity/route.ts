@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import {
   getActivities,
   createActivity,
-} from "@/lib/services/activity/activity.service";
+} from "@/services/activity/activity.service";
 
 export async function GET(req: NextRequest) {
   try {

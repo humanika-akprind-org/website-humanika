@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import {
   getApprovals,
   createApproval,
-} from "@/lib/services/approval/approval.service";
+} from "@/services/approval/approval.service";
 
 export async function GET(request: NextRequest) {
   try {

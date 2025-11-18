@@ -5,7 +5,7 @@ import {
   getWorkProgram,
   updateWorkProgram,
   deleteWorkProgram,
-} from "@/lib/services/work/work.service";
+} from "@/services/work/work.service";
 
 // GET work program by ID
 export async function GET(

@@ -10,8 +10,15 @@ import {
   FiEye,
   FiChevronDown,
 } from "react-icons/fi";
-import { useDocumentApprovals } from "@/hooks/document/useDocumentApprovals";
-import type { Approval } from "@/types/approval";
+import { ApprovalApi } from "use-cases/api/approval";
+import type { ApprovalWithRelations } from "types/approval";
+
+enum StatusApproval {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  CANCELLED = "CANCELLED",
+}
 
 // Helper function to format enum values for display
 const formatEnumValue = (value: string) =>
@@ -37,7 +44,7 @@ const getStatusClass = (status: string) => {
 };
 
 // Helper function to get entity name
-const getEntityName = (approval: Approval) => {
+const getEntityName = (approval: ApprovalWithRelations) => {
   switch (approval.entityType) {
     case "WORK_PROGRAM":
       return approval.workProgram?.name || "Work Program";
@@ -55,25 +62,123 @@ const getEntityName = (approval: Approval) => {
 };
 
 export default function DocumentApprovalPage() {
-  const {
-    approvals,
-    loading,
-    error,
-    success,
-    searchTerm,
-    setSearchTerm,
-    filters,
-    isFilterOpen,
-    setIsFilterOpen,
-    currentPage,
-    setCurrentPage,
-    totalPages,
-    handleApprove,
-    handleReject,
-    handleRequestRevision,
-    handleFilterChange,
-    clearFilters,
-  } = useDocumentApprovals();
+  const [approvals, setApprovals] = useState<ApprovalWithRelations[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    status: "",
+    entityType: "DOCUMENT", // Fixed to documents only
+  });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchApprovals = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await ApprovalApi.getApprovals({
+        status: filters.status,
+        entityType: filters.entityType,
+        page: currentPage,
+        limit: 10,
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else if (response.data) {
+        setApprovals(response.data.approvals);
+        setTotalPages(response.data.pagination.pages);
+      }
+    } catch (_error) {
+      setError("Failed to fetch approvals");
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, currentPage]);
+
+  useEffect(() => {
+    fetchApprovals();
+  }, [fetchApprovals]);
+
+  const handleApprove = async (approvalId: string) => {
+    try {
+      const response = await ApprovalApi.updateApproval(approvalId, {
+        status: StatusApproval.APPROVED,
+        note: "Approved by admin",
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Document approval updated successfully");
+        fetchApprovals();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to update approval");
+    }
+  };
+
+  const handleReject = async (approvalId: string) => {
+    try {
+      const response = await ApprovalApi.updateApproval(approvalId, {
+        status: StatusApproval.REJECTED,
+        note: "Rejected by admin",
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Document approval updated successfully");
+        fetchApprovals();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to update approval");
+    }
+  };
+
+  const handleRequestRevision = async (approvalId: string) => {
+    try {
+      const response = await ApprovalApi.updateApproval(approvalId, {
+        status: StatusApproval.CANCELLED,
+        note: "Please revise and resubmit",
+      });
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("Document approval updated successfully");
+        fetchApprovals();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to update approval");
+    }
+  };
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setFilters({ status: "", entityType: "DOCUMENT" });
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const filteredApprovals = approvals.filter((approval) => {
+    const matchesSearch =
+      approval.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      approval.user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getEntityName(approval).toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesSearch;
+  });
 
   return (
     <div className="p-6">

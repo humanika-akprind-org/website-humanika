@@ -307,9 +307,10 @@ export default function FinanceTable({
                     />
                   </td>
                   <td className="px-4 py-4">
-                    <div className="text-sm font-medium text-gray-900">
-                      {finance.description}
-                    </div>
+                    <div
+                      className="text-sm font-medium text-gray-900"
+                      dangerouslySetInnerHTML={{ __html: finance.description }}
+                    />
                     {finance.event && (
                       <div className="text-xs text-gray-500 mt-1">
                         Acara: {finance.event.name}

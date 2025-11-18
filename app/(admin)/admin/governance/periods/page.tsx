@@ -6,7 +6,7 @@ import type { Period } from "@/types/period";
 import {
   getPeriods,
   deletePeriod,
-  reorderPeriods,
+  // reorderPeriods,
 } from "@/use-cases/api/period";
 import PeriodStats from "@/components/admin/period/Stats";
 import PeriodFilters from "@/components/admin/period/Filters";
@@ -148,34 +148,34 @@ export default function PeriodsPage() {
     }
   };
 
-  const handleReorder = async (id: string, direction: "up" | "down") => {
-    const index = periods.findIndex((p) => p.id === id);
-    if (
-      (direction === "up" && index === 0) ||
-      (direction === "down" && index === periods.length - 1)
-    ) {
-      return;
-    }
+  // const handleReorder = async (id: string, direction: "up" | "down") => {
+  //   const index = periods.findIndex((p) => p.id === id);
+  //   if (
+  //     (direction === "up" && index === 0) ||
+  //     (direction === "down" && index === periods.length - 1)
+  //   ) {
+  //     return;
+  //   }
 
-    const newPeriods = [...periods];
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
+  //   const newPeriods = [...periods];
+  //   const targetIndex = direction === "up" ? index - 1 : index + 1;
 
-    // Swap positions
-    [newPeriods[index], newPeriods[targetIndex]] = [
-      newPeriods[targetIndex],
-      newPeriods[index],
-    ];
+  //   // Swap positions
+  //   [newPeriods[index], newPeriods[targetIndex]] = [
+  //     newPeriods[targetIndex],
+  //     newPeriods[index],
+  //   ];
 
-    setPeriods(newPeriods);
+  //   setPeriods(newPeriods);
 
-    try {
-      await reorderPeriods(newPeriods);
-    } catch (error) {
-      console.error("Error reordering periods:", error);
-      // Revert if API call fails
-      setPeriods([...periods]);
-    }
-  };
+  //   try {
+  //     await reorderPeriods(newPeriods);
+  //   } catch (error) {
+  //     console.error("Error reordering periods:", error);
+  //     // Revert if API call fails
+  //     setPeriods([...periods]);
+  //   }
+  // };
 
   if (loading) {
     return (
@@ -188,7 +188,7 @@ export default function PeriodsPage() {
   }
 
   return (
-    <div className="p-6">
+    <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
@@ -222,7 +222,6 @@ export default function PeriodsPage() {
         onSelectPeriod={togglePeriodSelection}
         onSelectAll={toggleSelectAll}
         onDelete={handleDelete}
-        onReorder={handleReorder}
         sortField={sortField}
         sortDirection={sortDirection}
         onSort={handleSort}

@@ -63,13 +63,6 @@ export default function AddTaskPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Add Department Task
-        </h1>
-        <p className="text-gray-600 mt-1">Create a new department task</p>
-      </div>
-
       <TaskForm onSubmit={handleSubmit} users={users} />
     </div>
   );

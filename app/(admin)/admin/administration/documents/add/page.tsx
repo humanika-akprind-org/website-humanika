@@ -3,6 +3,13 @@ import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { cookies } from "next/headers";
+import type {
+  CreateDocumentInput,
+  UpdateDocumentInput,
+  Document,
+} from "@/types/document";
+import { Status, ApprovalType } from "@/types/enums";
+import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import { fetchDocumentFormData } from "@/hooks/document/useDocumentFormData";

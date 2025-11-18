@@ -1,9 +1,9 @@
 import { apiUrl } from "@/lib/config/config";
 import type {
-  Approval,
   ApprovalsResponse,
   CreateApprovalInput,
   UpdateApprovalInput,
+  ApprovalWithRelations,
 } from "@/types/approval";
 
 class ApprovalApi {
@@ -56,8 +56,8 @@ class ApprovalApi {
 
   static async createApproval(
     approvalData: CreateApprovalInput
-  ): Promise<{ data?: Approval; error?: string }> {
-    return this.fetchApi<Approval>("/approval", {
+  ): Promise<{ data?: ApprovalWithRelations; error?: string }> {
+    return this.fetchApi<ApprovalWithRelations>("/approval", {
       method: "POST",
       body: JSON.stringify(approvalData),
     });
@@ -66,8 +66,8 @@ class ApprovalApi {
   static async updateApproval(
     id: string,
     approvalData: UpdateApprovalInput
-  ): Promise<{ data?: Approval; error?: string }> {
-    return this.fetchApi<Approval>(`/approval/${id}`, {
+  ): Promise<{ data?: ApprovalWithRelations; error?: string }> {
+    return this.fetchApi<ApprovalWithRelations>(`/approval/${id}`, {
       method: "PUT",
       body: JSON.stringify(approvalData),
     });
