@@ -90,8 +90,28 @@ export default function EventApprovalPage() {
       if (response.error) {
         setError(response.error);
       } else if (response.data) {
-        setApprovals(response.data.approvals);
-        setTotalPages(response.data.pagination.pages);
+        // Group approvals by event ID and keep only the latest one per event
+        const uniqueApprovals = Object.values(
+          response.data.approvals.reduce((acc, approval) => {
+            const eventId = approval.event?.id || approval.entityId;
+            if (
+              !acc[eventId] ||
+              new Date(approval.createdAt) > new Date(acc[eventId].createdAt)
+            ) {
+              acc[eventId] = approval;
+            }
+            return acc;
+          }, {} as Record<string, Approval>)
+        );
+
+        // Sort by createdAt descending to show latest first
+        uniqueApprovals.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        setApprovals(uniqueApprovals);
+        setTotalPages(1); // Disable pagination for unique approvals
       }
     } catch (_error) {
       setError("Failed to fetch approvals");

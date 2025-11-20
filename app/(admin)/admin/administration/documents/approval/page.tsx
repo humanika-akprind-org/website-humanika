@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   FiSearch,
   FiFilter,
@@ -172,14 +172,40 @@ export default function DocumentApprovalPage() {
     setCurrentPage(1);
   };
 
-  const filteredApprovals = approvals.filter((approval) => {
-    const matchesSearch =
-      approval.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      approval.user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      getEntityName(approval).toLowerCase().includes(searchTerm.toLowerCase());
+  const uniqueApprovals = useMemo(() => {
+    // Group approvals by entityType and entityId, keeping only the latest (by createdAt)
+    const grouped = approvals.reduce((acc, approval) => {
+      const key = `${approval.entityType}-${approval.entityId}`;
+      if (
+        !acc[key] ||
+        new Date(approval.createdAt) > new Date(acc[key].createdAt)
+      ) {
+        acc[key] = approval;
+      }
+      return acc;
+    }, {} as Record<string, ApprovalWithRelations>);
 
-    return matchesSearch;
-  });
+    return Object.values(grouped);
+  }, [approvals]);
+
+  const filteredApprovals = useMemo(
+    () =>
+      uniqueApprovals.filter((approval) => {
+        const matchesSearch =
+          approval.user?.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          approval.user?.email
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          getEntityName(approval)
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+
+        return matchesSearch;
+      }),
+    [uniqueApprovals, searchTerm]
+  );
 
   return (
     <div className="p-6">
@@ -397,7 +423,8 @@ export default function DocumentApprovalPage() {
                   <span className="font-medium">
                     {filteredApprovals.length}
                   </span>{" "}
-                  of <span className="font-medium">{approvals.length}</span>{" "}
+                  of{" "}
+                  <span className="font-medium">{uniqueApprovals.length}</span>{" "}
                   document approvals
                 </p>
                 <div className="flex space-x-2">
