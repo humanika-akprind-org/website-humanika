@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { LogoutButton } from "@/components/public/LogoutButton";
+import { LogoutButton } from "@/components/public/ui/LogoutButton";
 
 interface User {
   name: string;
@@ -16,10 +16,10 @@ interface UserDropdownProps {
 // Helper function to get user initials
 const getUserInitials = (name: string): string =>
   name
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase())
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase())
     .slice(0, 2)
-    .join('');
+    .join("");
 
 export function UserDropdown({ currentUser }: UserDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,14 +28,17 @@ export function UserDropdown({ currentUser }: UserDropdownProps) {
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -53,7 +56,7 @@ export function UserDropdown({ currentUser }: UserDropdownProps) {
         {/* User Avatar */}
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-          style={{ backgroundColor: currentUser.avatarColor || '#3B82F6' }}
+          style={{ backgroundColor: currentUser.avatarColor || "#3B82F6" }}
         >
           {getUserInitials(currentUser.name)}
         </div>
@@ -69,12 +72,19 @@ export function UserDropdown({ currentUser }: UserDropdownProps) {
 
         {/* Dropdown Arrow */}
         <svg
-          className={`w-4 h-4 text-white transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-white transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
 
@@ -86,7 +96,9 @@ export function UserDropdown({ currentUser }: UserDropdownProps) {
             <div className="flex items-center space-x-3">
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-base"
-                style={{ backgroundColor: currentUser.avatarColor || '#3B82F6' }}
+                style={{
+                  backgroundColor: currentUser.avatarColor || "#3B82F6",
+                }}
               >
                 {getUserInitials(currentUser.name)}
               </div>

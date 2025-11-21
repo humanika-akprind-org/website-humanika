@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { NavLink } from "./NavLink";
 import Image from "next/image";
-import { LogoutButton } from "@/components/public/LogoutButton";
+import { LogoutButton } from "@/components/public/ui/LogoutButton";
 import { useState } from "react";
 
 interface User {

@@ -92,11 +92,11 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/events"
+                  href="/event"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
                   <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
-                  Events
+                  Event
                 </Link>
               </li>
               <li>

@@ -1,7 +1,7 @@
 import Link from "next/link";
-import ArticleCard from "@/components/public/ArticleCard";
-import EventCard from "@/components/public/EventCard";
-import LatestGalleryGrid from "@/components/public/LatestGalleryGrid";
+import ArticleCard from "@/components/public/article/ArticleCard";
+import EventCard from "@/components/public/event/EventCard";
+import LatestGalleryGrid from "@/components/public/gallery/LatestGalleryGrid";
 import type { Gallery } from "@/types/gallery";
 import type { Article } from "@/types/article";
 import type { Event } from "@/types/event";
@@ -115,7 +115,7 @@ export default async function Home() {
                 Jelajahi HUMANIKA
               </Link>
               <Link
-                href="/join"
+                href="/auth/register"
                 className="px-8 py-4 bg-transparent border-2 border-red-500 text-white rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300 font-semibold"
               >
                 Bergabung Sekarang
@@ -441,7 +441,7 @@ export default async function Home() {
               Hubungi Kami
             </Link>
             <Link
-              href="/join"
+              href="/auth/register"
               className="px-8 py-4 bg-transparent border-2 border-red-500 text-white rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300 font-semibold"
             >
               Daftar Menjadi Anggota

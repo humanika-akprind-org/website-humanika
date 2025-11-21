@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./public.css";
 import Header from "@/components/public/layout/Header";
 import Footer from "@/components/public/layout/Footer";
-import AIButton from "@/components/public/AIButton";
+import AIButton from "@/components/public/ui/AIButton";
 import { getCurrentUser } from "@/lib/auth";
 import { geistSans, geistMono } from "@/app/ui/fonts";
 

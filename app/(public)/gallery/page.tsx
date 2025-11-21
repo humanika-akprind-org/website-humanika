@@ -1,5 +1,5 @@
-import GalleryGrid from "@/components/public/GalleryGrid";
-import AlbumGrid from "@/components/public/AlbumGrid";
+import GalleryGrid from "@/components/public/gallery/GalleryGrid";
+import AlbumGrid from "@/components/public/gallery/AlbumGrid";
 
 export default function GalleryPage() {
   const albums = [
