@@ -1,4 +1,4 @@
-import ContactForm from "@/components/public/ui/ContactForm";
+import ContactForm from "@/components/public/contact/ContactForm";
 
 export default function ContactPage() {
   return (
@@ -183,33 +183,20 @@ export default function ContactPage() {
         {/* Map Section */}
         <section className="mt-16 bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Lokasi Kami</h2>
-          <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg overflow-hidden">
-            <div className="flex items-center justify-center h-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-20 w-20 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-            </div>
+          <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg overflow-hidden h-96">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1976.5241078195088!2d110.38342661744383!3d-7.784712999999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a59ce29bc3887%3A0x2cad870b4a56cf1!2sUniversitas%20AKPRIND%20Indonesia!5e0!3m2!1sen!2sid!4v1763734370697!5m2!1sen!2sid"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full"
+            />
           </div>
           <p className="mt-4 text-gray-600 text-center">
-            Gedung Teknik Lt.3, Universitas Contoh, Jl. Contoh No. 123, Kota
-            Contoh
+            Universitas AKPRIND Indonesia
           </p>
         </section>
       </main>
