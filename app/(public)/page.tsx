@@ -42,7 +42,7 @@ export default async function Home() {
   const articles = articlesData.map((article: Article) => ({
     id: article.id,
     title: article.title,
-    date: article.createdAt.toISOString().split("T")[0],
+    date: new Date(article.createdAt).toISOString().split("T")[0],
     category: article.category?.name || "Uncategorized",
     excerpt: article.content?.substring(0, 150) + "..." || "",
     author: article.author?.name || "Unknown",
@@ -59,7 +59,7 @@ export default async function Home() {
   const events: MappedEvent[] = eventsData.map((event: Event) => ({
     id: event.id,
     title: event.name,
-    date: event.startDate.toISOString().split("T")[0],
+    date: new Date(event.startDate).toISOString().split("T")[0],
     category: event.department,
     description: event.description || "",
     image: event.thumbnail || "",
