@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { FiImage, FiSave, FiX } from "react-icons/fi";
 import type {
   Gallery,
   CreateGalleryInput,
@@ -253,182 +254,164 @@ export default function GalleryForm({
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <>
       {error && (
-        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
-          <h3 className="font-medium">Error</h3>
-          <p className="text-sm">{error}</p>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
-        <div>
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Title *
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter gallery title"
-          />
-          {errors.title && (
-            <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-          )}
-        </div>
+      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 gap-6 mb-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Title *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiImage className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="title"
+                  required
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter gallery title"
+                />
+              </div>
+              {errors.title && (
+                <p className="text-red-500 text-xs mt-1">{errors.title}</p>
+              )}
+            </div>
 
-        {/* Event */}
-        <div>
-          <label
-            htmlFor="eventId"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Event *
-          </label>
-          <select
-            id="eventId"
-            name="eventId"
-            value={formData.eventId}
-            onChange={handleInputChange}
-            disabled={eventsLoading}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">Select an event</option>
-            {events.map((event) => (
-              <option key={event.id} value={event.id}>
-                {event.name}
-              </option>
-            ))}
-          </select>
-          {errors.eventId && (
-            <p className="mt-1 text-sm text-red-600">{errors.eventId}</p>
-          )}
-        </div>
-
-        {/* File Upload */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            File {!gallery && "*"}
-          </label>
-
-          {previewUrl && (
-            <div className="mb-4">
-              <div className="relative inline-block">
-                {previewUrl.includes("video") ? (
-                  <video
-                    src={previewUrl}
-                    className="w-32 h-32 object-cover rounded-lg border"
-                    controls
-                  />
-                ) : (
-                  <Image
-                    src={getPreviewUrl(previewUrl)}
-                    alt="Preview"
-                    width={128}
-                    height={128}
-                    className="w-32 h-32 object-cover rounded-lg border"
-                  />
-                )}
-                <button
-                  type="button"
-                  onClick={removeFile}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                  title="Remove file"
+            {/* Event */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Event *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiImage className="text-gray-400" />
+                </div>
+                <select
+                  name="eventId"
+                  required
+                  value={formData.eventId}
+                  onChange={handleInputChange}
+                  disabled={eventsLoading}
+                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                 >
+                  <option value="">Select an event</option>
+                  {events.map((event) => (
+                    <option key={event.id} value={event.id}>
+                      {event.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                   <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    className="h-5 w-5 text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
                     />
                   </svg>
-                </button>
+                </div>
               </div>
+              {errors.eventId && (
+                <p className="text-red-500 text-xs mt-1">{errors.eventId}</p>
+              )}
             </div>
-          )}
 
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                disabled={isLoading || photoLoading}
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Upload image (max 5MB, format: JPG, PNG, GIF)
-              </p>
-              {photoLoading && (
-                <p className="text-sm text-blue-600 mt-1">
-                  Mengupload gambar...
-                </p>
+            {/* File Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                File {!gallery && "*"}
+              </label>
+
+              {previewUrl && (
+                <div className="mb-4">
+                  <div className="relative inline-block">
+                    {previewUrl.includes("video") ? (
+                      <video
+                        src={previewUrl}
+                        className="w-32 h-32 object-cover rounded-lg border"
+                        controls
+                      />
+                    ) : (
+                      <Image
+                        src={getPreviewUrl(previewUrl)}
+                        alt="Preview"
+                        width={128}
+                        height={128}
+                        className="w-32 h-32 object-cover rounded-lg border"
+                      />
+                    )}
+                    <button
+                      type="button"
+                      onClick={removeFile}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      title="Remove file"
+                    >
+                      <FiX className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center space-x-4">
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    disabled={isLoading || photoLoading}
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Upload image (max 5MB, format: JPG, PNG, GIF)
+                  </p>
+                  {photoLoading && (
+                    <p className="text-sm text-blue-600 mt-1">
+                      Mengupload gambar...
+                    </p>
+                  )}
+                </div>
+              </div>
+              {errors.file && (
+                <p className="text-red-500 text-xs mt-1">{errors.file}</p>
               )}
             </div>
           </div>
-          {errors.file && (
-            <p className="mt-1 text-sm text-red-600">{errors.file}</p>
-          )}
-        </div>
 
-        {/* Submit Buttons */}
-        <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            disabled={isLoading}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading || photoLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
-          >
-            {isLoading ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Menyimpan...
-              </>
-            ) : (
-              "Simpan"
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              disabled={isLoading}
+              className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading || photoLoading}
+              className="px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50"
+            >
+              <FiSave className="mr-2" />
+              {isLoading ? "Menyimpan..." : "Simpan"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

@@ -4,13 +4,13 @@ import GalleryCard from "./GalleryCard";
 import { useGalleries } from "@/hooks/gallery/useGalleries";
 import type { Gallery } from "@/types/gallery";
 
-interface GalleryGridProps {
+interface LatestGalleryGridProps {
   galleries?: Gallery[];
 }
 
-export default function GalleryGrid({
+export default function LatestGalleryGrid({
   galleries: propGalleries,
-}: GalleryGridProps) {
+}: LatestGalleryGridProps) {
   const { galleries: hookGalleries, isLoading, error } = useGalleries();
 
   const galleries = propGalleries || hookGalleries;

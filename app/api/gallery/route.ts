@@ -31,10 +31,11 @@ function validateCreateGalleryInput(body: CreateGalleryInput) {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Allow public access for galleries
+    // const user = await getCurrentUser();
+    // if (!user) {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
 
     // 1. Extract payload
     const queryParams = extractGalleryQueryParams(request);

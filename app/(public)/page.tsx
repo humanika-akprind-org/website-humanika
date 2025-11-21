@@ -1,78 +1,89 @@
 import Link from "next/link";
 import ArticleCard from "@/components/public/ArticleCard";
 import EventCard from "@/components/public/EventCard";
-import GalleryGrid from "@/components/public/GalleryGrid";
+import LatestGalleryGrid from "@/components/public/LatestGalleryGrid";
+import type { Gallery } from "@/types/gallery";
 
-export default function Home() {
-  // Data contoh untuk demo
-  const articles = [
-    {
-      id: "1",
-      title: "Perkembangan AI di Tahun 2023",
-      date: "2023-10-15",
-      category: "Teknologi",
-      excerpt:
-        "Bagaimana perkembangan teknologi AI di tahun 2023 dan dampaknya bagi industri.",
-      author: "Jane Doe",
-      image: "/ai-tech.jpg",
-    },
-    {
-      id: "2",
-      title: "Inovasi Blockchain untuk Masa Depan",
-      date: "2023-09-28",
-      category: "Teknologi",
-      excerpt:
-        "Eksplorasi potensi teknologi blockchain dalam berbagai sektor industri modern.",
-      author: "John Smith",
-      image: "/blockchain.jpg",
-    },
-    {
-      id: "3",
-      title: "Peran Data Science dalam Bisnis",
-      date: "2023-09-10",
-      category: "Data Science",
-      excerpt:
-        "Bagaimana data science mengubah cara perusahaan mengambil keputusan strategis.",
-      author: "Sarah Johnson",
-      image: "/data-science.jpg",
-    },
-  ];
+interface Stat {
+  number: string;
+  label: string;
+}
 
-  const events = [
-    {
-      id: "1",
-      title: "Tech Conference 2023",
-      date: "2023-11-15",
-      category: "Seminar",
-      description: "Annual technology conference featuring industry experts",
-      image: "/tech-conf.jpg",
-    },
-    {
-      id: "2",
-      title: "Hackathon Inovasi Digital",
-      date: "2023-12-05",
-      category: "Kompetisi",
-      description:
-        "Kompetisi coding 48 jam untuk menciptakan solusi digital inovatif",
-      image: "/hackathon.jpg",
-    },
-    {
-      id: "3",
-      title: "Workshop UI/UX Design",
-      date: "2023-11-28",
-      category: "Workshop",
-      description:
-        "Pelatihan praktis merancang pengalaman pengguna yang menarik",
-      image: "/uiux-workshop.jpg",
-    },
-  ];
+interface MappedArticle {
+  id: string;
+  title: string;
+  date: string;
+  category: string;
+  excerpt: string;
+  author: string;
+  image: string;
+}
 
-  const stats = [
-    { number: "500+", label: "Anggota Aktif" },
-    { number: "50+", label: "Kegiatan Tahunan" },
-    { number: "20+", label: "Proyek Kolaborasi" },
-    { number: "15+", label: "Penghargaan" },
-  ];
+interface MappedEvent {
+  id: string;
+  title: string;
+  date: string;
+  category: string;
+  description: string;
+  image: string;
+}
+
+export default async function Home() {
+  // Fetch data from database
+  const articlesResponse = await fetch(
+    `${
+      process.env.NEXTAUTH_URL || "http://localhost:3000"
+    }/api/article?isPublished=true`,
+    { cache: "no-store" }
+  );
+  const articlesData = articlesResponse.ok ? await articlesResponse.json() : [];
+  const articles = articlesData.map((article: any) => ({
+    id: article.id,
+    title: article.title,
+    date: article.createdAt,
+    category: article.category?.name || "Uncategorized",
+    excerpt:
+      article.excerpt || article.content?.substring(0, 150) + "..." || "",
+    author: article.author?.name || "Unknown",
+    image: article.thumbnail || "",
+  }));
+
+  const eventsResponse = await fetch(
+    `${
+      process.env.NEXTAUTH_URL || "http://localhost:3000"
+    }/api/event?status=PUBLISH`,
+    { cache: "no-store" }
+  );
+  const eventsData = eventsResponse.ok ? await eventsResponse.json() : [];
+  const events: MappedEvent[] = eventsData.map((event: any) => ({
+    id: event.id,
+    title: event.name,
+    date: event.startDate,
+    category: event.department,
+    description: event.description || "",
+    image: event.thumbnail || "",
+  }));
+
+  const galleriesResponse = await fetch(
+    `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/gallery`,
+    { cache: "no-store" }
+  );
+  const galleries: Gallery[] = galleriesResponse.ok
+    ? await galleriesResponse.json()
+    : [];
+
+  const statsResponse = await fetch(
+    `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/stats`,
+    { cache: "no-store" }
+  );
+  const stats = statsResponse.ok
+    ? await statsResponse.json()
+    : [
+        { number: "0", label: "Anggota Aktif" },
+        { number: "0", label: "Kegiatan Tahunan" },
+        { number: "0", label: "Proyek Kolaborasi" },
+        { number: "0", label: "Penghargaan" },
+      ];
 
   return (
     <div className="min-h-screen bg-grey-50">
@@ -115,7 +126,7 @@ export default function Home() {
         {/* Stats Section */}
         <div className="container mx-auto px-4 mt-20 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
+            {stats.map((stat: Stat, index: number) => (
               <div
                 key={index}
                 className="text-center p-6 bg-white/10 backdrop-blur-sm rounded-xl"
@@ -146,7 +157,7 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {articles.map((article) => (
+            {articles.map((article: MappedArticle) => (
               <ArticleCard key={article.id} article={article} />
             ))}
           </div>
@@ -344,7 +355,7 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {events.map((event) => (
+            {events.map((event: MappedEvent) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>
@@ -387,7 +398,7 @@ export default function Home() {
 
           {/* Gallery Grid Component */}
           <div className="mb-12">
-            <GalleryGrid />
+            <LatestGalleryGrid galleries={galleries.slice(0, 9)} />
           </div>
 
           <div className="text-center">

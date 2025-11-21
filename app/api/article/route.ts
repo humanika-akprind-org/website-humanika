@@ -6,17 +6,21 @@ import { getArticles, createArticle } from "@/services/article/article.service";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { searchParams } = new URL(request.url);
+    const isPublished = searchParams.get("isPublished") === "true";
+
+    // Allow public access for published articles
+    if (!isPublished) {
+      const user = await getCurrentUser();
+      if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
 
-    const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") as unknown as Status;
     const periodId = searchParams.get("periodId");
     const categoryId = searchParams.get("categoryId");
     const authorId = searchParams.get("authorId");
-    const isPublished = searchParams.get("isPublished");
     const search = searchParams.get("search");
 
     const filter = {
@@ -24,7 +28,7 @@ export async function GET(request: NextRequest) {
       periodId: periodId || undefined,
       categoryId: categoryId || undefined,
       authorId: authorId || undefined,
-      isPublished: isPublished ? isPublished === "true" : undefined,
+      isPublished: isPublished || undefined,
       search: search || undefined,
     };
 

@@ -1,23 +1,76 @@
-export default function GalleryCard({ index }: { index: number }) {
+import React from "react";
+import Image from "next/image";
+import { Image as ImageIcon } from "lucide-react";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import type { Gallery } from "@/types/gallery";
+
+export default function GalleryCard({ gallery }: { gallery: Gallery }) {
+  const [imageError, setImageError] = useState(false);
+  const [modalImageError, setModalImageError] = useState(false);
+
   return (
-    <div className="aspect-square bg-gray-200 rounded-md overflow-hidden relative group">
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-        <h3 className="text-white font-medium text-sm">Kegiatan {index + 1}</h3>
-      </div>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-full w-full text-gray-400 group-hover:scale-105 transition-transform"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1}
-          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-        />
-      </svg>
-    </div>
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="aspect-square bg-gray-200 rounded-md overflow-hidden relative group cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+            <h3 className="text-white font-medium text-sm">{gallery.title}</h3>
+          </div>
+          {imageError ? (
+            <div className="flex items-center justify-center h-full z-10">
+              <ImageIcon className="w-12 h-12 text-gray-400" />
+            </div>
+          ) : (
+            <>
+              <Image
+                src={`/api/drive-image?fileId=${gallery.image}`}
+                alt={gallery.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform"
+                onError={() => setImageError(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                <h3 className="text-white font-medium text-sm">
+                  {gallery.title}
+                </h3>
+              </div>
+            </>
+          )}
+        </div>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{gallery.title}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="relative w-full h-96 bg-gray-200 rounded-md overflow-hidden group">
+            {modalImageError ? (
+              <div className="flex items-center justify-center h-full">
+                <ImageIcon className="w-16 h-16 text-gray-400" />
+              </div>
+            ) : (
+              <Image
+                src={`/api/drive-image?fileId=${gallery.image}`}
+                alt={gallery.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform"
+                onError={() => setModalImageError(true)}
+              />
+            )}
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm text-gray-600">
+              <strong>Event:</strong> {gallery.event?.name || "N/A"}
+            </p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
