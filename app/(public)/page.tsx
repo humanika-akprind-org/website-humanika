@@ -3,6 +3,8 @@ import ArticleCard from "@/components/public/ArticleCard";
 import EventCard from "@/components/public/EventCard";
 import LatestGalleryGrid from "@/components/public/LatestGalleryGrid";
 import type { Gallery } from "@/types/gallery";
+import type { Article } from "@/types/article";
+import type { Event } from "@/types/event";
 
 interface Stat {
   number: string;
@@ -37,13 +39,12 @@ export default async function Home() {
     { cache: "no-store" }
   );
   const articlesData = articlesResponse.ok ? await articlesResponse.json() : [];
-  const articles = articlesData.map((article: any) => ({
+  const articles = articlesData.map((article: Article) => ({
     id: article.id,
     title: article.title,
-    date: article.createdAt,
+    date: article.createdAt.toISOString().split("T")[0],
     category: article.category?.name || "Uncategorized",
-    excerpt:
-      article.excerpt || article.content?.substring(0, 150) + "..." || "",
+    excerpt: article.content?.substring(0, 150) + "..." || "",
     author: article.author?.name || "Unknown",
     image: article.thumbnail || "",
   }));
@@ -55,10 +56,10 @@ export default async function Home() {
     { cache: "no-store" }
   );
   const eventsData = eventsResponse.ok ? await eventsResponse.json() : [];
-  const events: MappedEvent[] = eventsData.map((event: any) => ({
+  const events: MappedEvent[] = eventsData.map((event: Event) => ({
     id: event.id,
     title: event.name,
-    date: event.startDate,
+    date: event.startDate.toISOString().split("T")[0],
     category: event.department,
     description: event.description || "",
     image: event.thumbnail || "",
