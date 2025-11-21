@@ -6,6 +6,7 @@ interface Event {
   description: string;
   date: string | Date; // Can be either string or Date object
   category: string;
+  image?: string; // Optional image property
   // Add any other event properties you might have
 }
 

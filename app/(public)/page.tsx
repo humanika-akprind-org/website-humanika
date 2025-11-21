@@ -65,6 +65,7 @@ export default async function Home() {
       description: event.description,
       date: event.startDate,
       category: event.department,
+      image: event.image,
     }));
 
   const galleriesResponse = await fetch(
