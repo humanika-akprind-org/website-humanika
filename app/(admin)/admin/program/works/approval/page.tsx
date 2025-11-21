@@ -12,7 +12,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { ApprovalApi } from "@/use-cases/api/approval";
-import type { Approval } from "@/types/approval";
+import type { ApprovalWithRelations as Approval } from "@/types/approval";
 
 enum StatusApproval {
   PENDING = "PENDING",
@@ -90,8 +90,29 @@ export default function WorkProgramApprovalPage() {
       if (response.error) {
         setError(response.error);
       } else if (response.data) {
-        setApprovals(response.data.approvals);
-        setTotalPages(response.data.pagination.pages);
+        // Group approvals by work program ID and keep only the latest one per work program
+        const uniqueApprovals = Object.values(
+          response.data.approvals.reduce((acc, approval) => {
+            const workProgramId = approval.workProgram?.id || approval.entityId;
+            if (
+              !acc[workProgramId] ||
+              new Date(approval.createdAt) >
+                new Date(acc[workProgramId].createdAt)
+            ) {
+              acc[workProgramId] = approval;
+            }
+            return acc;
+          }, {} as Record<string, Approval>)
+        );
+
+        // Sort by createdAt descending to show latest first
+        uniqueApprovals.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        setApprovals(uniqueApprovals);
+        setTotalPages(1); // Disable pagination for unique approvals
       }
     } catch (_error) {
       setError("Failed to fetch approvals");

@@ -12,7 +12,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { ApprovalApi } from "@/use-cases/api/approval";
-import type { Approval } from "@/types/approval";
+import type { ApprovalWithRelations } from "@/types/approval";
 import { StatusApproval } from "@/types/enums";
 
 // Helper function to format enum values for display
@@ -39,7 +39,7 @@ const getStatusClass = (status: string) => {
 };
 
 // Helper function to get entity name
-const getEntityName = (approval: Approval) => {
+const getEntityName = (approval: ApprovalWithRelations) => {
   switch (approval.entityType) {
     case "WORK_PROGRAM":
       return approval.workProgram?.name || "Work Program";
@@ -57,7 +57,7 @@ const getEntityName = (approval: Approval) => {
 };
 
 export default function LetterApprovalPage() {
-  const [approvals, setApprovals] = useState<Approval[]>([]);
+  const [approvals, setApprovals] = useState<ApprovalWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -177,7 +177,7 @@ export default function LetterApprovalPage() {
         acc[key] = approval;
       }
       return acc;
-    }, {} as Record<string, Approval>);
+    }, {} as Record<string, ApprovalWithRelations>);
 
     return Object.values(grouped);
   }, [approvals]);
