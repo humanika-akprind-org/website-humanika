@@ -1,62 +1,32 @@
+"use client";
+
 import ArticleCard from "@/components/public/article/ArticleCard";
+import { useState, useEffect } from "react";
+import type { Article } from "@/types/article";
 
 export default function ArticlePage() {
-  const articles = [
-    {
-      id: 1,
-      title: "Perkembangan AI di Tahun 2023",
-      date: "2023-10-15",
-      category: "Teknologi",
-      excerpt:
-        "Bagaimana perkembangan teknologi AI di tahun 2023 dan dampaknya bagi industri.",
-      author: "Jane Doe",
-    },
-    {
-      id: 2,
-      title: "Workshop Flutter Sukses Digelar",
-      date: "2023-09-28",
-      category: "Event",
-      excerpt:
-        "Laporan lengkap tentang workshop Flutter yang dihadiri oleh 150 peserta.",
-      author: "John Smith",
-    },
-    {
-      id: 3,
-      title: "Tips Membangun Portofolio untuk Developer Pemula",
-      date: "2023-08-10",
-      category: "Karir",
-      excerpt:
-        "Panduan praktis untuk developer pemula dalam membangun portofolio yang menarik.",
-      author: "Alex Johnson",
-    },
-    {
-      id: 4,
-      title: "Blockchain Beyond Cryptocurrency",
-      date: "2023-07-22",
-      category: "Teknologi",
-      excerpt:
-        "Eksplorasi penggunaan teknologi blockchain di luar dunia cryptocurrency.",
-      author: "Sarah Williams",
-    },
-    {
-      id: 5,
-      title: "HUMANIKA Meraih Juara Hackathon Nasional",
-      date: "2023-06-15",
-      category: "Prestasi",
-      excerpt:
-        "Tim HUMANIKA berhasil meraih juara pertama dalam kompetisi hackathon nasional.",
-      author: "Michael Brown",
-    },
-    {
-      id: 6,
-      title: "Memulai Karir di Dunia Data Science",
-      date: "2023-05-30",
-      category: "Karir",
-      excerpt:
-        "Panduan untuk mahasiswa yang ingin memulai karir di bidang data science.",
-      author: "Emily Davis",
-    },
-  ];
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await fetch("/api/article?isPublished=true");
+        if (!response.ok) {
+          throw new Error("Failed to fetch articles");
+        }
+        const data = await response.json();
+        setArticles(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -96,17 +66,37 @@ export default function ArticlePage() {
             </div>
           </div>
 
+          {loading && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Memuat artikel...</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="text-center py-12">
+              <p className="text-red-500">{error}</p>
+            </div>
+          )}
+
+          {!loading && !error && articles.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Tidak ada artikel ditemukan.</p>
+            </div>
+          )}
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article) => (
               <ArticleCard key={article.id} article={article} />
             ))}
           </div>
 
-          <div className="mt-12 text-center">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium shadow-md">
-              Muat Lebih Banyak
-            </button>
-          </div>
+          {!loading && !error && articles.length > 0 && (
+            <div className="mt-12 text-center">
+              <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium shadow-md">
+                Muat Lebih Banyak
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Popular Tags */}

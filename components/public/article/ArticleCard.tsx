@@ -1,14 +1,5 @@
 import Link from "next/link";
-
-// Define interface for article props
-interface Article {
-  id: string | number;
-  title: string;
-  date: string;
-  category: string;
-  excerpt: string;
-  author: string;
-}
+import type { Article } from "@/types/article";
 
 interface ArticleCardProps {
   article: Article;
@@ -19,7 +10,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border-t-4 border-blue-600">
       <div className="h-48 bg-blue-100 flex items-center justify-center relative">
         <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded text-sm font-medium">
-          {article.category}
+          {article.category.name}
         </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +43,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          {new Date(article.date).toLocaleDateString("id-ID", {
+          {new Date(article.createdAt).toLocaleDateString("id-ID", {
             day: "numeric",
             month: "long",
             year: "numeric",
@@ -63,12 +54,19 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         </h3>
         <p
           className="text-gray-600 mb-4 line-clamp-2"
-          dangerouslySetInnerHTML={{ __html: article.excerpt }}
+          dangerouslySetInnerHTML={{
+            __html:
+              article.content.length > 150
+                ? `${article.content.substring(0, 150)}...`
+                : article.content,
+          }}
         />
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500">By {article.author}</span>
+          <span className="text-sm text-gray-500">
+            By {article.author.name}
+          </span>
           <Link
-            href={`/article/${article.id}`}
+            href={`/article/${article.slug}`}
             className="text-blue-600 font-medium hover:text-blue-800 transition-colors flex items-center"
           >
             Baca
