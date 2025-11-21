@@ -24,10 +24,9 @@ interface MappedArticle {
 interface MappedEvent {
   id: string;
   title: string;
+  description: string;
   date: string;
   category: string;
-  description: string;
-  image: string;
 }
 
 export default async function Home() {
@@ -56,14 +55,17 @@ export default async function Home() {
     { cache: "no-store" }
   );
   const eventsData = eventsResponse.ok ? await eventsResponse.json() : [];
-  const events: MappedEvent[] = eventsData.map((event: Event) => ({
-    id: event.id,
-    title: event.name,
-    date: new Date(event.startDate).toISOString().split("T")[0],
-    category: event.department,
-    description: event.description || "",
-    image: event.thumbnail || "",
-  }));
+  const now = new Date();
+  const upcomingEvents = eventsData
+    .filter((event: Event) => new Date(event.startDate) > now)
+    .slice(0, 3) // Limit to 3 upcoming events for home page
+    .map((event: Event) => ({
+      id: event.id,
+      title: event.name,
+      description: event.description,
+      date: event.startDate,
+      category: event.department,
+    }));
 
   const galleriesResponse = await fetch(
     `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/gallery`,
@@ -356,7 +358,7 @@ export default async function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {events.map((event: MappedEvent) => (
+            {upcomingEvents.map((event: MappedEvent) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>

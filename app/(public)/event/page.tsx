@@ -1,36 +1,64 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import EventCard from "@/components/public/event/EventCard";
+import PastEventCard from "@/components/public/event/PastEventCard";
+import type { Event } from "@/types/event";
 
 export default function EventPage() {
-  const events = [
-    {
-      id: "1",
-      title: "Tech Conference 2023",
-      date: "2023-11-15",
-      category: "Seminar",
-      description: "Annual technology conference featuring industry experts",
-    },
-    {
-      id: "2",
-      title: "Hackathon Nasional",
-      date: "2023-12-10",
-      category: "Kompetisi",
-      description: "48-hour coding competition with exciting prizes",
-    },
-    {
-      id: "3",
-      title: "Workshop Machine Learning",
-      date: "2024-01-20",
-      category: "Workshop",
-      description: "Hands-on machine learning workshop for beginners",
-    },
-    {
-      id: "4",
-      title: "Web Development Bootcamp",
-      date: "2024-02-05",
-      category: "Pelatihan",
-      description: "Intensive web development training program",
-    },
-  ];
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch(
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+          }/api/event?status=PUBLISH`,
+          {
+            cache: "no-store",
+          }
+        );
+        const events: Event[] = await res.json();
+        setAllEvents(events);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-xl">Loading events...</div>
+      </div>
+    );
+  }
+
+  const now = new Date();
+  const upcomingEvents = allEvents
+    .filter((event) => new Date(event.startDate) > now)
+    .map((event) => ({
+      id: event.id,
+      title: event.name,
+      description: event.description,
+      date: event.startDate,
+      category: event.department,
+    }));
+
+  const pastEvents = allEvents
+    .filter((event) => new Date(event.endDate) < now)
+    .slice(0, 4) // Limit to 4 past events
+    .map((event) => ({
+      id: event.id,
+      title: event.name,
+      date: event.endDate,
+    }));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,7 +95,7 @@ export default function EventPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
+            {upcomingEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>
@@ -85,48 +113,12 @@ export default function EventPage() {
             Past Events
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((item) => (
-              <div
-                key={item}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <div className="h-40 bg-gray-200 flex items-center justify-center relative">
-                  <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-1 rounded text-xs font-medium">
-                    Completed
-                  </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-16 w-16 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg text-gray-800 mb-1">
-                    Event Lama {item}
-                  </h3>
-                  <p className="text-gray-500 text-sm mb-3">
-                    {new Date(
-                      Date.now() - item * 30 * 24 * 60 * 60 * 1000
-                    ).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </p>
-                  <button className="w-full py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm font-medium">
-                    Lihat Dokumentasi
-                  </button>
-                </div>
-              </div>
+            {pastEvents.map((event) => (
+              <PastEventCard
+                key={event.id}
+                title={event.title}
+                date={event.date}
+              />
             ))}
           </div>
         </section>

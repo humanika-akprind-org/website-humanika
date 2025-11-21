@@ -47,7 +47,10 @@ export default function EventCard({ event }: EventCardProps) {
         <h3 className="text-xl font-semibold mb-3 text-gray-800">
           {event.title}
         </h3>
-        <p className="text-gray-600 mb-4 line-clamp-2">{event.description}</p>
+        <p
+          className="text-gray-600 mb-4 line-clamp-2"
+          dangerouslySetInnerHTML={{ __html: event.description }}
+        />
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">
             {eventDate.toLocaleTimeString("id-ID", {

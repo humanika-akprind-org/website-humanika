@@ -61,7 +61,10 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         <h3 className="text-xl font-semibold mb-3 text-gray-800">
           {article.title}
         </h3>
-        <p className="text-gray-600 mb-4 line-clamp-2">{article.excerpt}</p>
+        <p
+          className="text-gray-600 mb-4 line-clamp-2"
+          dangerouslySetInnerHTML={{ __html: article.excerpt }}
+        />
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">By {article.author}</span>
           <Link
