@@ -41,8 +41,8 @@ export default async function RootLayout({
                 <SidebarMobile />
 
                 <div className="px-6 py-4 flex justify-between items-center">
-                  <h1 className="text-2xl font-semibold text-gray-800">
-                    Organizational Dashboard
+                  <h1 className="text-2xl font-bold text-gray-800">
+                    Organizational Admin
                   </h1>
                   <div className="flex items-center space-x-4">
                     <UserInfo />

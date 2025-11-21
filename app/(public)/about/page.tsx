@@ -1,3 +1,140 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import type { OrganizationalStructure } from "@/types/structure";
+
+// Helper function to validate image URL
+const isValidImageUrl = (url: string): boolean => {
+  try {
+    new URL(url);
+    return (
+      /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) ||
+      url.includes("drive.google.com") ||
+      url.startsWith("blob:")
+    );
+  } catch {
+    return false;
+  }
+};
+
+// Helper function to get preview URL from structure image (file ID or URL)
+const getStructureImageUrl = (
+  structureImage: string | null | undefined
+): string => {
+  if (!structureImage) return "";
+
+  if (structureImage.includes("drive.google.com")) {
+    const fileIdMatch = structureImage.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch) {
+      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+    }
+    return structureImage;
+  } else if (structureImage.match(/^[a-zA-Z0-9_-]+$/)) {
+    return `https://drive.google.com/uc?export=view&id=${structureImage}`;
+  } else {
+    return structureImage;
+  }
+};
+
+function OrganizationalStructureImage() {
+  const [structures, setStructures] = useState<OrganizationalStructure[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStructures = async () => {
+      try {
+        const response = await fetch("/api/structure?status=PUBLISH");
+        if (response.ok) {
+          const data = await response.json();
+          setStructures(data || []);
+        } else {
+          setError("Failed to load organizational structure");
+        }
+      } catch (_err) {
+        setError("Failed to load organizational structure");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStructures();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"/>
+      </div>
+    );
+  }
+
+  if (error || structures.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200 mx-auto mb-4">
+          <svg
+            className="w-8 h-8 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </div>
+        <p className="text-gray-500">
+          {error || "No organizational structure available"}
+        </p>
+      </div>
+    );
+  }
+
+  // Get the latest published structure
+  const latestStructure = structures[0];
+  const displayUrl = getStructureImageUrl(latestStructure.structure);
+
+  return (
+    <div className="flex items-center justify-center">
+      {displayUrl && isValidImageUrl(displayUrl) ? (
+        <div className="w-full max-w-4xl">
+          <Image
+            src={displayUrl}
+            alt={`Struktur Organisasi ${latestStructure.name}`}
+            width={800}
+            height={600}
+            className="w-full h-auto object-contain rounded-lg"
+            onError={(e) => {
+              console.error("Image failed to load:", displayUrl, e);
+            }}
+          />
+        </div>
+      ) : (
+        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200">
+          <svg
+            className="w-8 h-8 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -190,71 +327,7 @@ export default function AboutPage() {
             Struktur Organisasi
           </h2>
           <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex justify-center">
-              <div className="relative">
-                {/* CEO/President */}
-                <div className="bg-gradient-to-r from-blue-700 to-blue-800 text-white p-4 rounded-lg shadow-lg text-center w-64 mx-auto mb-8 relative z-10">
-                  <div className="bg-white p-1 rounded-full w-16 h-16 mx-auto mb-2 flex items-center justify-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-10 w-10 text-blue-800"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="font-bold">Ketua Umum</h3>
-                  <p className="text-blue-200 text-sm">John Doe</p>
-                </div>
-
-                {/* Divisions */}
-                <div className="flex flex-wrap justify-center gap-6 relative">
-                  {/* Line connectors */}
-                  <div className="absolute top-0 left-1/2 w-1 h-8 bg-gray-300 transform -translate-x-1/2"/>
-
-                  {[
-                    "Sekretariat",
-                    "Bendahara",
-                    "Divisi Akademik",
-                    "Divisi Kominfo",
-                    "Divisi Minat Bakat",
-                  ].map((division, index) => (
-                    <div
-                      key={index}
-                      className="bg-white border-2 border-blue-600 p-3 rounded-lg shadow-md text-center w-48 relative"
-                    >
-                      <div className="bg-blue-100 p-1 rounded-full w-12 h-12 mx-auto mb-2 flex items-center justify-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6 text-blue-700"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                          />
-                        </svg>
-                      </div>
-                      <h4 className="font-semibold text-gray-800">
-                        {division}
-                      </h4>
-                      <div className="absolute top-0 left-1/2 w-1 h-6 bg-gray-300 transform -translate-x-1/2 -translate-y-full"/>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <OrganizationalStructureImage />
           </div>
         </section>
       </main>

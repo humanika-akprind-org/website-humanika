@@ -73,6 +73,9 @@ export async function POST(request: NextRequest) {
 
     // 4. Response
     return NextResponse.json(structure, { status: 201 });
+
+    // 4. Response
+    return NextResponse.json(structure, { status: 201 });
   } catch (error) {
     console.error("Error creating organizational structure:", error);
     return NextResponse.json(

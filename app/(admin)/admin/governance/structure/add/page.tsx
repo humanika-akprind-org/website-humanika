@@ -7,6 +7,7 @@ import type {
   UpdateOrganizationalStructureInput,
   OrganizationalStructure,
 } from "@/types/structure";
+import type { Status as StatusEnum } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -41,10 +42,11 @@ async function AddStructurePage() {
 
       const structurePayload: Omit<
         OrganizationalStructure,
-        "id" | "period" | "status" | "createdAt" | "updatedAt"
+        "id" | "period" | "createdAt" | "updatedAt"
       > = {
         name: structureData.name,
         periodId: structureData.periodId,
+        status: (structureData.status as StatusEnum) || ("DRAFT" as StatusEnum),
         decree: structureData.decree || "",
         structure: structureData.structure || "",
       };

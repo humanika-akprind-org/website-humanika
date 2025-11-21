@@ -65,6 +65,7 @@ export const createStructure = async (
   const structureData: Prisma.OrganizationalStructureCreateInput = {
     name: data.name,
     period: { connect: { id: data.periodId } },
+    status: (data.status as PrismaStatus) || "PENDING",
     decree: data.decree,
     ...(data.structure !== undefined && { structure: data.structure }),
   };

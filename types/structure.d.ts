@@ -16,6 +16,7 @@ export interface OrganizationalStructure {
 export interface CreateOrganizationalStructureInput {
   name: string;
   periodId: string;
+  status?: Status;
   decree: string;
   structure?: string | null;
 }
