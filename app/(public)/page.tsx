@@ -11,16 +11,6 @@ interface Stat {
   label: string;
 }
 
-interface MappedArticle {
-  id: string;
-  title: string;
-  date: string;
-  category: string;
-  excerpt: string;
-  author: string;
-  image: string;
-}
-
 interface MappedEvent {
   id: string;
   title: string;
@@ -37,16 +27,7 @@ export default async function Home() {
     }/api/article?isPublished=true`,
     { cache: "no-store" }
   );
-  const articlesData = articlesResponse.ok ? await articlesResponse.json() : [];
-  const articles = articlesData.map((article: Article) => ({
-    id: article.id,
-    title: article.title,
-    date: new Date(article.createdAt).toISOString().split("T")[0],
-    category: article.category?.name || "Uncategorized",
-    excerpt: article.content?.substring(0, 150) + "..." || "",
-    author: article.author?.name || "Unknown",
-    image: article.thumbnail || "",
-  }));
+  const articles = articlesResponse.ok ? await articlesResponse.json() : [];
 
   const eventsResponse = await fetch(
     `${
@@ -161,7 +142,7 @@ export default async function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {articles.map((article: MappedArticle) => (
+            {articles.map((article: Article) => (
               <ArticleCard key={article.id} article={article} />
             ))}
           </div>
