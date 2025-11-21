@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 // Define form schema
 const formSchema = z.object({
@@ -43,10 +43,54 @@ export default function ContactForm() {
     },
   });
 
-  function onSubmit(_values: z.infer<typeof formSchema>) {
-    toast.success("Pesan Terkirim", {
-      description: "Kami akan segera merespons pesan Anda.",
-    });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const subjectMap: Record<string, string> = {
+        general: "Pertanyaan Umum",
+        collaboration: "Kerja Sama",
+        feedback: "Feedback",
+        other: "Lainnya",
+      };
+
+      const html = `
+        <h2>Pesan Kontak dari Website HUMANIKA</h2>
+        <p><strong>Nama:</strong> ${values.name}</p>
+        <p><strong>Email:</strong> ${values.email}</p>
+        <p><strong>Subjek:</strong> ${
+          subjectMap[values.subject] || values.subject
+        }</p>
+        <p><strong>Pesan:</strong></p>
+        <p>${values.message.replace(/\n/g, "<br>")}</p>
+      `;
+
+      const response = await fetch("/api/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "humanika@akprind.ac.id",
+          subject: subjectMap[values.subject] || values.subject,
+          html,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+
+      toast.success("Pesan Terkirim", {
+        description: "Kami akan segera merespons pesan Anda.",
+      });
+
+      form.reset();
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast.error("Gagal Mengirim Pesan", {
+        description:
+          "Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.",
+      });
+    }
   }
 
   return (
