@@ -54,16 +54,29 @@ export default function ContactForm() {
         feedback: "Feedback",
         other: "Lainnya",
       };
-
-      const html = `
-        <h2>Pesan Kontak dari Website HUMANIKA</h2>
-        <p><strong>Nama:</strong> ${values.name}</p>
-        <p><strong>Email:</strong> ${values.email}</p>
-        <p><strong>Subjek:</strong> ${
-          subjectMap[values.subject] || values.subject
-        }</p>
-        <p><strong>Pesan:</strong></p>
-        <p>${values.message.replace(/\n/g, "<br>")}</p>
+      
+     const html = `
+      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 30px;">
+          <h2 style="color: #0070f3; text-align: center;">Pesan Kontak dari Website HUMANIKA</h2>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+          <div style="margin-bottom: 15px;">
+            <strong>Nama:</strong> <span>${values.name}</span>
+          </div>
+          <div style="margin-bottom: 15px;">
+            <strong>Email:</strong> <span>${values.email}</span>
+          </div>
+          <div style="margin-bottom: 15px;">
+            <strong>Subjek:</strong> <span>${subjectMap[values.subject] || values.subject}</span>
+          </div>
+          <div style="margin-top: 25px;">
+            <strong>Pesan:</strong>
+            <p style="white-space: pre-wrap; line-height: 1.5; margin-top: 8px;">${values.message.replace(/\n/g, "<br>")}</p>
+          </div>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0 10px 0;" />
+          <p style="font-size: 12px; color: gray; text-align: center;">Ini adalah pesan otomatis yang dikirim dari website HUMANIKA.</p>
+        </div>
+      </div>
       `;
 
       const response = await fetch("/api/email", {
