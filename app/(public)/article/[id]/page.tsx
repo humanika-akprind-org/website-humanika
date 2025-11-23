@@ -101,8 +101,8 @@ export default function ArticleDetail({ params }: { params: { id: string } }) {
             </div>
           </div>
 
-          {article.thumbnail && (
-            <div className="bg-gray-200 rounded-xl mb-8 flex items-center justify-center w-full h-96 overflow-hidden relative">
+          {article.thumbnail ? (
+            <div className="bg-white-0 rounded-xl mb-8 flex items-center justify-center w-full h-96 overflow-hidden relative">
               <Image
                 src={getPreviewUrl(article.thumbnail)}
                 alt={article.title}
@@ -110,6 +110,24 @@ export default function ArticleDetail({ params }: { params: { id: string } }) {
                 style={{ objectFit: "contain" }}
                 className="rounded-xl"
               />
+            </div>
+          ) : (
+            <div className="bg-gray-100 rounded-xl mb-8 flex flex-col items-center justify-center w-full h-96 text-grey-400">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-20 w-20 mx-auto mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                />
+              </svg>
+              <p className="text-lg font-medium">No image available</p>
             </div>
           )}
         </section>

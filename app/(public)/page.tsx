@@ -39,14 +39,7 @@ export default async function Home() {
   const now = new Date();
   const upcomingEvents = eventsData
     .filter((event: Event) => new Date(event.startDate) > now)
-    .slice(0, 3) // Limit to 3 upcoming events for home page
-    .map((event: Event) => ({
-      id: event.id,
-      title: event.name,
-      description: event.description,
-      date: event.startDate,
-      category: event.department,
-    }));
+    .slice(0, 3); // Limit to 3 upcoming events for home page
 
   const galleriesResponse = await fetch(
     `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/gallery`,
@@ -339,7 +332,7 @@ export default async function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {upcomingEvents.map((event: MappedEvent) => (
+            {upcomingEvents.map((event: Event) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>

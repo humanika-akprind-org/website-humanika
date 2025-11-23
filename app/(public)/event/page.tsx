@@ -41,24 +41,15 @@ export default function EventPage() {
   }
 
   const now = new Date();
-  const upcomingEvents = allEvents
-    .filter((event) => new Date(event.startDate) > now)
-    .map((event) => ({
-      id: event.id,
-      title: event.name,
-      description: event.description,
-      date: event.startDate,
-      category: event.department,
-    }));
+
+  // Pass full event objects without mapping to EventCard for correct props
+  const upcomingEvents = allEvents.filter(
+    (event) => new Date(event.startDate) > now
+  );
 
   const pastEvents = allEvents
     .filter((event) => new Date(event.endDate) < now)
-    .slice(0, 4) // Limit to 4 past events
-    .map((event) => ({
-      id: event.id,
-      title: event.name,
-      date: event.endDate,
-    }));
+    .slice(0, 4); // Limit to 4 past events
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -116,8 +107,8 @@ export default function EventPage() {
             {pastEvents.map((event) => (
               <PastEventCard
                 key={event.id}
-                title={event.title}
-                date={event.date}
+                title={event.name}
+                date={event.endDate}
               />
             ))}
           </div>

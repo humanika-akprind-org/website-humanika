@@ -102,8 +102,8 @@ export default function EventDetail({ params }: EventDetailProps) {
             {safeEvent?.title ?? safeEvent?.name ?? "Judul Acara"}
           </h1>
 
-          {safeEvent?.thumbnail && (
-            <div className="bg-gray-200 rounded-xl mb-8 flex items-center justify-center w-full h-96 overflow-hidden relative">
+          {safeEvent?.thumbnail ? (
+            <div className="bg-white-0 rounded-xl mb-8 flex items-center justify-center w-full h-96 overflow-hidden relative">
               <Image
                 src={getPreviewUrl(safeEvent.thumbnail)}
                 alt={safeEvent.title ?? "Event thumbnail"}
@@ -111,6 +111,24 @@ export default function EventDetail({ params }: EventDetailProps) {
                 style={{ objectFit: "contain" }}
                 className="rounded-xl"
               />
+            </div>
+          ) : (
+            <div className="bg-gray-100 rounded-xl mb-8 flex flex-col items-center justify-center w-full h-96 text-grey-400">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-20 w-20 mx-auto"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <p className="text-lg font-medium">No image available</p>
             </div>
           )}
 
