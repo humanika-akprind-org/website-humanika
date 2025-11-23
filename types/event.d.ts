@@ -1,35 +1,74 @@
-import type { Status } from "./enums";
-import type { Period } from "./period";
-import type { WorkProgram } from "./work";
-import type { User } from "./user";
+import { Department, Status } from "./enums";
+import { User } from "./user";
+import { Period } from "./period";
+import { WorkProgram } from "./work";
+import { Approval } from "./approval";
 
 export interface Event {
   id: string;
   name: string;
+  slug: string;
+  thumbnail?: string | null;
   description: string;
-  department: string;
-  periodId: string;
-  workProgramId?: string;
   responsibleId: string;
-  startDate: string;
-  endDate: string;
+  responsible: {
+    id: string;
+    name: string;
+    email: string;
+    username: string;
+    role: UserRole;
+    department: Department | null;
+    position: Position | null;
+    isActive: boolean;
+    verifiedAccount: boolean;
+    attemptLogin: number;
+    blockExpires: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+    avatarColor: string;
+  };
+  goal: string;
+  department: Department;
+  periodId: string;
+  period: Period;
+  startDate: Date;
+  endDate: Date;
+  funds: number;
+  usedFunds: number;
+  remainingFunds: number;
   status: Status;
-  image?: string;
-  createdAt: string;
-  updatedAt: string;
-  period?: Period;
-  workProgram?: WorkProgram;
-  responsible?: User;
+  workProgramId?: string | null;
+  workProgram?: WorkProgram | null;
+  approvals?: Approval[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateEventInput {
   name: string;
+  thumbnail?: string | null;
   description: string;
-  department: string;
-  periodId: string;
-  workProgramId?: string;
   responsibleId: string;
-  startDate: string;
-  endDate: string;
-  image?: string;
+  goal: string;
+  department: Department;
+  periodId: string;
+  startDate: Date;
+  endDate: Date;
+  funds: number;
+  workProgramId?: string;
+}
+
+export interface UpdateEventInput extends Partial<CreateEventInput> {
+  status?: Status;
+  usedFunds?: number;
+}
+
+export interface EventFilter {
+  department?: Department;
+  status?: Status;
+  periodId?: string;
+  workProgramId?: string;
+  search?: string;
+  startDate?: Date;
+  endDate?: Date;
 }
