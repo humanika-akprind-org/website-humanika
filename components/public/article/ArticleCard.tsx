@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import type { Article } from "@/types/article";
 
 // Helper function to get preview URL from image (file ID or URL)
@@ -27,6 +30,21 @@ interface ArticleCardProps {
 }
 
 export default function ArticleCard({ article }: ArticleCardProps) {
+  const [formattedDate, setFormattedDate] = useState<string>("");
+
+  useEffect(() => {
+    if (article.createdAt) {
+      const date = new Date(article.createdAt);
+      setFormattedDate(
+        date.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      );
+    }
+  }, [article.createdAt]);
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border-t-4 border-blue-600">
       <div className="h-48 bg-blue-100 flex items-center relative">
@@ -74,13 +92,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          {article.createdAt
-            ? new Date(article.createdAt).toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })
-            : "Unknown Date"}
+          {formattedDate || "Loading date..."}
         </div>
         <h3 className="text-xl font-semibold mb-3 text-gray-800">
           {article.title}

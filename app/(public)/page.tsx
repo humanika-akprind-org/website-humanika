@@ -11,14 +11,6 @@ interface Stat {
   label: string;
 }
 
-interface MappedEvent {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  category: string;
-}
-
 export default async function Home() {
   // Fetch data from database
   const articlesResponse = await fetch(

@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Event } from "@/types/event";
@@ -28,13 +30,32 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event }: EventCardProps) {
-  const eventDate = new Date(event.startDate);
-  const month = eventDate.toLocaleString("id-ID", { month: "short" });
-  const day = eventDate.getDate();
+  const [month, setMonth] = useState<string>("");
+  const [day, setDay] = useState<number | null>(null);
+  const [time, setTime] = useState<string>("");
 
-  const previewUrl = React.useMemo(() => getPreviewUrl(event.thumbnail ?? null), [event.thumbnail]);
+  const previewUrl = useMemo(
+    () => getPreviewUrl(event.thumbnail ?? null),
+    [event.thumbnail]
+  );
 
-  const category = event.department ? event.department.toString() : "Uncategorized";
+  const category = event.department
+    ? event.department.toString()
+    : "Uncategorized";
+
+  useEffect(() => {
+    if (event.startDate) {
+      const eventDate = new Date(event.startDate);
+      setMonth(eventDate.toLocaleString("id-ID", { month: "short" }));
+      setDay(eventDate.getDate());
+      setTime(
+        eventDate.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
+    }
+  }, [event.startDate]);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border-t-4 border-red-600">
@@ -67,23 +88,20 @@ export default function EventCard({ event }: EventCardProps) {
           </svg>
         )}
         <div className="absolute top-4 right-4 bg-white text-red-600 px-3 py-1 rounded-full text-sm font-medium shadow-md flex flex-col items-center justify-center w-12 h-12 z-10">
-          <span className="text-xs font-bold">{month}</span>
-          <span className="text-lg font-bold -mt-1">{day}</span>
+          <span className="text-xs font-bold">{month || "Loading"}</span>
+          <span className="text-lg font-bold -mt-1">{day ?? "-"}</span>
         </div>
       </div>
       <div className="p-6">
-        <h3 className="text-xl font-semibold mb-3 text-gray-800">{event.name}</h3>
+        <h3 className="text-xl font-semibold mb-3 text-gray-800">
+          {event.name}
+        </h3>
         <p
           className="text-gray-600 mb-4 line-clamp-2"
           dangerouslySetInnerHTML={{ __html: event.description }}
         />
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500">
-            {eventDate.toLocaleTimeString("id-ID", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
+          <span className="text-sm text-gray-500">{time || "Loading"}</span>
           <Link
             href={`/event/${event.id}`}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
