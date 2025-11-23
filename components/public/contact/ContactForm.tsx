@@ -35,6 +35,7 @@ const formSchema = z.object({
 
 export default function ContactForm() {
   const [success, setSuccess] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,8 +55,8 @@ export default function ContactForm() {
         feedback: "Feedback",
         other: "Lainnya",
       };
-      
-     const html = `
+
+      const html = `
       <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
         <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 30px;">
           <h2 style="color: #0070f3; text-align: center;">Pesan Kontak dari Website HUMANIKA</h2>
@@ -67,11 +68,16 @@ export default function ContactForm() {
             <strong>Email:</strong> <span>${values.email}</span>
           </div>
           <div style="margin-bottom: 15px;">
-            <strong>Subjek:</strong> <span>${subjectMap[values.subject] || values.subject}</span>
+            <strong>Subjek:</strong> <span>${
+              subjectMap[values.subject] || values.subject
+            }</span>
           </div>
           <div style="margin-top: 25px;">
             <strong>Pesan:</strong>
-            <p style="white-space: pre-wrap; line-height: 1.5; margin-top: 8px;">${values.message.replace(/\n/g, "<br>")}</p>
+            <p style="white-space: pre-wrap; line-height: 1.5; margin-top: 8px;">${values.message.replace(
+              /\n/g,
+              "<br>"
+            )}</p>
           </div>
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0 10px 0;" />
           <p style="font-size: 12px; color: gray; text-align: center;">Ini adalah pesan otomatis yang dikirim dari website HUMANIKA.</p>
@@ -92,15 +98,41 @@ export default function ContactForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to send email");
+        if (response.status >= 400 && response.status < 500) {
+          setErrorMsg(
+            "Terjadi kesalahan pada data yang Anda kirim. Mohon periksa kembali dan coba lagi."
+          );
+          toast.error("Gagal Mengirim Pesan: Kesalahan Data", {
+            description:
+              "Periksa dan pastikan informasi yang Anda masukkan benar.",
+          });
+        } else if (response.status >= 500) {
+          setErrorMsg(
+            "Terjadi kesalahan pada server. Silakan coba beberapa saat lagi."
+          );
+          toast.error("Gagal Mengirim Pesan: Kesalahan Server", {
+            description:
+              "Server saat ini tidak bisa memproses permintaan Anda.",
+          });
+        } else {
+          setErrorMsg("Gagal mengirim pesan. Silakan coba lagi.");
+          toast.error("Gagal Mengirim Pesan", {
+            description:
+              "Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.",
+          });
+        }
+        setLoading(false);
+        return;
       }
 
       setSuccess("Pesan Terkirim! Kami akan segera merespons pesan Anda.");
+      setErrorMsg("");
       setTimeout(() => setSuccess(""), 3000);
 
       form.reset();
     } catch (error) {
       console.error("Error sending email:", error);
+      setErrorMsg("Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.");
       toast.error("Gagal Mengirim Pesan", {
         description:
           "Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.",
@@ -115,6 +147,11 @@ export default function ContactForm() {
       {success && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
           {success}
+        </div>
+      )}
+      {errorMsg && (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+          {errorMsg}
         </div>
       )}
       <Form {...form}>
@@ -154,16 +191,11 @@ export default function ContactForm() {
               <FormItem>
                 <FormLabel>Subjek</FormLabel>
                 <FormControl>
-                  <select
+                  <Input
                     {...field}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="">Pilih Subjek</option>
-                    <option value="general">Pertanyaan Umum</option>
-                    <option value="collaboration">Kerja Sama</option>
-                    <option value="feedback">Feedback</option>
-                    <option value="other">Lainnya</option>
-                  </select>
+                    placeholder="Masukkan subjek pesan"
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
