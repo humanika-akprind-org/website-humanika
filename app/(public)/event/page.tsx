@@ -49,7 +49,6 @@ export default function EventPage() {
       description: event.description,
       date: event.startDate,
       category: event.department,
-      image: event.image,
     }));
 
   const pastEvents = allEvents
