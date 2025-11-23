@@ -9,6 +9,10 @@ export default function ArticlePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // TypeScript fix: declare fetchArticles as static property to avoid errors when referencing it
+  (ArticlePage as any).fetchArticles =
+    (ArticlePage as any).fetchArticles || (() => {});
+
   useEffect(() => {
     const fetchArticles = async () => {
       try {
@@ -17,13 +21,21 @@ export default function ArticlePage() {
           throw new Error("Failed to fetch articles");
         }
         const data = await response.json();
-        setArticles(data);
+        if (Array.isArray(data)) {
+          setArticles(data);
+        } else {
+          console.warn("Unexpected data format from articles API:", data);
+          setArticles([]);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
     };
+
+    // Expose fetchArticles for manual reload button usage
+    (ArticlePage as any).fetchArticles = fetchArticles;
 
     fetchArticles();
   }, []);
@@ -81,6 +93,17 @@ export default function ArticlePage() {
           {!loading && !error && articles.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500">Tidak ada artikel ditemukan.</p>
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  setError(null);
+                  setArticles([]);
+                  (ArticlePage as any).fetchArticles();
+                }}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium shadow-md"
+              >
+                Muat Ulang
+              </button>
             </div>
           )}
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -8,21 +9,14 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 className="text-xl font-bold mb-4 flex items-center">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-2 rounded-full mr-3">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-full mr-3">
+                <Image
+                  src="/logo.png"
+                  alt="HUMANIKA"
+                  width={50}
+                  height={50}
+                  className="rounded-full"
+                />
               </div>
               HUMANIKA
             </h3>
@@ -42,7 +36,7 @@ export default function Footer() {
                   href="/"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   Home
                 </Link>
               </li>
@@ -51,7 +45,7 @@ export default function Footer() {
                   href="/article"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   Article
                 </Link>
               </li>
@@ -60,7 +54,7 @@ export default function Footer() {
                   href="/about"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   About
                 </Link>
               </li>
@@ -69,7 +63,7 @@ export default function Footer() {
                   href="/gallery"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   Gallery
                 </Link>
               </li>
@@ -78,7 +72,7 @@ export default function Footer() {
                   href="/contact"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   Contact
                 </Link>
               </li>
@@ -95,7 +89,7 @@ export default function Footer() {
                   href="/event"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   Event
                 </Link>
               </li>
@@ -104,7 +98,7 @@ export default function Footer() {
                   href="/members"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   Members
                 </Link>
               </li>
@@ -113,7 +107,7 @@ export default function Footer() {
                   href="/projects"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   Projects
                 </Link>
               </li>
@@ -122,7 +116,7 @@ export default function Footer() {
                   href="/faq"
                   className="text-gray-400 hover:text-white transition-colors flex items-center group"
                 >
-                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all"/>
+                  <span className="w-1 h-1 bg-green-500 rounded-full mr-2 group-hover:w-2 group-hover:h-2 transition-all" />
                   FAQ
                 </Link>
               </li>
@@ -159,7 +153,19 @@ export default function Footer() {
               ].map((social) => (
                 <a
                   key={social.name}
-                  href="#"
+                  href={
+                    social.name === "Facebook"
+                      ? "https://www.facebook.com/share/1BSXSNnrgp/"
+                      : social.name === "Instagram"
+                      ? "https://www.instagram.com/humanika_akprind?igsh=d2E4bW5oOTVoaDlt"
+                      : social.name === "YouTube"
+                      ? "https://youtube.com/@humanika.akprind1991?si=JZE3TaAS-lfM3uMD"
+                      : social.name === "Twitter"
+                      ? "https://x.com/HumanikaAKPRIND?t=eneYcjEgcmP0k6mNhKWm1w&s=09"
+                      : "#"
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={`${social.color} text-white p-3 rounded-lg transition-all transform hover:-translate-y-1`}
                   aria-label={social.name}
                 >
@@ -212,7 +218,7 @@ export default function Footer() {
 
       {/* HUMANIKA besar di bagian bawah yang terpotong */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden">
-        <div className="text-[180px] lg:text-[240px] font-black tracking-wide text-gray-800 opacity-50 text-center -mb-16 lg:-mb-20 leading-none">
+        <div className="text-[60px] min-[490px]:text-[80px] sm:text-[120px] md:text-[150px] lg:text-[180px] xl:text-[240px] font-black tracking-wide text-gray-800 opacity-50 text-center -mb-6 min-[490px]:-mb-8 sm:-mb-12 md:-mb-14 lg:-mb-16 xl:-mb-20 leading-none">
           HUMANIKA
         </div>
       </div>

@@ -148,7 +148,7 @@ export default function LetterTable({ letters, onDelete }: LetterTableProps) {
 
   return (
     <div className="rounded-xl">
-      <LetterStats totalLetters={filteredLetters.length} />
+      <LetterStats letters={filteredLetters} />
 
       <LetterFilters
         onFilter={(filter) => {
