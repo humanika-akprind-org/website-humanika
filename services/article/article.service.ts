@@ -126,8 +126,14 @@ export async function createArticle(
 
 export async function getArticleById(
   id: string
-): Promise<ArticleWithPartialAuthor | null> {
-  return await prisma.article.findUnique({
+): Promise<
+  | (ArticleWithPartialAuthor & {
+      relatedArticles?: ArticleWithPartialAuthor[];
+    })
+  | null
+> {
+  // Fetch main article
+  const article = await prisma.article.findUnique({
     where: { id },
     include: {
       author: {
@@ -141,6 +147,41 @@ export async function getArticleById(
       period: true,
     },
   });
+
+  if (!article) {
+    return null;
+  }
+
+  // Fetch related articles by same category excluding current article
+  const relatedArticles = await prisma.article.findMany({
+    where: {
+      categoryId: article.categoryId,
+      id: {
+        not: id,
+      },
+      isPublished: true,
+    },
+    take: 4, // Limit to 4 related articles
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      category: true,
+      period: true,
+    },
+    orderBy: {
+      publishedAt: "desc",
+    },
+  });
+
+  return {
+    ...article,
+    relatedArticles,
+  };
 }
 
 export async function updateArticle(
