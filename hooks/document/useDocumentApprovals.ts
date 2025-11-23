@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ApprovalApi } from "use-cases/api/approval";
 import type { Approval } from "types/approval";
 import { StatusApproval } from "@/types/enums";
+import type { ApprovalType } from "@/types/enums";
 
 export function useDocumentApprovals() {
   const [approvals, setApprovals] = useState<Approval[]>([]);
@@ -31,7 +32,39 @@ export function useDocumentApprovals() {
       if (response.error) {
         setError(response.error);
       } else if (response.data) {
-        setApprovals(response.data.approvals);
+        type ApprovalWithRelations = Omit<
+          Approval,
+          "entityType" | "createdAt" | "updatedAt"
+        > & {
+          entityType: string;
+          createdAt: Date | string;
+          updatedAt: Date | string;
+          note: string | null | undefined;
+        };
+        const convertToApproval = (
+          approvalWithRelations: ApprovalWithRelations
+        ): Approval => {
+          const { note, ...rest } = approvalWithRelations;
+          return {
+            ...rest,
+            entityType: approvalWithRelations.entityType as ApprovalType,
+            createdAt:
+              approvalWithRelations.createdAt instanceof Date
+                ? approvalWithRelations.createdAt.toISOString()
+                : approvalWithRelations.createdAt,
+            updatedAt:
+              approvalWithRelations.updatedAt instanceof Date
+                ? approvalWithRelations.updatedAt.toISOString()
+                : approvalWithRelations.updatedAt,
+            note: note ?? undefined,
+          };
+        };
+        const convertedApprovals =
+          // Use a type assertion here to tell TypeScript to treat the approval items as ApprovalWithRelations
+          (response.data.approvals as unknown as ApprovalWithRelations[]).map(
+            convertToApproval
+          );
+        setApprovals(convertedApprovals);
         setTotalPages(response.data.pagination.pages);
       }
     } catch (_error) {

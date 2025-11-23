@@ -9,12 +9,9 @@ import type {
   UpdateDocumentInput,
 } from "@/types/document";
 import { DocumentType as DocumentTypeEnum, Status } from "@/types/enums";
-import { useFile } from "@/hooks/useFile";
-import { documentFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
-import type { User } from "@/types/user";
 import { useDocumentForm } from "@/hooks/document/useDocumentForm";
 
 interface DocumentFormProps {
