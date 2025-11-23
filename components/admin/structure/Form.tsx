@@ -8,6 +8,7 @@ import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
 } from "@/types/structure";
+import { Status } from "@/types/enums";
 
 import { useFile } from "@/hooks/useFile";
 import {
@@ -102,13 +103,20 @@ export default function StructureForm({
     error: fileError,
   } = useFile(accessToken);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    periodId: string;
+    decreeFile?: File;
+    structureImage?: File;
+    structure: string;
+    status: Status;
+  }>({
     name: structure?.name || "",
     periodId: structure?.period?.id || "",
-    decreeFile: undefined as File | undefined,
-    structureImage: undefined as File | undefined,
+    decreeFile: undefined,
+    structureImage: undefined,
     structure: structure?.structure || "",
-    status: structure?.status || "DRAFT",
+    status: structure?.status || Status.DRAFT,
   });
 
   const [isLoadingState, setIsLoadingState] = useState(false);
@@ -147,7 +155,11 @@ export default function StructureForm({
     >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "status" ? (value as Status) : value,
+    }));
 
     // Clear error when user starts typing
     if (errors[name]) {
