@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { getArticle } from "use-cases/api/article";
 import type { Article } from "types/article";
 import Image from "next/image";
@@ -26,32 +24,28 @@ function getPreviewUrl(image: string | null | undefined): string {
   }
 }
 
-export default function ArticleDetail({ params }: { params: { id: string } }) {
+interface ArticleDetailProps {
+  params: { id: string };
+}
+
+export default async function ArticleDetail({ params }: ArticleDetailProps) {
   const { id } = params;
-  const [article, setArticle] = useState<Article | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadArticle() {
-      try {
-        setLoading(true);
-        const articleData = await getArticle(id);
-        setArticle(articleData);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load article data"
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadArticle();
-  }, [id]);
+  let article: Article | null = null;
+  let error: string | null = null;
 
-  if (loading) return <div>Loading article details...</div>;
-  if (error) return <div>Error loading article: {error}</div>;
-  if (!article) return <div>No article found.</div>;
+  try {
+    article = await getArticle(id);
+  } catch (err) {
+    error = err instanceof Error ? err.message : "Failed to load article data";
+  }
+
+  if (error) {
+    return <div>Error loading article: {error}</div>;
+  }
+  if (!article) {
+    return <div>No article found.</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

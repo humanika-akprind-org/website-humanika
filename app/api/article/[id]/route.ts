@@ -12,10 +12,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Keep fetching user if needed for future enhancements, but do not require authentication
+    await getCurrentUser();
 
     const article = await getArticleById(params.id);
 
