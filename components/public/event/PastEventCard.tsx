@@ -1,11 +1,12 @@
 import Link from "next/link";
 
 interface PastEventCardProps {
+  id: string;
   title: string;
   date: Date | string;
 }
 
-export default function PastEventCard({ title, date }: PastEventCardProps) {
+export default function PastEventCard({ id, title, date }: PastEventCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <div className="h-40 bg-gray-200 flex items-center justify-center relative">
@@ -36,7 +37,7 @@ export default function PastEventCard({ title, date }: PastEventCardProps) {
             year: "numeric",
           })}
         </p>
-        <Link href="/gallery">
+        <Link href={`/gallery/${id}`}>
           <button className="w-full py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm font-medium">
             Lihat Dokumentasi
           </button>

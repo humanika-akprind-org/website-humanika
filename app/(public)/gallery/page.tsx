@@ -1,45 +1,77 @@
-import GalleryGrid from "@/components/public/gallery/GalleryGrid";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { getEvents } from "@/use-cases/api/event";
+import { getGalleries } from "@/use-cases/api/gallery";
+import type { Event } from "@/types/event";
+import type { Gallery } from "@/types/gallery";
+import { Status } from "@/types/enums";
 import AlbumGrid from "@/components/public/gallery/AlbumGrid";
+import GalleryGrid from "@/components/public/gallery/GalleryGrid";
 
 export default function GalleryPage() {
-  const albums = [
-    {
-      id: 1,
-      title: "Tech Conference 2023",
-      count: 24,
-      cover: "/placeholder-tech.jpg",
-    },
-    {
-      id: 2,
-      title: "Hackathon Nasional",
-      count: 48,
-      cover: "/placeholder-hackathon.jpg",
-    },
-    {
-      id: 3,
-      title: "Workshop Series",
-      count: 32,
-      cover: "/placeholder-workshop.jpg",
-    },
-    {
-      id: 4,
-      title: "Kunjungan Industri",
-      count: 18,
-      cover: "/placeholder-industri.jpg",
-    },
-    {
-      id: 5,
-      title: "Pelatihan Dasar",
-      count: 27,
-      cover: "/placeholder-training.jpg",
-    },
-    {
-      id: 6,
-      title: "Kegiatan Sosial",
-      count: 15,
-      cover: "/placeholder-social.jpg",
-    },
-  ];
+  // Helper function to get preview URL from image (file ID or URL)
+  function getPreviewUrl(image: string | null | undefined): string {
+    if (!image) return "";
+
+    if (image.includes("drive.google.com")) {
+      // It's a full Google Drive URL, convert to direct image URL
+      const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+      }
+      return image;
+    } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
+      // It's a Google Drive file ID, construct direct URL
+      return `https://drive.google.com/uc?export=view&id=${image}`;
+    } else {
+      // It's a direct URL or other format
+      return image;
+    }
+  }
+
+  const [events, setEvents] = useState<Event[]>([]);
+  const [galleries, setGalleries] = useState<Gallery[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        const [eventsData, galleriesData] = await Promise.all([
+          getEvents({ status: Status.PUBLISH }),
+          getGalleries(),
+        ]);
+        setEvents(eventsData);
+        setGalleries(galleriesData);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load gallery data"
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  if (loading) return <div>Loading galleries...</div>;
+  if (error) return <div>Error loading galleries: {error}</div>;
+
+  // Group galleries by eventId and count them
+  const galleryCounts = galleries.reduce((acc, gallery) => {
+    acc[gallery.eventId] = (acc[gallery.eventId] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const albums = events.map((event) => ({
+    id: event.id,
+    title: event.name,
+    count: galleryCounts[event.id] || 0,
+    cover: getPreviewUrl(event.thumbnail),
+    lastUpdated: event.updatedAt,
+  }));
 
   return (
     <div className="min-h-screen bg-gray-50">

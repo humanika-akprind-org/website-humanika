@@ -107,6 +107,7 @@ export default function EventPage() {
             {pastEvents.map((event) => (
               <PastEventCard
                 key={event.id}
+                id={event.id}
                 title={event.name}
                 date={event.endDate}
               />

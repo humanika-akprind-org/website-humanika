@@ -1,10 +1,11 @@
 import AlbumCard from "./AlbumCard";
 
 interface Album {
-  id: number;
+  id: string;
   title: string;
   count: number;
   cover?: string;
+  lastUpdated?: Date;
 }
 
 interface AlbumGridProps {
