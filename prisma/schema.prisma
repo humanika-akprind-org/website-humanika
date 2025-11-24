@@ -63,48 +63,6 @@ enum FinanceType {
   EXPENSE // Pengeluaran
 }
 
-// Enum untuk jenis dokumen yang dapat diunggah
-// PROPOSAL: Proposal kegiatan
-// LPJ: Laporan Pertanggungjawaban
-// BUDGET_PLAN: Rencana Anggaran Biaya
-// TIMELINE: Timeline kegiatan
-// WORKPLAN: Rencana Kerja
-// FINANCIAL_REPORT: Laporan Keuangan
-// ATTENDANCE_LIST: Daftar Hadir
-// ACTIVITY_REPORT: Laporan Kegiatan
-// EVALUATION_REPORT: Laporan Evaluasi
-// INVOICE: Faktur
-// RECEIPT: Kwitansi
-// OFFICIAL_LETTER: Surat Resmi
-// MEMORANDUM: Memorandum
-// POSTER: Poster
-// BROCHURE: Brosur
-// PRESENTATION: Presentasi
-// CERTIFICATE: Sertifikat
-// DECREE: Surat Keputusan
-// OTHER: Lainnya
-enum DocumentType {
-  PROPOSAL         // Proposal kegiatan
-  LPJ              // Laporan Pertanggungjawaban
-  BUDGET_PLAN      // Rencana Anggaran Biaya
-  TIMELINE         // Timeline kegiatan
-  WORKPLAN         // Rencana Kerja
-  FINANCIAL_REPORT // Laporan Keuangan
-  ATTENDANCE_LIST  // Daftar Hadir
-  ACTIVITY_REPORT  // Laporan Kegiatan
-  EVALUATION_REPORT // Laporan Evaluasi
-  INVOICE          // Faktur
-  RECEIPT          // Kwitansi
-  OFFICIAL_LETTER  // Surat Resmi
-  MEMORANDUM       // Memorandum
-  POSTER           // Poster
-  BROCHURE         // Brosur
-  PRESENTATION     // Presentasi
-  CERTIFICATE      // Sertifikat
-  DECREE           // Surat Keputusan
-  OTHER            // Lainnya
-}
-
 // Enum untuk status berbagai entitas dalam sistem
 // DRAFT: Draft, belum dipublikasikan
 // PENDING: Menunggu persetujuan atau proses
@@ -262,7 +220,7 @@ model WorkProgram {
 
   // Relations - Data yang terkait dengan program kerja
   period          Period           @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode program kerja
-  approvals       Approval[]       @relation("WorkProgramApprovals") // Persetujuan untuk program kerja
+  approval        Approval?        @relation("WorkProgramApprovals") // Persetujuan untuk program kerja
   events          Event[]          // Kegiatan yang termasuk dalam program kerja
   responsible     User             @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible") // Pengguna yang bertanggung jawab
 
@@ -295,8 +253,9 @@ model Event {
   // Relations - Data yang terkait dengan kegiatan
   period        Period          @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode kegiatan
   workProgram   WorkProgram?    @relation(fields: [workProgramId], references: [id], onDelete: SetNull) // Program kerja terkait
+  categories    EventCategory[] // Kategori kegiatan (many-to-many)
   documents     Document[]      // Dokumen yang terkait dengan kegiatan
-  approvals     Approval[]      @relation("EventApprovals") // Persetujuan untuk kegiatan
+  approval      Approval?       @relation("EventApprovals") // Persetujuan untuk kegiatan
   galleries     Gallery[]       // Galeri foto kegiatan
   finances      Finance[]       // Transaksi keuangan kegiatan
   letters       Letter[]        // Surat yang terkait dengan kegiatan
@@ -306,6 +265,18 @@ model Event {
   @@map("events")
 }
 
+model EventCategory {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    @unique
+  description String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  events Event[]
+
+  @@map("eventCategory")
+}
+
 // Model untuk dokumen
 // Menyimpan informasi tentang dokumen yang diunggah ke sistem
 model Document {
@@ -313,7 +284,7 @@ model Document {
   name      String         // Nama dokumen
   eventId   String?        @db.ObjectId // ID kegiatan terkait (opsional)
   letterId  String?        @db.ObjectId // ID surat terkait (opsional)
-  type      DocumentType   // Tipe dokumen
+  documentTypeId String    @db.ObjectId // ID tipe dokumen
   status    Status         @default(PENDING) // Status dokumen
   document   String?       // URL dokumen
   userId    String         @db.ObjectId // ID pengguna yang mengunggah
@@ -327,12 +298,25 @@ model Document {
   event           Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang mengunggah
   letter          Letter?   @relation(fields: [letterId], references: [id], onDelete: Cascade) // Surat terkait
+  documentType    DocumentType @relation(fields: [documentTypeId], references: [id], onDelete: Cascade) // Tipe dokumen
   previousVersion Document?  @relation("DocumentVersions", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Versi sebelumnya
   nextVersions    Document[] @relation("DocumentVersions") // Versi selanjutnya
-  approvals       Approval[] @relation("DocumentApprovals") // Persetujuan untuk dokumen
+  approval        Approval? @relation("DocumentApprovals") // Persetujuan untuk dokumen
 
-  @@index([type, status, userId])
+  @@index([documentTypeId, status, userId])
   @@map("documents")
+}
+
+model DocumentType {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  documents   Document[]
+
+  @@map("documentTypes")
 }
 
 // Model untuk galeri foto
@@ -348,9 +332,22 @@ model Gallery {
 
   // Relations - Data yang terkait dengan galeri
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
+  categories GalleryCategory[] // Kategori galeri (many-to-many)
 
   @@index([eventId])
   @@map("galleries")
+}
+
+model GalleryCategory {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    @unique
+  description String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  galleries Gallery[]
+
+  @@map("galleryCategory")
 }
 
 // Model untuk artikel
@@ -362,7 +359,6 @@ model Article {
   thumbnail    String? // URL gambar thumbnail
   content      String   // Isi artikel
   authorId     String     @db.ObjectId // ID penulis artikel
-  categoryId   String     @db.ObjectId // ID kategori artikel
   periodId     String?    @db.ObjectId // ID periode terkait (opsional)
   isPublished  Boolean  @default(false) // Status publikasi artikel
   publishedAt  DateTime? // Tanggal publikasi artikel
@@ -371,12 +367,12 @@ model Article {
   updatedAt    DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan artikel
-  author   User            @relation(fields: [authorId], references: [id], onDelete: Cascade) // Penulis artikel
-  category ArticleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori artikel
-  period   Period?         @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode terkait
+  author    User             @relation(fields: [authorId], references: [id], onDelete: Cascade) // Penulis artikel
+  categories ArticleCategory[] // Kategori artikel (many-to-many)
+  period    Period?          @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode terkait
   // approvals Approval[]     @relation("ArticleApprovals") // Persetujuan untuk artikel
 
-  @@index([isPublished, authorId, categoryId, status])
+  @@index([isPublished, authorId, status])
   @@map("articles")
 }
 model ArticleCategory {
@@ -401,8 +397,8 @@ model FinanceCategory {
   createdAt   DateTime    @default(now()) // Waktu pembuatan kategori
   updatedAt   DateTime    @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan kategori keuangan
-  finances Finance[] // Transaksi keuangan yang termasuk dalam kategori ini
+  // Relations - Data yang terkait dengan kategori keuangan (many-to-many)
+  financeCategory FinanceCategory[] // Relasi many-to-many dengan Finance
 
   // @@index([type, isActive])
   @@map("financeCategory")
@@ -414,7 +410,6 @@ model Finance {
   amount      Float    // Jumlah nominal transaksi
   description String   // Deskripsi transaksi
   date        DateTime // Tanggal transaksi
-  categoryId  String     @db.ObjectId
   type        FinanceType // Tipe transaksi (pemasukan/pengeluaran)
   periodId    String     @db.ObjectId
   eventId     String?    @db.ObjectId
@@ -425,13 +420,13 @@ model Finance {
   updatedAt   DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan transaksi keuangan
-  category FinanceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori transaksi
+  financeCategory FinanceCategory[] // Relasi many-to-many dengan FinanceCategory
   period   Period          @relation(fields: [periodId], references: [id], onDelete: Cascade)   // Periode transaksi
   event    Event?          @relation(fields: [eventId], references: [id], onDelete: SetNull)    // Kegiatan terkait (opsional)
   user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)     // Pengguna yang membuat transaksi
-  approvals Approval[]     @relation("FinanceApprovals") // Persetujuan untuk transaksi
+  approval Approval?       @relation("FinanceApprovals") // Persetujuan untuk transaksi
 
-  @@index([date, type, categoryId, status, periodId])
+  @@index([date, type, status, periodId])
   @@map("finances")
 }
 
@@ -632,6 +627,7 @@ model Approval {
   document             Document?             @relation("DocumentApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan dokumen
   letter               Letter?               @relation("LetterApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan surat
 
+  @@unique([entityType, entityId])
   @@index([entityType, entityId, userId, status])
   @@map("approvals")
 }
