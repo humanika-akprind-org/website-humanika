@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Download } from "lucide-react";
 import { useState } from "react";
 import {
   Dialog,
@@ -9,11 +9,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import type { Gallery } from "@/types/gallery";
 
 export default function GalleryCard({ gallery }: { gallery: Gallery }) {
   const [imageError, setImageError] = useState(false);
   const [modalImageError, setModalImageError] = useState(false);
+
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = `/api/drive-image?fileId=${gallery.image}`;
+    link.download = `${gallery.title
+      .replace(/[^a-z0-9]/gi, "_")
+      .toLowerCase()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <Dialog>
@@ -64,10 +76,21 @@ export default function GalleryCard({ gallery }: { gallery: Gallery }) {
               />
             )}
           </div>
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">
-              <strong>Event:</strong> {gallery.event?.name || "N/A"}
-            </p>
+          <div className="flex justify-between items-center">
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">
+                <strong>Event:</strong> {gallery.event?.name || "N/A"}
+              </p>
+            </div>
+            <Button
+              onClick={handleDownload}
+              disabled={modalImageError}
+              variant="outline"
+              size="sm"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download
+            </Button>
           </div>
         </div>
       </DialogContent>

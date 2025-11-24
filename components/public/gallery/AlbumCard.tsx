@@ -26,17 +26,15 @@ export default function AlbumCard({ album }: AlbumCardProps) {
   return (
     <Link href={`/gallery/${album.id}`}>
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-        <div className="aspect-video bg-gray-200 relative group flex items-center justify-center">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-            <h3 className="text-white font-medium">{album.title}</h3>
-          </div>
+        <div className="aspect-video bg-gray-200 relative group flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10" />
           {album.cover ? (
             <Image
               src={album.cover}
               alt={album.title}
               fill
               style={{ objectFit: "cover" }}
-              className="group-hover:scale-105 transition-transform"
+              className="group-hover:scale-105 transition-transform z-0"
             />
           ) : (
             <svg
