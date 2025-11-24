@@ -566,7 +566,7 @@ model Letter {
   period       Period?        @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode surat
   event        Event?         @relation(fields: [eventId], references: [id], onDelete: SetNull) // Kegiatan terkait
   attachments  Document[] // Dokumen lampiran surat
-  approvals    Approval[]     @relation("LetterApprovals") // Persetujuan surat
+  approval     Approval?      @relation("LetterApproval") // Persetujuan surat (one-to-one)
 
   @@index([type, priority, status, createdById, periodId])
   @@map("letters")
@@ -625,7 +625,7 @@ model Approval {
   event                Event?                @relation("EventApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan kegiatan
   finance              Finance?              @relation("FinanceApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan transaksi keuangan
   document             Document?             @relation("DocumentApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan dokumen
-  letter               Letter?               @relation("LetterApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan surat
+  letter               Letter?               @relation("LetterApproval", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan surat
 
   @@unique([entityType, entityId])
   @@index([entityType, entityId, userId, status])
