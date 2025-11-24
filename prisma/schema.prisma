@@ -179,11 +179,11 @@ model User {
 
   // Relations - Data yang terkait dengan pengguna
   activityLogs     ActivityLog[]  // Log aktivitas pengguna
-  linkHubs         LinkHub[]      // Link hubs yang dibuat pengguna
+  // linkHubs         LinkHub[]      // Link hubs yang dibuat pengguna
   approvals        Approval[]     // Persetujuan yang diberikan pengguna
   managements      Management[]   // Jabatan manajemen pengguna
-  linkHubThemes    LinkHubTheme[] // Tema link hub yang dibuat pengguna
-  shortLinks       ShortLink[]    // Short links yang dibuat pengguna
+  // linkHubThemes    LinkHubTheme[] // Tema link hub yang dibuat pengguna
+  // shortLinks       ShortLink[]    // Short links yang dibuat pengguna
   articles         Article[]      // Artikel yang ditulis pengguna
   finances         Finance[]      // Transaksi keuangan yang dibuat pengguna
   documents        Document[]     // Dokumen yang diunggah pengguna
@@ -382,6 +382,7 @@ model Article {
 model ArticleCategory {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId // ID unik kategori artikel (auto-generated)
   name      String    @unique // Nama kategori artikel (harus unik)
+  description String?     // Deskripsi kategori Article
   createdAt DateTime  @default(now()) // Waktu pembuatan kategori
   updatedAt DateTime  @updatedAt // Waktu terakhir update
 
@@ -396,14 +397,14 @@ model FinanceCategory {
   name        String      @unique // Nama kategori keuangan (harus unik)
   description String?     // Deskripsi kategori keuangan
   type        FinanceType // Tipe kategori (pemasukan/pengeluaran)
-  isActive    Boolean     @default(true) // Status aktif kategori
+  // isActive    Boolean     @default(true) // Status aktif kategori
   createdAt   DateTime    @default(now()) // Waktu pembuatan kategori
   updatedAt   DateTime    @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan kategori keuangan
   finances Finance[] // Transaksi keuangan yang termasuk dalam kategori ini
 
-  @@index([type, isActive])
+  // @@index([type, isActive])
   @@map("financeCategory")
 }
 
@@ -469,80 +470,80 @@ model DepartmentTask {
   @@map("departmentTasks")
 }
 
-model LinkHub {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik link hub (auto-generated)
-  userId    String     @db.ObjectId // ID pengguna pemilik link hub
-  username  String?    // Username pengguna (opsional)
-  themeId   String?    @db.ObjectId // ID tema link hub (opsional)
-  status    Status   @default(PENDING) // Status link hub
-  createdAt DateTime @default(now()) // Waktu pembuatan link hub
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+// model LinkHub {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik link hub (auto-generated)
+//   userId    String     @db.ObjectId // ID pengguna pemilik link hub
+//   username  String?    // Username pengguna (opsional)
+//   themeId   String?    @db.ObjectId // ID tema link hub (opsional)
+//   status    Status   @default(PENDING) // Status link hub
+//   createdAt DateTime @default(now()) // Waktu pembuatan link hub
+//   updatedAt DateTime @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan link hub
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade) // Pemilik link hub
-  theme     LinkHubTheme? @relation(fields: [themeId], references: [id], onDelete: SetNull) // Tema link hub
-  details   LinkHubDetail[] // Detail link dalam hub
-  // approvals Approval[]   @relation("LinkHubApprovals") // Persetujuan link hub
+//   // Relations - Data yang terkait dengan link hub
+//   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade) // Pemilik link hub
+//   theme     LinkHubTheme? @relation(fields: [themeId], references: [id], onDelete: SetNull) // Tema link hub
+//   details   LinkHubDetail[] // Detail link dalam hub
+//   // approvals Approval[]   @relation("LinkHubApprovals") // Persetujuan link hub
 
-  @@index([userId, status])
-  @@map("linkHubs")
-}
+//   @@index([userId, status])
+//   @@map("linkHubs")
+// }
 
-model LinkHubDetail {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik detail link hub (auto-generated)
-  linkHubId String     @db.ObjectId // ID link hub induk
-  title     String     // Judul link
-  shortLink String?    // Short link (opsional)
-  url       String     // URL asli link
-  thumbnail String?    // URL gambar thumbnail
-  status    Status   @default(PENDING) // Status detail link
-  createdAt DateTime @default(now()) // Waktu pembuatan detail link
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+// model LinkHubDetail {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik detail link hub (auto-generated)
+//   linkHubId String     @db.ObjectId // ID link hub induk
+//   title     String     // Judul link
+//   shortLink String?    // Short link (opsional)
+//   url       String     // URL asli link
+//   thumbnail String?    // URL gambar thumbnail
+//   status    Status   @default(PENDING) // Status detail link
+//   createdAt DateTime @default(now()) // Waktu pembuatan detail link
+//   updatedAt DateTime @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan detail link hub
-  linkHub   LinkHub @relation(fields: [linkHubId], references: [id], onDelete: Cascade) // Link hub induk
-  // approvals Approval[] @relation("LinkHubDetailApprovals") // Persetujuan detail link
+//   // Relations - Data yang terkait dengan detail link hub
+//   linkHub   LinkHub @relation(fields: [linkHubId], references: [id], onDelete: Cascade) // Link hub induk
+//   // approvals Approval[] @relation("LinkHubDetailApprovals") // Persetujuan detail link
 
-  @@index([linkHubId, status])
-  @@map("linkHubDetails")
-}
+//   @@index([linkHubId, status])
+//   @@map("linkHubDetails")
+// }
 
-model LinkHubTheme {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik tema link hub (auto-generated)
-  name      String   // Nama tema
-  userId    String     @db.ObjectId // ID pengguna pembuat tema
-  data      String?  // Data konfigurasi tema (opsional)
-  isActive  Boolean  @default(false) // Status aktif tema
-  status    Status   @default(PENDING) // Status tema
-  createdAt DateTime @default(now()) // Waktu pembuatan tema
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+// model LinkHubTheme {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik tema link hub (auto-generated)
+//   name      String   // Nama tema
+//   userId    String     @db.ObjectId // ID pengguna pembuat tema
+//   data      String?  // Data konfigurasi tema (opsional)
+//   isActive  Boolean  @default(false) // Status aktif tema
+//   status    Status   @default(PENDING) // Status tema
+//   createdAt DateTime @default(now()) // Waktu pembuatan tema
+//   updatedAt DateTime @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan tema link hub
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat tema
-  linkHubs LinkHub[] // Link hubs yang menggunakan tema ini
-  // approvals Approval[] @relation("LinkHubThemeApprovals") // Persetujuan tema
+//   // Relations - Data yang terkait dengan tema link hub
+//   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat tema
+//   linkHubs LinkHub[] // Link hubs yang menggunakan tema ini
+//   // approvals Approval[] @relation("LinkHubThemeApprovals") // Persetujuan tema
 
-  @@index([isActive, userId, status])
-  @@map("linkHubThemes")
-}
+//   @@index([isActive, userId, status])
+//   @@map("linkHubThemes")
+// }
 
-model ShortLink {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik short link (auto-generated)
-  title     String   // Judul short link
-  shortName String   @unique // Nama pendek unik untuk short link
-  url       String   // URL asli yang akan di-shortlink
-  userId    String     @db.ObjectId // ID pengguna pembuat short link
-  status    Status   @default(PENDING) // Status short link
-  createdAt DateTime @default(now()) // Waktu pembuatan short link
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+// model ShortLink {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik short link (auto-generated)
+//   title     String   // Judul short link
+//   shortName String   @unique // Nama pendek unik untuk short link
+//   url       String   // URL asli yang akan di-shortlink
+//   userId    String     @db.ObjectId // ID pengguna pembuat short link
+//   status    Status   @default(PENDING) // Status short link
+//   createdAt DateTime @default(now()) // Waktu pembuatan short link
+//   updatedAt DateTime @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan short link
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat short link
-  // approvals Approval[] @relation("ShortLinkApprovals") // Persetujuan short link
+//   // Relations - Data yang terkait dengan short link
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat short link
+//   // approvals Approval[] @relation("ShortLinkApprovals") // Persetujuan short link
 
-  @@index([userId, status])
-  @@map("shortLinks")
-}
+//   @@index([userId, status])
+//   @@map("shortLinks")
+// }
 
 model Letter {
   id           String         @id @default(auto()) @map("_id") @db.ObjectId // ID unik surat (auto-generated)

@@ -121,41 +121,6 @@ export default function ArticlePage() {
             </div>
           )}
         </section>
-
-        {/* Popular Tags */}
-        <section className="mt-16">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
-            Populer Tags
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            {[
-              "Teknologi",
-              "AI",
-              "Workshop",
-              "Karir",
-              "Hackathon",
-              "Blockchain",
-              "Web Development",
-              "Data Science",
-              "Mobile",
-              "Cloud Computing",
-            ].map((tag, index) => (
-              <a
-                key={index}
-                href="#"
-                className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  index % 3 === 0
-                    ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
-                    : index % 3 === 1
-                    ? "bg-red-100 text-red-800 hover:bg-red-200"
-                    : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                }`}
-              >
-                #{tag}
-              </a>
-            ))}
-          </div>
-        </section>
       </main>
     </div>
   );
