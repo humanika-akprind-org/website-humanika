@@ -43,7 +43,7 @@ export const getWorkPrograms = async (filter: {
           department: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -74,7 +74,7 @@ export const getWorkProgram = async (id: string) => {
           department: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -122,7 +122,7 @@ export const createWorkProgram = async (
           department: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -161,7 +161,7 @@ export const createWorkProgram = async (
 
   // Handle status change to PENDING - create approval record
   if (data.status === "PENDING") {
-    await prisma.approval.create({
+    const approval = await prisma.approval.create({
       data: {
         entityType: "WORK_PROGRAM",
         entityId: workProgram.id,
@@ -169,7 +169,26 @@ export const createWorkProgram = async (
         status: "PENDING",
         note: "Work program submitted for approval",
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
+
+    // Update the work program with the approval ID
+    await prisma.workProgram.update({
+      where: { id: workProgram.id },
+      data: { approvalId: approval.id },
+    });
+
+    // Add the approval to the returned work program
+    workProgram.approvalId = approval.id;
+    workProgram.approval = approval;
   }
 
   return workProgram;
@@ -182,25 +201,86 @@ export const updateWorkProgram = async (
 ) => {
   const existingWorkProgram = await prisma.workProgram.findUnique({
     where: { id },
+    include: { approval: true },
   });
 
   if (!existingWorkProgram) {
     throw new Error("Work program not found");
   }
 
-  const updateData = { ...data } as Prisma.WorkProgramUpdateInput;
+  const updateData: Prisma.WorkProgramUpdateInput = { ...data };
+
+  // Check if there are changes to the work program (excluding status)
+  const hasChanges =
+    (data.name !== undefined && data.name !== existingWorkProgram.name) ||
+    (data.department !== undefined &&
+      data.department !== existingWorkProgram.department) ||
+    (data.schedule !== undefined &&
+      data.schedule !== existingWorkProgram.schedule) ||
+    (data.funds !== undefined && data.funds !== existingWorkProgram.funds) ||
+    (data.usedFunds !== undefined &&
+      data.usedFunds !== existingWorkProgram.usedFunds) ||
+    (data.goal !== undefined && data.goal !== existingWorkProgram.goal) ||
+    (data.periodId !== undefined &&
+      data.periodId !== existingWorkProgram.periodId) ||
+    (data.responsibleId !== undefined &&
+      data.responsibleId !== existingWorkProgram.responsibleId);
+
+  // If there are changes and the work program has an existing approval that is APPROVED or REJECTED,
+  // reset the approval to PENDING
+  if (
+    hasChanges &&
+    existingWorkProgram.approval &&
+    (existingWorkProgram.approval.status === "APPROVED" ||
+      existingWorkProgram.approval.status === "REJECTED")
+  ) {
+    await prisma.approval.update({
+      where: { id: existingWorkProgram.approval.id },
+      data: {
+        status: "PENDING",
+        note: "Work program updated and resubmitted for approval",
+      },
+    });
+    // Also update the work program status to PENDING
+    updateData.status = "PENDING";
+  }
 
   // Handle status change to PENDING - create approval record
   if (data.status === "PENDING") {
-    await prisma.approval.create({
-      data: {
-        entityType: "WORK_PROGRAM",
-        entityId: id,
-        userId: user.id,
-        status: "PENDING",
-        note: "Work program submitted for approval",
-      },
-    });
+    // If there's already an approval, update it; otherwise create new
+    if (existingWorkProgram.approval) {
+      await prisma.approval.update({
+        where: { id: existingWorkProgram.approval.id },
+        data: {
+          status: "PENDING",
+          note: "Work program submitted for approval",
+        },
+      });
+    } else {
+      const approval = await prisma.approval.create({
+        data: {
+          entityType: "WORK_PROGRAM",
+          entityId: id,
+          userId: user.id,
+          status: "PENDING",
+          note: "Work program submitted for approval",
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      // Update the work program with the approval ID
+      (
+        updateData as Prisma.WorkProgramUpdateInput & { approvalId?: string }
+      ).approvalId = approval.id;
+    }
   }
 
   // Calculate remaining funds if funds or usedFunds is updated
@@ -216,7 +296,7 @@ export const updateWorkProgram = async (
 
   const workProgram = await prisma.workProgram.update({
     where: { id },
-    data: updateData,
+    data: updateData as Prisma.WorkProgramUpdateInput,
     include: {
       period: true,
       responsible: {
@@ -227,7 +307,7 @@ export const updateWorkProgram = async (
           department: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {

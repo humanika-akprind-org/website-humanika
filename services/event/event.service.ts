@@ -54,7 +54,8 @@ export const getEvents = async (filter: {
           name: true,
         },
       },
-      approvals: {
+      category: true,
+      approval: {
         include: {
           user: {
             select: {
@@ -65,6 +66,10 @@ export const getEvents = async (filter: {
           },
         },
       },
+      galleries: true,
+      finances: true,
+      letters: true,
+      documents: true,
     },
     orderBy: { startDate: "desc" },
   });
@@ -91,7 +96,8 @@ export const getEvent = async (id: string) => {
           name: true,
         },
       },
-      approvals: {
+      category: true,
+      approval: {
         include: {
           user: {
             select: {
@@ -102,6 +108,10 @@ export const getEvent = async (id: string) => {
           },
         },
       },
+      galleries: true,
+      finances: true,
+      letters: true,
+      documents: true,
     },
   });
 
@@ -138,6 +148,11 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
     eventData.workProgram = { connect: { id: data.workProgramId } };
   }
 
+  // Only include categoryId if it's provided and not empty
+  if (data.categoryId && data.categoryId.trim() !== "") {
+    eventData.category = { connect: { id: data.categoryId } };
+  }
+
   const event = await prisma.event.create({
     data: eventData,
     include: {
@@ -156,7 +171,8 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
           name: true,
         },
       },
-      approvals: {
+      category: true,
+      approval: {
         include: {
           user: {
             select: {
@@ -167,6 +183,10 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
           },
         },
       },
+      galleries: true,
+      finances: true,
+      letters: true,
+      documents: true,
     },
   });
 
@@ -268,7 +288,8 @@ export const updateEvent = async (
           name: true,
         },
       },
-      approvals: {
+      category: true,
+      approval: {
         include: {
           user: {
             select: {
@@ -279,6 +300,10 @@ export const updateEvent = async (
           },
         },
       },
+      galleries: true,
+      finances: true,
+      letters: true,
+      documents: true,
     },
   });
 

@@ -423,36 +423,27 @@ export default function WorkProgramTable({
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      {program.approvals && program.approvals.length > 0 ? (
-                        (() => {
-                          const latestApproval = program.approvals.sort(
-                            (a, b) =>
-                              new Date(b.updatedAt).getTime() -
-                              new Date(a.updatedAt).getTime()
-                          )[0];
-                          return (
-                            <span
-                              className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${
-                                latestApproval.status === "APPROVED"
-                                  ? "bg-green-100 text-green-800"
-                                  : latestApproval.status === "REJECTED"
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-yellow-100 text-yellow-800"
-                              }`}
-                            >
-                              {latestApproval.status === "APPROVED" && (
-                                <FiCheckCircle className="mr-1" />
-                              )}
-                              {latestApproval.status === "REJECTED" && (
-                                <FiXCircle className="mr-1" />
-                              )}
-                              {latestApproval.status === "PENDING" && (
-                                <FiClock className="mr-1" />
-                              )}
-                              {latestApproval.status}
-                            </span>
-                          );
-                        })()
+                      {program.approval ? (
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${
+                            program.approval.status === "APPROVED"
+                              ? "bg-green-100 text-green-800"
+                              : program.approval.status === "REJECTED"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {program.approval.status === "APPROVED" && (
+                            <FiCheckCircle className="mr-1" />
+                          )}
+                          {program.approval.status === "REJECTED" && (
+                            <FiXCircle className="mr-1" />
+                          )}
+                          {program.approval.status === "PENDING" && (
+                            <FiClock className="mr-1" />
+                          )}
+                          {program.approval.status}
+                        </span>
                       ) : (
                         <span className="text-xs text-gray-400">
                           No approvals

@@ -120,6 +120,7 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
       event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.category?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.responsible?.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
@@ -268,6 +269,12 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                  Category
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Status
                 </th>
                 <th
@@ -361,6 +368,9 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                       {event.department || "No department"}
                     </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {event.category?.name || "No category"}
+                    </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusColor(
@@ -371,13 +381,9 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      {event.approvals && event.approvals.length > 0 ? (
+                      {event.approval ? (
                         (() => {
-                          const latestApproval = event.approvals.sort(
-                            (a, b) =>
-                              new Date(b.updatedAt).getTime() -
-                              new Date(a.updatedAt).getTime()
-                          )[0];
+                          const latestApproval = event.approval;
                           return (
                             <span
                               className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${
@@ -403,7 +409,7 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                         })()
                       ) : (
                         <span className="text-xs text-gray-400">
-                          No approvals
+                          No approval
                         </span>
                       )}
                     </td>
@@ -466,7 +472,7 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={11} className="px-6 py-12 text-center">
+                  <td colSpan={12} className="px-6 py-12 text-center">
                     <FiCalendar className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-4 text-sm font-medium text-gray-900">
                       No events found

@@ -32,7 +32,7 @@ export interface WorkProgram {
     updatedAt: Date;
     avatarColor: string;
   };
-  approvals?: Approval[];
+  approval?: Approval;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -53,6 +53,7 @@ export interface UpdateWorkProgramInput
   extends Partial<CreateWorkProgramInput> {
   status?: Status;
   usedFunds?: number;
+  approvalId?: string;
 }
 
 export interface WorkProgramFilter {

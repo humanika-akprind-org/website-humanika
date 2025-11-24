@@ -39,7 +39,14 @@ export interface Event {
   status: Status;
   workProgramId?: string | null;
   workProgram?: WorkProgram | null;
-  approvals?: Approval[];
+  categoryId?: string | null;
+  category?: EventCategory | null;
+  approvalId?: string | null;
+  approval?: Approval | null;
+  galleries: Gallery[];
+  finances: Finance[];
+  letters: Letter[];
+  documents: Document[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,6 +63,7 @@ export interface CreateEventInput {
   endDate: Date;
   funds: number;
   workProgramId?: string;
+  categoryId?: string;
 }
 
 export interface UpdateEventInput extends Partial<CreateEventInput> {
