@@ -61,7 +61,7 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
             </p>
             <div className="flex justify-center">
               <a
-                href="/auth/login"
+                href="/auth/admin/login"
                 className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 Go to Login
