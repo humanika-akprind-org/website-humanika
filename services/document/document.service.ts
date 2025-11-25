@@ -3,10 +3,7 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/types/document";
-import { Status } from "@/types/enums";
-import type { DocumentType } from "@/types/enums";
-import { ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/enums";
+import type { Status } from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
@@ -15,7 +12,7 @@ import type { User } from "@/types/user";
 type UserWithId = Pick<User, "id">;
 
 export const getDocuments = async (filter: {
-  type?: DocumentType;
+  documentTypeId?: string;
   status?: Status;
   userId?: string;
   eventId?: string;
@@ -24,8 +21,8 @@ export const getDocuments = async (filter: {
 }) => {
   const where: Prisma.DocumentWhereInput = {};
 
-  if (filter.type) {
-    where.documentTypeId = filter.type;
+  if (filter.documentTypeId) {
+    where.documentTypeId = filter.documentTypeId;
   }
   if (filter.status) {
     where.status = { equals: filter.status as unknown as PrismaStatus };
@@ -60,7 +57,7 @@ export const getDocuments = async (filter: {
           regarding: true,
         },
       },
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -105,7 +102,7 @@ export const getDocument = async (id: string) => {
           regarding: true,
         },
       },
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -130,7 +127,7 @@ export const createDocument = async (
 ) => {
   const documentData: Prisma.DocumentCreateInput = {
     name: data.name,
-    documentType: { connect: { id: data.type } },
+    documentType: { connect: { id: data.documentTypeId } },
     status: (data.status as unknown as PrismaStatus) || "DRAFT",
     document: data.document,
     user: { connect: { id: user.id } },
@@ -167,7 +164,7 @@ export const createDocument = async (
           regarding: true,
         },
       },
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -185,36 +182,15 @@ export const createDocument = async (
   });
 
   // Always create approval record with PENDING status
-  const approval = await prisma.approval.create({
+  await prisma.approval.create({
     data: {
-      entityType: ApprovalType.DOCUMENT,
+      entityType: "DOCUMENT",
       entityId: document.id,
       userId: user.id,
-      status: StatusApproval.PENDING,
+      status: "PENDING",
       note: "Document created and pending approval",
     },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          department: true,
-        },
-      },
-    },
   });
-
-  // Update the document with the approval ID
-  await prisma.document.update({
-    where: { id: document.id },
-    data: { approvalId: approval.id },
-  });
-
-  // Add the approval to the returned document
-  document.approvalId = approval.id;
-  document.approval = approval;
 
   // Log activity
   await logActivity({
@@ -245,7 +221,7 @@ export const updateDocument = async (
   // Check if document exists with approval
   const existingDocument = await prisma.document.findUnique({
     where: { id },
-    include: { approval: true },
+    include: { approvals: true },
   });
 
   if (!existingDocument) {
@@ -258,69 +234,52 @@ export const updateDocument = async (
     (data.eventId !== undefined && data.eventId !== existingDocument.eventId) ||
     (data.letterId !== undefined &&
       data.letterId !== existingDocument.letterId) ||
-    (data.type !== undefined &&
-      data.type !== existingDocument.documentTypeId) ||
+    (data.documentTypeId !== undefined &&
+      data.documentTypeId !== existingDocument.documentTypeId) ||
     (data.document !== undefined &&
       data.document !== existingDocument.document);
+
+  const updateData: Record<string, unknown> = {};
 
   // If there are changes and the document has an existing approval that is APPROVED or REJECTED,
   // reset the approval to PENDING
   if (
     hasChanges &&
-    existingDocument.approval &&
-    (existingDocument.approval.status === "APPROVED" ||
-      existingDocument.approval.status === "REJECTED")
+    existingDocument.approvals &&
+    existingDocument.approvals.length > 0 &&
+    (existingDocument.approvals[0].status === "APPROVED" ||
+      existingDocument.approvals[0].status === "REJECTED")
   ) {
     await prisma.approval.update({
-      where: { id: existingDocument.approval.id },
+      where: { id: existingDocument.approvals[0].id },
       data: {
         status: "PENDING",
         note: "Document updated and resubmitted for approval",
       },
     });
     // Also update the document status to PENDING
-    data.status = Status.PENDING;
+    updateData.status = "PENDING";
   }
-
-  const updateData: Record<string, unknown> = {};
 
   if (data.name !== undefined) updateData.name = data.name;
   if (data.eventId !== undefined) updateData.eventId = data.eventId;
   if (data.letterId !== undefined) updateData.letterId = data.letterId;
-  if (data.type) updateData.type = data.type;
+  if (data.documentTypeId) updateData.documentTypeId = data.documentTypeId;
   if (data.document !== undefined) updateData.document = data.document;
   if (data.status) updateData.status = data.status;
 
   // Handle status change to PENDING - create approval record
   if (data.status === "PENDING") {
-    // Check if approval already exists for this document
-    const existingApproval = await prisma.approval.findFirst({
-      where: {
+    // Create approval record for the document
+    await prisma.approval.create({
+      data: {
         entityType: "DOCUMENT",
         entityId: id,
+        userId: user.id, // Current user submitting for approval
+        status: "PENDING",
+        note: "Document submitted for approval",
       },
     });
-
-    if (!existingApproval) {
-      // Create approval record for the document if it doesn't exist
-      await prisma.approval.create({
-        data: {
-          entityType: "DOCUMENT",
-          entityId: id,
-          userId: user.id,
-          status: "PENDING",
-          note: "Document submitted for approval",
-        },
-      });
-    } else {
-      // Update existing approval status to PENDING
-      await prisma.approval.update({
-        where: { id: existingApproval.id },
-        data: {
-          status: "PENDING",
-        },
-      });
-    }
   }
 
   const document = await prisma.document.update({
@@ -347,7 +306,7 @@ export const updateDocument = async (
           regarding: true,
         },
       },
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {

@@ -1,15 +1,16 @@
-import { DocumentType, Status } from "./enums";
+import { Status } from "./enums";
 import { User } from "./user";
 import { Event } from "./event";
 import { Letter } from "./letter";
 import { Approval } from "./approval";
+import { DocumentType } from "./document-type";
 
 export interface Document {
   id: string;
   name: string;
   eventId?: string | null;
   letterId?: string | null;
-  type: DocumentType;
+  documentTypeId: string;
   status: Status;
   document?: string | null;
   userId: string;
@@ -21,6 +22,7 @@ export interface Document {
   updatedAt: Date;
   event?: Event | null;
   letter?: Letter | null;
+  documentType?: DocumentType | null;
   previousVersion?: Document | null;
   nextVersions: Document[];
   approvals: Approval[];
@@ -30,7 +32,7 @@ export interface CreateDocumentInput {
   name: string;
   eventId?: string;
   letterId?: string;
-  type: DocumentType;
+  documentTypeId: string;
   status?: Status;
   document?: string | null;
 }

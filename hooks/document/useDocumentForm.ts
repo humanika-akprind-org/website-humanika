@@ -36,7 +36,7 @@ export function useDocumentForm({
 
   const [formData, setFormData] = useState({
     name: document?.name || "",
-    type: document?.type || DocumentTypeEnum.OTHER,
+    documentTypeId: document?.documentTypeId || "",
     status: document?.status || Status.DRAFT,
     eventId: document?.eventId || "",
     letterId: document?.letterId || "",
