@@ -3,14 +3,11 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/types/document";
-import type { Status, DocumentType } from "@/types/enums";
+import { Status } from "@/types/enums";
+import type { DocumentType } from "@/types/enums";
 import { ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/enums";
-import type {
-  Prisma,
-  Status as PrismaStatus,
-  DocumentType as PrismaDocumentType,
-} from "@prisma/client";
+import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
@@ -28,7 +25,7 @@ export const getDocuments = async (filter: {
   const where: Prisma.DocumentWhereInput = {};
 
   if (filter.type) {
-    where.type = { equals: filter.type as unknown as PrismaDocumentType };
+    where.documentTypeId = filter.type;
   }
   if (filter.status) {
     where.status = { equals: filter.status as unknown as PrismaStatus };
@@ -63,7 +60,7 @@ export const getDocuments = async (filter: {
           regarding: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -75,8 +72,8 @@ export const getDocuments = async (filter: {
             },
           },
         },
-        orderBy: { updatedAt: "desc" },
       },
+      documentType: true,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -108,7 +105,7 @@ export const getDocument = async (id: string) => {
           regarding: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -133,7 +130,7 @@ export const createDocument = async (
 ) => {
   const documentData: Prisma.DocumentCreateInput = {
     name: data.name,
-    type: data.type as unknown as PrismaDocumentType,
+    documentType: { connect: { id: data.type } },
     status: (data.status as unknown as PrismaStatus) || "DRAFT",
     document: data.document,
     user: { connect: { id: user.id } },
@@ -170,7 +167,7 @@ export const createDocument = async (
           regarding: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -183,21 +180,41 @@ export const createDocument = async (
           },
         },
       },
+      documentType: true,
     },
   });
 
-  // Create initial approval request for the document if status is PENDING
-  if (data.status === "PENDING") {
-    await prisma.approval.create({
-      data: {
-        entityType: ApprovalType.DOCUMENT,
-        entityId: document.id,
-        userId: user.id,
-        status: StatusApproval.PENDING,
-        note: "Document submitted for approval",
+  // Always create approval record with PENDING status
+  const approval = await prisma.approval.create({
+    data: {
+      entityType: ApprovalType.DOCUMENT,
+      entityId: document.id,
+      userId: user.id,
+      status: StatusApproval.PENDING,
+      note: "Document created and pending approval",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          department: true,
+        },
       },
-    });
-  }
+    },
+  });
+
+  // Update the document with the approval ID
+  await prisma.document.update({
+    where: { id: document.id },
+    data: { approvalId: approval.id },
+  });
+
+  // Add the approval to the returned document
+  document.approvalId = approval.id;
+  document.approval = approval;
 
   // Log activity
   await logActivity({
@@ -209,7 +226,7 @@ export const createDocument = async (
     metadata: {
       newData: {
         name: document.name,
-        type: document.type,
+        documentTypeId: document.documentTypeId,
         status: document.status,
         eventId: document.eventId,
         letterId: document.letterId,
@@ -225,13 +242,44 @@ export const updateDocument = async (
   data: UpdateDocumentInput,
   user: UserWithId
 ) => {
-  // Check if document exists
+  // Check if document exists with approval
   const existingDocument = await prisma.document.findUnique({
     where: { id },
+    include: { approval: true },
   });
 
   if (!existingDocument) {
     throw new Error("Document not found");
+  }
+
+  // Check if there are changes to the document (excluding status)
+  const hasChanges =
+    (data.name !== undefined && data.name !== existingDocument.name) ||
+    (data.eventId !== undefined && data.eventId !== existingDocument.eventId) ||
+    (data.letterId !== undefined &&
+      data.letterId !== existingDocument.letterId) ||
+    (data.type !== undefined &&
+      data.type !== existingDocument.documentTypeId) ||
+    (data.document !== undefined &&
+      data.document !== existingDocument.document);
+
+  // If there are changes and the document has an existing approval that is APPROVED or REJECTED,
+  // reset the approval to PENDING
+  if (
+    hasChanges &&
+    existingDocument.approval &&
+    (existingDocument.approval.status === "APPROVED" ||
+      existingDocument.approval.status === "REJECTED")
+  ) {
+    await prisma.approval.update({
+      where: { id: existingDocument.approval.id },
+      data: {
+        status: "PENDING",
+        note: "Document updated and resubmitted for approval",
+      },
+    });
+    // Also update the document status to PENDING
+    data.status = Status.PENDING;
   }
 
   const updateData: Record<string, unknown> = {};
@@ -299,7 +347,7 @@ export const updateDocument = async (
           regarding: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -325,14 +373,14 @@ export const updateDocument = async (
     metadata: {
       oldData: {
         name: existingDocument.name,
-        type: existingDocument.type,
+        documentTypeId: existingDocument.documentTypeId,
         status: existingDocument.status,
         eventId: existingDocument.eventId,
         letterId: existingDocument.letterId,
       },
       newData: {
         name: document.name,
-        type: document.type,
+        documentTypeId: document.documentTypeId,
         status: document.status,
         eventId: document.eventId,
         letterId: document.letterId,
@@ -367,7 +415,7 @@ export const deleteDocument = async (id: string, user: UserWithId) => {
     metadata: {
       oldData: {
         name: existingDocument.name,
-        type: existingDocument.type,
+        documentTypeId: existingDocument.documentTypeId,
         status: existingDocument.status,
         eventId: existingDocument.eventId,
         letterId: existingDocument.letterId,

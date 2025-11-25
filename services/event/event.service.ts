@@ -20,7 +20,9 @@ export const getEvents = async (filter: {
   const where: Prisma.EventWhereInput = {};
 
   if (filter.department) where.department = { equals: filter.department };
-  if (filter.status) where.status = { equals: filter.status as unknown as PrismaStatus };
+  if (filter.status) {
+    where.status = { equals: filter.status as unknown as PrismaStatus };
+  }
   if (filter.periodId) where.periodId = filter.periodId;
   if (filter.workProgramId) where.workProgramId = filter.workProgramId;
   if (filter.search) {
@@ -190,6 +192,36 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
     },
   });
 
+  // Always create approval record with PENDING status
+  const approval = await prisma.approval.create({
+    data: {
+      entityType: "EVENT",
+      entityId: event.id,
+      userId: user.id,
+      status: "PENDING",
+      note: "Event created and pending approval",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  // Update the event with the approval ID
+  await prisma.event.update({
+    where: { id: event.id },
+    data: { approvalId: approval.id },
+  });
+
+  // Add the approval to the returned event
+  event.approvalId = approval.id;
+  event.approval = approval;
+
   // Log activity
   await logActivity({
     userId: user.id,
@@ -218,9 +250,10 @@ export const updateEvent = async (
   data: UpdateEventInput,
   user: UserWithId
 ) => {
-  // Get existing event for logging
+  // Get existing event with approval
   const existingEvent = await prisma.event.findUnique({
     where: { id },
+    include: { approval: true },
   });
 
   if (!existingEvent) {
@@ -228,6 +261,46 @@ export const updateEvent = async (
   }
 
   const updateData = { ...data } as Prisma.EventUpdateInput;
+
+  // Check if there are changes to the event (excluding status)
+  const hasChanges =
+    (data.name !== undefined && data.name !== existingEvent.name) ||
+    (data.description !== undefined &&
+      data.description !== existingEvent.description) ||
+    (data.goal !== undefined && data.goal !== existingEvent.goal) ||
+    (data.department !== undefined &&
+      data.department !== existingEvent.department) ||
+    (data.startDate !== undefined &&
+      new Date(data.startDate).getTime() !==
+        existingEvent.startDate.getTime()) ||
+    (data.endDate !== undefined &&
+      new Date(data.endDate).getTime() !== existingEvent.endDate.getTime()) ||
+    (data.funds !== undefined && data.funds !== existingEvent.funds) ||
+    (data.responsibleId !== undefined &&
+      data.responsibleId !== existingEvent.responsibleId) ||
+    (data.workProgramId !== undefined &&
+      data.workProgramId !== existingEvent.workProgramId) ||
+    (data.categoryId !== undefined &&
+      data.categoryId !== existingEvent.categoryId);
+
+  // If there are changes and the event has an existing approval that is APPROVED or REJECTED,
+  // reset the approval to PENDING
+  if (
+    hasChanges &&
+    existingEvent.approval &&
+    (existingEvent.approval.status === "APPROVED" ||
+      existingEvent.approval.status === "REJECTED")
+  ) {
+    await prisma.approval.update({
+      where: { id: existingEvent.approval.id },
+      data: {
+        status: "PENDING",
+        note: "Event updated and resubmitted for approval",
+      },
+    });
+    // Also update the event status to PENDING
+    updateData.status = "PENDING";
+  }
 
   // Handle status change to PENDING - create approval record
   if (data.status === "PENDING") {

@@ -1,7 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import type { StatusApproval } from "@prisma/client";
 import type { ApprovalType } from "@/types/enums";
-import type { ApprovalFilters, ApprovalsResponse } from "@/types/approval";
+import type { StatusApproval } from "@prisma/client";
+import type {
+  ApprovalFilters,
+  ApprovalsResponse,
+  ApprovalWithRelations,
+} from "@/types/approval";
 
 export async function getApprovals(
   filters: ApprovalFilters
@@ -24,7 +28,7 @@ export async function getApprovals(
   const total = await prisma.approval.count({ where });
 
   // Get approvals with related data
-  const approvals = await prisma.approval.findMany({
+  const approvals = (await prisma.approval.findMany({
     where,
     skip,
     take: limit,
@@ -68,7 +72,7 @@ export async function getApprovals(
         select: {
           id: true,
           name: true,
-          type: true,
+          documentTypeId: true,
           status: true,
         },
       },
@@ -81,7 +85,7 @@ export async function getApprovals(
         },
       },
     },
-  });
+  })) as ApprovalWithRelations[];
 
   const pages = Math.ceil(total / limit);
 
@@ -96,17 +100,66 @@ export async function getApprovals(
   };
 }
 
-export async function findApprovalById(id: string) {
-  return await prisma.approval.findUnique({
+export async function findApprovalById(
+  id: string
+): Promise<ApprovalWithRelations | null> {
+  const result = await prisma.approval.findUnique({
     where: { id },
     include: {
-      workProgram: true,
-      event: true,
-      finance: true,
-      document: true,
-      letter: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          department: true,
+        },
+      },
+      workProgram: {
+        select: {
+          id: true,
+          name: true,
+          department: true,
+          status: true,
+        },
+      },
+      event: {
+        select: {
+          id: true,
+          name: true,
+          department: true,
+          status: true,
+        },
+      },
+      finance: {
+        select: {
+          id: true,
+          name: true,
+          amount: true,
+          type: true,
+          status: true,
+        },
+      },
+      document: {
+        select: {
+          id: true,
+          name: true,
+          documentTypeId: true,
+          status: true,
+        },
+      },
+      letter: {
+        select: {
+          id: true,
+          regarding: true,
+          type: true,
+          status: true,
+        },
+      },
     },
   });
+
+  return result as ApprovalWithRelations | null;
 }
 
 export async function findApprovalByEntity(
@@ -152,7 +205,7 @@ export async function updateApprovalRecord(
     status: StatusApproval;
     note?: string;
   }
-) {
+): Promise<ApprovalWithRelations> {
   return await prisma.approval.update({
     where: { id },
     data,
@@ -195,7 +248,7 @@ export async function updateApprovalRecord(
         select: {
           id: true,
           name: true,
-          type: true,
+          documentTypeId: true,
           status: true,
         },
       },

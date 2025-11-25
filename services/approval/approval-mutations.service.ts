@@ -1,7 +1,7 @@
 import { logActivityFromRequest } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { NextRequest } from "next/server";
-import { StatusApproval } from "@prisma/client";
+import { StatusApproval } from "@/types/enums";
 import type {
   CreateApprovalData,
   UpdateApprovalData,
@@ -103,10 +103,11 @@ export async function updateApproval(
     },
   });
 
-  // If approval is approved or rejected, update the related entity's status
+  // If approval is approved, rejected, or cancelled, update the related entity's status
   if (
     status === StatusApproval.APPROVED ||
-    status === StatusApproval.REJECTED
+    status === StatusApproval.REJECTED ||
+    status === StatusApproval.CANCELLED
   ) {
     await updateEntityStatus(existingApproval, status);
   }

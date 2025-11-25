@@ -20,7 +20,9 @@ export const getLetters = async (filter: {
 
   if (filter.type) where.type = { equals: filter.type };
   if (filter.priority) where.priority = { equals: filter.priority };
-  if (filter.status) where.status = { equals: filter.status as unknown as PrismaStatus };
+  if (filter.status) {
+    where.status = { equals: filter.status as unknown as PrismaStatus };
+  }
   if (filter.periodId) where.periodId = filter.periodId;
   if (filter.eventId) where.eventId = filter.eventId;
   if (filter.search) {
@@ -58,7 +60,7 @@ export const getLetters = async (filter: {
           document: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -103,7 +105,7 @@ export const getLetter = async (id: string) => {
           document: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -169,7 +171,7 @@ export const createLetter = async (
           document: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {
@@ -226,13 +228,55 @@ export const updateLetter = async (
   data: UpdateLetterInput,
   user: UserWithId
 ) => {
-  // Check if letter exists
+  // Check if letter exists with approval
   const existingLetter = await prisma.letter.findUnique({
     where: { id },
+    include: { approval: true },
   });
 
   if (!existingLetter) {
     throw new Error("Letter not found");
+  }
+
+  // Check if there are changes to the letter (excluding status)
+  const hasChanges =
+    (data.number !== undefined && data.number !== existingLetter.number) ||
+    (data.regarding !== undefined &&
+      data.regarding !== existingLetter.regarding) ||
+    (data.origin !== undefined && data.origin !== existingLetter.origin) ||
+    (data.destination !== undefined &&
+      data.destination !== existingLetter.destination) ||
+    (data.date !== undefined &&
+      new Date(data.date).getTime() !== existingLetter.date.getTime()) ||
+    (data.type !== undefined && data.type !== existingLetter.type) ||
+    (data.priority !== undefined &&
+      data.priority !== existingLetter.priority) ||
+    (data.body !== undefined && data.body !== existingLetter.body) ||
+    (data.letter !== undefined && data.letter !== existingLetter.letter) ||
+    (data.notes !== undefined && data.notes !== existingLetter.notes) ||
+    (data.approvedById !== undefined &&
+      data.approvedById !== existingLetter.approvedById) ||
+    (data.periodId !== undefined &&
+      data.periodId !== existingLetter.periodId) ||
+    (data.eventId !== undefined && data.eventId !== existingLetter.eventId);
+
+  // If there are changes and the letter has an existing approval that is APPROVED or REJECTED,
+  // reset the approval to PENDING
+  if (
+    hasChanges &&
+    existingLetter.approval &&
+    (existingLetter.approval.status === "APPROVED" ||
+      existingLetter.approval.status === "REJECTED")
+  ) {
+    await prisma.approval.update({
+      where: { id: existingLetter.approval.id },
+      data: {
+        status: "PENDING",
+        note: "Letter updated and resubmitted for approval",
+      },
+    });
+    // Also update the letter status to PENDING
+    data.status = "PENDING";
   }
 
   const updateData: Prisma.LetterUpdateInput = {};
@@ -323,7 +367,7 @@ export const updateLetter = async (
           document: true,
         },
       },
-      approvals: {
+      approval: {
         include: {
           user: {
             select: {

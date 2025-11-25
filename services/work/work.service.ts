@@ -161,7 +161,7 @@ export const createWorkProgram = async (
 
   // Handle status change to PENDING - create approval record
   if (data.status === "PENDING") {
-    const approval = await prisma.approval.create({
+    await prisma.approval.create({
       data: {
         entityType: "WORK_PROGRAM",
         entityId: workProgram.id,
@@ -169,26 +169,7 @@ export const createWorkProgram = async (
         status: "PENDING",
         note: "Work program submitted for approval",
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
     });
-
-    // Update the work program with the approval ID
-    await prisma.workProgram.update({
-      where: { id: workProgram.id },
-      data: { approvalId: approval.id },
-    });
-
-    // Add the approval to the returned work program
-    workProgram.approvalId = approval.id;
-    workProgram.approval = approval;
   }
 
   return workProgram;
@@ -245,18 +226,29 @@ export const updateWorkProgram = async (
     updateData.status = "PENDING";
   }
 
-  // Handle status change to PENDING - create approval record
+  // Handle status change to PENDING - create or update approval record
   if (data.status === "PENDING") {
-    // If there's already an approval, update it; otherwise create new
-    if (existingWorkProgram.approval) {
+    // Check if there's already an approval record for this work program
+    const existingApproval = await prisma.approval.findUnique({
+      where: {
+        entityType_entityId: {
+          entityType: "WORK_PROGRAM",
+          entityId: id,
+        },
+      },
+    });
+
+    if (existingApproval) {
+      // Update existing approval
       await prisma.approval.update({
-        where: { id: existingWorkProgram.approval.id },
+        where: { id: existingApproval.id },
         data: {
           status: "PENDING",
           note: "Work program submitted for approval",
         },
       });
     } else {
+      // Create new approval
       const approval = await prisma.approval.create({
         data: {
           entityType: "WORK_PROGRAM",
