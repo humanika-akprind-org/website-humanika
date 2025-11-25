@@ -248,7 +248,7 @@ export default function SidebarMobile() {
             <NavDropdownItem href="/admin/administration/documents/add">
               Add New
             </NavDropdownItem>
-            <NavDropdownItem href="/admin/administration/documents/type">
+            <NavDropdownItem href="/admin/administration/documents/types">
               Document Type
             </NavDropdownItem>
             <NavDropdownItem href="/admin/administration/documents/approval">
