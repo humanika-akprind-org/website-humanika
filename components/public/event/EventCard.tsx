@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Event } from "@/types/event";
@@ -27,13 +27,13 @@ function getPreviewUrl(image: string | null | undefined): string {
 
 interface EventCardProps {
   event: Event;
+  truncatedDescription: string;
 }
 
-export default function EventCard({ event }: EventCardProps) {
-  const [month, setMonth] = useState<string>("");
-  const [day, setDay] = useState<number | null>(null);
-  const [time, setTime] = useState<string>("");
-
+export default function EventCard({
+  event,
+  truncatedDescription,
+}: EventCardProps) {
   const previewUrl = useMemo(
     () => getPreviewUrl(event.thumbnail ?? null),
     [event.thumbnail]
@@ -43,19 +43,17 @@ export default function EventCard({ event }: EventCardProps) {
     ? event.department.toString()
     : "Uncategorized";
 
-  useEffect(() => {
-    if (event.startDate) {
-      const eventDate = new Date(event.startDate);
-      setMonth(eventDate.toLocaleString("id-ID", { month: "short" }));
-      setDay(eventDate.getDate());
-      setTime(
-        eventDate.toLocaleTimeString("id-ID", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
-    }
-  }, [event.startDate]);
+  // Compute date values synchronously to avoid hydration mismatch
+  const month = event.startDate
+    ? new Date(event.startDate).toLocaleString("id-ID", { month: "short" })
+    : "N/A";
+  const day = event.startDate ? new Date(event.startDate).getDate() : null;
+  const time = event.startDate
+    ? new Date(event.startDate).toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "Loading";
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border-t-4 border-red-600">
@@ -98,7 +96,7 @@ export default function EventCard({ event }: EventCardProps) {
         </h3>
         <p
           className="text-gray-600 mb-4 line-clamp-2"
-          dangerouslySetInnerHTML={{ __html: event.description }}
+          dangerouslySetInnerHTML={{ __html: truncatedDescription }}
         />
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">{time || "Loading"}</span>

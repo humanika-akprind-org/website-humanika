@@ -5,7 +5,7 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/types/document";
-import { DocumentType as DocumentTypeEnum, Status } from "@/types/enums";
+import { Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { documentFolderId } from "@/lib/config/config";
 

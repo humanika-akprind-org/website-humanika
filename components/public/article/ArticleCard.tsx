@@ -26,17 +26,15 @@ function getPreviewUrl(image: string | null | undefined): string {
 
 interface ArticleCardProps {
   article: Article;
+  formattedDate: string;
+  truncatedContent: string;
 }
 
-export default function ArticleCard({ article }: ArticleCardProps) {
-  const formattedDate = article.createdAt
-    ? new Date(article.createdAt).toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : "";
-
+export default function ArticleCard({
+  article,
+  formattedDate,
+  truncatedContent,
+}: ArticleCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border-t-4 border-blue-600">
       <div className="h-48 bg-blue-100 flex items-center relative">
@@ -92,10 +90,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         <p
           className="text-gray-600 mb-4 line-clamp-2"
           dangerouslySetInnerHTML={{
-            __html:
-              article.content && article.content.length > 150
-                ? `${article.content.substring(0, 150)}...`
-                : article.content || "",
+            __html: truncatedContent,
           }}
         />
         <div className="flex justify-between items-center">

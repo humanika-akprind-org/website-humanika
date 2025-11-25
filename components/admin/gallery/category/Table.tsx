@@ -95,7 +95,7 @@ export default function GalleryCategoryTable({
           No categories found
         </h3>
         <p className="text-gray-500">
-          Get started by creating your first gallery category.
+          Get started by creating your first event category.
         </p>
       </div>
     );

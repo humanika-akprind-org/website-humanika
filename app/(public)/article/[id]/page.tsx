@@ -137,11 +137,28 @@ export default async function ArticleDetail({ params }: ArticleDetailProps) {
             Artikel Terkait
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
-            {(article as any)?.relatedArticles &&
-            (article as any).relatedArticles.length > 0
-              ? (article as any).relatedArticles.map((item: any) => (
-                  <ArticleCard key={item.id} article={item} />
-                ))
+            {article.relatedArticles && article.relatedArticles.length > 0
+              ? article.relatedArticles.map((item) => {
+                  const formattedDate = item.createdAt
+                    ? new Date(item.createdAt).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "";
+                  const truncatedContent =
+                    item.content && item.content.length > 150
+                      ? `${item.content.substring(0, 150)}...`
+                      : item.content || "";
+                  return (
+                    <ArticleCard
+                      key={item.id}
+                      article={item}
+                      formattedDate={formattedDate}
+                      truncatedContent={truncatedContent}
+                    />
+                  );
+                })
               : null}
           </div>
         </section>

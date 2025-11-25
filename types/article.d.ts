@@ -20,6 +20,7 @@ export interface Article {
   status: Status;
   createdAt: Date;
   updatedAt: Date;
+  relatedArticles?: Article[];
 }
 
 export interface CreateArticleInput {
