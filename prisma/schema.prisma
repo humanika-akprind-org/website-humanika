@@ -621,12 +621,16 @@ model Approval {
   createdAt  DateTime       @default(now()) // Waktu pembuatan persetujuan
   updatedAt  DateTime       @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan persetujuan
-  workPrograms          WorkProgram[]          @relation("WorkProgramApprovals") // Persetujuan program kerja
-  events                Event[]                @relation("EventApprovals") // Persetujuan kegiatan
-  finances              Finance[]              @relation("FinanceApprovals") // Persetujuan transaksi keuangan
-  documents             Document[]             @relation("DocumentApprovals") // Persetujuan dokumen
-  letters               Letter[]               @relation("LetterApprovals") // Persetujuan surat
+    // Relations - Data yang terkait dengan persetujuan
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang memberikan persetujuan
+
+  // Opposite relations untuk setiap entitas - Relasi terbalik ke berbagai jenis entitas
+  workProgram          WorkProgram?          @relation("WorkProgramApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan program kerja
+  event                Event?                @relation("EventApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan kegiatan
+  finance              Finance?              @relation("FinanceApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan transaksi keuangan
+  document             Document?             @relation("DocumentApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan dokumen
+  letter               Letter?               @relation("LetterApprovals", fields: [entityId], references: [id], onDelete: Cascade) // Persetujuan surat
+
   @@index([entityType, entityId, userId, status])
   @@map("approvals")
 }

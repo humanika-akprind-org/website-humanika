@@ -41,8 +41,7 @@ export interface Event {
   workProgram?: WorkProgram | null;
   categoryId?: string | null;
   category?: EventCategory | null;
-  approvalId?: string | null;
-  approval?: Approval | null;
+  approvals: Approval[];
   galleries: Gallery[];
   finances: Finance[];
   letters: Letter[];

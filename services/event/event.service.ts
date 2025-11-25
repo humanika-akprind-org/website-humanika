@@ -25,17 +25,52 @@ export const getEvents = async (filter: {
   }
   if (filter.periodId) where.periodId = filter.periodId;
   if (filter.workProgramId) where.workProgramId = filter.workProgramId;
+  const orConditions: Prisma.EventWhereInput[] = [];
+
   if (filter.search) {
-    where.OR = [
+    orConditions.push(
       { name: { contains: filter.search, mode: "insensitive" } },
       { description: { contains: filter.search, mode: "insensitive" } },
-      { goal: { contains: filter.search, mode: "insensitive" } },
-    ];
+      { goal: { contains: filter.search, mode: "insensitive" } }
+    );
   }
+
   if (filter.startDate || filter.endDate) {
-    where.startDate = {};
-    if (filter.startDate) where.startDate.gte = new Date(filter.startDate);
-    if (filter.endDate) where.startDate.lte = new Date(filter.endDate);
+    orConditions.push(
+      // Events that start within the range
+      {
+        startDate: {
+          gte: filter.startDate ? new Date(filter.startDate) : undefined,
+          lte: filter.endDate ? new Date(filter.endDate) : undefined,
+        },
+      },
+      // Events that end within the range
+      {
+        endDate: {
+          gte: filter.startDate ? new Date(filter.startDate) : undefined,
+          lte: filter.endDate ? new Date(filter.endDate) : undefined,
+        },
+      },
+      // Events that span the entire range
+      {
+        AND: [
+          {
+            startDate: {
+              lte: filter.startDate ? new Date(filter.startDate) : undefined,
+            },
+          },
+          {
+            endDate: {
+              gte: filter.endDate ? new Date(filter.endDate) : undefined,
+            },
+          },
+        ],
+      }
+    );
+  }
+
+  if (orConditions.length > 0) {
+    where.OR = orConditions;
   }
 
   const events = await prisma.event.findMany({
@@ -57,7 +92,7 @@ export const getEvents = async (filter: {
         },
       },
       category: true,
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -99,7 +134,7 @@ export const getEvent = async (id: string) => {
         },
       },
       category: true,
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -174,7 +209,7 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
         },
       },
       category: true,
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -193,7 +228,7 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
   });
 
   // Always create approval record with PENDING status
-  const approval = await prisma.approval.create({
+  await prisma.approval.create({
     data: {
       entityType: "EVENT",
       entityId: event.id,
@@ -201,26 +236,7 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
       status: "PENDING",
       note: "Event created and pending approval",
     },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
   });
-
-  // Update the event with the approval ID
-  await prisma.event.update({
-    where: { id: event.id },
-    data: { approvalId: approval.id },
-  });
-
-  // Add the approval to the returned event
-  event.approvalId = approval.id;
-  event.approval = approval;
 
   // Log activity
   await logActivity({
@@ -253,7 +269,7 @@ export const updateEvent = async (
   // Get existing event with approval
   const existingEvent = await prisma.event.findUnique({
     where: { id },
-    include: { approval: true },
+    include: { approvals: true },
   });
 
   if (!existingEvent) {
@@ -287,12 +303,13 @@ export const updateEvent = async (
   // reset the approval to PENDING
   if (
     hasChanges &&
-    existingEvent.approval &&
-    (existingEvent.approval.status === "APPROVED" ||
-      existingEvent.approval.status === "REJECTED")
+    existingEvent.approvals &&
+    existingEvent.approvals.length > 0 &&
+    (existingEvent.approvals[0].status === "APPROVED" ||
+      existingEvent.approvals[0].status === "REJECTED")
   ) {
     await prisma.approval.update({
-      where: { id: existingEvent.approval.id },
+      where: { id: existingEvent.approvals[0].id },
       data: {
         status: "PENDING",
         note: "Event updated and resubmitted for approval",
@@ -362,7 +379,7 @@ export const updateEvent = async (
         },
       },
       category: true,
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {

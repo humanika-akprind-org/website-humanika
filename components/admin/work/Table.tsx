@@ -423,26 +423,26 @@ export default function WorkProgramTable({
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      {program.approval ? (
+                      {program.approvals && program.approvals.length > 0 ? (
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${
-                            program.approval.status === "APPROVED"
+                            program.approvals[0].status === "APPROVED"
                               ? "bg-green-100 text-green-800"
-                              : program.approval.status === "REJECTED"
+                              : program.approvals[0].status === "REJECTED"
                               ? "bg-red-100 text-red-800"
                               : "bg-yellow-100 text-yellow-800"
                           }`}
                         >
-                          {program.approval.status === "APPROVED" && (
+                          {program.approvals[0].status === "APPROVED" && (
                             <FiCheckCircle className="mr-1" />
                           )}
-                          {program.approval.status === "REJECTED" && (
+                          {program.approvals[0].status === "REJECTED" && (
                             <FiXCircle className="mr-1" />
                           )}
-                          {program.approval.status === "PENDING" && (
+                          {program.approvals[0].status === "PENDING" && (
                             <FiClock className="mr-1" />
                           )}
-                          {program.approval.status}
+                          {program.approvals[0].status}
                         </span>
                       ) : (
                         <span className="text-xs text-gray-400">

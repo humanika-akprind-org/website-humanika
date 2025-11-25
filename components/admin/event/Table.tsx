@@ -381,9 +381,14 @@ export default function EventTable({ events, onDelete }: EventTableProps) {
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      {event.approval ? (
+                      {event.approvals && event.approvals.length > 0 ? (
                         (() => {
-                          const latestApproval = event.approval;
+                          // Get the latest approval (most recent by createdAt)
+                          const latestApproval = event.approvals.sort(
+                            (a, b) =>
+                              new Date(b.createdAt).getTime() -
+                              new Date(a.createdAt).getTime()
+                          )[0];
                           return (
                             <span
                               className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${

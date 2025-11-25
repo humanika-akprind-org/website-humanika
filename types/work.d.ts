@@ -32,7 +32,7 @@ export interface WorkProgram {
     updatedAt: Date;
     avatarColor: string;
   };
-  approval?: Approval;
+  approvals?: Approval[];
   createdAt: Date;
   updatedAt: Date;
 }
