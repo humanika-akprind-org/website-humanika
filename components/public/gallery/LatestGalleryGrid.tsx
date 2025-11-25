@@ -23,6 +23,10 @@ export default function LatestGalleryGrid({
     return <div>Error: {error}</div>;
   }
 
+  if (!galleries || galleries.length === 0) {
+    return <div>No galleries available</div>;
+  }
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {galleries.map((gallery: Gallery) => (
