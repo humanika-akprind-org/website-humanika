@@ -7,6 +7,7 @@ import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
 import { Department as DepartmentEnum, Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { useWorkPrograms } from "@/hooks/work-program/useWorkPrograms";
+import { useEventCategories } from "@/hooks/event-category/useEventCategories";
 import { eventThumbnailFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
@@ -114,6 +115,10 @@ export default function EventForm({
   // Fetch work programs
   const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
 
+  // Fetch event categories
+  const { categories: eventCategories, isLoading: categoriesLoading } =
+    useEventCategories();
+
   // Users and periods are now passed as props
 
   const [formData, setFormData] = useState({
@@ -131,6 +136,7 @@ export default function EventForm({
       : "",
     funds: event?.funds || 0,
     workProgramId: event?.workProgram?.id || "",
+    categoryId: event?.category?.id || "",
     thumbnailFile: undefined as File | undefined,
   });
 
@@ -502,6 +508,29 @@ export default function EventForm({
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Category
+            </label>
+            <select
+              name="categoryId"
+              value={formData.categoryId}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={isLoadingState || categoriesLoading}
+            >
+              <option value="">Pilih Category (Opsional)</option>
+              {eventCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+            {categoriesLoading && (
+              <p className="text-sm text-gray-500 mt-1">Memuat categories...</p>
+            )}
           </div>
         </div>
 

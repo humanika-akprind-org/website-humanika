@@ -1,7 +1,7 @@
 // components/admin/layout/SidebarMobile.jsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Home,
   Users,
@@ -34,6 +34,19 @@ export default function SidebarMobile() {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   return (
     <>
@@ -74,7 +87,7 @@ export default function SidebarMobile() {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-lg transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-lg transform transition-transform duration-300 ease-in-out md:hidden flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -213,6 +226,9 @@ export default function SidebarMobile() {
             <NavDropdownItem href="/admin/program/events/add">
               Add New
             </NavDropdownItem>
+            <NavDropdownItem href="/admin/program/events/categories">
+              Categories
+            </NavDropdownItem>
             <NavDropdownItem href="/admin/program/events/approval">
               Approval
             </NavDropdownItem>
@@ -231,6 +247,9 @@ export default function SidebarMobile() {
             </NavDropdownItem>
             <NavDropdownItem href="/admin/administration/documents/add">
               Add New
+            </NavDropdownItem>
+            <NavDropdownItem href="/admin/administration/documents/types">
+              Document Type
             </NavDropdownItem>
             <NavDropdownItem href="/admin/administration/documents/approval">
               Approval
@@ -274,6 +293,9 @@ export default function SidebarMobile() {
             </NavDropdownItem>
             <NavDropdownItem href="/admin/content/galleries/add">
               Add New
+            </NavDropdownItem>
+            <NavDropdownItem href="/admin/content/galleries/categories">
+              Categories
             </NavDropdownItem>
           </NavDropdown>
 

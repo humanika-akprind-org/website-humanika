@@ -105,7 +105,7 @@ export interface ApprovalWithRelations {
   document?: {
     id: string;
     name: string;
-    type: string;
+    documentTypeId: string;
     status: string;
   } | null;
   letter?: {

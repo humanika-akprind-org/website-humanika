@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { getEvent } from "use-cases/api/event";
+import { getEvent, getEvents } from "use-cases/api/event";
 import type { Event } from "types/event";
 import { FiSend } from "react-icons/fi";
+import PastEventCard from "@/components/public/event/PastEventCard";
 
 interface EventDetailProps {
   params: { id: string };
@@ -49,6 +50,7 @@ export default function EventDetail({ params }: EventDetailProps) {
   }
 
   const [event, setEvent] = useState<Event | null>(null);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,6 +71,18 @@ export default function EventDetail({ params }: EventDetailProps) {
     loadEvent();
   }, [id]);
 
+  useEffect(() => {
+    async function loadAllEvents() {
+      try {
+        const events = await getEvents();
+        setAllEvents(events);
+      } catch (err) {
+        console.error("Failed to load all events:", err);
+      }
+    }
+    loadAllEvents();
+  }, []);
+
   if (loading) return <div>Loading event details...</div>;
   if (error) return <div>Error loading event: {error}</div>;
   if (!event) return <div>No event found.</div>;
@@ -76,6 +90,11 @@ export default function EventDetail({ params }: EventDetailProps) {
   const safeEvent = event ? getSafeEvent(event) : null;
 
   const eventDate = new Date(safeEvent?.startDate ?? "");
+
+  const now = new Date();
+  const pastEvents = allEvents
+    .filter((e) => new Date(e.endDate) < now && e.id !== id)
+    .slice(0, 4); // Limit to 4 past events, exclude current event
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -144,6 +163,23 @@ export default function EventDetail({ params }: EventDetailProps) {
           <div
             dangerouslySetInnerHTML={{ __html: safeEvent?.description ?? "" }}
           />
+        </section>
+
+        {/* Past Events */}
+        <section className="mt-16">
+          <h2 className="text-2xl font-bold mb-8 text-gray-900 border-b-2 border-gray-200 pb-2">
+            Past Events
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {pastEvents.map((event) => (
+              <PastEventCard
+                key={event.id}
+                id={event.id}
+                title={event.name}
+                date={event.endDate}
+              />
+            ))}
+          </div>
         </section>
       </main>
     </div>

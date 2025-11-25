@@ -331,7 +331,7 @@ export default async function Home() {
 
           <div className="text-center">
             <Link
-              href="/events"
+              href="/event"
               className="inline-flex items-center px-6 py-3 bg-white border border-grey-200 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-medium shadow-sm hover:shadow-md"
             >
               Lihat Semua Event

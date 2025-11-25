@@ -61,7 +61,10 @@ export default function EditWorkProgramPage() {
   const handleSubmitForApproval = async (
     data: CreateWorkProgramInput | UpdateWorkProgramInput
   ) => {
-    await updateWorkProgram(id, data as UpdateWorkProgramInput);
+    await updateWorkProgram(id, {
+      ...data,
+      status: "PENDING",
+    } as UpdateWorkProgramInput);
   };
 
   if (loading) {

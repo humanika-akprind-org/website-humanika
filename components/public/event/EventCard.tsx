@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Event } from "@/types/event";
@@ -88,7 +88,7 @@ export default function EventCard({ event }: EventCardProps) {
           </svg>
         )}
         <div className="absolute top-4 right-4 bg-white text-red-600 px-3 py-1 rounded-full text-sm font-medium shadow-md flex flex-col items-center justify-center w-12 h-12 z-10">
-          <span className="text-xs font-bold">{month || "Loading"}</span>
+          <span className="text-xs font-bold">{month || "N/A"}</span>
           <span className="text-lg font-bold -mt-1">{day ?? "-"}</span>
         </div>
       </div>

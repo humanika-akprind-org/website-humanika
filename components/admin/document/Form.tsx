@@ -8,11 +8,12 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/types/document";
-import { DocumentType as DocumentTypeEnum, Status } from "@/types/enums";
+import { Status } from "@/types/enums";
 import type { User } from "@/types/user";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
 import { useDocumentForm } from "@/hooks/document/useDocumentForm";
+import { useDocumentTypes } from "@/hooks/document-type/useDocumentTypes";
 
 interface DocumentFormProps {
   document?: Document;
@@ -37,6 +38,9 @@ export default function DocumentForm({
   letters,
 }: DocumentFormProps) {
   const router = useRouter();
+
+  // Fetch document types
+  const { documentTypes, isLoading: documentTypesLoading } = useDocumentTypes();
 
   const {
     formData,
@@ -87,23 +91,25 @@ export default function DocumentForm({
               Type *
             </label>
             <select
-              name="type"
-              value={formData.type}
+              name="documentTypeId"
+              value={formData.documentTypeId}
               onChange={handleInputChange}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
-              disabled={isLoadingState}
+              disabled={isLoadingState || documentTypesLoading}
             >
               <option value="">Pilih Type</option>
-              {Object.values(DocumentTypeEnum).map((type) => (
-                <option key={type} value={type}>
-                  {type
-                    .replace(/_/g, " ")
-                    .toLowerCase()
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+              {documentTypes.map((type) => (
+                <option key={type.id} value={type.id}>
+                  {type.name}
                 </option>
               ))}
             </select>
+            {documentTypesLoading && (
+              <p className="text-sm text-gray-500 mt-1">
+                Memuat document types...
+              </p>
+            )}
           </div>
 
           <div>

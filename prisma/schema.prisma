@@ -15,10 +15,10 @@ datasource db {
 // PENGURUS: Anggota pengurus
 // ANGGOTA: Anggota biasa
 enum UserRole {
-  DPO      // Dewan Pengurus Organisasi
-  BPH      // Badan Pengurus Harian
+  DPO // Dewan Pengurus Organisasi
+  BPH // Badan Pengurus Harian
   PENGURUS // Pengurus
-  ANGGOTA  // Anggota
+  ANGGOTA // Anggota
 }
 
 // Enum untuk departemen dalam organisasi
@@ -29,12 +29,12 @@ enum UserRole {
 // KWU: Departemen Kewirausahaan
 enum Department {
   // BPH Departments
-  BPH     // Badan Pengurus Harian
+  BPH // Badan Pengurus Harian
   // Departments
   INFOKOM // Departemen Informasi dan Komunikasi
-  PSDM    // Departemen Pengembangan Sumber Daya Mahasiswa
+  PSDM // Departemen Pengembangan Sumber Daya Mahasiswa
   LITBANG // Departemen Penelitian dan Pengembangan
-  KWU     // Departemen Kewirausahaan
+  KWU // Departemen Kewirausahaan
 }
 
 // Enum untuk posisi jabatan dalam organisasi
@@ -46,63 +46,21 @@ enum Department {
 // STAFF_DEPARTEMEN: Staff Departemen
 enum Position {
   // BPH Positions
-  KETUA_UMUM        // Ketua Umum
-  WAKIL_KETUA_UMUM  // Wakil Ketua Umum
-  SEKRETARIS        // Sekretaris
-  BENDAHARA         // Bendahara
+  KETUA_UMUM // Ketua Umum
+  WAKIL_KETUA_UMUM // Wakil Ketua Umum
+  SEKRETARIS // Sekretaris
+  BENDAHARA // Bendahara
   // Department Positions
   KEPALA_DEPARTEMEN // Kepala Departemen
-  STAFF_DEPARTEMEN  // Staff Departemen
+  STAFF_DEPARTEMEN // Staff Departemen
 }
 
 // Enum untuk jenis transaksi keuangan
 // INCOME: Pemasukan (pendapatan)
 // EXPENSE: Pengeluaran (biaya)
 enum FinanceType {
-  INCOME  // Pemasukan
+  INCOME // Pemasukan
   EXPENSE // Pengeluaran
-}
-
-// Enum untuk jenis dokumen yang dapat diunggah
-// PROPOSAL: Proposal kegiatan
-// LPJ: Laporan Pertanggungjawaban
-// BUDGET_PLAN: Rencana Anggaran Biaya
-// TIMELINE: Timeline kegiatan
-// WORKPLAN: Rencana Kerja
-// FINANCIAL_REPORT: Laporan Keuangan
-// ATTENDANCE_LIST: Daftar Hadir
-// ACTIVITY_REPORT: Laporan Kegiatan
-// EVALUATION_REPORT: Laporan Evaluasi
-// INVOICE: Faktur
-// RECEIPT: Kwitansi
-// OFFICIAL_LETTER: Surat Resmi
-// MEMORANDUM: Memorandum
-// POSTER: Poster
-// BROCHURE: Brosur
-// PRESENTATION: Presentasi
-// CERTIFICATE: Sertifikat
-// DECREE: Surat Keputusan
-// OTHER: Lainnya
-enum DocumentType {
-  PROPOSAL         // Proposal kegiatan
-  LPJ              // Laporan Pertanggungjawaban
-  BUDGET_PLAN      // Rencana Anggaran Biaya
-  TIMELINE         // Timeline kegiatan
-  WORKPLAN         // Rencana Kerja
-  FINANCIAL_REPORT // Laporan Keuangan
-  ATTENDANCE_LIST  // Daftar Hadir
-  ACTIVITY_REPORT  // Laporan Kegiatan
-  EVALUATION_REPORT // Laporan Evaluasi
-  INVOICE          // Faktur
-  RECEIPT          // Kwitansi
-  OFFICIAL_LETTER  // Surat Resmi
-  MEMORANDUM       // Memorandum
-  POSTER           // Poster
-  BROCHURE         // Brosur
-  PRESENTATION     // Presentasi
-  CERTIFICATE      // Sertifikat
-  DECREE           // Surat Keputusan
-  OTHER            // Lainnya
 }
 
 // Enum untuk status berbagai entitas dalam sistem
@@ -112,18 +70,18 @@ enum DocumentType {
 // PRIVATE: Hanya dapat diakses oleh pihak tertentu
 // ARCHIVE: Diarsipkan, tidak aktif
 enum Status {
-  DRAFT     // Draft awal, bisa edit dan ajukan approval
-  PENDING   // Sedang menunggu persetujuan (dengan StatusApproval.PENDING)
-  PUBLISH   // Konten publik dan aktif
-  PRIVATE   // Konten tidak publik tapi masih aktif
-  ARCHIVE    // Konten diarsipkan, tidak bisa langsung publish
+  DRAFT // Draft awal, bisa edit dan ajukan approval
+  PENDING // Sedang menunggu persetujuan (dengan StatusApproval.PENDING)
+  PUBLISH // Konten publik dan aktif
+  PRIVATE // Konten tidak publik tapi masih aktif
+  ARCHIVE // Konten diarsipkan, tidak bisa langsung publish
 }
 
 enum StatusApproval {
-  PENDING   // Default saat pertama diajukan
-  APPROVED  // Disetujui, status utama bisa ke PUBLISH/PRIVATE/ARCHIVE
-  REJECTED  // Ditolak, kembali ke DRAFT
-  CANCELLED  // Dibatalkan oleh pengguna
+  PENDING // Default saat pertama diajukan
+  APPROVED // Disetujui, status utama bisa ke PUBLISH/PRIVATE/ARCHIVE
+  REJECTED // Ditolak, kembali ke DRAFT
+  CANCELLED // Dibatalkan oleh pengguna
 }
 
 // Enum untuk jenis surat
@@ -139,9 +97,9 @@ enum LetterType {
 // IMPORTANT: Penting
 // URGENT: Mendesak
 enum LetterPriority {
-  NORMAL    // Prioritas normal
+  NORMAL // Prioritas normal
   IMPORTANT // Penting
-  URGENT    // Mendesak
+  URGENT // Mendesak
 }
 
 // Enum untuk jenis entitas yang memerlukan persetujuan
@@ -151,47 +109,47 @@ enum LetterPriority {
 // DOCUMENT: Dokumen
 // LETTER: Surat
 enum ApprovalType {
-  WORK_PROGRAM           // Program kerja
-  EVENT                  // Kegiatan/acara
-  FINANCE                // Transaksi keuangan
-  DOCUMENT               // Dokumen
-  LETTER                 // Surat
+  WORK_PROGRAM // Program kerja
+  EVENT // Kegiatan/acara
+  FINANCE // Transaksi keuangan
+  DOCUMENT // Dokumen
+  LETTER // Surat
 }
 
 // Model untuk data pengguna sistem
 // Menyimpan informasi lengkap tentang anggota organisasi
 model User {
-  id            String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik pengguna (auto-generated)
-  name          String     // Nama lengkap pengguna
-  email         String     @unique // Email pengguna (harus unik)
-  username      String     @unique // Username untuk login (harus unik)
-  password      String     // Password terenkripsi
-  role          UserRole   @default(ANGGOTA) // Peran pengguna dalam organisasi
-  department    Department? // Departemen pengguna (opsional)
-  position      Position?   // Jabatan pengguna (opsional)
-  isActive      Boolean    @default(true) // Status aktif pengguna
-  verifiedAccount Boolean    @default(false) // Status verifikasi akun
-  attemptLogin  Int        @default(0) // Jumlah percobaan login gagal
-  blockExpires  DateTime?  // Waktu kapan blokir login berakhir
-  avatarColor   String     @default("#3B82F6") // Warna avatar default
-  createdAt     DateTime   @default(now()) // Waktu pembuatan akun
-  updatedAt     DateTime   @updatedAt // Waktu terakhir update
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId // ID unik pengguna (auto-generated)
+  name            String // Nama lengkap pengguna
+  email           String      @unique // Email pengguna (harus unik)
+  username        String      @unique // Username untuk login (harus unik)
+  password        String // Password terenkripsi
+  role            UserRole    @default(ANGGOTA) // Peran pengguna dalam organisasi
+  department      Department? // Departemen pengguna (opsional)
+  position        Position? // Jabatan pengguna (opsional)
+  isActive        Boolean     @default(true) // Status aktif pengguna
+  verifiedAccount Boolean     @default(false) // Status verifikasi akun
+  attemptLogin    Int         @default(0) // Jumlah percobaan login gagal
+  blockExpires    DateTime? // Waktu kapan blokir login berakhir
+  avatarColor     String      @default("#3B82F6") // Warna avatar default
+  createdAt       DateTime    @default(now()) // Waktu pembuatan akun
+  updatedAt       DateTime    @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan pengguna
-  activityLogs     ActivityLog[]  // Log aktivitas pengguna
-  linkHubs         LinkHub[]      // Link hubs yang dibuat pengguna
-  approvals        Approval[]     // Persetujuan yang diberikan pengguna
-  managements      Management[]   // Jabatan manajemen pengguna
-  linkHubThemes    LinkHubTheme[] // Tema link hub yang dibuat pengguna
-  shortLinks       ShortLink[]    // Short links yang dibuat pengguna
-  articles         Article[]      // Artikel yang ditulis pengguna
-  finances         Finance[]      // Transaksi keuangan yang dibuat pengguna
-  documents        Document[]     // Dokumen yang diunggah pengguna
-  createdLetters   Letter[]       @relation("LetterCreator")   // Surat yang dibuat pengguna
-  approvedLetters  Letter[]       @relation("LetterApprover")  // Surat yang disetujui pengguna
-  workPrograms     WorkProgram[]  @relation("WorkProgramResponsible") // Program kerja yang bertanggung jawab
-  events           Event[]        @relation("EventResponsible") // Kegiatan yang bertanggung jawab
-  departmentTasks  DepartmentTask[] // Tugas departemen yang ditugaskan
+  activityLogs    ActivityLog[] // Log aktivitas pengguna
+  // linkHubs         LinkHub[]      // Link hubs yang dibuat pengguna
+  approvals       Approval[] // Persetujuan yang diberikan pengguna
+  managements     Management[] // Jabatan manajemen pengguna
+  // linkHubThemes    LinkHubTheme[] // Tema link hub yang dibuat pengguna
+  // shortLinks       ShortLink[]    // Short links yang dibuat pengguna
+  articles        Article[] // Artikel yang ditulis pengguna
+  finances        Finance[] // Transaksi keuangan yang dibuat pengguna
+  documents       Document[] // Dokumen yang diunggah pengguna
+  createdLetters  Letter[]         @relation("LetterCreator") // Surat yang dibuat pengguna
+  approvedLetters Letter[]         @relation("LetterApprover") // Surat yang disetujui pengguna
+  workPrograms    WorkProgram[]    @relation("WorkProgramResponsible") // Program kerja yang bertanggung jawab
+  events          Event[]          @relation("EventResponsible") // Kegiatan yang bertanggung jawab
+  departmentTasks DepartmentTask[] // Tugas departemen yang ditugaskan
 
   @@index([email, role, isActive, department, position])
   @@map("users")
@@ -200,21 +158,21 @@ model User {
 // Model untuk periode organisasi
 // Menyimpan informasi tentang periode kepengurusan organisasi
 model Period {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik periode (auto-generated)
-  name        String   // Nama periode (contoh: "2023-2024")
-  startYear   Int      // Tahun mulai periode
-  endYear     Int      // Tahun akhir periode
-  isActive    Boolean  @default(false) // Status aktif periode
-  createdAt   DateTime @default(now()) // Waktu pembuatan periode
-  updatedAt   DateTime @updatedAt // Waktu terakhir update
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik periode (auto-generated)
+  name      String // Nama periode (contoh: "2023-2024")
+  startYear Int // Tahun mulai periode
+  endYear   Int // Tahun akhir periode
+  isActive  Boolean  @default(false) // Status aktif periode
+  createdAt DateTime @default(now()) // Waktu pembuatan periode
+  updatedAt DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan periode
-  managements Management[] // Jabatan manajemen dalam periode ini
-  finances    Finance[]    // Transaksi keuangan dalam periode ini
-  letters     Letter[]     // Surat yang dibuat dalam periode ini
-  workPrograms WorkProgram[] // Program kerja dalam periode ini
-  events      Event[]      // Kegiatan dalam periode ini
-  articles    Article[]    // Artikel yang dibuat dalam periode ini
+  managements              Management[] // Jabatan manajemen dalam periode ini
+  finances                 Finance[] // Transaksi keuangan dalam periode ini
+  letters                  Letter[] // Surat yang dibuat dalam periode ini
+  workPrograms             WorkProgram[] // Program kerja dalam periode ini
+  events                   Event[] // Kegiatan dalam periode ini
+  articles                 Article[] // Artikel yang dibuat dalam periode ini
   organizationalStructures OrganizationalStructure[] @relation("OrganizationalStructurePeriod") // Struktur organisasi periode ini
 
   @@index([isActive, startYear, endYear])
@@ -227,14 +185,14 @@ model Management {
   id         String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik jabatan manajemen (auto-generated)
   userId     String     @db.ObjectId // ID pengguna yang menjabat
   periodId   String     @db.ObjectId // ID periode jabatan
-  position   Position   // Jabatan yang dipegang
-  photo      String?    // URL foto pengguna dalam jabatan ini
+  position   Position // Jabatan yang dipegang
+  photo      String? // URL foto pengguna dalam jabatan ini
   department Department // Departemen jabatan
   createdAt  DateTime   @default(now()) // Waktu pembuatan jabatan
   updatedAt  DateTime   @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan jabatan manajemen
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)   // Pengguna yang menjabat
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang menjabat
   period Period @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode jabatan
 
   @@unique([userId, periodId])
@@ -246,25 +204,25 @@ model Management {
 // Model untuk program kerja
 // Menyimpan informasi tentang program kerja departemen dalam periode tertentu
 model WorkProgram {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik program kerja (auto-generated)
-  name        String     // Nama program kerja
-  department  Department // Departemen yang menjalankan program
-  schedule    String     // Jadwal pelaksanaan program
-  status      Status     @default(DRAFT) // Status program kerja
-  funds       Float      // Dana yang dialokasikan
-  usedFunds   Float      @default(0) // Dana yang sudah digunakan
-  remainingFunds Float   @default(0) // Sisa dana
-  goal        String     // Tujuan program kerja
-  periodId    String     @db.ObjectId // ID periode program
-  responsibleId String   @db.ObjectId // ID pengguna yang bertanggung jawab
-  createdAt   DateTime   @default(now()) // Waktu pembuatan program
-  updatedAt   DateTime   @updatedAt // Waktu terakhir update
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik program kerja (auto-generated)
+  name           String // Nama program kerja
+  department     Department // Departemen yang menjalankan program
+  schedule       String // Jadwal pelaksanaan program
+  status         Status     @default(DRAFT) // Status program kerja
+  funds          Float // Dana yang dialokasikan
+  usedFunds      Float      @default(0) // Dana yang sudah digunakan
+  remainingFunds Float      @default(0) // Sisa dana
+  goal           String // Tujuan program kerja
+  periodId       String     @db.ObjectId // ID periode program
+  responsibleId  String     @db.ObjectId // ID pengguna yang bertanggung jawab
+  createdAt      DateTime   @default(now()) // Waktu pembuatan program
+  updatedAt      DateTime   @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan program kerja
-  period          Period           @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode program kerja
-  approvals       Approval[]       @relation("WorkProgramApprovals") // Persetujuan untuk program kerja
-  events          Event[]          // Kegiatan yang termasuk dalam program kerja
-  responsible     User             @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible") // Pengguna yang bertanggung jawab
+  period      Period    @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode program kerja
+  approvals Approval[] @relation("WorkProgramApprovals") // Persetujuan untuk program kerja
+  events      Event[] // Kegiatan yang termasuk dalam program kerja
+  responsible User      @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible") // Pengguna yang bertanggung jawab
 
   @@index([department, status, periodId])
   @@map("workPrograms")
@@ -273,117 +231,159 @@ model WorkProgram {
 // Model untuk kegiatan/acara
 // Menyimpan informasi lengkap tentang kegiatan yang diselenggarakan organisasi
 model Event {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik kegiatan (auto-generated)
-  name         String     // Nama kegiatan
-  slug         String     @unique // Slug unik untuk URL kegiatan
-  thumbnail    String?    // URL gambar thumbnail kegiatan
-  description  String     // Deskripsi lengkap kegiatan
-  responsibleId String    @db.ObjectId // ID pengguna yang bertanggung jawab
-  goal         String     // Tujuan kegiatan
-  department   Department // Departemen penyelenggara
-  periodId     String     @db.ObjectId // ID periode kegiatan
-  startDate    DateTime   // Tanggal dan waktu mulai kegiatan
-  endDate      DateTime   // Tanggal dan waktu selesai kegiatan
-  funds        Float      // Dana yang dialokasikan untuk kegiatan
-  usedFunds    Float      @default(0) // Dana yang sudah digunakan
-  remainingFunds Float    @default(0) // Sisa dana kegiatan
-  status       Status     @default(DRAFT) // Status kegiatan
-  workProgramId String?   @db.ObjectId // ID program kerja terkait (opsional)
-  createdAt    DateTime   @default(now()) // Waktu pembuatan kegiatan
-  updatedAt    DateTime   @updatedAt // Waktu terakhir update
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik kegiatan (auto-generated)
+  name           String // Nama kegiatan
+  slug           String     @unique // Slug unik untuk URL kegiatan
+  thumbnail      String? // URL gambar thumbnail kegiatan
+  description    String // Deskripsi lengkap kegiatan
+  responsibleId  String     @db.ObjectId // ID pengguna yang bertanggung jawab
+  goal           String // Tujuan kegiatan
+  department     Department // Departemen penyelenggara
+  periodId       String     @db.ObjectId // ID periode kegiatan
+  startDate      DateTime // Tanggal dan waktu mulai kegiatan
+  endDate        DateTime // Tanggal dan waktu selesai kegiatan
+  funds          Float // Dana yang dialokasikan untuk kegiatan
+  usedFunds      Float      @default(0) // Dana yang sudah digunakan
+  remainingFunds Float      @default(0) // Sisa dana kegiatan
+  status         Status     @default(DRAFT) // Status kegiatan
+  workProgramId  String?    @db.ObjectId // ID program kerja terkait (opsional)
+  categoryId     String?    @db.ObjectId // ID kategori kegiatan
+  createdAt      DateTime   @default(now()) // Waktu pembuatan kegiatan
+  updatedAt      DateTime   @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan kegiatan
-  period        Period          @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode kegiatan
-  workProgram   WorkProgram?    @relation(fields: [workProgramId], references: [id], onDelete: SetNull) // Program kerja terkait
-  documents     Document[]      // Dokumen yang terkait dengan kegiatan
-  approvals     Approval[]      @relation("EventApprovals") // Persetujuan untuk kegiatan
-  galleries     Gallery[]       // Galeri foto kegiatan
-  finances      Finance[]       // Transaksi keuangan kegiatan
-  letters       Letter[]        // Surat yang terkait dengan kegiatan
-  responsible   User            @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "EventResponsible") // Pengguna yang bertanggung jawab
+  period      Period         @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode kegiatan
+  workProgram WorkProgram?   @relation(fields: [workProgramId], references: [id], onDelete: SetNull) // Program kerja terkait
+  category    EventCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori kegiatan
+  documents   Document[] // Dokumen yang terkait dengan kegiatan
+  approvals Approval[]      @relation("EventApprovals") // Persetujuan untuk kegiatan
+  galleries   Gallery[] // Galeri foto kegiatan
+  finances    Finance[] // Transaksi keuangan kegiatan
+  letters     Letter[] // Surat yang terkait dengan kegiatan
+  responsible User           @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "EventResponsible") // Pengguna yang bertanggung jawab
 
   @@index([startDate, status, periodId, department])
   @@map("events")
 }
 
+model EventCategory {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  events Event[]
+
+  @@map("eventCategory")
+}
+
 // Model untuk dokumen
 // Menyimpan informasi tentang dokumen yang diunggah ke sistem
 model Document {
-  id        String         @id @default(auto()) @map("_id") @db.ObjectId // ID unik dokumen (auto-generated)
-  name      String         // Nama dokumen
-  eventId   String?        @db.ObjectId // ID kegiatan terkait (opsional)
-  letterId  String?        @db.ObjectId // ID surat terkait (opsional)
-  type      DocumentType   // Tipe dokumen
-  status    Status         @default(PENDING) // Status dokumen
-  document   String?       // URL dokumen
-  userId    String         @db.ObjectId // ID pengguna yang mengunggah
-  version   Int            @default(1) // Versi dokumen
-  parentId  String?        @db.ObjectId // ID dokumen induk (untuk versioning)
-  isCurrent Boolean        @default(true) // Apakah ini versi terbaru
-  createdAt DateTime       @default(now()) // Waktu pembuatan dokumen
-  updatedAt DateTime       @updatedAt // Waktu terakhir update
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik dokumen (auto-generated)
+  name           String // Nama dokumen
+  eventId        String?  @db.ObjectId // ID kegiatan terkait (opsional)
+  letterId       String?  @db.ObjectId // ID surat terkait (opsional)
+  documentTypeId String   @db.ObjectId // ID tipe dokumen
+  status         Status   @default(PENDING) // Status dokumen
+  document       String? // URL dokumen
+  userId         String   @db.ObjectId // ID pengguna yang mengunggah
+  version        Int      @default(1) // Versi dokumen
+  parentId       String?  @db.ObjectId // ID dokumen induk (untuk versioning)
+  isCurrent      Boolean  @default(true) // Apakah ini versi terbaru
+  createdAt      DateTime @default(now()) // Waktu pembuatan dokumen
+  updatedAt      DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan dokumen
-  event           Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang mengunggah
-  letter          Letter?   @relation(fields: [letterId], references: [id], onDelete: Cascade) // Surat terkait
-  previousVersion Document?  @relation("DocumentVersions", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Versi sebelumnya
-  nextVersions    Document[] @relation("DocumentVersions") // Versi selanjutnya
-  approvals       Approval[] @relation("DocumentApprovals") // Persetujuan untuk dokumen
+  event           Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang mengunggah
+  letter          Letter?      @relation(fields: [letterId], references: [id], onDelete: Cascade) // Surat terkait
+  documentType    DocumentType @relation(fields: [documentTypeId], references: [id], onDelete: Cascade) // Tipe dokumen
+  previousVersion Document?    @relation("DocumentVersions", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Versi sebelumnya
+  nextVersions    Document[]   @relation("DocumentVersions") // Versi selanjutnya
+  approvals       Approval[]   @relation("DocumentApprovals") // Persetujuan untuk transaksi
 
-  @@index([type, status, userId])
+  @@index([documentTypeId, status, userId])
   @@map("documents")
+}
+
+model DocumentType {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  documents Document[]
+
+  @@map("documentTypes")
 }
 
 // Model untuk galeri foto
 // Menyimpan informasi tentang foto-foto yang terkait dengan kegiatan
 model Gallery {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik galeri (auto-generated)
-  title    String   // Judul foto
-  image    String   // Nama file gambar
-  eventId  String     @db.ObjectId // ID kegiatan terkait
-  gallery String?  // URL gambar
-  createdAt DateTime @default(now()) // Waktu pembuatan galeri
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik galeri (auto-generated)
+  title      String // Judul foto
+  image      String // Nama file gambar
+  eventId    String   @db.ObjectId // ID kegiatan terkait
+  categoryId String?  @db.ObjectId // ID kategori galeri
+  createdAt  DateTime @default(now()) // Waktu pembuatan galeri
+  updatedAt  DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan galeri
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
+  event    Event            @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
+  category GalleryCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori galeri
 
   @@index([eventId])
   @@map("galleries")
 }
 
+model GalleryCategory {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  galleries Gallery[]
+
+  @@map("galleryCategory")
+}
+
 // Model untuk artikel
 // Menyimpan informasi tentang artikel yang dipublikasikan di website
 model Article {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik artikel (auto-generated)
-  title        String   // Judul artikel
-  slug         String   @unique // Slug unik untuk URL artikel
-  thumbnail    String? // URL gambar thumbnail
-  content      String   // Isi artikel
-  authorId     String     @db.ObjectId // ID penulis artikel
-  categoryId   String     @db.ObjectId // ID kategori artikel
-  periodId     String?    @db.ObjectId // ID periode terkait (opsional)
-  isPublished  Boolean  @default(false) // Status publikasi artikel
-  publishedAt  DateTime? // Tanggal publikasi artikel
-  status       Status   @default(DRAFT) // Status artikel
-  createdAt    DateTime @default(now()) // Waktu pembuatan artikel
-  updatedAt    DateTime @updatedAt // Waktu terakhir update
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId // ID unik artikel (auto-generated)
+  title       String // Judul artikel
+  slug        String    @unique // Slug unik untuk URL artikel
+  thumbnail   String? // URL gambar thumbnail
+  content     String // Isi artikel
+  authorId    String    @db.ObjectId // ID penulis artikel
+  periodId    String?   @db.ObjectId // ID periode terkait (opsional)
+  isPublished Boolean   @default(false) // Status publikasi artikel
+  publishedAt DateTime? // Tanggal publikasi artikel
+  status      Status    @default(DRAFT) // Status artikel
+  categoryId  String?   @db.ObjectId // ID kategori artikel
+  createdAt   DateTime  @default(now()) // Waktu pembuatan artikel
+  updatedAt   DateTime  @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan artikel
-  author   User            @relation(fields: [authorId], references: [id], onDelete: Cascade) // Penulis artikel
-  category ArticleCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori artikel
-  period   Period?         @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode terkait
+  author   User             @relation(fields: [authorId], references: [id], onDelete: Cascade) // Penulis artikel
+  category ArticleCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori artikel
+  period   Period?          @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode terkait
   // approvals Approval[]     @relation("ArticleApprovals") // Persetujuan untuk artikel
 
-  @@index([isPublished, authorId, categoryId, status])
+  @@index([isPublished, authorId, status])
   @@map("articles")
 }
+
 model ArticleCategory {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId // ID unik kategori artikel (auto-generated)
-  name      String    @unique // Nama kategori artikel (harus unik)
-  createdAt DateTime  @default(now()) // Waktu pembuatan kategori
-  updatedAt DateTime  @updatedAt // Waktu terakhir update
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik kategori artikel (auto-generated)
+  name        String   @unique // Nama kategori artikel (harus unik)
+  description String? // Deskripsi kategori Article
+  createdAt   DateTime @default(now()) // Waktu pembuatan kategori
+  updatedAt   DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan kategori artikel
   articles Article[] // Artikel yang termasuk dalam kategori ini
@@ -394,58 +394,58 @@ model ArticleCategory {
 model FinanceCategory {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId // ID unik kategori keuangan (auto-generated)
   name        String      @unique // Nama kategori keuangan (harus unik)
-  description String?     // Deskripsi kategori keuangan
+  description String? // Deskripsi kategori keuangan
   type        FinanceType // Tipe kategori (pemasukan/pengeluaran)
-  isActive    Boolean     @default(true) // Status aktif kategori
+  // isActive    Boolean     @default(true) // Status aktif kategori
   createdAt   DateTime    @default(now()) // Waktu pembuatan kategori
   updatedAt   DateTime    @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan kategori keuangan
-  finances Finance[] // Transaksi keuangan yang termasuk dalam kategori ini
+  // Relations - Data yang terkait dengan kategori keuangan (one-to-many)
+  finances Finance[] // Relasi one-to-many dengan Finance
 
-  @@index([type, isActive])
+  // @@index([type, isActive])
   @@map("financeCategory")
 }
 
 model Finance {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String   // Nama transaksi
-  amount      Float    // Jumlah nominal transaksi
-  description String   // Deskripsi transaksi
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String // Nama transaksi
+  amount      Float // Jumlah nominal transaksi
+  description String // Deskripsi transaksi
   date        DateTime // Tanggal transaksi
-  categoryId  String     @db.ObjectId
   type        FinanceType // Tipe transaksi (pemasukan/pengeluaran)
-  periodId    String     @db.ObjectId
-  eventId     String?    @db.ObjectId
-  userId      String     @db.ObjectId
-  status      Status   @default(PENDING) // Status transaksi
-  proof       String?   // URL file bukti transaksi
-  createdAt   DateTime @default(now()) // Waktu pembuatan transaksi
-  updatedAt   DateTime @updatedAt // Waktu terakhir update
+  periodId    String      @db.ObjectId
+  eventId     String?     @db.ObjectId
+  userId      String      @db.ObjectId
+  status      Status      @default(PENDING) // Status transaksi
+  proof       String? // URL file bukti transaksi
+  categoryId  String?     @db.ObjectId // ID kategori keuangan
+  createdAt   DateTime    @default(now()) // Waktu pembuatan transaksi
+  updatedAt   DateTime    @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan transaksi keuangan
-  category FinanceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Kategori transaksi
-  period   Period          @relation(fields: [periodId], references: [id], onDelete: Cascade)   // Periode transaksi
-  event    Event?          @relation(fields: [eventId], references: [id], onDelete: SetNull)    // Kegiatan terkait (opsional)
-  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)     // Pengguna yang membuat transaksi
-  approvals Approval[]     @relation("FinanceApprovals") // Persetujuan untuk transaksi
+  category FinanceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori keuangan
+  period   Period           @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode transaksi
+  event    Event?           @relation(fields: [eventId], references: [id], onDelete: SetNull) // Kegiatan terkait (opsional)
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang membuat transaksi
+  approvals Approval[]        @relation("FinanceApprovals") // Persetujuan untuk transaksi
 
-  @@index([date, type, categoryId, status, periodId])
+  @@index([date, type, status, periodId])
   @@map("finances")
 }
 
 model OrganizationalStructure {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik struktur organisasi (auto-generated)
-  name     String   // Nama struktur organisasi
-  status   Status   @default(PENDING) // Status struktur organisasi
-  periodId String     @db.ObjectId // ID periode struktur organisasi
-  decree   String   // URL file Surat Keputusan (SK)
-  structure   String?  // URL file struktur organisasi
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik struktur organisasi (auto-generated)
+  name      String // Nama struktur organisasi
+  status    Status   @default(PENDING) // Status struktur organisasi
+  periodId  String   @db.ObjectId // ID periode struktur organisasi
+  decree    String // URL file Surat Keputusan (SK)
+  structure String? // URL file struktur organisasi
   createdAt DateTime @default(now()) // Waktu pembuatan struktur
   updatedAt DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan struktur organisasi
-  period      Period           @relation(fields: [periodId], references: [id], onDelete: Cascade, name: "OrganizationalStructurePeriod") // Periode struktur organisasi
+  period Period @relation(fields: [periodId], references: [id], onDelete: Cascade, name: "OrganizationalStructurePeriod") // Periode struktur organisasi
   // approvals Approval[] @relation("OrganizationalStructureApprovals") // Persetujuan untuk struktur organisasi
 
   @@index([status])
@@ -454,7 +454,7 @@ model OrganizationalStructure {
 
 model DepartmentTask {
   id         String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik tugas departemen (auto-generated)
-  note       String     // Catatan tugas departemen
+  note       String // Catatan tugas departemen
   department Department // Departemen yang memiliki tugas
   userId     String?    @db.ObjectId // ID pengguna yang ditugaskan (opsional)
   status     Status     @default(PENDING) // Status tugas departemen
@@ -469,93 +469,93 @@ model DepartmentTask {
   @@map("departmentTasks")
 }
 
-model LinkHub {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik link hub (auto-generated)
-  userId    String     @db.ObjectId // ID pengguna pemilik link hub
-  username  String?    // Username pengguna (opsional)
-  themeId   String?    @db.ObjectId // ID tema link hub (opsional)
-  status    Status   @default(PENDING) // Status link hub
-  createdAt DateTime @default(now()) // Waktu pembuatan link hub
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+// model LinkHub {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik link hub (auto-generated)
+//   userId    String     @db.ObjectId // ID pengguna pemilik link hub
+//   username  String?    // Username pengguna (opsional)
+//   themeId   String?    @db.ObjectId // ID tema link hub (opsional)
+//   status    Status   @default(PENDING) // Status link hub
+//   createdAt DateTime @default(now()) // Waktu pembuatan link hub
+//   updatedAt DateTime @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan link hub
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade) // Pemilik link hub
-  theme     LinkHubTheme? @relation(fields: [themeId], references: [id], onDelete: SetNull) // Tema link hub
-  details   LinkHubDetail[] // Detail link dalam hub
-  // approvals Approval[]   @relation("LinkHubApprovals") // Persetujuan link hub
+//   // Relations - Data yang terkait dengan link hub
+//   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade) // Pemilik link hub
+//   theme     LinkHubTheme? @relation(fields: [themeId], references: [id], onDelete: SetNull) // Tema link hub
+//   details   LinkHubDetail[] // Detail link dalam hub
+//   // approvals Approval[]   @relation("LinkHubApprovals") // Persetujuan link hub
 
-  @@index([userId, status])
-  @@map("linkHubs")
-}
+//   @@index([userId, status])
+//   @@map("linkHubs")
+// }
 
-model LinkHubDetail {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik detail link hub (auto-generated)
-  linkHubId String     @db.ObjectId // ID link hub induk
-  title     String     // Judul link
-  shortLink String?    // Short link (opsional)
-  url       String     // URL asli link
-  thumbnail String?    // URL gambar thumbnail
-  status    Status   @default(PENDING) // Status detail link
-  createdAt DateTime @default(now()) // Waktu pembuatan detail link
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+// model LinkHubDetail {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik detail link hub (auto-generated)
+//   linkHubId String     @db.ObjectId // ID link hub induk
+//   title     String     // Judul link
+//   shortLink String?    // Short link (opsional)
+//   url       String     // URL asli link
+//   thumbnail String?    // URL gambar thumbnail
+//   status    Status   @default(PENDING) // Status detail link
+//   createdAt DateTime @default(now()) // Waktu pembuatan detail link
+//   updatedAt DateTime @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan detail link hub
-  linkHub   LinkHub @relation(fields: [linkHubId], references: [id], onDelete: Cascade) // Link hub induk
-  // approvals Approval[] @relation("LinkHubDetailApprovals") // Persetujuan detail link
+//   // Relations - Data yang terkait dengan detail link hub
+//   linkHub   LinkHub @relation(fields: [linkHubId], references: [id], onDelete: Cascade) // Link hub induk
+//   // approvals Approval[] @relation("LinkHubDetailApprovals") // Persetujuan detail link
 
-  @@index([linkHubId, status])
-  @@map("linkHubDetails")
-}
+//   @@index([linkHubId, status])
+//   @@map("linkHubDetails")
+// }
 
-model LinkHubTheme {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik tema link hub (auto-generated)
-  name      String   // Nama tema
-  userId    String     @db.ObjectId // ID pengguna pembuat tema
-  data      String?  // Data konfigurasi tema (opsional)
-  isActive  Boolean  @default(false) // Status aktif tema
-  status    Status   @default(PENDING) // Status tema
-  createdAt DateTime @default(now()) // Waktu pembuatan tema
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+// model LinkHubTheme {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik tema link hub (auto-generated)
+//   name      String   // Nama tema
+//   userId    String     @db.ObjectId // ID pengguna pembuat tema
+//   data      String?  // Data konfigurasi tema (opsional)
+//   isActive  Boolean  @default(false) // Status aktif tema
+//   status    Status   @default(PENDING) // Status tema
+//   createdAt DateTime @default(now()) // Waktu pembuatan tema
+//   updatedAt DateTime @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan tema link hub
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat tema
-  linkHubs LinkHub[] // Link hubs yang menggunakan tema ini
-  // approvals Approval[] @relation("LinkHubThemeApprovals") // Persetujuan tema
+//   // Relations - Data yang terkait dengan tema link hub
+//   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat tema
+//   linkHubs LinkHub[] // Link hubs yang menggunakan tema ini
+//   // approvals Approval[] @relation("LinkHubThemeApprovals") // Persetujuan tema
 
-  @@index([isActive, userId, status])
-  @@map("linkHubThemes")
-}
+//   @@index([isActive, userId, status])
+//   @@map("linkHubThemes")
+// }
 
-model ShortLink {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik short link (auto-generated)
-  title     String   // Judul short link
-  shortName String   @unique // Nama pendek unik untuk short link
-  url       String   // URL asli yang akan di-shortlink
-  userId    String     @db.ObjectId // ID pengguna pembuat short link
-  status    Status   @default(PENDING) // Status short link
-  createdAt DateTime @default(now()) // Waktu pembuatan short link
-  updatedAt DateTime @updatedAt // Waktu terakhir update
+// model ShortLink {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik short link (auto-generated)
+//   title     String   // Judul short link
+//   shortName String   @unique // Nama pendek unik untuk short link
+//   url       String   // URL asli yang akan di-shortlink
+//   userId    String     @db.ObjectId // ID pengguna pembuat short link
+//   status    Status   @default(PENDING) // Status short link
+//   createdAt DateTime @default(now()) // Waktu pembuatan short link
+//   updatedAt DateTime @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan short link
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat short link
-  // approvals Approval[] @relation("ShortLinkApprovals") // Persetujuan short link
+//   // Relations - Data yang terkait dengan short link
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Pembuat short link
+//   // approvals Approval[] @relation("ShortLinkApprovals") // Persetujuan short link
 
-  @@index([userId, status])
-  @@map("shortLinks")
-}
+//   @@index([userId, status])
+//   @@map("shortLinks")
+// }
 
 model Letter {
   id           String         @id @default(auto()) @map("_id") @db.ObjectId // ID unik surat (auto-generated)
   number       String?        @unique // Nomor surat (unik)
-  regarding    String         // Perihal surat
-  origin       String         // Asal surat
-  destination  String         // Tujuan surat
-  date         DateTime       // Tanggal surat
-  type         LetterType     // Tipe surat
+  regarding    String // Perihal surat
+  origin       String // Asal surat
+  destination  String // Tujuan surat
+  date         DateTime // Tanggal surat
+  type         LetterType // Tipe surat
   priority     LetterPriority @default(NORMAL) // Prioritas surat
-  body         String?        // Isi surat (opsional)
-  letter       String?        // URL file surat
-  notes        String?        // Catatan tambahan
+  body         String? // Isi surat (opsional)
+  letter       String? // URL file surat
+  notes        String? // Catatan tambahan
   status       Status         @default(PENDING) // Status surat
   createdById  String         @db.ObjectId // ID pengguna yang membuat surat
   approvedById String?        @db.ObjectId // ID pengguna yang menyetujui surat (opsional)
@@ -565,12 +565,12 @@ model Letter {
   updatedAt    DateTime       @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan surat
-  createdBy    User           @relation(fields: [createdById], references: [id], onDelete: Cascade, name: "LetterCreator") // Pembuat surat
-  approvedBy   User?          @relation(fields: [approvedById], references: [id], onDelete: SetNull, name: "LetterApprover") // Penyetuju surat
-  period       Period?        @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode surat
-  event        Event?         @relation(fields: [eventId], references: [id], onDelete: SetNull) // Kegiatan terkait
-  attachments  Document[] // Dokumen lampiran surat
-  approvals    Approval[]     @relation("LetterApprovals") // Persetujuan surat
+  createdBy   User       @relation(fields: [createdById], references: [id], onDelete: Cascade, name: "LetterCreator") // Pembuat surat
+  approvedBy  User?      @relation(fields: [approvedById], references: [id], onDelete: SetNull, name: "LetterApprover") // Penyetuju surat
+  period      Period?    @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode surat
+  event       Event?     @relation(fields: [eventId], references: [id], onDelete: SetNull) // Kegiatan terkait
+  attachments Document[] // Dokumen lampiran surat
+  approvals Approval[]  @relation("LetterApprovals") // Persetujuan surat
 
   @@index([type, priority, status, createdById, periodId])
   @@map("letters")
@@ -578,33 +578,33 @@ model Letter {
 
 // Enum untuk tipe aktivitas dalam sistem
 enum ActivityType {
-  CREATE    // Membuat data baru
-  UPDATE    // Mengubah data
-  DELETE    // Menghapus data
-  LOGIN     // Login ke sistem
-  LOGOUT    // Logout dari sistem
-  APPROVE   // Menyetujui sesuatu
-  REJECT    // Menolak sesuatu
-  UPLOAD    // Mengunggah file
-  DOWNLOAD  // Mengunduh file
-  OTHER     // Aktivitas lainnya
+  CREATE // Membuat data baru
+  UPDATE // Mengubah data
+  DELETE // Menghapus data
+  LOGIN // Login ke sistem
+  LOGOUT // Logout dari sistem
+  APPROVE // Menyetujui sesuatu
+  REJECT // Menolak sesuatu
+  UPLOAD // Mengunggah file
+  DOWNLOAD // Mengunduh file
+  OTHER // Aktivitas lainnya
 }
 
 // Model untuk mencatat aktivitas pengguna dalam sistem
 model ActivityLog {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String       @db.ObjectId         // ID pengguna yang melakukan aktivitas
-  activityType ActivityType                     // Tipe aktivitas
-  entityType  String                           // Tipe entitas yang dipengaruhi (contoh: "User", "Article", dll)
-  entityId    String?      @db.ObjectId         // ID entitas yang dipengaruhi
-  description String                            // Deskripsi aktivitas
-  metadata    Json?                             // Data tambahan dalam format JSON (opsional)
-  ipAddress   String?                           // Alamat IP pengguna
-  userAgent   String?                           // User agent browser
-  createdAt   DateTime     @default(now())      // Waktu aktivitas tercatat
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String       @db.ObjectId // ID pengguna yang melakukan aktivitas
+  activityType ActivityType // Tipe aktivitas
+  entityType   String // Tipe entitas yang dipengaruhi (contoh: "User", "Article", dll)
+  entityId     String?      @db.ObjectId // ID entitas yang dipengaruhi
+  description  String // Deskripsi aktivitas
+  metadata     Json? // Data tambahan dalam format JSON (opsional)
+  ipAddress    String? // Alamat IP pengguna
+  userAgent    String? // User agent browser
+  createdAt    DateTime     @default(now()) // Waktu aktivitas tercatat
 
   // Relations
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, activityType, entityType, createdAt])
   @@map("activityLogs")
@@ -612,16 +612,16 @@ model ActivityLog {
 
 // Unified Approval Model dengan relasi yang benar - Model terpadu untuk semua jenis persetujuan
 model Approval {
-  id           String             @id @default(auto()) @map("_id") @db.ObjectId // ID unik persetujuan (auto-generated)
-  entityType   ApprovalType       // Tipe entitas yang memerlukan persetujuan
-  entityId     String             @db.ObjectId // ID entitas yang memerlukan persetujuan
-  userId       String             @db.ObjectId // ID pengguna yang memberikan persetujuan
-  status       StatusApproval     // Status persetujuan
-  note         String?            // Catatan tambahan untuk persetujuan
-  createdAt    DateTime           @default(now()) // Waktu pembuatan persetujuan
-  updatedAt    DateTime           @updatedAt // Waktu terakhir update
+  id         String         @id @default(auto()) @map("_id") @db.ObjectId // ID unik persetujuan (auto-generated)
+  entityType ApprovalType // Tipe entitas yang memerlukan persetujuan
+  entityId   String         @db.ObjectId // ID entitas yang memerlukan persetujuan
+  userId     String         @db.ObjectId // ID pengguna yang memberikan persetujuan
+  status     StatusApproval // Status persetujuan
+  note       String? // Catatan tambahan untuk persetujuan
+  createdAt  DateTime       @default(now()) // Waktu pembuatan persetujuan
+  updatedAt  DateTime       @updatedAt // Waktu terakhir update
 
-  // Relations - Data yang terkait dengan persetujuan
+    // Relations - Data yang terkait dengan persetujuan
   user         User               @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang memberikan persetujuan
 
   // Opposite relations untuk setiap entitas - Relasi terbalik ke berbagai jenis entitas

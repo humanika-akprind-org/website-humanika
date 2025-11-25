@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import type { Article } from "@/types/article";
 
 // Helper function to get preview URL from image (file ID or URL)
@@ -30,20 +29,13 @@ interface ArticleCardProps {
 }
 
 export default function ArticleCard({ article }: ArticleCardProps) {
-  const [formattedDate, setFormattedDate] = useState<string>("");
-
-  useEffect(() => {
-    if (article.createdAt) {
-      const date = new Date(article.createdAt);
-      setFormattedDate(
-        date.toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        })
-      );
-    }
-  }, [article.createdAt]);
+  const formattedDate = article.createdAt
+    ? new Date(article.createdAt).toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "";
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border-t-4 border-blue-600">

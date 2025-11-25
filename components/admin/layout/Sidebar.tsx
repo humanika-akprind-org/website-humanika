@@ -159,6 +159,9 @@ export default function Sidebar() {
           <NavDropdownItem href="/admin/program/events/add">
             Add New
           </NavDropdownItem>
+          <NavDropdownItem href="/admin/program/events/categories">
+            Categories
+          </NavDropdownItem>
           <NavDropdownItem href="/admin/program/events/approval">
             Approval
           </NavDropdownItem>
@@ -177,6 +180,9 @@ export default function Sidebar() {
           </NavDropdownItem>
           <NavDropdownItem href="/admin/administration/documents/add">
             Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/documents/types">
+            Document Type
           </NavDropdownItem>
           <NavDropdownItem href="/admin/administration/documents/approval">
             Approval
@@ -220,6 +226,9 @@ export default function Sidebar() {
           </NavDropdownItem>
           <NavDropdownItem href="/admin/content/galleries/add">
             Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/content/galleries/categories">
+            Categories
           </NavDropdownItem>
         </NavDropdown>
 

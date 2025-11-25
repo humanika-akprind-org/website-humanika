@@ -1,15 +1,84 @@
-export default function GalleryDetail({ params }: { params: { id: string } }) {
-  // In a real app, you would fetch this data based on params.id
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { getEvent, getEvents } from "@/use-cases/api/event";
+import { getGalleries } from "@/use-cases/api/gallery";
+import type { Event } from "@/types/event";
+import type { Gallery } from "@/types/gallery";
+import { Status } from "@/types/enums";
+import AlbumGrid from "@/components/public/gallery/AlbumGrid";
+import GalleryGrid from "@/components/public/gallery/GalleryGrid";
+
+interface GalleryDetailProps {
+  params: { id: string };
+}
+
+export default function GalleryDetail({ params }: GalleryDetailProps) {
+  const { id } = params;
+
+  // Helper function to get preview URL from image (file ID or URL)
+  function getPreviewUrl(image: string | null | undefined): string {
+    if (!image) return "";
+
+    if (image.includes("drive.google.com")) {
+      // It's a full Google Drive URL, convert to direct image URL
+      const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+      }
+      return image;
+    } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
+      // It's a Google Drive file ID, construct direct URL
+      return `https://drive.google.com/uc?export=view&id=${image}`;
+    } else {
+      // It's a direct URL or other format
+      return image;
+    }
+  }
+
+  const [event, setEvent] = useState<Event | null>(null);
+  const [galleries, setGalleries] = useState<Gallery[]>([]);
+  const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        const [eventData, galleriesData, eventsData] = await Promise.all([
+          getEvent(id),
+          getGalleries({ eventId: id }),
+          getEvents({ status: Status.PUBLISH }), // Fetch published events for related albums
+        ]);
+        setEvent(eventData);
+        setGalleries(galleriesData);
+        setRelatedEvents(eventsData.filter((e) => e.id !== id).slice(0, 3)); // Exclude current event, take first 3
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load gallery data"
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [id]);
+
+  if (loading) return <div>Loading gallery details...</div>;
+  if (error) return <div>Error loading gallery: {error}</div>;
+  if (!event) return <div>No event found.</div>;
+
   const album = {
-    id: params.id,
-    title: "Tech Conference 2023",
-    date: "2023-11-15",
-    description:
-      "Dokumentasi lengkap dari Tech Conference 2023 yang diselenggarakan oleh HUMANIKA dengan berbagai pembicara dari industri teknologi.",
-    photos: Array.from({ length: 24 }).map((_, i) => ({
-      id: i + 1,
-      title: `Foto ${i + 1} dari Tech Conference 2023`,
-      url: "/placeholder-photo.jpg",
+    id: event.id,
+    title: event.name,
+    date: event.startDate,
+    description: event.description,
+    photos: galleries.map((gallery) => ({
+      id: gallery.id,
+      title: gallery.title,
+      url: getPreviewUrl(gallery.image),
     })),
   };
 
@@ -32,24 +101,39 @@ export default function GalleryDetail({ params }: { params: { id: string } }) {
           <h1 className="text-4xl font-bold mb-4 text-gray-900">
             {album.title}
           </h1>
-          <p className="text-lg text-gray-700 mb-8">{album.description}</p>
+          <div
+            className="text-lg text-gray-700 mb-8"
+            dangerouslySetInnerHTML={{ __html: album.description }}
+          />
 
-          <div className="bg-gray-200 h-96 rounded-xl mb-8 flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-20 w-20 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          {event.thumbnail ? (
+            <div className="bg-white-0 rounded-xl mb-8 flex items-center justify-center w-full h-96 overflow-hidden relative">
+              <Image
+                src={getPreviewUrl(event.thumbnail)}
+                alt={album.title}
+                fill
+                style={{ objectFit: "contain" }}
+                className="rounded-xl"
               />
-            </svg>
-          </div>
+            </div>
+          ) : (
+            <div className="bg-gray-200 h-96 rounded-xl mb-8 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-20 w-20 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+          )}
         </section>
 
         {/* Photo Grid */}
@@ -57,96 +141,23 @@ export default function GalleryDetail({ params }: { params: { id: string } }) {
           <h2 className="text-2xl font-bold mb-8 text-gray-900 border-b-2 border-gray-200 pb-2">
             Semua Foto
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {album.photos.map((photo) => (
-              <div
-                key={photo.id}
-                className="aspect-square bg-gray-200 rounded-lg overflow-hidden relative group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                  <h3 className="text-white font-medium text-sm">
-                    {photo.title}
-                  </h3>
-                </div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-full w-full text-gray-400 group-hover:scale-105 transition-transform"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-            ))}
-          </div>
+          <GalleryGrid galleries={galleries} />
         </section>
 
         {/* Related Albums */}
-        <section className="max-w-4xl mx-auto">
+        <section>
           <h2 className="text-2xl font-bold mb-8 text-gray-900 border-b-2 border-gray-200 pb-2">
             Album Lainnya
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                id: "2",
-                title: "Hackathon Nasional",
-                count: 48,
-                cover: "/placeholder-hackathon.jpg",
-              },
-              {
-                id: "3",
-                title: "Workshop Series",
-                count: 32,
-                cover: "/placeholder-workshop.jpg",
-              },
-              {
-                id: "4",
-                title: "Kunjungan Industri",
-                count: 18,
-                cover: "/placeholder-industri.jpg",
-              },
-            ].map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <div className="aspect-video bg-gray-200 relative group">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                    <h3 className="text-white font-medium">{item.title}</h3>
-                  </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-full w-full text-gray-400 group-hover:scale-105 transition-transform"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg text-gray-800 mb-1">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm">
-                    {item.count} foto • Terakhir diupdate 2 minggu lalu
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <AlbumGrid
+            albums={relatedEvents.map((event) => ({
+              id: event.id,
+              title: event.name,
+              count: 0, // Placeholder, could fetch actual count if needed
+              cover: getPreviewUrl(event.thumbnail),
+              lastUpdated: event.updatedAt,
+            }))}
+          />
         </section>
       </main>
     </div>

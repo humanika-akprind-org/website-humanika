@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { CreateDocumentInput } from "@/types/document";
-import type { Status, DocumentType } from "@/types/enums";
+import type { Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth";
 import {
   getDocuments,
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get("type") as DocumentType;
+    const documentTypeId = searchParams.get("documentTypeId");
     const status = searchParams.get("status") as unknown as Status;
     const userId = searchParams.get("userId");
     const eventId = searchParams.get("eventId");
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
 
     const documents = await getDocuments({
-      type,
+      documentTypeId: documentTypeId || undefined,
       status,
       userId: userId || undefined,
       eventId: eventId || undefined,
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     const body: CreateDocumentInput = await request.json();
 
-    if (!body.name || !body.type) {
+    if (!body.name || !body.documentTypeId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
