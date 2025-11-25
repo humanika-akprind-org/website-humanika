@@ -215,13 +215,12 @@ model WorkProgram {
   goal           String // Tujuan program kerja
   periodId       String     @db.ObjectId // ID periode program
   responsibleId  String     @db.ObjectId // ID pengguna yang bertanggung jawab
-  approvalId     String?    @unique @db.ObjectId // ID persetujuan (opsional)
   createdAt      DateTime   @default(now()) // Waktu pembuatan program
   updatedAt      DateTime   @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan program kerja
   period      Period    @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode program kerja
-  approval    Approval? @relation("WorkProgramApproval", fields: [approvalId], references: [id], onDelete: SetNull) // Persetujuan untuk program kerja
+  approvals Approval[] @relation("WorkProgramApprovals") // Persetujuan untuk program kerja
   events      Event[] // Kegiatan yang termasuk dalam program kerja
   responsible User      @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible") // Pengguna yang bertanggung jawab
 
@@ -249,7 +248,6 @@ model Event {
   status         Status     @default(DRAFT) // Status kegiatan
   workProgramId  String?    @db.ObjectId // ID program kerja terkait (opsional)
   categoryId     String?    @db.ObjectId // ID kategori kegiatan
-  approvalId     String?    @unique @db.ObjectId // ID persetujuan (opsional)
   createdAt      DateTime   @default(now()) // Waktu pembuatan kegiatan
   updatedAt      DateTime   @updatedAt // Waktu terakhir update
 
@@ -258,7 +256,7 @@ model Event {
   workProgram WorkProgram?   @relation(fields: [workProgramId], references: [id], onDelete: SetNull) // Program kerja terkait
   category    EventCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori kegiatan
   documents   Document[] // Dokumen yang terkait dengan kegiatan
-  approval    Approval?      @relation("EventApproval", fields: [approvalId], references: [id], onDelete: SetNull) // Persetujuan untuk kegiatan
+  approvals Approval[]      @relation("EventApprovals") // Persetujuan untuk kegiatan
   galleries   Gallery[] // Galeri foto kegiatan
   finances    Finance[] // Transaksi keuangan kegiatan
   letters     Letter[] // Surat yang terkait dengan kegiatan
@@ -294,7 +292,6 @@ model Document {
   version        Int      @default(1) // Versi dokumen
   parentId       String?  @db.ObjectId // ID dokumen induk (untuk versioning)
   isCurrent      Boolean  @default(true) // Apakah ini versi terbaru
-  approvalId     String?  @unique @db.ObjectId // ID persetujuan (opsional)
   createdAt      DateTime @default(now()) // Waktu pembuatan dokumen
   updatedAt      DateTime @updatedAt // Waktu terakhir update
 
@@ -305,7 +302,7 @@ model Document {
   documentType    DocumentType @relation(fields: [documentTypeId], references: [id], onDelete: Cascade) // Tipe dokumen
   previousVersion Document?    @relation("DocumentVersions", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Versi sebelumnya
   nextVersions    Document[]   @relation("DocumentVersions") // Versi selanjutnya
-  approval        Approval?    @relation("DocumentApproval", fields: [approvalId], references: [id], onDelete: SetNull) // Persetujuan untuk dokumen
+  approvals       Approval[]   @relation("DocumentApprovals") // Persetujuan untuk transaksi
 
   @@index([documentTypeId, status, userId])
   @@map("documents")
@@ -423,7 +420,6 @@ model Finance {
   status      Status      @default(PENDING) // Status transaksi
   proof       String? // URL file bukti transaksi
   categoryId  String?     @db.ObjectId // ID kategori keuangan
-  approvalId  String?     @unique @db.ObjectId // ID persetujuan (opsional)
   createdAt   DateTime    @default(now()) // Waktu pembuatan transaksi
   updatedAt   DateTime    @updatedAt // Waktu terakhir update
 
@@ -432,7 +428,7 @@ model Finance {
   period   Period           @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode transaksi
   event    Event?           @relation(fields: [eventId], references: [id], onDelete: SetNull) // Kegiatan terkait (opsional)
   user     User             @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang membuat transaksi
-  approval Approval?        @relation("FinanceApproval", fields: [approvalId], references: [id], onDelete: SetNull) // Persetujuan untuk transaksi
+  approvals Approval[]        @relation("FinanceApprovals") // Persetujuan untuk transaksi
 
   @@index([date, type, status, periodId])
   @@map("finances")
@@ -574,8 +570,7 @@ model Letter {
   period      Period?    @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode surat
   event       Event?     @relation(fields: [eventId], references: [id], onDelete: SetNull) // Kegiatan terkait
   attachments Document[] // Dokumen lampiran surat
-  approval    Approval?  @relation("LetterApproval", fields: [approvalId], references: [id]) // Persetujuan surat (one-to-one)
-  approvalId  String?    @unique @db.ObjectId // ID persetujuan (opsional)
+  approvals Approval[]  @relation("LetterApprovals") // Persetujuan surat
 
   @@index([type, priority, status, createdById, periodId])
   @@map("letters")
@@ -627,14 +622,11 @@ model Approval {
   updatedAt  DateTime       @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan persetujuan
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang memberikan persetujuan
-  workProgram WorkProgram? @relation("WorkProgramApproval") // Program kerja yang disetujui
-  event       Event?       @relation("EventApproval") // Kegiatan yang disetujui
-  document    Document?    @relation("DocumentApproval") // Dokumen yang disetujui
-  finance     Finance?     @relation("FinanceApproval") // Transaksi keuangan yang disetujui
-  letter      Letter?      @relation("LetterApproval") // Surat yang disetujui
-
-  @@unique([entityType, entityId])
+  workPrograms          WorkProgram[]          @relation("WorkProgramApprovals") // Persetujuan program kerja
+  events                Event[]                @relation("EventApprovals") // Persetujuan kegiatan
+  finances              Finance[]              @relation("FinanceApprovals") // Persetujuan transaksi keuangan
+  documents             Document[]             @relation("DocumentApprovals") // Persetujuan dokumen
+  letters               Letter[]               @relation("LetterApprovals") // Persetujuan surat
   @@index([entityType, entityId, userId, status])
   @@map("approvals")
 }
