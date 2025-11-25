@@ -30,6 +30,7 @@ export async function createArticleCategory(
   const category = await prisma.articleCategory.create({
     data: {
       name: data.name.trim(),
+      description: data.description?.trim() || null,
     },
   });
 
@@ -70,6 +71,10 @@ export async function updateArticleCategory(
     updateData.name = data.name.trim();
   }
 
+  if (data.description !== undefined) {
+    updateData.description = data.description?.trim() || null;
+  }
+
   const category = await prisma.articleCategory.update({
     where: { id },
     data: updateData,
@@ -85,9 +90,11 @@ export async function updateArticleCategory(
     metadata: {
       oldData: {
         name: existingCategory.name,
+        description: existingCategory.description,
       },
       newData: {
         name: category.name,
+        description: category.description,
       },
     },
   });
