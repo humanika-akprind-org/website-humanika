@@ -11,6 +11,7 @@ import type {
 } from "@/types/gallery";
 import type { Event } from "@/types/event";
 import { useEvents } from "@/hooks/event/useEvents";
+import { useGalleryCategories } from "@/hooks/gallery-category/useGalleryCategories";
 import { useFile } from "@/hooks/useFile";
 import { galleryFolderId } from "@/lib/config/config";
 
@@ -55,6 +56,8 @@ export default function GalleryForm({
 }: GalleryFormProps) {
   const router = useRouter();
   const { events: hookEvents, isLoading: eventsLoading } = useEvents();
+  const { categories: galleryCategories, isLoading: categoriesLoading } =
+    useGalleryCategories();
   const events = propEvents || hookEvents;
   const {
     uploadFile,
@@ -68,6 +71,7 @@ export default function GalleryForm({
   const [formData, setFormData] = useState({
     title: gallery?.title || "",
     eventId: gallery?.eventId || "",
+    categoryId: gallery?.categoryId || "",
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -209,6 +213,7 @@ export default function GalleryForm({
       const submitData = {
         title: formData.title,
         eventId: formData.eventId,
+        categoryId: formData.categoryId,
         ...(imageUrl && { image: imageUrl }),
       };
 
@@ -328,6 +333,50 @@ export default function GalleryForm({
               </div>
               {errors.eventId && (
                 <p className="text-red-500 text-xs mt-1">{errors.eventId}</p>
+              )}
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiImage className="text-gray-400" />
+                </div>
+                <select
+                  name="categoryId"
+                  value={formData.categoryId}
+                  onChange={handleInputChange}
+                  disabled={categoriesLoading}
+                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                >
+                  <option value="">Select a category (Optional)</option>
+                  {galleryCategories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </div>
+              {categoriesLoading && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Loading categories...
+                </p>
               )}
             </div>
 

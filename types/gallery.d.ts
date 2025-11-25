@@ -1,4 +1,5 @@
 import { Status } from "./enums";
+import { GalleryCategory } from "./gallery-category";
 
 export interface Gallery {
   id: string;
@@ -6,6 +7,8 @@ export interface Gallery {
   image: string;
   eventId: string;
   gallery?: string | null;
+  categoryId?: string | null;
+  category?: GalleryCategory | null;
   createdAt: Date;
   updatedAt: Date;
   event?: {
@@ -19,6 +22,7 @@ export interface CreateGalleryInput {
   image: string;
   eventId: string;
   gallery?: string | null;
+  categoryId?: string;
   file?: File;
 }
 
