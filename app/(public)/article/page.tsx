@@ -4,14 +4,17 @@ import ArticleCard from "@/components/public/article/ArticleCard";
 import { useState, useEffect } from "react";
 import type { Article } from "@/types/article";
 
-export default function ArticlePage() {
+interface ArticlePageType extends React.FC {
+  fetchArticles?: () => void;
+}
+
+const ArticlePage: ArticlePageType = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // TypeScript fix: declare fetchArticles as static property to avoid errors when referencing it
-  (ArticlePage as any).fetchArticles =
-    (ArticlePage as any).fetchArticles || (() => {});
+  // Initialize fetchArticles as static property
+  ArticlePage.fetchArticles = ArticlePage.fetchArticles || (() => {});
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -35,7 +38,7 @@ export default function ArticlePage() {
     };
 
     // Expose fetchArticles for manual reload button usage
-    (ArticlePage as any).fetchArticles = fetchArticles;
+    ArticlePage.fetchArticles = fetchArticles;
 
     fetchArticles();
   }, []);
@@ -98,7 +101,7 @@ export default function ArticlePage() {
                   setLoading(true);
                   setError(null);
                   setArticles([]);
-                  (ArticlePage as any).fetchArticles();
+                  ArticlePage.fetchArticles?.();
                 }}
                 className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium shadow-md"
               >
@@ -108,9 +111,27 @@ export default function ArticlePage() {
           )}
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
+            {articles.map((article) => {
+              const formattedDate = article.createdAt
+                ? new Date(article.createdAt).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "";
+              const truncatedContent =
+                article.content && article.content.length > 150
+                  ? `${article.content.substring(0, 150)}...`
+                  : article.content || "";
+              return (
+                <ArticleCard
+                  key={article.id}
+                  article={article}
+                  formattedDate={formattedDate}
+                  truncatedContent={truncatedContent}
+                />
+              );
+            })}
           </div>
 
           {!loading && !error && articles.length > 0 && (
@@ -124,4 +145,6 @@ export default function ArticlePage() {
       </main>
     </div>
   );
-}
+};
+
+export default ArticlePage;
