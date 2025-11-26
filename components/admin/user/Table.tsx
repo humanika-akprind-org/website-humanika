@@ -160,7 +160,7 @@ export default function UserTable({
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <Avatar user={user} />
+                    <Avatar user={user} size="sm" />
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
                         {user.name}

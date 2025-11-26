@@ -14,6 +14,7 @@ import { UserRole, Department, Position } from "@/types/enums";
 import { formatEnumValue } from "@/lib/utils";
 import { UserApi } from "@/use-cases/api/user";
 import type { User, UpdateUserData } from "@/types/user";
+import Avatar from "../ui/avatar/Avatar";
 
 interface UserEditFormProps {
   userId: string;
@@ -206,19 +207,7 @@ export default function UserEditForm({
 
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6">
         <div className="flex items-center">
-          <div
-            className="flex-shrink-0 rounded-full overflow-hidden"
-            style={{ backgroundColor: user.avatarColor }}
-          >
-            <span className="w-16 h-16 flex items-center justify-center text-white font-semibold text-lg">
-              {user.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2)}
-            </span>
-          </div>
+          <Avatar user={user} size="xl" />
           <div className="ml-4">
             <div className="text-sm font-medium text-gray-900">{user.name}</div>
             <div className="text-sm text-gray-500 flex items-center">

@@ -76,7 +76,7 @@ export default function UserInfo() {
           </p>
         </div>
         <Link href="/admin/settings/profile">
-          <Avatar user={user} />
+          <Avatar user={user} size="md" />
         </Link>
       </button>
 

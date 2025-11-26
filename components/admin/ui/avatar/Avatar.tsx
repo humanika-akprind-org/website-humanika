@@ -2,22 +2,30 @@ import type { User } from "@/types/user";
 
 interface AvatarProps {
   user: User;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
 export default function Avatar({ user, size = "md" }: AvatarProps) {
   const sizeClasses = {
     sm: {
-      avatar: "w-8 h-8",
+      avatar: "w-10 h-10",
       text: "text-xs",
     },
     md: {
-      avatar: "w-10 h-10",
+      avatar: "w-12 h-12",
       text: "text-sm",
     },
     lg: {
-      avatar: "w-12 h-12",
+      avatar: "w-14 h-14",
       text: "text-base",
+    },
+    xl: {
+      avatar: "w-16 h-16",
+      text: "text-lg",
+    },
+    xxl: {
+      avatar: "w-18 h-18",
+      text: "text-xl",
     },
   };
 
