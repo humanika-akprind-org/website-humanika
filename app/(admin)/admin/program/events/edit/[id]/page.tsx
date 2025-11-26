@@ -73,17 +73,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-      const eventPayload: Omit<
-        Event,
-        | "id"
-        | "responsible"
-        | "period"
-        | "workProgram"
-        | "status"
-        | "createdAt"
-        | "updatedAt"
-        | "approvals"
-      > & { usedFunds: number } = {
+      const eventPayload = {
         name: eventData.name,
         slug,
         thumbnail: eventData.thumbnail,
@@ -97,12 +87,11 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         funds: parseFloat(String(eventData.funds)) || 0,
         remainingFunds: parseFloat(String(eventData.funds)) || 0,
         usedFunds: eventData.usedFunds || 0,
+        workProgramId:
+          eventData.workProgramId && eventData.workProgramId.trim() !== ""
+            ? eventData.workProgramId
+            : undefined,
       };
-
-      // Only include workProgramId if it's provided and not empty
-      if (eventData.workProgramId && eventData.workProgramId.trim() !== "") {
-        eventPayload.workProgramId = eventData.workProgramId;
-      }
 
       await prisma.event.update({
         where: { id: params.id },
@@ -142,17 +131,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-      const eventPayload: Omit<
-        Event,
-        | "id"
-        | "responsible"
-        | "period"
-        | "workProgram"
-        | "status"
-        | "createdAt"
-        | "updatedAt"
-        | "approvals"
-      > & { usedFunds: number } = {
+      const eventPayload = {
         name: eventData.name,
         slug,
         thumbnail: eventData.thumbnail,
@@ -166,12 +145,11 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         funds: parseFloat(String(eventData.funds)) || 0,
         remainingFunds: parseFloat(String(eventData.funds)) || 0,
         usedFunds: eventData.usedFunds || 0,
+        workProgramId:
+          eventData.workProgramId && eventData.workProgramId.trim() !== ""
+            ? eventData.workProgramId
+            : undefined,
       };
-
-      // Only include workProgramId if it's provided and not empty
-      if (eventData.workProgramId && eventData.workProgramId.trim() !== "") {
-        eventPayload.workProgramId = eventData.workProgramId;
-      }
 
       // Update the event with PENDING status
       await prisma.event.update({

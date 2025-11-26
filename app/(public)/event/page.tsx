@@ -86,9 +86,22 @@ export default function EventPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {upcomingEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
+            {upcomingEvents.map((event) => {
+              // Truncate description for EventCard
+              const truncatedDescription = event.description
+                ? event.description.length > 150
+                  ? event.description.substring(0, 150) + "..."
+                  : event.description
+                : "";
+
+              return (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  truncatedDescription={truncatedDescription}
+                />
+              );
+            })}
           </div>
 
           <div className="mt-12 text-center">

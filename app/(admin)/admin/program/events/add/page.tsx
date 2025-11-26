@@ -61,6 +61,12 @@ async function AddEventPage() {
         | "createdAt"
         | "updatedAt"
         | "approvals"
+        | "categoryId"
+        | "category"
+        | "documents"
+        | "galleries"
+        | "finances"
+        | "letters"
       > = {
         name: eventData.name,
         slug,
@@ -129,6 +135,12 @@ async function AddEventPage() {
         | "createdAt"
         | "updatedAt"
         | "approvals"
+        | "categoryId"
+        | "category"
+        | "galleries"
+        | "finances"
+        | "letters"
+        | "documents"
       > = {
         name: eventData.name,
         slug,
