@@ -7,7 +7,7 @@ import UserStats from "@/components/admin/user/Stats";
 import UserFilters from "@/components/admin/user/Filters";
 import UserTable from "@/components/admin/user/Table";
 import DeleteModal from "@/components/admin/user/modal/DeleteModal";
-import PasswordResetModal from "@/components/admin/user/modal/PasswordResetModal";
+import ViewUserModal from "@/components/admin/user/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";
 import { UserApi } from "@/use-cases/api/user";
 import type { User, UserFilters as UserFiltersType } from "@/types/user";
@@ -28,11 +28,8 @@ export default function UsersPage() {
     isActive: "",
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [forceReset, setForceReset] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -83,6 +80,14 @@ export default function UsersPage() {
       setSelectedUsers([]);
     } else {
       setSelectedUsers(users.map((user) => user.id));
+    }
+  };
+
+  const handleViewUser = (id: string) => {
+    const user = users.find((u) => u.id === id);
+    if (user) {
+      setCurrentUser(user);
+      setShowViewModal(true);
     }
   };
 
@@ -158,23 +163,6 @@ export default function UsersPage() {
     }
   };
 
-  const confirmPasswordReset = () => {
-    if (newPassword !== confirmPassword) {
-      setError("Passwords don't match!");
-      return;
-    }
-
-    console.log(`Password reset for ${currentUser?.name} to: ${newPassword}`);
-    console.log(`Force reset on next login: ${forceReset}`);
-
-    setShowPasswordModal(false);
-    setCurrentUser(null);
-    setNewPassword("");
-    setConfirmPassword("");
-    setSuccess("Password reset successfully");
-    setTimeout(() => setSuccess(""), 3000);
-  };
-
   const handleFilterChange = (key: keyof UserFiltersType, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
@@ -235,6 +223,7 @@ export default function UsersPage() {
         totalPages={totalPages}
         onUserSelect={toggleUserSelection}
         onSelectAll={toggleSelectAll}
+        onViewUser={handleViewUser}
         onEditUser={handleEditUser}
         onDeleteUser={handleDelete}
         onLockAccount={handleLockAccount}
@@ -253,20 +242,13 @@ export default function UsersPage() {
         onConfirm={confirmDelete}
       />
 
-      <PasswordResetModal
-        isOpen={showPasswordModal}
+      <ViewUserModal
+        isOpen={showViewModal}
         user={currentUser}
-        newPassword={newPassword}
-        confirmPassword={confirmPassword}
-        forceReset={forceReset}
         onClose={() => {
-          setShowPasswordModal(false);
+          setShowViewModal(false);
           setCurrentUser(null);
         }}
-        onPasswordChange={setNewPassword}
-        onConfirmPasswordChange={setConfirmPassword}
-        onForceResetChange={setForceReset}
-        onConfirm={confirmPasswordReset}
       />
     </div>
   );

@@ -1,30 +1,12 @@
-import {
-  FiEdit,
-  FiTrash2,
-  FiUnlock,
-  FiLock,
-  FiX,
-  FiMail,
-} from "react-icons/fi";
-import type { User } from "@/types/user";
-import { UserRole } from "@/types/enums";
-import { formatEnumValue } from "@/use-cases/api/user";
+import { FiEye, FiX, FiEdit, FiTrash, FiLock, FiUnlock } from "react-icons/fi";
+import type { UserTableProps } from "@/types/user";
 import Avatar from "../ui/avatar/Avatar";
-
-interface UserTableProps {
-  users: User[];
-  selectedUsers: string[];
-  loading: boolean;
-  currentPage: number;
-  totalPages: number;
-  onUserSelect: (id: string) => void;
-  onSelectAll: () => void;
-  onEditUser: (id: string) => void;
-  onDeleteUser: (user: User) => void;
-  onLockAccount: (userId: string) => void;
-  onUnlockAccount: (userId: string) => void;
-  onPageChange: (page: number) => void;
-}
+import Role from "../ui/chip/user/Role";
+import PositionChip from "../ui/chip/user/Position";
+import DepartmentChip from "../ui/chip/user/Department";
+import UserInfo from "../ui/user/UserInfo";
+import DropdownMenu, { DropdownMenuItem } from "../ui/dropdown/DropdownMenu";
+import ActiveChip from "../ui/chip/user/Active";
 
 export default function UserTable({
   users,
@@ -34,42 +16,13 @@ export default function UserTable({
   totalPages,
   onUserSelect,
   onSelectAll,
+  onViewUser,
   onEditUser,
   onDeleteUser,
   onLockAccount,
   onUnlockAccount,
   onPageChange,
 }: UserTableProps) {
-  const getStatusClass = (isActive: boolean) =>
-    isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
-
-  const getRoleClass = (role: UserRole) => {
-    switch (role) {
-      case UserRole.DPO:
-        return "bg-purple-100 text-purple-800";
-      case UserRole.BPH:
-        return "bg-blue-100 text-blue-800";
-      case UserRole.PENGURUS:
-        return "bg-indigo-100 text-indigo-800";
-      case UserRole.ANGGOTA:
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const formatDate = (date: Date | string) => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return (
-      dateObj.toLocaleDateString() +
-      " " +
-      dateObj.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    );
-  };
-
   if (users.length === 0 && !loading) {
     return (
       <div className="text-center py-12">
@@ -135,16 +88,8 @@ export default function UserTable({
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Created At
-              </th>
-              <th
-                scope="col"
                 className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Actions
-              </th>
+              />
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -161,81 +106,62 @@ export default function UserTable({
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <Avatar user={user} size="sm" />
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {user.name}
-                      </div>
-                      <div className="text-sm text-gray-500 flex items-center">
-                        <FiMail className="mr-1 text-gray-400" size={14} />
-                        {user.email}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        @{user.username}
-                      </div>
-                    </div>
+                    <UserInfo user={user} />
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getRoleClass(
-                      user.role
-                    )}`}
-                  >
-                    {formatEnumValue(user.role)}
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {user.department ? formatEnumValue(user.department) : "-"}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {user.position ? formatEnumValue(user.position) : "-"}
+                  <Role role={user.role} />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusClass(
-                      user.isActive
-                    )}`}
-                  >
-                    {user.isActive ? "Active" : "Inactive"}
-                  </span>
+                  <DepartmentChip department={user.department} />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(user.createdAt)}
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <PositionChip position={user.position} />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <ActiveChip isActive={user.isActive} />
                 </td>
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                  <DropdownMenu>
+                    <DropdownMenuItem
+                      onClick={() => onViewUser(user.id)}
+                      color="default"
+                    >
+                      <FiEye className="mr-2" size={14} />
+                      View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => onEditUser(user.id)}
-                      title="Edit user"
+                      color="blue"
                     >
-                      <FiEdit size={16} />
-                    </button>
-                    <button
-                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                      <FiEdit className="mr-2" size={14} />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => onDeleteUser(user)}
-                      title="Delete user"
+                      color="red"
                     >
-                      <FiTrash2 size={16} />
-                    </button>
+                      <FiTrash className="mr-2" size={14} />
+                      Delete
+                    </DropdownMenuItem>
                     {!user.isActive ? (
-                      <button
-                        className="p-1.5 rounded-lg text-purple-600 hover:bg-purple-50 transition-colors"
+                      <DropdownMenuItem
                         onClick={() => onUnlockAccount(user.id)}
-                        title="Activate account"
+                        color="green"
                       >
-                        <FiUnlock size={16} />
-                      </button>
+                        <FiUnlock className="mr-2" size={14} />
+                        Activate account
+                      </DropdownMenuItem>
                     ) : (
-                      <button
-                        className="p-1.5 rounded-lg text-orange-600 hover:bg-orange-50 transition-colors"
+                      <DropdownMenuItem
                         onClick={() => onLockAccount(user.id)}
-                        title="Deactivate account"
+                        color="orange"
                       >
-                        <FiLock size={16} />
-                      </button>
+                        <FiLock className="mr-2" size={14} />
+                        Deactivate account
+                      </DropdownMenuItem>
                     )}
-                  </div>
+                  </DropdownMenu>
                 </td>
               </tr>
             ))}
@@ -256,7 +182,7 @@ export default function UserTable({
           <p className="text-sm text-gray-700 mb-4 sm:mb-0">
             Showing <span className="font-medium">{users.length}</span> users
           </p>
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-1">
             <button
               className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
               onClick={() => onPageChange(currentPage - 1)}
@@ -264,6 +190,76 @@ export default function UserTable({
             >
               Previous
             </button>
+
+            {/* Page Numbers */}
+            {(() => {
+              const pages = [];
+              const delta = 2; // Number of pages to show on each side of current page
+
+              // Always show first page
+              if (1 < currentPage - delta) {
+                pages.push(
+                  <button
+                    key={1}
+                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+                    onClick={() => onPageChange(1)}
+                  >
+                    1
+                  </button>
+                );
+                if (2 < currentPage - delta) {
+                  pages.push(
+                    <span key="start-ellipsis" className="px-2 text-gray-500">
+                      ...
+                    </span>
+                  );
+                }
+              }
+
+              // Show pages around current page
+              for (
+                let i = Math.max(1, currentPage - delta);
+                i <= Math.min(totalPages, currentPage + delta);
+                i++
+              ) {
+                pages.push(
+                  <button
+                    key={i}
+                    className={`px-3 py-1.5 text-sm border rounded-md ${
+                      i === currentPage
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                    }`}
+                    onClick={() => onPageChange(i)}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+
+              // Always show last page
+              if (totalPages > currentPage + delta) {
+                if (totalPages - 1 > currentPage + delta) {
+                  pages.push(
+                    <span key="end-ellipsis" className="px-2 text-gray-500">
+                      ...
+                    </span>
+                  );
+                }
+                pages.push(
+                  <button
+                    key={totalPages}
+                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+                    onClick={() => onPageChange(totalPages)}
+                  >
+                    {totalPages}
+                  </button>
+                );
+              }
+
+              return pages;
+            })()}
+
             <button
               className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 disabled:opacity-50"
               onClick={() => onPageChange(currentPage + 1)}
