@@ -93,7 +93,7 @@ export default function FinanceTransactionsReportsPage() {
     // Category filter
     if (categoryFilter !== "all") {
       filtered = filtered.filter(
-        (finance) => finance.category.id === categoryFilter
+        (finance) => finance.category?.id === categoryFilter
       );
     }
 
@@ -223,7 +223,7 @@ export default function FinanceTransactionsReportsPage() {
       `Rp ${finance.amount.toLocaleString()}`,
       finance.description,
       new Date(finance.date).toLocaleDateString(),
-      finance.category.name,
+      finance.category?.name || "Tidak ada kategori",
       finance.type,
       finance.status,
       finance.user.name,
@@ -268,7 +268,7 @@ export default function FinanceTransactionsReportsPage() {
         Amount: finance.amount,
         Description: finance.description,
         Date: new Date(finance.date).toLocaleDateString(),
-        Category: finance.category.name,
+        Category: finance.category?.name || "Tidak ada kategori",
         Type: finance.type,
         Status: finance.status,
         User: finance.user.name,

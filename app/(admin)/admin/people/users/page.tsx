@@ -8,6 +8,7 @@ import UserFilters from "@/components/admin/user/Filters";
 import UserTable from "@/components/admin/user/Table";
 import DeleteModal from "@/components/admin/user/modal/DeleteModal";
 import PasswordResetModal from "@/components/admin/user/modal/PasswordResetModal";
+import Loading from "@/components/admin/layout/loading/Loading";
 import { UserApi } from "@/use-cases/api/user";
 import type { User, UserFilters as UserFiltersType } from "@/types/user";
 
@@ -100,14 +101,6 @@ export default function UsersPage() {
     setShowDeleteModal(true);
   };
 
-  const handleResetPassword = (user: User) => {
-    setCurrentUser(user);
-    setNewPassword("");
-    setConfirmPassword("");
-    setForceReset(false);
-    setShowPasswordModal(true);
-  };
-
   const handleLockAccount = async (userId: string) => {
     try {
       const response = await UserApi.toggleUserStatus(userId, false);
@@ -187,6 +180,10 @@ export default function UsersPage() {
     setCurrentPage(1);
   };
 
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
@@ -240,7 +237,6 @@ export default function UsersPage() {
         onSelectAll={toggleSelectAll}
         onEditUser={handleEditUser}
         onDeleteUser={handleDelete}
-        onResetPassword={handleResetPassword}
         onLockAccount={handleLockAccount}
         onUnlockAccount={handleUnlockAccount}
         onPageChange={setCurrentPage}

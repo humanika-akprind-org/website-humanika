@@ -5,6 +5,10 @@ import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceCategory } from "@/types/finance-category";
 import type { Period } from "@/types/period";
 import type { Event } from "@/types/event";
+import type { Gallery } from "@/types/gallery";
+import type { Finance } from "@/types/finance";
+import type { Letter } from "@/types/letter";
+import type { Document } from "@/types/document";
 import type {
   Department,
   FinanceType,
@@ -148,7 +152,6 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
         },
       }),
       prisma.financeCategory.findMany({
-        where: { isActive: true },
         orderBy: { createdAt: "desc" },
       }),
       prisma.period.findMany({
@@ -199,6 +202,11 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
               },
             },
           },
+          approvals: true,
+          galleries: true,
+          finances: true,
+          letters: true,
+          documents: true,
         },
       }),
     ]);
@@ -208,28 +216,32 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
     }
 
     // Transform data to match expected types
-    const transformedFinance = {
+    const transformedFinance: Finance = {
       id: finance.id,
       name: finance.name,
       amount: finance.amount,
       description: finance.description || "",
       date: finance.date,
-      categoryId: finance.categoryId,
+      categoryId: finance.categoryId!,
       type: finance.type as FinanceType,
       periodId: finance.periodId,
+      eventId: finance.eventId,
       userId: finance.userId,
       status: finance.status as Status,
       proof: finance.proof,
-      eventId: finance.eventId,
-      category: {
-        id: finance.category.id,
-        name: finance.category.name,
-        type: finance.category.type as FinanceType,
-        description: finance.category.description ?? undefined,
-        isActive: finance.category.isActive,
-        createdAt: finance.category.createdAt,
-        updatedAt: finance.category.updatedAt,
-      },
+      createdAt: finance.createdAt,
+      updatedAt: finance.updatedAt,
+      // Relations
+      category: finance.category
+        ? {
+            id: finance.category.id,
+            name: finance.category.name,
+            type: finance.category.type as FinanceType,
+            description: finance.category.description ?? undefined,
+            createdAt: finance.category.createdAt,
+            updatedAt: finance.category.updatedAt,
+          }
+        : undefined,
       period: finance.period,
       event: finance.event
         ? {
@@ -244,10 +256,10 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
               name: finance.event.responsible.name,
               email: finance.event.responsible.email,
               username: finance.event.responsible.username,
-              role: finance.event.responsible.role,
+              role: finance.event.responsible.role as UserRole,
               department: finance.event.responsible
                 .department as Department | null,
-              position: finance.event.responsible.position,
+              position: finance.event.responsible.position as Position | null,
               isActive: finance.event.responsible.isActive,
               verifiedAccount: finance.event.responsible.verifiedAccount,
               attemptLogin: finance.event.responsible.attemptLogin,
@@ -287,10 +299,12 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
                     name: finance.event.workProgram.responsible.name,
                     email: finance.event.workProgram.responsible.email,
                     username: finance.event.workProgram.responsible.username,
-                    role: finance.event.workProgram.responsible.role,
+                    role: finance.event.workProgram.responsible
+                      .role as UserRole,
                     department: finance.event.workProgram.responsible
                       .department as Department | null,
-                    position: finance.event.workProgram.responsible.position,
+                    position: finance.event.workProgram.responsible
+                      .position as Position | null,
                     isActive: finance.event.workProgram.responsible.isActive,
                     verifiedAccount:
                       finance.event.workProgram.responsible.verifiedAccount,
@@ -307,10 +321,15 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
                   updatedAt: finance.event.workProgram.updatedAt,
                 }
               : null,
+            approvals: [],
+            galleries: [],
+            finances: [],
+            letters: [],
+            documents: [],
             createdAt: finance.event.createdAt,
             updatedAt: finance.event.updatedAt,
           }
-        : undefined,
+        : null,
       user: {
         id: finance.user.id,
         name: finance.user.name,
@@ -327,8 +346,7 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
         updatedAt: finance.user.updatedAt,
         avatarColor: finance.user.avatarColor,
       },
-      createdAt: finance.createdAt,
-      updatedAt: finance.updatedAt,
+      approvals: [], // Optional approvals array
     };
 
     const transformedCategories: FinanceCategory[] = categories.map((cat) => ({
@@ -336,7 +354,6 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
       name: cat.name,
       description: cat.description ?? undefined,
       type: cat.type as FinanceType,
-      isActive: cat.isActive,
       createdAt: cat.createdAt,
       updatedAt: cat.updatedAt,
     }));
@@ -356,7 +373,7 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
         username: event.responsible.username,
         role: event.responsible.role as UserRole,
         department: event.responsible.department as Department | null,
-        position: event.responsible.position,
+        position: event.responsible.position as Position | null,
         isActive: event.responsible.isActive,
         verifiedAccount: event.responsible.verifiedAccount,
         attemptLogin: event.responsible.attemptLogin,
@@ -398,7 +415,8 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
               role: event.workProgram.responsible.role as UserRole,
               department: event.workProgram.responsible
                 .department as Department | null,
-              position: event.workProgram.responsible.position,
+              position: event.workProgram.responsible
+                .position as Position | null,
               isActive: event.workProgram.responsible.isActive,
               verifiedAccount: event.workProgram.responsible.verifiedAccount,
               attemptLogin: event.workProgram.responsible.attemptLogin,
@@ -411,6 +429,17 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
             updatedAt: event.workProgram.updatedAt,
           }
         : null,
+      approvals: event.approvals.map((approval) => ({
+        ...approval,
+        entityType: approval.entityType as ApprovalType,
+        note: approval.note || undefined,
+        createdAt: approval.createdAt.toISOString(),
+        updatedAt: approval.updatedAt.toISOString(),
+      })),
+      galleries: event.galleries as Gallery[],
+      finances: event.finances as Finance[],
+      letters: event.letters as Letter[],
+      documents: event.documents as Document[],
       createdAt: event.createdAt,
       updatedAt: event.updatedAt,
     }));

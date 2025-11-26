@@ -13,6 +13,7 @@ import { UserApi } from "@/use-cases/api/user";
 import Stats from "@/components/admin/user/roles/Stats";
 import Filters from "@/components/admin/user/roles/Filters";
 import Table from "@/components/admin/user/roles/Table";
+import Loading from "@/components/admin/layout/loading/Loading";
 
 export default function VerifyAccountsPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -190,6 +191,10 @@ export default function VerifyAccountsPage() {
     setSearchTerm("");
     setCurrentPage(1);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div>

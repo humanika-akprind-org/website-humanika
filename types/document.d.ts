@@ -1,4 +1,4 @@
-import { Status } from "./enums";
+import { Status, DocumentType as DocumentTypeEnum } from "./enums";
 import { User } from "./user";
 import { Event } from "./event";
 import { Letter } from "./letter";
@@ -11,6 +11,7 @@ export interface Document {
   eventId?: string | null;
   letterId?: string | null;
   documentTypeId: string;
+  type: DocumentTypeEnum;
   status: Status;
   document?: string | null;
   userId: string;

@@ -10,7 +10,6 @@ import { cookies } from "next/headers";
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
-  Document,
 } from "@/types/document";
 import { Status, ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/enums";
@@ -61,28 +60,14 @@ async function AddDocumentPage() {
       // Cast data to CreateDocumentInput since this is the add page
       const documentData = data as CreateDocumentInput;
 
-      if (!documentData.name || !documentData.type) {
+      if (!documentData.name || !documentData.documentTypeId) {
         throw new Error("Missing required fields");
       }
 
       // Prepare data to send
-      const submitData: Omit<
-        Document,
-        | "id"
-        | "user"
-        | "event"
-        | "letter"
-        | "version"
-        | "parentId"
-        | "isCurrent"
-        | "createdAt"
-        | "updatedAt"
-        | "previousVersion"
-        | "nextVersions"
-        | "approvals"
-      > = {
+      const submitData = {
         name: documentData.name,
-        type: documentData.type,
+        documentTypeId: documentData.documentTypeId,
         status: Status.DRAFT,
         document: documentData.document,
         userId: user.id,
@@ -110,28 +95,14 @@ async function AddDocumentPage() {
       // Cast data to CreateDocumentInput since this is the add page
       const documentData = data as CreateDocumentInput;
 
-      if (!documentData.name || !documentData.type) {
+      if (!documentData.name || !documentData.documentTypeId) {
         throw new Error("Missing required fields");
       }
 
       // Prepare data to send
-      const submitData: Omit<
-        Document,
-        | "id"
-        | "user"
-        | "event"
-        | "letter"
-        | "version"
-        | "parentId"
-        | "isCurrent"
-        | "createdAt"
-        | "updatedAt"
-        | "previousVersion"
-        | "nextVersions"
-        | "approvals"
-      > = {
+      const submitData = {
         name: documentData.name,
-        type: documentData.type,
+        documentTypeId: documentData.documentTypeId,
         status: Status.PENDING,
         document: documentData.document,
         userId: user.id,

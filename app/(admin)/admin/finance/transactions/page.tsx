@@ -91,7 +91,7 @@ export default function FinanceTransactionsPage() {
     // Category filter
     if (categoryFilter !== "all") {
       filtered = filtered.filter(
-        (finance) => finance.category.id === categoryFilter
+        (finance) => finance.category?.id === categoryFilter
       );
     }
 

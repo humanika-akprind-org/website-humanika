@@ -19,7 +19,6 @@ export const getFinanceCategories = async (filter: {
   const where: Prisma.FinanceCategoryWhereInput = {};
 
   if (filter.type) where.type = { equals: filter.type };
-  if (filter.isActive !== undefined)  where.isActive = { equals: filter.isActive === "true" };
   if (filter.search) {
     where.OR = [
       { name: { contains: filter.search, mode: "insensitive" } },
@@ -90,7 +89,6 @@ export const createFinanceCategory = async (
         name: financeCategory.name,
         description: financeCategory.description,
         type: financeCategory.type,
-        isActive: financeCategory.isActive,
       },
     },
   });
@@ -143,13 +141,11 @@ export const updateFinanceCategory = async (
         name: existingFinanceCategory.name,
         description: existingFinanceCategory.description,
         type: existingFinanceCategory.type,
-        isActive: existingFinanceCategory.isActive,
       },
       newData: {
         name: financeCategory.name,
         description: financeCategory.description,
         type: financeCategory.type,
-        isActive: financeCategory.isActive,
       },
     },
   });
@@ -183,7 +179,6 @@ export const deleteFinanceCategory = async (id: string, user: UserWithId) => {
         name: existingFinanceCategory.name,
         description: existingFinanceCategory.description,
         type: existingFinanceCategory.type,
-        isActive: existingFinanceCategory.isActive,
       },
       newData: null,
     },

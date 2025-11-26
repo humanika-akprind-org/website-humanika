@@ -21,7 +21,7 @@ export interface Finance {
   createdAt: Date;
   updatedAt: Date;
   // Relations
-  category: FinanceCategory;
+  category?: FinanceCategory;
   period: Period;
   event?: Event | null;
   user: User;

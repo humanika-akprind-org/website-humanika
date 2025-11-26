@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import type { CreateLetterInput, UpdateLetterInput } from "@/types/letter";
-import type { LetterType, LetterPriority, Status } from "@/types/enums";
+import type { LetterType, LetterPriority } from "@/types/enums";
+import { Status } from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
@@ -60,7 +61,7 @@ export const getLetters = async (filter: {
           document: true,
         },
       },
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -105,7 +106,7 @@ export const getLetter = async (id: string) => {
           document: true,
         },
       },
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -171,7 +172,7 @@ export const createLetter = async (
           document: true,
         },
       },
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {
@@ -231,7 +232,7 @@ export const updateLetter = async (
   // Check if letter exists with approval
   const existingLetter = await prisma.letter.findUnique({
     where: { id },
-    include: { approval: true },
+    include: { approvals: true },
   });
 
   if (!existingLetter) {
@@ -262,21 +263,23 @@ export const updateLetter = async (
 
   // If there are changes and the letter has an existing approval that is APPROVED or REJECTED,
   // reset the approval to PENDING
-  if (
-    hasChanges &&
-    existingLetter.approval &&
-    (existingLetter.approval.status === "APPROVED" ||
-      existingLetter.approval.status === "REJECTED")
-  ) {
-    await prisma.approval.update({
-      where: { id: existingLetter.approval.id },
-      data: {
-        status: "PENDING",
-        note: "Letter updated and resubmitted for approval",
-      },
-    });
-    // Also update the letter status to PENDING
-    data.status = "PENDING";
+  if (hasChanges) {
+    const existingApproval = existingLetter.approvals.find(
+      (approval) =>
+        approval.status === "APPROVED" || approval.status === "REJECTED"
+    );
+
+    if (existingApproval) {
+      await prisma.approval.update({
+        where: { id: existingApproval.id },
+        data: {
+          status: "PENDING",
+          note: "Letter updated and resubmitted for approval",
+        },
+      });
+      // Also update the letter status to PENDING
+      data.status = Status.PENDING;
+    }
   }
 
   const updateData: Prisma.LetterUpdateInput = {};
@@ -367,7 +370,7 @@ export const updateLetter = async (
           document: true,
         },
       },
-      approval: {
+      approvals: {
         include: {
           user: {
             select: {

@@ -27,7 +27,6 @@ export default function FinanceCategoryForm({
     name: category?.name || "",
     description: category?.description || "",
     type: category?.type || FinanceType.INCOME,
-    isActive: category?.isActive ?? true,
   });
 
   const [isLoadingState, setIsLoadingState] = useState(false);

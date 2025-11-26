@@ -5,7 +5,7 @@ export interface FinanceCategory {
   name: string;
   description?: string;
   type: FinanceType;
-  isActive: boolean;
+  isActive?: boolean;
   createdAt: Date;
   updatedAt: Date;
   _count?: {
@@ -19,7 +19,8 @@ export interface CreateFinanceCategoryInput {
   type: FinanceType;
 }
 
-export interface UpdateFinanceCategoryInput extends Partial<CreateFinanceCategoryInput> {
+export interface UpdateFinanceCategoryInput
+  extends Partial<CreateFinanceCategoryInput> {
   isActive?: boolean;
 }
 

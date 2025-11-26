@@ -5,14 +5,18 @@ import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceCategory } from "@/types/finance-category";
 import type { Period } from "@/types/period";
 import type { Event } from "@/types/event";
+import type { Gallery } from "@/types/gallery";
+import type { Finance } from "@/types/finance";
+import type { Letter } from "@/types/letter";
+import type { Document } from "@/types/document";
 import type {
   Department,
   FinanceType,
   UserRole,
   Position,
 } from "@/types/enums";
-import { Status } from "@/types/enums";
 import { ApprovalType } from "@/types/enums";
+import { Status } from "@/types/enums";
 import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
@@ -71,7 +75,6 @@ async function AddFinancePage() {
     // Fetch data directly from database to avoid API authentication issues
     const [categories, periodsData, eventsData] = await Promise.all([
       prisma.financeCategory.findMany({
-        where: { isActive: true },
         orderBy: { createdAt: "desc" },
       }),
       prisma.period.findMany({
@@ -105,6 +108,11 @@ async function AddFinancePage() {
               responsible: true,
             },
           },
+          approvals: true,
+          galleries: true,
+          finances: true,
+          letters: true,
+          documents: true,
         },
       }),
     ]);
@@ -115,7 +123,6 @@ async function AddFinancePage() {
       name: cat.name,
       description: cat.description || undefined,
       type: cat.type as FinanceType, // Type assertion to handle enum differences
-      isActive: cat.isActive,
       createdAt: cat.createdAt,
       updatedAt: cat.updatedAt,
     }));
@@ -179,6 +186,17 @@ async function AddFinancePage() {
             },
           }
         : null,
+      approvals: event.approvals.map((approval) => ({
+        ...approval,
+        entityType: approval.entityType as ApprovalType,
+        note: approval.note || undefined,
+        createdAt: approval.createdAt.toISOString(),
+        updatedAt: approval.updatedAt.toISOString(),
+      })),
+      galleries: event.galleries as Gallery[],
+      finances: event.finances as Finance[],
+      letters: event.letters as Letter[],
+      documents: event.documents as Document[],
       createdAt: event.createdAt,
       updatedAt: event.updatedAt,
     }));
