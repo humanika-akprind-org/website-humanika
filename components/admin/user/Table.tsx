@@ -1,7 +1,6 @@
 import {
   FiEdit,
   FiTrash2,
-  FiKey,
   FiUnlock,
   FiLock,
   FiMail,
@@ -21,7 +20,6 @@ interface UserTableProps {
   onSelectAll: () => void;
   onEditUser: (id: string) => void;
   onDeleteUser: (user: User) => void;
-  onResetPassword: (user: User) => void;
   onLockAccount: (userId: string) => void;
   onUnlockAccount: (userId: string) => void;
   onPageChange: (page: number) => void;
@@ -37,7 +35,6 @@ export default function UserTable({
   onSelectAll,
   onEditUser,
   onDeleteUser,
-  onResetPassword,
   onLockAccount,
   onUnlockAccount,
   onPageChange,
@@ -127,6 +124,12 @@ export default function UserTable({
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                Position
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Status
               </th>
               <th
@@ -194,7 +197,9 @@ export default function UserTable({
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                   {user.department ? formatEnumValue(user.department) : "-"}
-                  {user.position && ` • ${formatEnumValue(user.position)}`}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {user.position ? formatEnumValue(user.position) : "-"}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <span
@@ -223,13 +228,6 @@ export default function UserTable({
                       title="Delete user"
                     >
                       <FiTrash2 size={16} />
-                    </button>
-                    <button
-                      className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
-                      onClick={() => onResetPassword(user)}
-                      title="Reset password"
-                    >
-                      <FiKey size={16} />
                     </button>
                     {!user.isActive ? (
                       <button

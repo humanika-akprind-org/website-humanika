@@ -4,9 +4,7 @@ import { useState } from "react";
 import { FiUser, FiMail, FiKey, FiUsers, FiLock, FiSave } from "react-icons/fi";
 import { UserRole, Department, Position } from "@/types/enums";
 import { formatEnumValue } from "@/lib/utils";
-import { apiUrl } from "@/lib/config/config";
-
-interface CreateUserData {
+export interface CreateUserData {
   name: string;
   email: string;
   username: string;
@@ -17,53 +15,16 @@ interface CreateUserData {
   isActive?: boolean;
 }
 
-interface ApiResponse<T = unknown> {
+export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
 }
 
-class UserApi {
-  private static API_BASE_URL = apiUrl;
-
-  private static async fetchApi<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
-    try {
-      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
-        ...options,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: data.error || "An error occurred" };
-      }
-
-      return { data };
-    } catch (error) {
-      console.error("API Error:", error);
-      return { error: "Network error occurred" };
-    }
-  }
-
-  static async createUser(userData: CreateUserData): Promise<ApiResponse> {
-    return this.fetchApi("/user", {
-      method: "POST",
-      body: JSON.stringify(userData),
-    });
-  }
-}
-
 interface UserFormProps {
-  onSuccess?: () => void;
+  onSubmit: (formData: CreateUserData) => Promise<void>;
 }
 
-export default function UserForm({ onSuccess }: UserFormProps) {
+export default function UserForm({ onSubmit }: UserFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState<CreateUserData>({
@@ -124,13 +85,7 @@ export default function UserForm({ onSuccess }: UserFormProps) {
     setError("");
 
     try {
-      const response = await UserApi.createUser(formData);
-
-      if (response.error) {
-        setError(response.error);
-      } else {
-        onSuccess?.();
-      }
+      await onSubmit(formData);
     } catch (err) {
       console.error("Submission error:", err);
       setError("Failed to create user. Please try again.");

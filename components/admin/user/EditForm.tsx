@@ -10,131 +10,24 @@ import {
   FiSave,
   FiX,
 } from "react-icons/fi";
-import { apiUrl } from "@/lib/config/config";
-
-// Enum values from Prisma
-enum UserRole {
-  DPO = "DPO",
-  BPH = "BPH",
-  PENGURUS = "PENGURUS",
-  ANGGOTA = "ANGGOTA",
-}
-
-enum Department {
-  INFOKOM = "INFOKOM",
-  PSDM = "PSDM",
-  LITBANG = "LITBANG",
-  KWU = "KWU",
-}
-
-enum Position {
-  KETUA_UMUM = "KETUA_UMUM",
-  WAKIL_KETUA_UMUM = "WAKIL_KETUA_UMUM",
-  SEKRETARIS = "SEKRETARIS",
-  BENDAHARA = "BENDAHARA",
-  KEPALA_DEPARTEMEN = "KEPALA_DEPARTEMEN",
-  STAFF_DEPARTEMEN = "STAFF_DEPARTEMEN",
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  username: string;
-  role: UserRole;
-  department?: Department;
-  position?: Position;
-  isActive: boolean;
-  verifiedAccount: boolean;
-  attemptLogin: number;
-  blockExpires?: string;
-  createdAt: string;
-  updatedAt: string;
-  avatarColor: string;
-}
-
-interface UpdateUserData {
-  name?: string;
-  email?: string;
-  username?: string;
-  password?: string;
-  role?: UserRole;
-  department?: Department;
-  position?: Position;
-  isActive?: boolean;
-}
-
-// Helper function to format enum values for display
-const formatEnumValue = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
-
-class UserApi {
-  private static API_BASE_URL = apiUrl;
-
-  private static async fetchApi<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<{ data?: T; error?: string }> {
-    try {
-      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
-        ...options,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: data.error || "An error occurred" };
-      }
-
-      return { data };
-    } catch (_error) {
-      return { error: "Network error occurred" };
-    }
-  }
-
-  static async getUserById(
-    id: string
-  ): Promise<{ data?: User; error?: string }> {
-    return this.fetchApi<User>(`/user/${id}`);
-  }
-
-  static async updateUser(
-    id: string,
-    userData: UpdateUserData
-  ): Promise<{ data?: User; error?: string }> {
-    return this.fetchApi<User>(`/user/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(userData),
-    });
-  }
-
-  static async deleteUser(
-    id: string
-  ): Promise<{ data?: { message: string }; error?: string }> {
-    return this.fetchApi<{ message: string }>(`/user/${id}`, {
-      method: "DELETE",
-    });
-  }
-}
+import { UserRole, Department, Position } from "@/types/enums";
+import { formatEnumValue } from "@/lib/utils";
+import { UserApi } from "@/use-cases/api/user";
+import type { User, UpdateUserData } from "@/types/user";
 
 interface UserEditFormProps {
   userId: string;
   onSuccess?: () => void;
   onDelete?: () => void;
+  user?: User;
 }
 
 export default function UserEditForm({
   userId,
   onSuccess,
   onDelete,
-}: UserEditFormProps) {
+  user: initialUser,
+}: UserEditFormProps): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -155,33 +48,47 @@ export default function UserEditForm({
   const [formErrors, setFormErrors] = useState<Partial<UpdateUserData>>({});
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await UserApi.getUserById(userId);
+    if (initialUser) {
+      setUser(initialUser);
+      setFormData({
+        name: initialUser.name,
+        email: initialUser.email,
+        username: initialUser.username,
+        password: "",
+        role: initialUser.role,
+        department: initialUser.department || undefined,
+        position: initialUser.position || undefined,
+        isActive: initialUser.isActive,
+      });
+    } else {
+      const fetchUser = async () => {
+        try {
+          const response = await UserApi.getUserById(userId);
 
-        if (response.error) {
-          setError(response.error);
-        } else if (response.data) {
-          const userData = response.data;
-          setUser(userData);
-          setFormData({
-            name: userData.name,
-            email: userData.email,
-            username: userData.username,
-            password: "",
-            role: userData.role,
-            department: userData.department,
-            position: userData.position,
-            isActive: userData.isActive,
-          });
+          if (response.error) {
+            setError(response.error);
+          } else if (response.data) {
+            const userData = response.data;
+            setUser(userData);
+            setFormData({
+              name: userData.name,
+              email: userData.email,
+              username: userData.username,
+              password: "",
+              role: userData.role,
+              department: userData.department ?? undefined,
+              position: userData.position ?? undefined,
+              isActive: userData.isActive,
+            });
+          }
+        } catch (_error) {
+          setError("Failed to fetch user data");
         }
-      } catch (_error) {
-        setError("Failed to fetch user data");
-      }
-    };
+      };
 
-    fetchUser();
-  }, [userId]);
+      fetchUser();
+    }
+  }, [userId, initialUser]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -189,7 +96,12 @@ export default function UserEditForm({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]:
+        name === "department" || name === "position"
+          ? value === ""
+            ? undefined
+            : value
+          : value,
     }));
 
     // Clear error when field is changed
@@ -201,11 +113,20 @@ export default function UserEditForm({
   const validateForm = (): boolean => {
     const errors: Partial<UpdateUserData> = {};
 
-    if (!formData.name?.trim()) errors.name = "Name is required";
-    if (!formData.email?.trim()) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
-    if (!formData.username?.trim()) errors.username = "Username is required";
-    if (formData.password && formData.password.length < 6) errors.password = "Password must be at least 6 characters";
+    if (!formData.name?.trim()) {
+      errors.name = "Name is required";
+    }
+    if (!formData.email?.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid";
+    }
+    if (!formData.username?.trim()) {
+      errors.username = "Username is required";
+    }
+    if (formData.password && formData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -559,7 +480,17 @@ export default function UserEditForm({
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3">
+          <div className="flex justify-between items-center">
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              disabled={isDeleting}
+              className="px-4 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center disabled:opacity-50"
+            >
+              <FiX className="mr-2" />
+              {isDeleting ? "Deleting..." : "Delete User"}
+            </button>
+
             <button
               type="submit"
               disabled={isSubmitting}
