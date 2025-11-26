@@ -3,12 +3,13 @@ import {
   FiTrash2,
   FiUnlock,
   FiLock,
-  FiMail,
   FiX,
+  FiMail,
 } from "react-icons/fi";
 import type { User } from "@/types/user";
 import { UserRole } from "@/types/enums";
 import { formatEnumValue } from "@/use-cases/api/user";
+import Avatar from "../ui/avatar/Avatar";
 
 interface UserTableProps {
   users: User[];
@@ -159,19 +160,7 @@ export default function UserTable({
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div
-                      className="flex-shrink-0 rounded-full overflow-hidden"
-                      style={{ backgroundColor: user.avatarColor }}
-                    >
-                      <span className="w-10 h-10 flex items-center justify-center text-white font-semibold text-sm">
-                        {user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2)}
-                      </span>
-                    </div>
+                    <Avatar user={user} />
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
                         {user.name}

@@ -3,16 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/admin/auth/LogoutButton";
-
-interface User {
-  username: string;
-  email: string;
-  name: string;
-  role: string;
-  department: string;
-  position: string;
-  avatarColor: string;
-}
+import Avatar from "../ui/avatar/Avatar";
+import type { User } from "@/types/user";
 
 export default function UserInfo() {
   const [user, setUser] = useState<User | null>(null);
@@ -84,17 +76,7 @@ export default function UserInfo() {
           </p>
         </div>
         <Link href="/admin/settings/profile">
-          <span
-            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-            style={{ backgroundColor: user.avatarColor }}
-          >
-            {user.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .toUpperCase()
-              .slice(0, 2)}
-          </span>
+          <Avatar user={user} />
         </Link>
       </button>
 

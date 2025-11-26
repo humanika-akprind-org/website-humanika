@@ -94,7 +94,19 @@ export default function Table({
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                Position
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Status
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Verify
               </th>
               <th
                 scope="col"
@@ -159,6 +171,9 @@ export default function Table({
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                   {user.department ? formatEnumValue(user.department) : "-"}
                 </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {user.position ? formatEnumValue(user.position) : "-"}
+                </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <span
                     className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
@@ -169,9 +184,16 @@ export default function Table({
                   >
                     {user.isActive ? "Active" : "Inactive"}
                   </span>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
                   {!user.verifiedAccount && (
-                    <span className="ml-2 px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                    <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
                       Unverified
+                    </span>
+                  )}
+                  {user.verifiedAccount && (
+                    <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                      Verified
                     </span>
                   )}
                 </td>
