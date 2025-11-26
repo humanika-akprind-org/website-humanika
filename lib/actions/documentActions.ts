@@ -23,28 +23,14 @@ export async function handleDocumentSubmit(
 
   const documentData = data as CreateDocumentInput;
 
-  if (!documentData.name || !documentData.type) {
+  if (!documentData.name || !documentData.documentTypeId) {
     throw new Error("Missing required fields");
   }
 
   // Prepare data to send
-  const submitData: Omit<
-    Document,
-    | "id"
-    | "user"
-    | "event"
-    | "letter"
-    | "version"
-    | "parentId"
-    | "isCurrent"
-    | "createdAt"
-    | "updatedAt"
-    | "previousVersion"
-    | "nextVersions"
-    | "approvals"
-  > = {
+  const submitData = {
     name: documentData.name,
-    type: documentData.type,
+    documentTypeId: documentData.documentTypeId,
     status: Status.DRAFT,
     document: documentData.document,
     userId: user.id,
@@ -80,7 +66,7 @@ export async function handleDocumentSubmitForApproval(
 
   const documentData = data as CreateDocumentInput;
 
-  if (!documentData.name || !documentData.type) {
+  if (!documentData.name || !documentData.documentTypeId) {
     throw new Error("Missing required fields");
   }
 
@@ -99,9 +85,11 @@ export async function handleDocumentSubmitForApproval(
     | "previousVersion"
     | "nextVersions"
     | "approvals"
+    | "type"
+    | "documentType"
   > = {
     name: documentData.name,
-    type: documentData.type,
+    documentTypeId: documentData.documentTypeId,
     status: Status.PENDING,
     document: documentData.document,
     userId: user.id,

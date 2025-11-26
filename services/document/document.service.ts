@@ -3,7 +3,7 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/types/document";
-import type { Status } from "@/types/enums";
+import type { Status, DocumentType as DocumentTypeEnum } from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
@@ -75,7 +75,17 @@ export const getDocuments = async (filter: {
     orderBy: { createdAt: "desc" },
   });
 
-  return documents;
+  // Add type field by converting documentType name to enum format
+  const documentsWithType = documents.map((doc) => ({
+    ...doc,
+    type: doc.documentType?.name
+      ? (doc.documentType.name
+          .toUpperCase()
+          .replace(/ /g, "_") as DocumentTypeEnum)
+      : undefined,
+  }));
+
+  return documentsWithType;
 };
 
 export const getDocument = async (id: string) => {
@@ -115,10 +125,23 @@ export const getDocument = async (id: string) => {
           },
         },
       },
+      documentType: true,
     },
   });
 
-  return document;
+  if (!document) return null;
+
+  // Add type field
+  const documentWithType = {
+    ...document,
+    type: document.documentType?.name
+      ? (document.documentType.name
+          .toUpperCase()
+          .replace(/ /g, "_") as DocumentTypeEnum)
+      : undefined,
+  };
+
+  return documentWithType;
 };
 
 export const createDocument = async (
@@ -181,6 +204,16 @@ export const createDocument = async (
     },
   });
 
+  // Add type field
+  const documentWithType = {
+    ...document,
+    type: document.documentType?.name
+      ? (document.documentType.name
+          .toUpperCase()
+          .replace(/ /g, "_") as DocumentTypeEnum)
+      : undefined,
+  };
+
   // Always create approval record with PENDING status
   await prisma.approval.create({
     data: {
@@ -197,20 +230,20 @@ export const createDocument = async (
     userId: user.id,
     activityType: ActivityType.CREATE,
     entityType: "Document",
-    entityId: document.id,
-    description: `Created document: ${document.name}`,
+    entityId: documentWithType.id,
+    description: `Created document: ${documentWithType.name}`,
     metadata: {
       newData: {
-        name: document.name,
-        documentTypeId: document.documentTypeId,
-        status: document.status,
-        eventId: document.eventId,
-        letterId: document.letterId,
+        name: documentWithType.name,
+        documentTypeId: documentWithType.documentTypeId,
+        status: documentWithType.status,
+        eventId: documentWithType.eventId,
+        letterId: documentWithType.letterId,
       },
     },
   });
 
-  return document;
+  return documentWithType;
 };
 
 export const updateDocument = async (
@@ -319,16 +352,27 @@ export const updateDocument = async (
           },
         },
       },
+      documentType: true,
     },
   });
+
+  // Add type field
+  const documentWithType = {
+    ...document,
+    type: document.documentType?.name
+      ? (document.documentType.name
+          .toUpperCase()
+          .replace(/ /g, "_") as DocumentTypeEnum)
+      : undefined,
+  };
 
   // Log activity
   await logActivity({
     userId: user.id,
     activityType: ActivityType.UPDATE,
     entityType: "Document",
-    entityId: document.id,
-    description: `Updated document: ${document.name}`,
+    entityId: documentWithType.id,
+    description: `Updated document: ${documentWithType.name}`,
     metadata: {
       oldData: {
         name: existingDocument.name,
@@ -338,16 +382,16 @@ export const updateDocument = async (
         letterId: existingDocument.letterId,
       },
       newData: {
-        name: document.name,
-        documentTypeId: document.documentTypeId,
-        status: document.status,
-        eventId: document.eventId,
-        letterId: document.letterId,
+        name: documentWithType.name,
+        documentTypeId: documentWithType.documentTypeId,
+        status: documentWithType.status,
+        eventId: documentWithType.eventId,
+        letterId: documentWithType.letterId,
       },
     },
   });
 
-  return document;
+  return documentWithType;
 };
 
 export const deleteDocument = async (id: string, user: UserWithId) => {

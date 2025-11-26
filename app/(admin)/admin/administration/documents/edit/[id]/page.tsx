@@ -75,28 +75,14 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
       // Cast data to UpdateDocumentInput since this is the edit page
       const documentData = data as UpdateDocumentInput;
 
-      if (!documentData.name || !documentData.type) {
+      if (!documentData.name || !documentData.documentTypeId) {
         throw new Error("Missing required fields");
       }
 
       // Prepare data to send
-      const submitData: Omit<
-        Document,
-        | "id"
-        | "user"
-        | "event"
-        | "letter"
-        | "version"
-        | "parentId"
-        | "isCurrent"
-        | "createdAt"
-        | "updatedAt"
-        | "previousVersion"
-        | "nextVersions"
-        | "approvals"
-      > = {
+      const submitData = {
         name: documentData.name,
-        type: documentData.type,
+        documentTypeId: documentData.documentTypeId,
         status: documentData.status || Status.DRAFT,
         document: documentData.document,
         userId: user.id,
@@ -125,28 +111,14 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
       // Cast data to UpdateDocumentInput since this is the edit page
       const documentData = data as UpdateDocumentInput;
 
-      if (!documentData.name || !documentData.type) {
+      if (!documentData.name || !documentData.documentTypeId) {
         throw new Error("Missing required fields");
       }
 
       // Prepare data to send
-      const submitData: Omit<
-        Document,
-        | "id"
-        | "user"
-        | "event"
-        | "letter"
-        | "version"
-        | "parentId"
-        | "isCurrent"
-        | "createdAt"
-        | "updatedAt"
-        | "previousVersion"
-        | "nextVersions"
-        | "approvals"
-      > = {
+      const submitData = {
         name: documentData.name,
-        type: documentData.type,
+        documentTypeId: documentData.documentTypeId,
         status: Status.PENDING,
         document: documentData.document,
         userId: user.id,

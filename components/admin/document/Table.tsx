@@ -223,7 +223,7 @@ export default function DocumentTable({
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {document.type
+                      {document.documentType?.name
                         .replace(/_/g, " ")
                         .toLowerCase()
                         .replace(/\b\w/g, (l) => l.toUpperCase())}
