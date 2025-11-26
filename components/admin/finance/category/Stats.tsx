@@ -16,7 +16,6 @@ interface StatsProps {
 export default function Stats({ categories }: StatsProps) {
   // Calculate stats
   const totalCategories = categories.length;
-  const activeCategories = categories.filter((cat) => cat.isActive).length;
   const incomeCategories = categories.filter(
     (cat) => cat.type === FinanceType.INCOME
   ).length;
@@ -34,7 +33,6 @@ export default function Stats({ categories }: StatsProps) {
     },
     {
       title: "Active Categories",
-      value: activeCategories.toString(),
       icon: FiCheckCircle,
       color: "text-green-600",
       bgColor: "bg-green-100",

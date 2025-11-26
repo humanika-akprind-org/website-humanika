@@ -77,12 +77,7 @@ export default function FinanceCategoryTable({
 
     const matchesType = typeFilter === "all" || category.type === typeFilter;
 
-    const matchesIsActive =
-      isActiveFilter === "all" ||
-      (isActiveFilter === "true" && category.isActive) ||
-      (isActiveFilter === "false" && !category.isActive);
-
-    return matchesSearch && matchesType && matchesIsActive;
+    return matchesSearch && matchesType;
   });
 
   // Toggle category selection
@@ -255,17 +250,6 @@ export default function FinanceCategoryTable({
                         {category.type === FinanceType.INCOME
                           ? "Pemasukan"
                           : "Pengeluaran"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                          category.isActive
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {category.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
