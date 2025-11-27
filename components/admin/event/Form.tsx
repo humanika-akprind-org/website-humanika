@@ -12,7 +12,7 @@ import { eventThumbnailFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 import { FiSend } from "react-icons/fi";
-import DescriptionEditor from "../ui/TextEditor";
+import DescriptionEditor from "../ui/text-area/TextEditor";
 
 // Helper function to check if HTML content is empty
 const isHtmlEmpty = (html: string): boolean => {

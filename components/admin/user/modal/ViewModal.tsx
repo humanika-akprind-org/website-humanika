@@ -1,10 +1,10 @@
 import { FiX } from "react-icons/fi";
 import type { User } from "@/types/user";
 import Avatar from "../../ui/avatar/Avatar";
-import Role from "../../ui/chip/user/Role";
-import PositionChip from "../../ui/chip/user/Position";
-import DepartmentChip from "../../ui/chip/user/Department";
-import ActiveChip from "../../ui/chip/user/Active";
+import Role from "../../ui/chip/Role";
+import PositionChip from "../../ui/chip/Position";
+import DepartmentChip from "../../ui/chip/Department";
+import ActiveChip from "../../ui/chip/Active";
 import DateDisplay from "../../ui/date/DateDisplay";
 
 interface ViewUserModalProps {
