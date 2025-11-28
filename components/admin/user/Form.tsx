@@ -201,13 +201,11 @@ export default function UserForm({ onSubmit }: UserFormProps) {
                   department: value ? (value as Department) : undefined,
                 }))
               }
-              options={[
-                { value: "", label: "Select a department" },
-                ...Object.values(Department).map((dept) => ({
-                  value: dept,
-                  label: dept,
-                })),
-              ]}
+              options={Object.values(Department).map((dept) => ({
+                value: dept,
+                label: dept,
+              }))}
+              placeholder="Select a department"
               icon={<FiUsers className="text-gray-400" />}
             />
 
@@ -221,13 +219,11 @@ export default function UserForm({ onSubmit }: UserFormProps) {
                   position: value ? (value as Position) : undefined,
                 }))
               }
-              options={[
-                { value: "", label: "Select a position" },
-                ...Object.values(Position).map((pos) => ({
-                  value: pos,
-                  label: formatEnumValue(pos),
-                })),
-              ]}
+              options={Object.values(Position).map((pos) => ({
+                value: pos,
+                label: formatEnumValue(pos),
+              }))}
+              placeholder="Select a position"
               icon={<FiUsers className="text-gray-400" />}
             />
 

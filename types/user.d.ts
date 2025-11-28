@@ -44,9 +44,9 @@ export interface ApiResponse<T> {
 }
 
 export interface UserFilters {
-  role: UserRole | "";
-  department: Department | "";
-  isActive: string;
+  role: UserRole | "" | "all";
+  department: Department | "" | "all";
+  isActive: string | "all";
 }
 
 export interface CreateUserData {

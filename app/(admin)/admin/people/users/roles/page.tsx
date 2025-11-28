@@ -1,11 +1,7 @@
-// app/(admin)/admin/people/users/verify-accounts/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  // FiSend,
-  FiCheckCircle,
-} from "react-icons/fi";
+import { FiCheckCircle } from "react-icons/fi";
 
 import type { UserRole, Department } from "@/types/enums";
 import type { User } from "@/types/user";
@@ -113,25 +109,6 @@ export default function VerifyAccountsPage() {
     }
   };
 
-  // Send verification email to a single user
-  // const handleSendVerification = async (userId: string) => {
-  //   try {
-  //     setProcessingIds([...processingIds, userId]);
-  //     const response = await UserApi.sendVerificationEmail(userId);
-
-  //     if (response.error) {
-  //       setError(response.error);
-  //     } else {
-  //       setSuccess("Verification email sent successfully");
-  //     }
-  //   } catch (_error) {
-  //     setError("Failed to send verification email");
-  //   } finally {
-  //     setProcessingIds(processingIds.filter((id) => id !== userId));
-  //     setTimeout(() => setSuccess(""), 3000);
-  //   }
-  // };
-
   // Bulk verify users
   const handleBulkVerify = async () => {
     if (selectedUsers.length === 0) return;
@@ -157,29 +134,6 @@ export default function VerifyAccountsPage() {
       setTimeout(() => setSuccess(""), 3000);
     }
   };
-
-  // Bulk send verification emails
-  // const handleBulkSendVerification = async () => {
-  //   if (selectedUsers.length === 0) return;
-
-  //   try {
-  //     setProcessingIds([...processingIds, ...selectedUsers]);
-  //     const response = await UserApi.bulkSendVerification(selectedUsers);
-
-  //     if (response.error) {
-  //       setError(response.error);
-  //     } else if (response.data) {
-  //       setSuccess(`Verification emails sent to ${response.data.count} users`);
-  //     }
-  //   } catch (_error) {
-  //     setError("Failed to send verification emails");
-  //   } finally {
-  //     setProcessingIds(
-  //       processingIds.filter((id) => !selectedUsers.includes(id))
-  //     );
-  //     setTimeout(() => setSuccess(""), 3000);
-  //   }
-  // };
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -208,14 +162,6 @@ export default function VerifyAccountsPage() {
           </p>
         </div>
         <div className="flex space-x-2 mt-4 md:mt-0">
-          {/* <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50"
-            onClick={handleBulkSendVerification}
-            disabled={selectedUsers.length === 0 || processingIds.length > 0}
-          >
-            <FiSend className="mr-2" />
-            Send Verification ({selectedUsers.length})
-          </button> */}
           <button
             className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center disabled:opacity-50"
             onClick={handleBulkVerify}
@@ -266,7 +212,6 @@ export default function VerifyAccountsPage() {
         processingIds={processingIds}
         onToggleUserSelection={toggleUserSelection}
         onToggleSelectAll={toggleSelectAll}
-        // onSendVerification={handleSendVerification}
         onVerifyUser={handleVerifyUser}
         loading={loading}
         currentPage={currentPage}
