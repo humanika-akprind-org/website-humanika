@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { FiCheckCircle } from "react-icons/fi";
-
 import type { UserRole, Department } from "@/types/enums";
 import type { User } from "@/types/user";
 import { UserApi } from "@/use-cases/api/user";
@@ -10,12 +8,17 @@ import Stats from "@/components/admin/user/roles/Stats";
 import Filters from "@/components/admin/user/roles/Filters";
 import Table from "@/components/admin/user/roles/Table";
 import Loading from "@/components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/components/admin/ui/ManagementHeader";
+import VerifyButton from "@/components/admin/ui/button/VerifyButton";
 
 export default function VerifyAccountsPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
+  const [alert, setAlert] = useState<{
+    type: AlertType;
+    message: string;
+  } | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,7 +33,7 @@ export default function VerifyAccountsPage() {
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      setError("");
+      setAlert(null);
       const response = await UserApi.getUnverifiedUsers({
         search: searchTerm,
         role: filters.role || undefined,
@@ -40,13 +43,13 @@ export default function VerifyAccountsPage() {
       });
 
       if (response.error) {
-        setError(response.error);
+        setAlert({ type: "error", message: response.error });
       } else if (response.data) {
         setUsers(response.data.users);
         setTotalPages(response.data.pagination.pages);
       }
     } catch (_error) {
-      setError("Failed to fetch unverified users");
+      setAlert({ type: "error", message: "Failed to fetch unverified users" });
     } finally {
       setLoading(false);
     }
@@ -94,18 +97,18 @@ export default function VerifyAccountsPage() {
       const response = await UserApi.verifyUser(userId);
 
       if (response.error) {
-        setError(response.error);
+        setAlert({ type: "error", message: response.error });
       } else {
-        setSuccess("User verified successfully");
+        setAlert({ type: "success", message: "User verified successfully" });
         // Remove the user from the list
         setUsers(users.filter((user) => user.id !== userId));
         setSelectedUsers(selectedUsers.filter((id) => id !== userId));
       }
     } catch (_error) {
-      setError("Failed to verify user");
+      setAlert({ type: "error", message: "Failed to verify user" });
     } finally {
       setProcessingIds(processingIds.filter((id) => id !== userId));
-      setTimeout(() => setSuccess(""), 3000);
+      setTimeout(() => setAlert(null), 3000);
     }
   };
 
@@ -118,20 +121,23 @@ export default function VerifyAccountsPage() {
       const response = await UserApi.bulkVerifyUsers(selectedUsers);
 
       if (response.error) {
-        setError(response.error);
+        setAlert({ type: "error", message: response.error });
       } else if (response.data) {
-        setSuccess(`${response.data.count} users verified successfully`);
+        setAlert({
+          type: "success",
+          message: `${response.data.count} users verified successfully`,
+        });
         // Remove verified users from the list
         setUsers(users.filter((user) => !selectedUsers.includes(user.id)));
         setSelectedUsers([]);
       }
     } catch (_error) {
-      setError("Failed to verify users");
+      setAlert({ type: "error", message: "Failed to verify users" });
     } finally {
       setProcessingIds(
         processingIds.filter((id) => !selectedUsers.includes(id))
       );
-      setTimeout(() => setSuccess(""), 3000);
+      setTimeout(() => setAlert(null), 3000);
     }
   };
 
@@ -153,23 +159,16 @@ export default function VerifyAccountsPage() {
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">
-            Account Verification
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Manage unverified user accounts and send verification emails
-          </p>
-        </div>
+        <ManagementHeader
+          title="Account Verification"
+          description="Manage unverified user accounts and send verification emails"
+        />
         <div className="flex space-x-2 mt-4 md:mt-0">
-          <button
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center disabled:opacity-50"
+          <VerifyButton
             onClick={handleBulkVerify}
+            selectedCount={selectedUsers.length}
             disabled={selectedUsers.length === 0 || processingIds.length > 0}
-          >
-            <FiCheckCircle className="mr-2" />
-            Verify Accounts ({selectedUsers.length})
-          </button>
+          />
         </div>
       </div>
 
@@ -180,19 +179,8 @@ export default function VerifyAccountsPage() {
         processingCount={processingIds.length}
       />
 
-      {/* Success Message */}
-      {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          {success}
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
+      {/* Alert Message */}
+      {alert && <Alert type={alert.type} message={alert.message} />}
 
       {/* Filters and Search */}
       <Filters
