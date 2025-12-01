@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import type { UserRole, Department } from "@/types/enums";
 import type { User } from "@/types/user";
 import { UserApi } from "@/use-cases/api/user";
-import Stats from "@/components/admin/user/roles/Stats";
+import UserStats from "@/components/admin/user/roles/Stats";
 import Filters from "@/components/admin/user/roles/Filters";
 import Table from "@/components/admin/user/roles/Table";
 import Loading from "@/components/admin/layout/loading/Loading";
@@ -173,11 +173,7 @@ export default function VerifyAccountsPage() {
       </div>
 
       {/* Stats Overview */}
-      <Stats
-        unverifiedUsersCount={users.length}
-        selectedUsersCount={selectedUsers.length}
-        processingCount={processingIds.length}
-      />
+      <UserStats users={users} />
 
       {/* Alert Message */}
       {alert && <Alert type={alert.type} message={alert.message} />}

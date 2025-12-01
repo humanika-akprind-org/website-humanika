@@ -1,12 +1,16 @@
 import { FiUsers, FiUserCheck, FiUserX, FiMail } from "react-icons/fi";
-import type { User } from "types/user";
+import type { User } from "@/types/user";
 import StatCard from "../../ui/card/StatCard";
 
 interface UserStatsProps {
   users: User[];
+  selectedUsersCount?: number;
 }
 
-export default function UserStats({ users }: UserStatsProps) {
+export default function UserStats({
+  users,
+  selectedUsersCount = 0,
+}: UserStatsProps) {
   const stats = [
     {
       title: "Total Users",
@@ -15,22 +19,22 @@ export default function UserStats({ users }: UserStatsProps) {
       color: "blue",
     },
     {
-      title: "Active Users",
-      value: users.filter((u) => u.isActive).length,
+      title: "Selected Users",
+      value: selectedUsersCount,
       icon: FiUserCheck,
       color: "green",
+    },
+    {
+      title: "Unverified Users",
+      value: users.filter((u) => !u.verifiedAccount).length,
+      icon: FiMail,
+      color: "yellow",
     },
     {
       title: "Inactive Users",
       value: users.filter((u) => !u.isActive).length,
       icon: FiUserX,
-      color: "yellow",
-    },
-    {
-      title: "Verified Emails",
-      value: users.filter((u) => u.verifiedAccount).length,
-      icon: FiMail,
-      color: "green",
+      color: "red",
     },
   ];
 
