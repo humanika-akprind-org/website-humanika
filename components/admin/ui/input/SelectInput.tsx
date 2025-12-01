@@ -52,7 +52,11 @@ export default function SelectInput({
           </SelectTrigger>
           <SelectContent>
             {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="hover:bg-gray-100"
+              >
                 {option.label}
               </SelectItem>
             ))}

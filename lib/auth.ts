@@ -83,7 +83,8 @@ export function verifyToken(token: string): DecodedToken | null {
 
 export function setAuthCookie(
   response: NextResponse,
-  token: string
+  token: string,
+  p0: number
 ): NextResponse {
   response.cookies.set({
     name: COOKIE_NAME,

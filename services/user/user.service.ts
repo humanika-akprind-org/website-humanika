@@ -63,8 +63,7 @@ export const getUsers = async (filter: {
   const [users, total] = await Promise.all([
     prisma.user.findMany({
       where,
-      skip,
-      take: limit,
+      ...(filter.allUsers ? {} : { skip, take: limit }),
       orderBy: { createdAt: "desc" },
       select: {
         id: true,

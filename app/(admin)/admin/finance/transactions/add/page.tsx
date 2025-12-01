@@ -28,49 +28,6 @@ async function AddFinancePage() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("google_access_token")?.value || "";
 
-  // Check authentication first
-  const user = await getCurrentUser();
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <main className="flex-1 flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-white rounded-xl shadow-sm p-8 text-center">
-            <div className="mb-6">
-              <svg
-                className="w-20 h-20 mx-auto text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-semibold text-gray-800 mb-4">
-              Authentication Required
-            </h1>
-            <p className="text-gray-600 mb-6">
-              Please log in to access the organizational management system
-            </p>
-            <div className="flex justify-center">
-              <a
-                href="/auth/admin/login"
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Go to Login
-              </a>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   try {
     // Fetch data directly from database to avoid API authentication issues
     const [categories, periodsData, eventsData] = await Promise.all([

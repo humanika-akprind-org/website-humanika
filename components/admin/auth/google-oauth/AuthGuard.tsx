@@ -1,4 +1,5 @@
 import GoogleDriveConnect from "@/components/admin/google-drive/GoogleDriveConnect";
+import RefreshButton from "./RefreshButton";
 import { getGoogleDriveFiles } from "@/lib/google-drive/google-drive";
 import { getCurrentUser } from "@/lib/auth";
 import { type AuthGuardProps } from "@/types/google-drive";
@@ -37,7 +38,8 @@ export default async function AuthGuard({
             <p className="text-gray-600 mb-6">
               Please log in to access the organizational management system
             </p>
-            <div className="flex justify-center">
+            <div className="flex justify-center space-x-3">
+              <RefreshButton />
               <a
                 href="/auth/admin/login"
                 className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { UserApi } from "@/use-cases/api/user";
 import type { User, UserFilters as UserFiltersType } from "@/types/user";
 
-export function useUserManagement() {
+export function useUnverifiedUserManagement() {
   const router = useRouter();
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -29,8 +29,8 @@ export function useUserManagement() {
     try {
       setLoading(true);
       setError("");
-      const response = await UserApi.getUsers({
-        allUsers: true, // Fetch all users for client-side filtering
+      const response = await UserApi.getUnverifiedUsers({
+        allUsers: true, // Fetch all unverified users for client-side filtering
       });
 
       if (response.error) {
@@ -73,6 +73,11 @@ export function useUserManagement() {
       filtered = filtered.filter(
         (user) => user.department === filters.department
       );
+    }
+
+    // Position filter
+    if (filters.position && filters.position !== "all") {
+      filtered = filtered.filter((user) => user.position === filters.position);
     }
 
     // Active status filter
@@ -224,6 +229,21 @@ export function useUserManagement() {
     }
   };
 
+  const handleVerifyUser = async (userId: string) => {
+    try {
+      const response = await UserApi.verifyUser(userId);
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setSuccess("User verified successfully");
+        fetchAllUsers();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (_error) {
+      setError("Failed to verify user");
+    }
+  };
+
   const handleFilterChange = (key: keyof UserFiltersType, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
@@ -258,5 +278,6 @@ export function useUserManagement() {
     confirmDelete,
     handleFilterChange,
     handleVerify,
+    handleVerifyUser,
   };
 }

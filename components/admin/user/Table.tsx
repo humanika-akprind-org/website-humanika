@@ -1,4 +1,12 @@
-import { FiEye, FiX, FiEdit, FiTrash, FiLock, FiUnlock } from "react-icons/fi";
+import { useRef } from "react";
+import {
+  FiEye,
+  FiEdit,
+  FiTrash,
+  FiLock,
+  FiUnlock,
+  FiUser,
+} from "react-icons/fi";
 import type { UserTableProps } from "@/types/user";
 import Avatar from "../ui/avatar/Avatar";
 import Role from "../ui/chip/Role";
@@ -9,6 +17,8 @@ import DropdownMenu, { DropdownMenuItem } from "../ui/dropdown/DropdownMenu";
 import ActiveChip from "../ui/chip/Active";
 import Checkbox from "../ui/checkbox/Checkbox";
 import Pagination from "../ui/pagination/Pagination";
+import AddButton from "../ui/button/AddButton";
+import EmptyState from "../ui/EmptyState";
 
 export default function UserTable({
   users,
@@ -16,6 +26,7 @@ export default function UserTable({
   loading,
   currentPage,
   totalPages,
+  currentUserId,
   onUserSelect,
   onSelectAll,
   onViewUser,
@@ -24,23 +35,16 @@ export default function UserTable({
   onLockAccount,
   onUnlockAccount,
   onPageChange,
+  onAddUser,
 }: UserTableProps) {
-  if (users.length === 0 && !loading) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-gray-400 mb-2">
-          <FiX size={48} className="mx-auto" />
-        </div>
-        <p className="text-gray-500 text-lg font-medium">No users found</p>
-        <p className="text-gray-400 mt-1">
-          Try adjusting your search or filter criteria
-        </p>
-      </div>
-    );
-  }
+  // Filter users to exclude unverified users and current user
+  const filteredUsers = users.filter(
+    (user) => user.verifiedAccount && user.id !== currentUserId
+  );
 
+  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+    <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -51,7 +55,8 @@ export default function UserTable({
               >
                 <Checkbox
                   checked={
-                    users.length > 0 && selectedUsers.length === users.length
+                    filteredUsers.length > 0 &&
+                    selectedUsers.length === filteredUsers.length
                   }
                   onChange={onSelectAll}
                 />
@@ -93,8 +98,14 @@ export default function UserTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+            {filteredUsers.map((user, index) => (
+              <tr
+                key={user.id}
+                ref={(el) => {
+                  rowRefs.current[index] = el;
+                }}
+                className="hover:bg-gray-50 transition-colors"
+              >
                 <td className="pl-6 pr-2 py-4 whitespace-nowrap">
                   <Checkbox
                     checked={selectedUsers.includes(user.id)}
@@ -120,7 +131,11 @@ export default function UserTable({
                   <ActiveChip isActive={user.isActive} />
                 </td>
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
-                  <DropdownMenu>
+                  <DropdownMenu
+                    boundaryRef={{ current: rowRefs.current[index] }}
+                    isLastItem={index === filteredUsers.length - 1}
+                    hasMultipleItems={filteredUsers.length > 1}
+                  >
                     <DropdownMenuItem
                       onClick={() => onViewUser(user.id)}
                       color="default"
@@ -167,9 +182,18 @@ export default function UserTable({
         </table>
       </div>
 
-      {users.length > 0 && (
+      {filteredUsers.length === 0 && !loading && (
+        <EmptyState
+          icon={<FiUser size={48} className="mx-auto" />}
+          title="No users found"
+          description="Try adjusting your search or filter criteria"
+          actionButton={<AddButton onClick={onAddUser} text="Add User" />}
+        />
+      )}
+
+      {filteredUsers.length > 0 && (
         <Pagination
-          usersLength={users.length}
+          usersLength={filteredUsers.length}
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={onPageChange}
