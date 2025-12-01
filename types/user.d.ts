@@ -44,10 +44,13 @@ export interface ApiResponse<T> {
 }
 
 export interface UserFilters {
+  position: string;
   role: UserRole | "" | "all";
   department: Department | "" | "all";
   isActive: string | "all";
 }
+
+export type UserFiltersType = UserFilters;
 
 export interface CreateUserData {
   name: string;
@@ -95,12 +98,13 @@ export interface VerificationResponse {
   message: string;
 }
 
-interface UserTableProps {
+export interface UserTableProps {
   users: User[];
   selectedUsers: string[];
   loading: boolean;
   currentPage: number;
   totalPages: number;
+  currentUserId?: string | null;
   onUserSelect: (id: string) => void;
   onSelectAll: () => void;
   onViewUser: (id: string) => void;
@@ -109,4 +113,5 @@ interface UserTableProps {
   onLockAccount: (userId: string) => void;
   onUnlockAccount: (userId: string) => void;
   onPageChange: (page: number) => void;
+  onAddUser: () => void;
 }

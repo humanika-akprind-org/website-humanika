@@ -89,6 +89,7 @@ export default function UsersPage() {
         onLockAccount={handleLockAccount}
         onUnlockAccount={handleUnlockAccount}
         onPageChange={setCurrentPage}
+        onAddUser={handleAddUser}
       />
 
       <DeleteModal

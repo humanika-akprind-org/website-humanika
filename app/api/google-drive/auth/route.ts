@@ -37,7 +37,7 @@ export async function GET() {
     response.cookies.set("oauth_state", state, {
       httpOnly: true,
       secure: isProduction,
-      maxAge: 60 * 10, // 10 menit
+      maxAge: 60 * 60, // 1 jam
       path: "/",
     });
 

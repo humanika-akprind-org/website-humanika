@@ -1,5 +1,5 @@
 // @lib/api/user.ts
-import { UserRole, Department } from "@/types/enums";
+import { UserRole, Department, Position } from "@/types/enums";
 import type {
   User,
   CreateUserData,
@@ -44,6 +44,7 @@ export async function getUsers(params?: {
   search?: string;
   role?: UserRole | string;
   department?: Department | string;
+  position?: Position | string;
   isActive?: boolean;
   verifiedAccount?: boolean;
   allUsers?: boolean;
@@ -55,6 +56,7 @@ export async function getUsers(params?: {
   if (params?.search) queryParams.append("search", params.search);
   if (params?.role) queryParams.append("role", params.role);
   if (params?.department) queryParams.append("department", params.department);
+  if (params?.position) queryParams.append("position", params.position);
   if (params?.isActive !== undefined) {
     queryParams.append("isActive", params.isActive.toString());
   }
@@ -119,8 +121,10 @@ export async function getUnverifiedUsers(params?: {
   search?: string;
   role?: UserRole | string;
   department?: Department | string;
+  position?: Position | string;
   page?: number;
   limit?: number;
+  allUsers?: boolean;
 }): Promise<ApiResponse<UsersResponse>> {
   return getUsers({
     ...params,
@@ -182,6 +186,11 @@ export const departmentOptions = Object.values(Department).map((dept) => ({
   label: formatEnumValue(dept),
 }));
 
+export const positionOptions = Object.values(Position).map((position) => ({
+  value: position as string,
+  label: formatEnumValue(position as string),
+}));
+
 // Export types for convenience
 export type {
   User,
@@ -207,4 +216,5 @@ export const UserApi = {
   formatEnumValue,
   userRoleOptions,
   departmentOptions,
+  positionOptions,
 };

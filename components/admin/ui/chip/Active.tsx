@@ -16,7 +16,7 @@ export default function ActiveChip({ isActive }: ActiveChipProps) {
       return {
         class: "bg-red-100 text-red-800",
         icon: <FiXCircle className="mr-1" />,
-        text: "Deactive",
+        text: "Inactive",
       };
     }
   };
