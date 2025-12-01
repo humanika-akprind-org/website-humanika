@@ -9,18 +9,16 @@ import {
   FiCalendar,
   FiUser,
   FiTrendingUp,
-  FiClock,
-  FiCheckCircle,
-  FiXCircle,
-  FiAlertCircle,
   FiPlus,
 } from "react-icons/fi";
 import type { WorkProgram } from "@/types/work";
 import type { Department } from "@/types/enums";
-import { Status } from "@/types/enums";
+import { type Status } from "@/types/enums";
 import DeleteModal from "./modal/DeleteModal";
 import Stats from "./Stats";
 import Filters from "./Filters";
+import StatusChip from "../ui/chip/Status";
+import StatusApproval from "@/components/admin/ui/chip/StatusApproval";
 
 interface WorkProgramTableProps {
   workPrograms: WorkProgram[];
@@ -172,48 +170,6 @@ export default function WorkProgramTable({
     setCurrentProgram(null);
   };
 
-  // Get status badge class and icon
-  const getStatusInfo = (status: Status) => {
-    switch (status) {
-      case Status.DRAFT:
-        return {
-          class: "bg-gray-100 text-gray-800",
-          icon: <FiClock className="mr-1" />,
-          text: "Draft",
-        };
-      case Status.PENDING:
-        return {
-          class: "bg-blue-100 text-blue-800",
-          icon: <FiAlertCircle className="mr-1" />,
-          text: "Pending",
-        };
-      case Status.PUBLISH:
-        return {
-          class: "bg-green-100 text-green-800",
-          icon: <FiCheckCircle className="mr-1" />,
-          text: "Published",
-        };
-      case Status.PRIVATE:
-        return {
-          class: "bg-yellow-100 text-yellow-800",
-          icon: <FiEye className="mr-1" />,
-          text: "Private",
-        };
-      case Status.ARCHIVE:
-        return {
-          class: "bg-red-100 text-red-800",
-          icon: <FiXCircle className="mr-1" />,
-          text: "Archived",
-        };
-      default:
-        return {
-          class: "bg-gray-100 text-gray-800",
-          icon: <FiClock className="mr-1" />,
-          text: status,
-        };
-    }
-  };
-
   // Format currency
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("id-ID", {
@@ -358,7 +314,6 @@ export default function WorkProgramTable({
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {validPrograms.map((program) => {
-                const statusInfo = getStatusInfo(program.status);
                 const usagePercentage = calculateUsagePercentage(
                   program.usedFunds,
                   program.funds
@@ -415,35 +370,11 @@ export default function WorkProgramTable({
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2.5 py-0.5 text-xs font-medium rounded-full flex items-center w-fit ${statusInfo.class}`}
-                      >
-                        {statusInfo.icon}
-                        {statusInfo.text}
-                      </span>
+                      <StatusChip status={program.status} />
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       {program.approvals && program.approvals.length > 0 ? (
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full flex items-center w-fit ${
-                            program.approvals[0].status === "APPROVED"
-                              ? "bg-green-100 text-green-800"
-                              : program.approvals[0].status === "REJECTED"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {program.approvals[0].status === "APPROVED" && (
-                            <FiCheckCircle className="mr-1" />
-                          )}
-                          {program.approvals[0].status === "REJECTED" && (
-                            <FiXCircle className="mr-1" />
-                          )}
-                          {program.approvals[0].status === "PENDING" && (
-                            <FiClock className="mr-1" />
-                          )}
-                          {program.approvals[0].status}
-                        </span>
+                        <StatusApproval status={program.approvals[0].status} />
                       ) : (
                         <span className="text-xs text-gray-400">
                           No approvals

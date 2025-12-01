@@ -9,7 +9,7 @@ import type {
 } from "@/types/task";
 import { Department as DepartmentEnum, Status } from "@/types/enums";
 import type { User } from "@/types/user";
-import TextEditor from "@/components/admin/ui/TextEditor";
+import TextEditor from "@/components/admin/ui/text-area/TextEditor";
 import {
   FiArrowLeft,
   FiBriefcase,

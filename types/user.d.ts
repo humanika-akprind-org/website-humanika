@@ -44,9 +44,9 @@ export interface ApiResponse<T> {
 }
 
 export interface UserFilters {
-  role: UserRole | "";
-  department: Department | "";
-  isActive: string;
+  role: UserRole | "" | "all";
+  department: Department | "" | "all";
+  isActive: string | "all";
 }
 
 export interface CreateUserData {
@@ -93,4 +93,20 @@ export interface BulkOperationResponse {
 
 export interface VerificationResponse {
   message: string;
+}
+
+interface UserTableProps {
+  users: User[];
+  selectedUsers: string[];
+  loading: boolean;
+  currentPage: number;
+  totalPages: number;
+  onUserSelect: (id: string) => void;
+  onSelectAll: () => void;
+  onViewUser: (id: string) => void;
+  onEditUser: (id: string) => void;
+  onDeleteUser: (user: User) => void;
+  onLockAccount: (userId: string) => void;
+  onUnlockAccount: (userId: string) => void;
+  onPageChange: (page: number) => void;
 }

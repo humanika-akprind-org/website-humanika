@@ -15,7 +15,7 @@ import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 import { getArticleCategories } from "@/use-cases/api/article-category";
 import type { ArticleCategory } from "@/types/article-category";
-import DescriptionEditor from "../ui/TextEditor";
+import DescriptionEditor from "../ui/text-area/TextEditor";
 
 // Helper function to check if HTML content is empty
 const isHtmlEmpty = (html: string): boolean => {

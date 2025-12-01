@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { FiUser, FiMail, FiKey, FiUsers, FiLock, FiSave } from "react-icons/fi";
+import { FiUser, FiMail, FiKey, FiUsers, FiLock } from "react-icons/fi";
 import { UserRole, Department, Position } from "@/types/enums";
 import { formatEnumValue } from "@/lib/utils";
+import TextInput from "@/components/admin/ui/input/TextInput";
+import SelectInput from "@/components/admin/ui/input/SelectInput";
+import PasswordInput from "@/components/admin/ui/input/PasswordInput";
+import SubmitButton from "@/components/admin/ui/button/SubmitButton";
+import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
 export interface CreateUserData {
   name: string;
   email: string;
@@ -26,7 +31,10 @@ interface UserFormProps {
 
 export default function UserForm({ onSubmit }: UserFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [alert, setAlert] = useState<{
+    type: AlertType;
+    message: string;
+  } | null>(null);
   const [formData, setFormData] = useState<CreateUserData>({
     name: "",
     email: "",
@@ -82,13 +90,17 @@ export default function UserForm({ onSubmit }: UserFormProps) {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    setError("");
+    setAlert(null);
 
     try {
       await onSubmit(formData);
+      setAlert({ type: "success", message: "User created successfully!" });
     } catch (err) {
       console.error("Submission error:", err);
-      setError("Failed to create user. Please try again.");
+      setAlert({
+        type: "error",
+        message: "Failed to create user. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -125,274 +137,131 @@ export default function UserForm({ onSubmit }: UserFormProps) {
 
   return (
     <>
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          {error}
-        </div>
-      )}
+      {alert && <Alert type={alert.type} message={alert.message} />}
 
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter full name"
-                />
-              </div>
-              {formErrors.name && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
-              )}
-            </div>
+            <TextInput
+              label="Full Name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter full name"
+              required
+              icon={<FiUser className="text-gray-400" />}
+              error={formErrors.name}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiMail className="text-gray-400" />
-                </div>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleEmailChange}
-                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter email address"
-                />
-              </div>
-              {formErrors.email && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
-              )}
-            </div>
+            <TextInput
+              label="Email Address"
+              name="email"
+              value={formData.email}
+              onChange={handleEmailChange}
+              placeholder="Enter email address"
+              required
+              type="email"
+              icon={<FiMail className="text-gray-400" />}
+              error={formErrors.email}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Username *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  name="username"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter username"
-                />
-              </div>
-              {formErrors.username && (
-                <p className="text-red-500 text-xs mt-1">
-                  {formErrors.username}
-                </p>
-              )}
-            </div>
+            <TextInput
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Enter username"
+              required
+              icon={<FiUser className="text-gray-400" />}
+              error={formErrors.username}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUsers className="text-gray-400" />
-                </div>
-                <select
-                  name="role"
-                  required
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                >
-                  {Object.values(UserRole).map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
+            <SelectInput
+              label="Role"
+              name="role"
+              value={formData.role || ""}
+              onChange={(value: string) =>
+                setFormData((prev) => ({ ...prev, role: value as UserRole }))
+              }
+              options={Object.values(UserRole).map((role) => ({
+                value: role,
+                label: role,
+              }))}
+              required
+              icon={<FiUsers className="text-gray-400" />}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Department
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUsers className="text-gray-400" />
-                </div>
-                <select
-                  name="department"
-                  value={formData.department || ""}
-                  onChange={handleChange}
-                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                >
-                  <option value="">Select a department</option>
-                  {Object.values(Department).map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
+            <SelectInput
+              label="Department"
+              name="department"
+              value={formData.department || ""}
+              onChange={(value: string) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  department: value ? (value as Department) : undefined,
+                }))
+              }
+              options={Object.values(Department).map((dept) => ({
+                value: dept,
+                label: dept,
+              }))}
+              placeholder="Select a department"
+              icon={<FiUsers className="text-gray-400" />}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Position
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUsers className="text-gray-400" />
-                </div>
-                <select
-                  name="position"
-                  value={formData.position || ""}
-                  onChange={handleChange}
-                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                >
-                  <option value="">Select a position</option>
-                  {Object.values(Position).map((pos) => (
-                    <option key={pos} value={pos}>
-                      {formatEnumValue(pos)}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
+            <SelectInput
+              label="Position"
+              name="position"
+              value={formData.position || ""}
+              onChange={(value: string) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  position: value ? (value as Position) : undefined,
+                }))
+              }
+              options={Object.values(Position).map((pos) => ({
+                value: pos,
+                label: formatEnumValue(pos),
+              }))}
+              placeholder="Select a position"
+              icon={<FiUsers className="text-gray-400" />}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiLock className="text-gray-400" />
-                </div>
-                <select
-                  name="isActive"
-                  required
-                  value={formData.isActive ? "true" : "false"}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      isActive: e.target.value === "true",
-                    }))
-                  }
-                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                >
-                  <option value="true">Active</option>
-                  <option value="false">Inactive</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
+            <SelectInput
+              label="Status"
+              name="isActive"
+              value={formData.isActive ? "true" : "false"}
+              onChange={(value: string) =>
+                setFormData((prev) => ({ ...prev, isActive: value === "true" }))
+              }
+              options={[
+                { value: "true", label: "Active" },
+                { value: "false", label: "Inactive" },
+              ]}
+              required
+              icon={<FiLock className="text-gray-400" />}
+            />
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiKey className="text-gray-400" />
-                </div>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Set a password (min. 6 characters)"
-                />
-              </div>
-              {formErrors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {formErrors.password}
-                </p>
-              )}
-              <p className="text-xs text-gray-500 mt-1">
-                Password must be at least 6 characters long.
-              </p>
-            </div>
+            <PasswordInput
+              label="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Set a password (min. 6 characters)"
+              required
+              icon={<FiKey className="text-gray-400" />}
+              error={formErrors.password}
+              hint="Password must be at least 6 characters long."
+              className="md:col-span-2"
+            />
           </div>
 
           <div className="flex justify-end space-x-3">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50"
-            >
-              <FiSave className="mr-2" />
-              {isSubmitting ? "Creating User..." : "Create User"}
-            </button>
+            <SubmitButton
+              isSubmitting={isSubmitting}
+              text="Create User"
+              loadingText="Creating User..."
+            />
           </div>
         </form>
       </div>
