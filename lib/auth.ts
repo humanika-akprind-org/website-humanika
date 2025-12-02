@@ -84,12 +84,13 @@ export function verifyToken(token: string): DecodedToken | null {
 export function setAuthCookie(
   response: NextResponse,
   token: string,
-  p0: number
+  maxAge: number
 ): NextResponse {
   response.cookies.set({
     name: COOKIE_NAME,
     value: token,
     ...COOKIE_OPTIONS,
+    maxAge,
   });
   return response;
 }

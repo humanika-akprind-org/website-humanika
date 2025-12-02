@@ -1,17 +1,16 @@
 import { FiX } from "react-icons/fi";
-import type { User } from "../../../../types/user";
 
 interface DeleteModalProps {
   isOpen: boolean;
-  user: User | null;
-  selectedCount: number;
+  itemName?: string;
+  selectedCount?: number;
   onClose: () => void;
   onConfirm: () => void;
 }
 
 export default function DeleteModal({
   isOpen,
-  user,
+  itemName,
   selectedCount,
   onClose,
   onConfirm,
@@ -36,9 +35,9 @@ export default function DeleteModal({
         </div>
         <div className="p-6">
           <p className="text-gray-600">
-            {user
-              ? `Are you sure you want to delete ${user.name}? This action cannot be undone.`
-              : `Are you sure you want to delete ${selectedCount} selected users? This action cannot be undone.`}
+            {itemName
+              ? `Are you sure you want to delete ${itemName}? This action cannot be undone.`
+              : `Are you sure you want to delete ${selectedCount} selected items? This action cannot be undone.`}
           </p>
         </div>
         <div className="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">

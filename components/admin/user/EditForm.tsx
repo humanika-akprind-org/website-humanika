@@ -19,7 +19,7 @@ import SelectInput from "../ui/input/SelectInput";
 import PasswordInput from "../ui/input/PasswordInput";
 import Alert, { type AlertType } from "../ui/alert/Alert";
 import SubmitButton from "../ui/button/SubmitButton";
-import DeleteModal from "./modal/DeleteModal";
+import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import UserInfoHeader from "../ui/UserInfoHeader";
 
 interface UserEditFormProps {
@@ -349,8 +349,7 @@ export default function UserEditForm({
 
       <DeleteModal
         isOpen={showDeleteModal}
-        user={user}
-        selectedCount={1}
+        itemName={user?.name}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
       />

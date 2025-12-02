@@ -13,7 +13,6 @@ import {
 import { ActivityType } from "@/types/enums";
 import { useActivityLog } from "@/hooks/activity-log/useActivityLog";
 import Loading from "@/components/Loading";
-import Error from "@/components/error/Error";
 
 interface ActivityLogData {
   id: string;
@@ -46,7 +45,6 @@ export default function ActivityLogPage() {
   const [activities, setActivities] = useState<ActivityLogData[]>([]);
   const [pagination, setPagination] = useState<PaginationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const { getActivityLogs } = useActivityLog();
 
@@ -54,7 +52,6 @@ export default function ActivityLogPage() {
     const fetchActivities = async () => {
       try {
         setIsLoading(true);
-        setError(null);
         const data = await getActivityLogs({
           activityType:
             filter.activityType === "ALL"
@@ -67,7 +64,6 @@ export default function ActivityLogPage() {
         setActivities(data.activities);
         setPagination(data.pagination);
       } catch (err) {
-        setError("Failed to fetch activity logs");
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -92,10 +88,6 @@ export default function ActivityLogPage() {
     };
     return colors[type] || "text-gray-600";
   };
-
-  if (error) {
-    return <Error message={error} />;
-  }
 
   return (
     <div className="container mx-auto py-6">
