@@ -7,6 +7,9 @@ import { createPeriod, updatePeriod } from "@/use-cases/api/period";
 import { FiFileText, FiCalendar } from "react-icons/fi";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
+import TextInput from "@/components/admin/ui/input/TextInput";
+import SubmitButton from "@/components/admin/ui/button/SubmitButton";
+import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
 
 interface PeriodFormProps {
   period?: Period;
@@ -18,14 +21,21 @@ export default function PeriodForm({
   isEdit = false,
 }: PeriodFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alert, setAlert] = useState<{
+    type: AlertType;
+    message: string;
+  } | null>(null);
   const [formData, setFormData] = useState<PeriodFormData>({
     name: "",
     startYear: new Date().getFullYear(),
     endYear: new Date().getFullYear() + 1,
     isActive: false,
   });
+
+  const [formErrors, setFormErrors] = useState<
+    Partial<Record<keyof PeriodFormData, string>>
+  >({});
 
   useEffect(() => {
     if (period) {
@@ -49,12 +59,46 @@ export default function PeriodForm({
           ? parseInt(value)
           : value,
     }));
+
+    // Clear error when field is changed
+    if (formErrors[name as keyof PeriodFormData]) {
+      setFormErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Partial<Record<keyof PeriodFormData, string>> = {};
+
+    if (!formData.name.trim()) errors.name = "Name is required";
+    if (
+      !formData.startYear ||
+      formData.startYear < 2000 ||
+      formData.startYear > 2100
+    ) {
+      errors.startYear = "Start year must be between 2000 and 2100";
+    }
+    if (
+      !formData.endYear ||
+      formData.endYear < 2001 ||
+      formData.endYear > 2101
+    ) {
+      errors.endYear = "End year must be between 2001 and 2101";
+    }
+    if (formData.startYear >= formData.endYear) {
+      errors.endYear = "End year must be greater than start year";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    setAlert(null);
 
     try {
       if (isEdit && period) {
@@ -62,12 +106,20 @@ export default function PeriodForm({
       } else {
         await createPeriod(formData);
       }
+      setAlert({ type: "success", message: "Period saved successfully!" });
       router.push("/admin/governance/periods");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Submission error:", err);
+      setAlert({
+        type: "error",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Failed to save period. Please try again.",
+      });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -85,97 +137,56 @@ export default function PeriodForm({
           {isEdit ? "Edit Period" : "Tambah Period Baru"}
         </h1>
       </div>
-      {error && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          {error}
-        </div>
-      )}
+      {alert && <Alert type={alert.type} message={alert.message} />}
 
       <form
         onSubmit={handleSubmit}
         className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
       >
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Nama Period *
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiFileText className="text-gray-400" />
-            </div>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Masukkan nama period"
-              required
-              className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <p className="mt-1 text-xs text-gray-500">
-            Wajib diisi dengan nama period yang jelas
-          </p>
-        </div>
+        <TextInput
+          label="Nama Period"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Masukkan nama period"
+          required
+          icon={<FiFileText className="text-gray-400" />}
+          error={formErrors.name}
+        />
+        <p className="mt-1 text-xs text-gray-500">
+          Wajib diisi dengan nama period yang jelas
+        </p>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label
-              htmlFor="startYear"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Tahun Mulai *
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiCalendar className="text-gray-400" />
-              </div>
-              <input
-                type="number"
-                id="startYear"
-                name="startYear"
-                value={formData.startYear}
-                onChange={handleChange}
-                placeholder="2024"
-                min="2000"
-                max="2100"
-                required
-                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            <TextInput
+              label="Tahun Mulai"
+              name="startYear"
+              value={formData.startYear.toString()}
+              onChange={handleChange}
+              placeholder="2024"
+              type="number"
+              required
+              icon={<FiCalendar className="text-gray-400" />}
+              error={formErrors.startYear}
+            />
             <p className="mt-1 text-xs text-gray-500">
               Tahun mulai period (min: 2000, max: 2100)
             </p>
           </div>
 
           <div>
-            <label
-              htmlFor="endYear"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Tahun Selesai *
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiCalendar className="text-gray-400" />
-              </div>
-              <input
-                type="number"
-                id="endYear"
-                name="endYear"
-                value={formData.endYear}
-                onChange={handleChange}
-                placeholder="2025"
-                min="2001"
-                max="2101"
-                required
-                className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            <TextInput
+              label="Tahun Selesai"
+              name="endYear"
+              value={formData.endYear?.toString() || ""}
+              onChange={handleChange}
+              placeholder="2025"
+              type="number"
+              required
+              icon={<FiCalendar className="text-gray-400" />}
+              error={formErrors.endYear}
+            />
             <p className="mt-1 text-xs text-gray-500">
               Tahun selesai period (min: 2001, max: 2101)
             </p>
@@ -207,17 +218,11 @@ export default function PeriodForm({
           >
             Batal
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {loading
-              ? "Menyimpan..."
-              : isEdit
-              ? "Update Period"
-              : "Tambah Period"}
-          </button>
+          <SubmitButton
+            isSubmitting={isSubmitting}
+            text={isEdit ? "Update Period" : "Tambah Period"}
+            loadingText="Menyimpan..."
+          />
         </div>
       </form>
     </div>

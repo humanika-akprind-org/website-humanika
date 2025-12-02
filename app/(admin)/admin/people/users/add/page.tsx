@@ -8,11 +8,11 @@ import Alert from "@/components/admin/ui/alert/Alert";
 import { useCreateUser } from "@/hooks/user/useCreateUser";
 
 export default function AddUserPage() {
-  const { createUser, isSubmitting, error } = useCreateUser();
+  const { createUser, handleBack, isSubmitting, error } = useCreateUser();
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <PageHeader title="Add New User" backHref="/admin/people/users" />
+      <PageHeader title="Add New User" onBack={handleBack} />
 
       {error && <Alert type="error" message={error} />}
 

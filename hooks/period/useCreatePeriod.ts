@@ -1,28 +1,23 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserApi } from "@/use-cases/api/user";
-import type { CreateUserData } from "@/types/user";
+import { PeriodApi } from "@/use-cases/api/period";
+import type { PeriodFormData } from "@/types/period";
 
-export function useCreateUser() {
+export function useCreatePeriod() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const createUser = async (formData: CreateUserData) => {
+  const createPeriod = async (formData: PeriodFormData) => {
     setIsSubmitting(true);
     setError("");
 
     try {
-      const response = await UserApi.createUser(formData);
-
-      if (response.error) {
-        setError(response.error);
-      } else {
-        router.push("/admin/people/users");
-      }
+      await PeriodApi.createPeriod(formData);
+      router.push("/admin/governance/periods");
     } catch (err) {
       console.error("Submission error:", err);
-      setError("Failed to create user. Please try again.");
+      setError("Failed to create period. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -33,7 +28,7 @@ export function useCreateUser() {
   };
 
   return {
-    createUser,
+    createPeriod,
     isSubmitting,
     error,
     setError,
