@@ -1,6 +1,6 @@
 import GalleryForm from "@/components/admin/gallery/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { UpdateGalleryInput } from "@/types/gallery";
 import type { Event } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
@@ -10,8 +10,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 
 async function EditGalleryPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     const [events, gallery] = await Promise.all([

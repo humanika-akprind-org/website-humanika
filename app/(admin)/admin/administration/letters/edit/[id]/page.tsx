@@ -1,6 +1,6 @@
 import LetterForm from "@/components/admin/letter/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type {
   CreateLetterInput,
   UpdateLetterInput,
@@ -19,8 +19,7 @@ import { getPeriods } from "@/use-cases/api/period";
 import { getEvents } from "@/use-cases/api/event";
 
 async function EditLetterPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     // Fetch letter data and related data

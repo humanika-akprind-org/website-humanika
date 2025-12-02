@@ -3,7 +3,7 @@ import AuthProvider from "@/components/admin/auth/AuthProvider";
 import Sidebar from "@/components/admin/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import "./admin.css";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/components/admin/layout/UserInfo";
 import { geistSans, geistMono } from "@/app/ui/fonts";
@@ -24,8 +24,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   return (
     <html lang="en">

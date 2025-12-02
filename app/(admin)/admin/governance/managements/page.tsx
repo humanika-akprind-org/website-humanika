@@ -5,14 +5,13 @@ import ManagementTable from "@/components/admin/management/Table";
 import PageHeader from "@/components/admin/drive/PageHeader";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import ErrorFallback from "@/components/admin/ErrorFallback";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { Management } from "@/types/management";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 
 async function ManagementsPage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     const [managements, usersResponse, periods] = await Promise.all([

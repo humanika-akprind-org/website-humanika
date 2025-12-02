@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { cookies } from "next/headers";
 import {
   googleClientId,
   googleClientSecret,
@@ -23,3 +24,12 @@ export const drive = google.drive({
   version: "v3",
   auth: oauth2Client,
 });
+
+/**
+ * Get Google access token from cookies
+ * @returns The access token string or empty string if not found
+ */
+export function getGoogleAccessToken(): string {
+  const cookieStore = cookies();
+  return cookieStore.get("google_access_token")?.value || "";
+}

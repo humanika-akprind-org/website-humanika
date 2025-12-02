@@ -1,6 +1,6 @@
 import FinanceForm from "@/components/admin/finance/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceCategory } from "@/types/finance-category";
 import type { Period } from "@/types/period";
@@ -31,8 +31,7 @@ interface EditFinancePageProps {
 }
 
 async function EditFinancePage({ params }: EditFinancePageProps) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     // Fetch data directly from database to avoid API authentication issues

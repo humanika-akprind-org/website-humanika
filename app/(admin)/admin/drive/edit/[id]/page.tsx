@@ -2,13 +2,12 @@ import DriveForm from "@/components/admin/drive/Form";
 import PageHeader from "@/components/admin/drive/PageHeader";
 import { getGoogleDriveFile } from "@/lib/google-drive/google-drive";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 
 async function EditDriveFilePage({ params }: { params: { id: string } }) {
   const fileId = params.id;
 
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   let file = null;
   if (accessToken) {

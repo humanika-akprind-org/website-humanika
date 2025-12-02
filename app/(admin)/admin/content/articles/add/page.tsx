@@ -2,7 +2,7 @@ import { UserApi } from "@/use-cases/api/user";
 import { PeriodApi } from "@/use-cases/api/period";
 import ArticleForm from "@/components/admin/article/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type {
   CreateArticleInput,
   UpdateArticleInput,
@@ -17,8 +17,7 @@ import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 
 async function AddArticlePage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     const [usersResponse, periods] = await Promise.all([

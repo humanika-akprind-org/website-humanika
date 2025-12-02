@@ -6,7 +6,7 @@ import DocumentForm from "@/components/admin/document/Form";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
@@ -20,8 +20,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 async function AddDocumentPage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     // Fetch users first (this is used to assign ownership).

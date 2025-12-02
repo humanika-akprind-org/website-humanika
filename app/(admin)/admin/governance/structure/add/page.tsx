@@ -1,7 +1,7 @@
 import { PeriodApi } from "@/use-cases/api/period";
 import StructureForm from "@/components/admin/structure/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
@@ -15,8 +15,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 async function AddStructurePage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     const periods = await PeriodApi.getPeriods();

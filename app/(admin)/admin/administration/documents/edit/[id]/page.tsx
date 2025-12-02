@@ -3,7 +3,6 @@ import DocumentForm from "@/components/admin/document/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
-import { cookies } from "next/headers";
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
@@ -17,10 +16,10 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 
 async function EditDocumentPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     // Fetch document data

@@ -3,14 +3,13 @@ import { PeriodApi } from "@/use-cases/api/period";
 import { ManagementApi } from "@/use-cases/api/management";
 import ManagementForm from "@/components/admin/management/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { ManagementServerData } from "@/types/management";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 
 async function EditManagementPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     const [management, usersResponse, periods] = await Promise.all([

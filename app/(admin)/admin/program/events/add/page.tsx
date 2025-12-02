@@ -2,7 +2,7 @@ import { UserApi } from "@/use-cases/api/user";
 import { PeriodApi } from "@/use-cases/api/period";
 import EventForm from "@/components/admin/event/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { CreateEventInput, UpdateEventInput, Event } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
@@ -11,8 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 async function AddEventPage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   try {
     const [usersResponse, periods] = await Promise.all([

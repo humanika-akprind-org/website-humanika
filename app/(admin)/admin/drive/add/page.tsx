@@ -1,11 +1,10 @@
 import DriveForm from "@/components/admin/drive/Form";
 import PageHeader from "@/components/admin/drive/PageHeader";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 
 export default async function AddDriveFilePage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = getGoogleAccessToken();
 
   return (
     <AuthGuard accessToken={accessToken}>
