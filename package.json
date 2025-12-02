@@ -88,6 +88,7 @@
     "@types/node": "^20.19.11",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/styled-jsx": "^2.2.9",
     "@typescript-eslint/eslint-plugin": "^8.39.1",
     "@typescript-eslint/parser": "^8.39.1",
     "eslint": "^8",

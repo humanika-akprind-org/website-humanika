@@ -131,7 +131,7 @@ export default function UserTable({
                       color="green"
                     >
                       <FiCheck className="mr-2" size={14} />
-                      Verify User
+                      Verify Account
                     </DropdownMenuItem>
                   </DropdownMenu>
                 </td>

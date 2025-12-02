@@ -193,6 +193,21 @@ const config: Config = {
       // ===== ANIMATIONS =====
       animation: {
         blob: "blob 7s infinite",
+        float: "float 8s ease-in-out infinite",
+        orbit: "orbit 3s linear infinite",
+        gradient: "gradient 3s ease infinite",
+        "slide-up": "slide-up 0.6s ease-out forwards",
+        "fade-in": "fade-in 0.6s ease-out forwards",
+        "spin-slow": "spin 20s linear infinite",
+        "bounce-slow": "bounce 3s infinite",
+        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "ping-slow": "ping 3s cubic-bezier(0, 0, 0.2, 1) infinite",
+        shake: "shake 0.5s ease-in-out",
+        glow: "glow 2s ease-in-out infinite alternate",
+        "slide-in-right": "slideInRight 0.5s ease-out",
+        "slide-in-left": "slideInLeft 0.5s ease-out",
+        "zoom-in": "zoomIn 0.3s ease-out",
+        "rotate-3d": "rotate3d 20s infinite linear",
       },
 
       keyframes: {
@@ -210,6 +225,140 @@ const config: Config = {
             transform: "translate(0px, 0px) scale(1)",
           },
         },
+        float: {
+          "0%, 100%": {
+            transform: "translateY(0px) rotate(0deg)",
+          },
+          "50%": {
+            transform: "translateY(-20px) rotate(180deg)",
+          },
+        },
+        orbit: {
+          "0%": {
+            transform: "rotate(0deg) translateX(45px) rotate(0deg)",
+          },
+          "100%": {
+            transform: "rotate(360deg) translateX(45px) rotate(-360deg)",
+          },
+        },
+        gradient: {
+          "0%, 100%": {
+            "background-position": "0% 50%",
+          },
+          "50%": {
+            "background-position": "100% 50%",
+          },
+        },
+        "slide-up": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "fade-in": {
+          "0%": {
+            opacity: "0",
+          },
+          "100%": {
+            opacity: "1",
+          },
+        },
+        shake: {
+          "0%, 100%": {
+            transform: "translateX(0)",
+          },
+          "10%, 30%, 50%, 70%, 90%": {
+            transform: "translateX(-5px)",
+          },
+          "20%, 40%, 60%, 80%": {
+            transform: "translateX(5px)",
+          },
+        },
+        glow: {
+          "0%": {
+            "box-shadow": "0 0 5px rgba(59, 130, 246, 0.5)",
+          },
+          "100%": {
+            "box-shadow":
+              "0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(147, 51, 234, 0.6)",
+          },
+        },
+        slideInRight: {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(100%)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        slideInLeft: {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(-100%)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        zoomIn: {
+          "0%": {
+            opacity: "0",
+            transform: "scale(0.9)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+        },
+        rotate3d: {
+          "0%": {
+            transform: "rotate3d(1, 1, 0, 0deg)",
+          },
+          "100%": {
+            transform: "rotate3d(1, 1, 0, 360deg)",
+          },
+        },
+      },
+
+      // ===== TRANSITION DURATIONS =====
+      transitionDuration: {
+        "2000": "2000ms",
+        "3000": "3000ms",
+      },
+
+      // ===== TRANSITION TIMING FUNCTIONS =====
+      transitionTimingFunction: {
+        "bounce-in": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "smooth-step": "cubic-bezier(0.4, 0, 0.2, 1)",
+      },
+
+      // ===== BACKGROUND IMAGE =====
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic":
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-404": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "gradient-buttons": "linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%)",
+      },
+
+      // ===== BACKDROP FILTER =====
+      backdropBlur: {
+        xs: "2px",
+      },
+
+      // ===== BOX SHADOW =====
+      boxShadow: {
+        soft: "0 10px 40px rgba(0, 0, 0, 0.1)",
+        glow: "0 0 20px rgba(59, 130, 246, 0.5)",
+        "inner-glow": "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+        float: "0 20px 60px rgba(0, 0, 0, 0.3)",
       },
     },
   },
