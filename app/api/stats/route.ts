@@ -23,7 +23,7 @@ export async function GET() {
     const stats = [
       { number: userCount.toString(), label: "Anggota Aktif" },
       { number: eventCount.toString(), label: "Kegiatan Tahunan" },
-      { number: workProgramCount.toString(), label: "Proyek Kolaborasi" },
+      { number: workProgramCount.toString(), label: "Program Kerja" },
       { number: awardCount.toString(), label: "Penghargaan" },
     ];
 

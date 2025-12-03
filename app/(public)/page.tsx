@@ -1,40 +1,13 @@
 import Link from "next/link";
-import ArticleCard from "@/components/public/article/ArticleCard";
+import ArticleSection from "@/components/public/ArticleSection";
+import GallerySection from "@/components/public/GallerySection";
 import UpcomingEventsSection from "@/components/public/UpcomingEventsSection";
-import LatestGalleryGrid from "@/components/public/gallery/LatestGalleryGrid";
-import type { Gallery } from "@/types/gallery";
-import type { Article } from "@/types/article";
 interface Stat {
   number: string;
   label: string;
 }
 
 export default async function Home() {
-  // Fetch data from database
-  const articlesResponse = await fetch(
-    `${
-      process.env.NEXTAUTH_URL || "http://localhost:3000"
-    }/api/article?isPublished=true`,
-    { cache: "no-store" }
-  );
-  const articles = articlesResponse.ok ? await articlesResponse.json() : [];
-
-  const eventsResponse = await fetch(
-    `${
-      process.env.NEXTAUTH_URL || "http://localhost:3000"
-    }/api/event?status=PUBLISH`,
-    { cache: "no-store" }
-  );
-  const eventsData = eventsResponse.ok ? await eventsResponse.json() : [];
-
-  const galleriesResponse = await fetch(
-    `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/gallery`,
-    { cache: "no-store" }
-  );
-  const galleries: Gallery[] = galleriesResponse.ok
-    ? await galleriesResponse.json()
-    : [];
-
   const statsResponse = await fetch(
     `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/stats`,
     { cache: "no-store" }
@@ -107,64 +80,7 @@ export default async function Home() {
       </section>
 
       {/* 2. Artikel Terbaru */}
-      <section className="py-16 bg-grey-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-heading-2 text-grey-900 mb-4">
-              Artikel Terbaru
-            </h2>
-            <p className="text-body-1 text-grey-600 max-w-2xl mx-auto">
-              Temukan wawasan dan perspektif terbaru seputar teknologi dan
-              informatika
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {articles.map((article: Article) => {
-              const formattedDate = article.createdAt
-                ? new Date(article.createdAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })
-                : "";
-              const truncatedContent =
-                article.content && article.content.length > 150
-                  ? `${article.content.substring(0, 150)}...`
-                  : article.content || "";
-              return (
-                <ArticleCard
-                  key={article.id}
-                  article={article}
-                  formattedDate={formattedDate}
-                  truncatedContent={truncatedContent}
-                />
-              );
-            })}
-          </div>
-
-          <div className="text-center">
-            <Link
-              href="/article"
-              className="inline-flex items-center px-6 py-3 bg-white border border-grey-200 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-medium shadow-sm hover:shadow-md"
-            >
-              Lihat Semua Artikel
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 ml-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <ArticleSection />
 
       {/* 3. Tentang Kami */}
       <section className="py-16 bg-white">
@@ -323,48 +239,10 @@ export default async function Home() {
       </section>
 
       {/* 4. Event Terdekat */}
-      <UpcomingEventsSection eventsData={eventsData} />
+      <UpcomingEventsSection />
 
       {/* 5. Galeri */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-heading-2 text-grey-900 mb-4">
-              Galeri Kegiatan
-            </h2>
-            <p className="text-body-1 text-grey-600 max-w-2xl mx-auto">
-              Dokumentasi momen berharga dari berbagai kegiatan dan acara
-              HUMANIKA
-            </p>
-          </div>
-
-          {/* Gallery Grid Component */}
-          <div className="mb-12">
-            <LatestGalleryGrid galleries={galleries.slice(0, 9)} />
-          </div>
-
-          <div className="text-center">
-            <Link
-              href="/gallery"
-              className="inline-flex items-center px-6 py-3 bg-white border border-grey-200 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-medium shadow-sm hover:shadow-md"
-            >
-              Lihat Galeri Lengkap
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 ml-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <GallerySection />
 
       {/* 6. Kontak CTA */}
       <section className="py-16 bg-gradient-to-r from-primary-800 to-primary-900 text-white">

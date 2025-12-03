@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import EventCard from "@/components/public/event/EventCard";
+import PastEventCard from "@/components/public/event/PastEventCard";
 import type { Event } from "@/types/event";
 
-export default function UpcomingEventsSection() {
+export default function EventSection() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,6 +61,10 @@ export default function UpcomingEventsSection() {
     (event) => new Date(event.startDate) > now
   );
 
+  const pastEvents = allEvents
+    .filter((event) => new Date(event.endDate) < now)
+    .slice(0, 4); // Limit to 4 past events
+
   return (
     <section className="py-16 bg-grey-50">
       <div className="container mx-auto px-4">
@@ -104,6 +109,29 @@ export default function UpcomingEventsSection() {
                 />
               );
             })}
+          </div>
+
+          <div className="mt-12 text-center">
+            <button className="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium shadow-md">
+              Load More Events
+            </button>
+          </div>
+        </div>
+
+        {/* Past Events */}
+        <div>
+          <h3 className="text-2xl font-bold mb-8 text-gray-800 border-b-4 border-red-600 pb-2 inline-block">
+            Past Events
+          </h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {pastEvents.map((event) => (
+              <PastEventCard
+                key={event.id}
+                id={event.id}
+                title={event.name}
+                date={event.endDate}
+              />
+            ))}
           </div>
         </div>
 
