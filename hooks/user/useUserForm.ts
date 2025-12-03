@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UserRole } from "@/types/enums";
-import { CreateUserData } from "@/components/admin/user/Form";
-import { AlertType } from "@/components/admin/ui/alert/Alert";
+import { type CreateUserData } from "@/components/admin/user/Form";
+import { type AlertType } from "@/components/admin/ui/alert/Alert";
 
 export const useUserForm = (
   onSubmit: (formData: CreateUserData) => Promise<void>

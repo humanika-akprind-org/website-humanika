@@ -20,8 +20,6 @@ export function usePeriodManagement() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
-  const [sortField, setSortField] = useState("name");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const itemsPerPage = 10;
 
@@ -44,29 +42,6 @@ export function usePeriodManagement() {
       });
     }
 
-    // Apply sorting
-    result.sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortField) {
-        case "name":
-          aValue = a.name;
-          bValue = b.name;
-          break;
-        case "createdAt":
-          aValue = a.createdAt;
-          bValue = b.createdAt;
-          break;
-        default:
-          aValue = a.name;
-          bValue = b.name;
-      }
-
-      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
     // Apply pagination
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -74,7 +49,7 @@ export function usePeriodManagement() {
 
     setFilteredPeriods(paginatedResult);
     setTotalPages(Math.ceil(result.length / itemsPerPage));
-  }, [periods, searchTerm, filters, sortField, sortDirection, currentPage]);
+  }, [periods, searchTerm, filters, currentPage]);
 
   useEffect(() => {
     filterPeriods();
@@ -111,15 +86,6 @@ export function usePeriodManagement() {
       setSelectedPeriods([]);
     } else {
       setSelectedPeriods(filteredPeriods.map((period) => period.id));
-    }
-  };
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
     }
   };
 
@@ -189,8 +155,7 @@ export function usePeriodManagement() {
     showDeleteModal,
     showViewModal,
     currentPeriod,
-    sortField,
-    sortDirection,
+
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -198,7 +163,7 @@ export function usePeriodManagement() {
     setCurrentPeriod,
     togglePeriodSelection,
     toggleSelectAll,
-    handleSort,
+
     handleViewPeriod,
     handleAddPeriod,
     handleEditPeriod,

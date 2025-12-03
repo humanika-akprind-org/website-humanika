@@ -28,8 +28,6 @@ export default function PeriodsPage() {
     showDeleteModal,
     showViewModal,
     currentPeriod,
-    sortField,
-    sortDirection,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -37,7 +35,6 @@ export default function PeriodsPage() {
     setCurrentPeriod,
     togglePeriodSelection,
     toggleSelectAll,
-    handleSort,
     handleViewPeriod,
     handleAddPeriod,
     handleEditPeriod,
@@ -87,9 +84,6 @@ export default function PeriodsPage() {
         onViewPeriod={handleViewPeriod}
         onEditPeriod={handleEditPeriod}
         onDelete={handleDelete}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        onSort={handleSort}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}

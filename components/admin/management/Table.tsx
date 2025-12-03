@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { FiEye, FiEdit, FiTrash, FiUser } from "react-icons/fi";
 import type { Management } from "@/types/management";
 import ManagementAvatar from "../ui/avatar/ManagementAvatar";
@@ -11,6 +11,7 @@ import Checkbox from "../ui/checkbox/Checkbox";
 import Pagination from "../ui/pagination/Pagination";
 import AddButton from "../ui/button/AddButton";
 import EmptyState from "../ui/EmptyState";
+import SortIcon from "../ui/SortIcon";
 
 interface ManagementTableProps {
   managements: Management[];
@@ -43,6 +44,50 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
   onPageChange,
   onAddManagement,
 }) => {
+  const [sortField, setSortField] = useState("management");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  // Sort managements
+  const sortedManagements = [...managements].sort((a, b) => {
+    let aValue, bValue;
+
+    switch (sortField) {
+      case "management":
+        aValue = a.user?.name?.toLowerCase() || "";
+        bValue = b.user?.name?.toLowerCase() || "";
+        break;
+      case "department":
+        aValue = a.department?.toLowerCase() || "";
+        bValue = b.department?.toLowerCase() || "";
+        break;
+      case "position":
+        aValue = a.position?.toLowerCase() || "";
+        bValue = b.position?.toLowerCase() || "";
+        break;
+      case "period":
+        aValue = a.period?.name?.toLowerCase() || "";
+        bValue = b.period?.name?.toLowerCase() || "";
+        break;
+      default:
+        aValue = a.user?.name?.toLowerCase() || "";
+        bValue = b.user?.name?.toLowerCase() || "";
+    }
+
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Handle sort
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
   const handleSelectAll = () => {
@@ -77,35 +122,71 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
               >
                 <Checkbox
                   checked={
-                    managements.length > 0 &&
-                    selectedManagements.length === managements.length
+                    sortedManagements.length > 0 &&
+                    selectedManagements.length === sortedManagements.length
                   }
                   onChange={handleSelectAll}
                 />
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("management")}
               >
-                Management
+                <div className="flex items-center">
+                  Management
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="management"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("department")}
               >
-                Department
+                <div className="flex items-center">
+                  Department
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="department"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("position")}
               >
-                Position
+                <div className="flex items-center">
+                  Position
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="position"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("period")}
               >
-                Period
+                <div className="flex items-center">
+                  Period
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="period"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
@@ -114,7 +195,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {managements.map((management, index) => (
+            {sortedManagements.map((management, index) => (
               <tr
                 key={management.id}
                 ref={(el) => {
@@ -148,8 +229,8 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                   <DropdownMenu
                     boundaryRef={{ current: rowRefs.current[index] }}
-                    isLastItem={index === managements.length - 1}
-                    hasMultipleItems={managements.length > 1}
+                    isLastItem={index === sortedManagements.length - 1}
+                    hasMultipleItems={sortedManagements.length > 1}
                   >
                     <DropdownMenuItem
                       onClick={() => handleViewManagement(management.id)}
@@ -180,7 +261,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
         </table>
       </div>
 
-      {managements.length === 0 && !loading && (
+      {sortedManagements.length === 0 && !loading && (
         <EmptyState
           icon={<FiUser size={48} className="mx-auto" />}
           title="No managements found"
@@ -191,9 +272,9 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
         />
       )}
 
-      {managements.length > 0 && (
+      {sortedManagements.length > 0 && (
         <Pagination
-          usersLength={managements.length}
+          usersLength={sortedManagements.length}
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={onPageChange}

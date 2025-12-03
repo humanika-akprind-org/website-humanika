@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { FiEye, FiEdit, FiTrash2, FiCalendar } from "react-icons/fi";
 import type { Period } from "@/types/period";
 import ActiveChip from "../ui/chip/Active";
@@ -17,9 +17,6 @@ interface PeriodTableProps {
   onViewPeriod: (period: Period) => void;
   onEditPeriod: (period: Period) => void;
   onDelete: (period?: Period) => void;
-  sortField: string;
-  sortDirection: "asc" | "desc";
-  onSort: (field: string) => void;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -33,14 +30,55 @@ export default function PeriodTable({
   onViewPeriod,
   onEditPeriod,
   onDelete,
-  sortField,
-  sortDirection,
-  onSort,
   currentPage,
   totalPages,
   onPageChange,
 }: PeriodTableProps) {
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+
+  const [sortField, setSortField] = useState("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  // Sort periods
+  const sortedPeriods = [...periods].sort((a, b) => {
+    let aValue, bValue;
+
+    switch (sortField) {
+      case "name":
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+        break;
+      case "startYear":
+        aValue = a.startYear;
+        bValue = b.startYear;
+        break;
+      case "endYear":
+        aValue = a.endYear;
+        bValue = b.endYear;
+        break;
+      case "status":
+        aValue = a.isActive ? "active" : "inactive";
+        bValue = b.isActive ? "active" : "inactive";
+        break;
+      default:
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+    }
+
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Handle sort
+  const onSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
@@ -54,8 +92,8 @@ export default function PeriodTable({
               >
                 <Checkbox
                   checked={
-                    periods.length > 0 &&
-                    selectedPeriods.length === periods.length
+                    sortedPeriods.length > 0 &&
+                    selectedPeriods.length === sortedPeriods.length
                   }
                   onChange={onSelectAll}
                 />
@@ -71,26 +109,53 @@ export default function PeriodTable({
                     sortField={sortField}
                     sortDirection={sortDirection}
                     field="name"
+                    iconType="arrow"
                   />
                 </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => onSort("startYear")}
               >
-                Start Year
+                <div className="flex items-center">
+                  Start Year
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="startYear"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => onSort("endYear")}
               >
-                End Year
+                <div className="flex items-center">
+                  End Year
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="endYear"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => onSort("status")}
               >
-                Status
+                <div className="flex items-center">
+                  Status
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="status"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
@@ -99,7 +164,7 @@ export default function PeriodTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {periods.map((period, index) => (
+            {sortedPeriods.map((period, index) => (
               <tr
                 key={period.id}
                 ref={(el) => {
@@ -132,8 +197,8 @@ export default function PeriodTable({
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                   <DropdownMenu
                     boundaryRef={{ current: rowRefs.current[index] }}
-                    isLastItem={index === periods.length - 1}
-                    hasMultipleItems={periods.length > 1}
+                    isLastItem={index === sortedPeriods.length - 1}
+                    hasMultipleItems={sortedPeriods.length > 1}
                   >
                     <DropdownMenuItem
                       onClick={() => onViewPeriod(period)}
@@ -164,7 +229,7 @@ export default function PeriodTable({
         </table>
       </div>
 
-      {periods.length === 0 && (
+      {sortedPeriods.length === 0 && (
         <EmptyState
           icon={<FiCalendar size={48} className="mx-auto" />}
           title="No periods found"
