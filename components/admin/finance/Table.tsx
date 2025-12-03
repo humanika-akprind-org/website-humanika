@@ -8,8 +8,6 @@ import {
   FiEye,
   FiDownload,
   FiX,
-  FiArrowUp,
-  FiArrowDown,
   FiDollarSign,
   FiFile,
   FiTrendingUp,
@@ -19,6 +17,7 @@ import {
   FiXCircle,
   FiClock,
 } from "react-icons/fi";
+import SortIcon from "../ui/SortIcon";
 import type { Finance } from "@/types/finance";
 
 interface FinanceTableProps {
@@ -192,16 +191,6 @@ export default function FinanceTable({
     return <FiFile className="text-gray-400" />;
   };
 
-  // Get sort icon
-  const getSortIcon = (field: string) => {
-    if (sortField !== field) return null;
-    return sortDirection === "asc" ? (
-      <FiArrowUp size={14} />
-    ) : (
-      <FiArrowDown size={14} />
-    );
-  };
-
   return (
     <div className="p-0">
       {/* Finances Table */}
@@ -231,7 +220,12 @@ export default function FinanceTable({
                 >
                   <div className="flex items-center">
                     Deskripsi
-                    {getSortIcon("description")}
+                    <SortIcon
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                      field="description"
+                      iconType="arrow"
+                    />
                   </div>
                 </th>
                 <th
@@ -247,7 +241,12 @@ export default function FinanceTable({
                 >
                   <div className="flex items-center">
                     Jumlah
-                    {getSortIcon("amount")}
+                    <SortIcon
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                      field="amount"
+                      iconType="arrow"
+                    />
                   </div>
                 </th>
                 <th
@@ -269,7 +268,12 @@ export default function FinanceTable({
                 >
                   <div className="flex items-center">
                     Tanggal
-                    {getSortIcon("date")}
+                    <SortIcon
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                      field="date"
+                      iconType="arrow"
+                    />{" "}
                   </div>
                 </th>
                 <th

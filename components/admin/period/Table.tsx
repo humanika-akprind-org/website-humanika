@@ -8,7 +8,7 @@ import Checkbox from "../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../ui/dropdown/DropdownMenu";
 import Pagination from "../ui/pagination/Pagination";
 import EmptyState from "../ui/EmptyState";
-
+import SortIcon from "../ui/SortIcon";
 interface PeriodTableProps {
   periods: Period[];
   selectedPeriods: string[];
@@ -42,11 +42,6 @@ export default function PeriodTable({
 }: PeriodTableProps) {
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
-  const getSortIcon = (field: string) => {
-    if (sortField !== field) return null;
-    return sortDirection === "asc" ? "↑" : "↓";
-  };
-
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
       <div className="overflow-x-auto">
@@ -72,7 +67,11 @@ export default function PeriodTable({
               >
                 <div className="flex items-center">
                   Nama Period
-                  {getSortIcon("name")}
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="name"
+                  />
                 </div>
               </th>
               <th

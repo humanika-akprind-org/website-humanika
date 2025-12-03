@@ -11,7 +11,6 @@ import Checkbox from "../../ui/checkbox/Checkbox";
 import Pagination from "../../ui/pagination/Pagination";
 import EmptyState from "../../ui/EmptyState";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
-
 export default function UserTable({
   users,
   selectedUsers,
