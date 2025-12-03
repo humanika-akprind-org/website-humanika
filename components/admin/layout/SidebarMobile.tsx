@@ -156,10 +156,10 @@ export default function SidebarMobile() {
 
           <NavDropdown icon={Shield} title="Managements">
             <NavDropdownItem href="/admin/governance/managements">
-              All Manage
+              All Management
             </NavDropdownItem>
             <NavDropdownItem href="/admin/governance/managements/add">
-              Add Manage
+              Add New
             </NavDropdownItem>
           </NavDropdown>
 
@@ -168,7 +168,7 @@ export default function SidebarMobile() {
               All Structure
             </NavDropdownItem>
             <NavDropdownItem href="/admin/governance/structure/add">
-              Add Structure
+              Add New
             </NavDropdownItem>
           </NavDropdown>
 
