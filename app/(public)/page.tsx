@@ -1,25 +1,47 @@
+"use client";
+
 import Link from "next/link";
 import ArticleSection from "@/components/public/ArticleSection";
 import GallerySection from "@/components/public/GallerySection";
 import UpcomingEventsSection from "@/components/public/UpcomingEventsSection";
+import { useEffect, useState } from "react";
 interface Stat {
   number: string;
   label: string;
 }
 
-export default async function Home() {
-  const statsResponse = await fetch(
-    `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/stats`,
-    { cache: "no-store" }
-  );
-  const stats = statsResponse.ok
-    ? await statsResponse.json()
-    : [
-        { number: "0", label: "Anggota Aktif" },
-        { number: "0", label: "Kegiatan Tahunan" },
-        { number: "0", label: "Proyek Kolaborasi" },
-        { number: "0", label: "Penghargaan" },
-      ];
+export default function Home() {
+  const [stats, setStats] = useState<Stat[]>([
+    { number: "0", label: "Anggota Aktif" },
+    { number: "0", label: "Kegiatan Tahunan" },
+    { number: "0", label: "Proyek Kolaborasi" },
+    { number: "0", label: "Penghargaan" },
+  ]);
+  const [_loading, setLoading] = useState(true);
+  const [_error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/stats`,
+          { cache: "no-store" }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        } else {
+          setError("Failed to fetch stats");
+        }
+      } catch (_err) {
+        setError("Failed to fetch stats");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <div className="min-h-screen bg-grey-50">
