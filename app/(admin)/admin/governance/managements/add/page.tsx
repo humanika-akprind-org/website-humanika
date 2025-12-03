@@ -1,12 +1,14 @@
 import { UserApi } from "@/use-cases/api/user";
 import { PeriodApi } from "@/use-cases/api/period";
 import ManagementForm from "@/components/admin/management/Form";
-import { ManagementApi } from "@/use-cases/api/management";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { ManagementServerData } from "@/types/management";
+import { ManagementService } from "@/services/management/management.service";
+import { redirect } from "next/navigation";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
 
 async function AddManagementPage() {
   const accessToken = getGoogleAccessToken();
@@ -21,7 +23,14 @@ async function AddManagementPage() {
 
     const handleSubmit = async (data: ManagementServerData) => {
       "use server";
-      await ManagementApi.createManagement(data);
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      await ManagementService.createManagement(data, user);
+      redirect("/admin/governance/managements");
     };
 
     return (

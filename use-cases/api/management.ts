@@ -26,7 +26,9 @@ export const ManagementApi = {
 
   async getManagement(id: string): Promise<Management> {
     try {
-      const response = await fetch(`${API_BASE_URL}/management/${id}`);
+      const response = await fetch(`${API_BASE_URL}/management/${id}`, {
+        credentials: "include",
+      });
       const result: ManagementApiResponse = await response.json();
 
       if (result.success && result.data && !Array.isArray(result.data)) {
@@ -46,6 +48,7 @@ export const ManagementApi = {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
@@ -71,6 +74,7 @@ export const ManagementApi = {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
@@ -100,6 +104,7 @@ export const ManagementApi = {
       const response = await fetch(`${API_BASE_URL}/management/${id}`, {
         method: "DELETE",
         headers,
+        credentials: "include",
       });
 
       const result: ManagementApiResponse = await response.json();

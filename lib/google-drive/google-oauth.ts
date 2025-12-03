@@ -1,10 +1,10 @@
 import { google } from "googleapis";
-import { cookies } from "next/headers";
 import {
   googleClientId,
   googleClientSecret,
   googleRedirectUri,
 } from "@/lib/config/config";
+import { cookies } from "next/headers";
 
 export const oauth2Client = new google.auth.OAuth2(
   googleClientId,
@@ -31,5 +31,6 @@ export const drive = google.drive({
  */
 export function getGoogleAccessToken(): string {
   const cookieStore = cookies();
-  return cookieStore.get("google_access_token")?.value || "";
+  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  return accessToken;
 }

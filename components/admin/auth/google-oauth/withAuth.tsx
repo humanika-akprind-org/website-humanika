@@ -9,7 +9,7 @@ export interface WithAuthProps {
 
 export function withAuth<T extends object>(Component: React.ComponentType<T>) {
   return async function WithAuthWrapper(props: T) {
-    const accessToken = getGoogleAccessToken();
+    const accessToken = await getGoogleAccessToken();
 
     return (
       <AuthGuard accessToken={accessToken}>

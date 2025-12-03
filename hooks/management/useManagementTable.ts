@@ -10,18 +10,10 @@ export const useManagementTable = (
 ) => {
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [positionFilter, setPositionFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [selectedManagements, setSelectedManagements] = useState<string[]>([]);
-
-  // Computed filter values
-  const filterIsActive =
-    statusFilter === "all"
-      ? "all"
-      : statusFilter === "ACTIVE"
-      ? "active"
-      : "inactive";
 
   const handleDeleteSelected = () => {
     if (selectedManagements.length === 0) return;
@@ -214,9 +206,8 @@ export const useManagementTable = (
             management.department === departmentFilter) &&
           (periodFilter === "all" ||
             management.period?.name === periodFilter) &&
-          (filterIsActive === "all" ||
-            (filterIsActive === "active" && management.period?.isActive) ||
-            (filterIsActive === "inactive" && !management.period?.isActive)) &&
+          (positionFilter === "all" ||
+            management.position === positionFilter) &&
           (!searchTerm ||
             management.user?.name
               ?.toLowerCase()
@@ -234,7 +225,7 @@ export const useManagementTable = (
               ?.toLowerCase()
               .includes(searchTerm.toLowerCase()))
       ),
-    [managements, departmentFilter, periodFilter, filterIsActive, searchTerm]
+    [managements, departmentFilter, periodFilter, positionFilter, searchTerm]
   );
 
   // Stats for departments INFOKOM, PSDM, LITBANG, KWU based on filtered managements
@@ -292,8 +283,8 @@ export const useManagementTable = (
     // States
     searchTerm,
     setSearchTerm,
-    statusFilter,
-    setStatusFilter,
+    positionFilter,
+    setPositionFilter,
     periodFilter,
     setPeriodFilter,
     departmentFilter,

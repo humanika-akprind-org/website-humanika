@@ -1,19 +1,21 @@
 import { UserApi } from "@/use-cases/api/user";
 import { PeriodApi } from "@/use-cases/api/period";
-import { ManagementApi } from "@/use-cases/api/management";
 import ManagementForm from "@/components/admin/management/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { ManagementServerData } from "@/types/management";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
+import { ManagementService } from "@/services/management/management.service";
+import { redirect } from "next/navigation";
 
 async function EditManagementPage({ params }: { params: { id: string } }) {
   const accessToken = getGoogleAccessToken();
 
   try {
     const [management, usersResponse, periods] = await Promise.all([
-      ManagementApi.getManagement(params.id),
+      ManagementService.getManagement(params.id),
       UserApi.getUsers({ limit: 50 }),
       PeriodApi.getPeriods(),
     ]);
@@ -22,7 +24,14 @@ async function EditManagementPage({ params }: { params: { id: string } }) {
 
     const handleSubmit = async (data: ManagementServerData) => {
       "use server";
-      await ManagementApi.updateManagement(params.id, data);
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      await ManagementService.updateManagement(params.id, data, user);
+      redirect("/admin/governance/managements");
     };
 
     return (
