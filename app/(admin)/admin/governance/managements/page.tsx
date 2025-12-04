@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import ManagementStats from "@/components/admin/management/Stats";
 import ManagementFilters from "@/components/admin/management/Filters";
 import ManagementTable from "@/components/admin/management/Table";
@@ -15,19 +14,8 @@ import DepartmentChip from "@/components/admin/ui/chip/Department";
 import PositionChip from "@/components/admin/ui/chip/Position";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import { useManagementManagement } from "@/hooks/management/useManagementManagement";
-import { getAccessTokenAction } from "@/lib/actions/accessToken";
 
 export default function ManagementsPage() {
-  const [accessToken, setAccessToken] = useState<string>("");
-
-  useEffect(() => {
-    const fetchAccessToken = async () => {
-      const token = await getAccessTokenAction();
-      setAccessToken(token);
-    };
-    fetchAccessToken();
-  }, []);
-
   const {
     managements,
     loading,
@@ -95,7 +83,6 @@ export default function ManagementsPage() {
         loading={loading}
         currentPage={currentPage}
         totalPages={totalPages}
-        accessToken={accessToken}
         onManagementSelect={toggleManagementSelection}
         onSelectAll={toggleSelectAll}
         onViewManagement={handleViewManagement}
@@ -127,10 +114,7 @@ export default function ManagementsPage() {
         {currentManagement && (
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
-              <ManagementAvatar
-                management={currentManagement}
-                accessToken={accessToken}
-              />
+              <ManagementAvatar management={currentManagement} />
               <div>
                 <h4 className="text-xl font-semibold text-gray-900">
                   {currentManagement.user?.name}

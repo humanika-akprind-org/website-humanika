@@ -35,7 +35,6 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
   loading,
   currentPage,
   totalPages,
-  accessToken,
   onManagementSelect,
   onSelectAll,
   onViewManagement,
@@ -210,10 +209,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                   />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <ManagementAvatar
-                    management={management}
-                    accessToken={accessToken}
-                  />
+                  <ManagementAvatar management={management} />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <DepartmentChip department={management.department} />
