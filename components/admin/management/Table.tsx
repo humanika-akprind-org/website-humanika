@@ -280,23 +280,6 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
           onPageChange={onPageChange}
         />
       )}
-
-      {/* Loading Overlay */}
-      {loading && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
-          role="status"
-          aria-live="polite"
-        >
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-            <div
-              className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"
-              aria-hidden="true"
-            />
-            <p className="text-gray-700">Processing your request...</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,176 +1,204 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { FiPlus } from "react-icons/fi";
+import StructureStats from "@/components/admin/structure/Stats";
+import StructureFilters from "@/components/admin/structure/Filters";
 import StructureTable from "@/components/admin/structure/Table";
-import DeleteModal from "@/components/admin/structure/modal/DeleteModal";
-import type { OrganizationalStructure } from "@/types/structure";
-import { useToast } from "@/hooks/use-toast";
-import { useFile } from "@/hooks/useFile";
+import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/components/admin/ui/modal/ViewModal";
+import Loading from "@/components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/components/admin/ui/ManagementHeader";
+import AddButton from "@/components/admin/ui/button/AddButton";
+import DateDisplay from "@/components/admin/ui/date/DateDisplay";
+import { useStructureManagement } from "@/hooks/structure/useStructureManagement";
+import StructureAvatar from "@/components/admin/ui/avatar/StructureAvatar";
 
 export default function StructuresPage() {
-  const [_structures, setStructures] = useState<OrganizationalStructure[]>([]);
-  const [filteredStructures, setFilteredStructures] = useState<
-    OrganizationalStructure[]
-  >([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    structureId: "",
-    structureName: "",
-    fileId: "",
-  });
+  const {
+    structures,
+    loading,
+    error,
+    success,
+    selectedStructures,
+    searchTerm,
+    currentPage,
+    totalPages,
+    filters,
+    showDeleteModal,
+    showViewModal,
+    currentStructure,
+    setSearchTerm,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentStructure,
+    toggleStructureSelection,
+    toggleSelectAll,
+    handleViewStructure,
+    handleAddStructure,
+    handleEditStructure,
+    handleDelete,
+    confirmDelete,
+    handleFilterChange,
+  } = useStructureManagement();
 
-  const { toast } = useToast();
-  const { deleteFile } = useFile("");
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
 
-  const fetchStructures = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/structure");
-      if (response.ok) {
-        const data = await response.json();
-        setStructures(data || []);
-        setFilteredStructures(data || []);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch organizational structures",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching structures:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch organizational structures",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
-  // Fetch structures
-  useEffect(() => {
-    fetchStructures();
-  }, [fetchStructures]);
-
-  const handleDelete = async (structureId: string) => {
-    try {
-      // First, get the structure to check if it has a file
-      const structureResponse = await fetch(`/api/structure/${structureId}`);
-      if (!structureResponse.ok) {
-        throw new Error("Failed to fetch structure details");
-      }
-      const structure = await structureResponse.json();
-
-      // Delete the file from Google Drive if it exists
-      if (structure.fileId) {
-        const fileDeleted = await deleteFile(structure.fileId);
-        if (!fileDeleted) {
-          console.warn(
-            "Failed to delete file from Google Drive, but continuing with database deletion"
-          );
-        }
-      }
-
-      // Delete from database
-      const response = await fetch(`/api/structure/${structureId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Organizational structure deleted successfully",
-        });
-        fetchStructures(); // Refresh the list
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to delete organizational structure",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting structure:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete organizational structure",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteModal({
-        isOpen: false,
-        structureId: "",
-        structureName: "",
-        fileId: "",
-      });
-    }
-  };
-
-  const closeDeleteModal = () => {
-    setDeleteModal({
-      isOpen: false,
-      structureId: "",
-      structureName: "",
-      fileId: "",
-    });
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Organizational Structures Management
-          </h1>
-          <p className="text-gray-600">
-            Manage and organize your organizational structures
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/admin/governance/structure/add"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <FiPlus className="h-4 w-4 mr-2" />
-            Add Structure
-          </Link>
-        </div>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Organizational Structures Management"
+          description="Manage and organize your organizational structures"
+        />
+        <AddButton onClick={handleAddStructure} text="Add Structure" />
       </div>
 
-      {/* Structures Table */}
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
+      <StructureStats structures={structures} />
+
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <StructureFilters
+        filters={filters}
+        searchTerm={searchTerm}
+        selectedCount={selectedStructures.length}
+        onFilterChange={handleFilterChange}
+        onSearchChange={setSearchTerm}
+        onDeleteSelected={() => handleDelete()}
+      />
+
+      <StructureTable
+        structures={structures}
+        selectedStructures={selectedStructures}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onStructureSelect={toggleStructureSelection}
+        onSelectAll={toggleSelectAll}
+        onViewStructure={handleViewStructure}
+        onEditStructure={handleEditStructure}
+        onDeleteStructure={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddStructure={handleAddStructure}
+      />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentStructure?.name}
+        selectedCount={selectedStructures.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentStructure(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Structure Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentStructure(null);
+        }}
+      >
+        {currentStructure && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900">
+                  {currentStructure.name}
+                </h4>
+                <p className="text-gray-600">
+                  {currentStructure.status} - {currentStructure.period?.name}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentStructure.name}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentStructure.status}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Period
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentStructure.period?.name}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Decree
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentStructure.decree ? (
+                    <a
+                      href={
+                        currentStructure.decree.startsWith("http")
+                          ? currentStructure.decree
+                          : `https://drive.google.com/file/d/${currentStructure.decree}/view`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      {`Decree - ${currentStructure.name}`}
+                    </a>
+                  ) : (
+                    "No decree"
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentStructure.createdAt} />
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Updated At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentStructure.updatedAt} />
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <StructureAvatar structure={currentStructure} />
             </div>
           </div>
-        </div>
-      ) : (
-        <StructureTable
-          structures={filteredStructures}
-          onDelete={handleDelete}
-        />
-      )}
-
-      {/* Delete Modal */}
-      <DeleteModal
-        isOpen={deleteModal.isOpen}
-        onClose={closeDeleteModal}
-        onConfirm={() => handleDelete(deleteModal.structureId)}
-        structureName={deleteModal.structureName}
-        count={1}
-        isLoading={false}
-      />
+        )}
+      </ViewModal>
     </div>
   );
 }

@@ -1,11 +1,13 @@
 "use client";
 
+import React from "react";
 import {
   FiFileText,
   FiTrendingUp,
   FiCheckCircle,
   FiEdit,
 } from "react-icons/fi";
+import StatCard from "../ui/card/StatCard";
 import type { OrganizationalStructure } from "@/types/structure";
 import { Status } from "@/types/enums";
 
@@ -29,53 +31,40 @@ export default function Stats({ structures }: StatsProps) {
   const stats = [
     {
       title: "Total Structures",
-      value: totalStructures.toString(),
+      value: totalStructures,
       icon: FiFileText,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
+      color: "blue",
     },
     {
       title: "Published",
-      value: publishedStructures.toString(),
+      value: publishedStructures,
       icon: FiCheckCircle,
-      color: "text-green-600",
-      bgColor: "bg-green-100",
+      color: "green",
     },
     {
       title: "Pending",
-      value: pendingStructures.toString(),
+      value: pendingStructures,
       icon: FiTrendingUp,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100",
+      color: "orange",
     },
     {
       title: "Draft",
-      value: draftStructures.toString(),
+      value: draftStructures,
       icon: FiEdit,
-      color: "text-gray-600",
-      bgColor: "bg-gray-100",
+      color: "gray",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {stats.map((stat, index) => (
-        <div
+        <StatCard
           key={index}
-          className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
-                {stat.value}
-              </p>
-            </div>
-            <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-              <stat.icon className={`w-6 h-6 ${stat.color}`} />
-            </div>
-          </div>
-        </div>
+          title={stat.title}
+          value={stat.value}
+          icon={stat.icon}
+          color={stat.color}
+        />
       ))}
     </div>
   );

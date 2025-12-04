@@ -6,7 +6,7 @@ export interface OrganizationalStructure {
   name: string;
   status: Status;
   periodId: string;
-  period: Period;
+  period?: Period;
   decree: string; // URL file Surat Keputusan (SK)
   structure?: string | null; // JSX as string
   createdAt: Date;
