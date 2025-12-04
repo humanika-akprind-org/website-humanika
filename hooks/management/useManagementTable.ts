@@ -84,11 +84,11 @@ export const useManagementTable = (
     if (photoUrl.includes("drive.google.com")) {
       const fileIdMatch = photoUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (fileIdMatch) {
-        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
       }
       return photoUrl;
     } else if (photoUrl.match(/^[a-zA-Z0-9_-]+$/)) {
-      return `https://drive.google.com/uc?export=view&id=${photoUrl}`;
+      return `/api/drive-image?fileId=${photoUrl}`;
     } else {
       return photoUrl;
     }

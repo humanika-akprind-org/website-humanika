@@ -125,11 +125,11 @@ export default function StructureTable({
     if (structureImage.includes("drive.google.com")) {
       const fileIdMatch = structureImage.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (fileIdMatch) {
-        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
       }
       return structureImage;
     } else if (structureImage.match(/^[a-zA-Z0-9_-]+$/)) {
-      return `https://drive.google.com/uc?export=view&id=${structureImage}`;
+      return `/api/drive-image?fileId=${structureImage}`;
     } else {
       return structureImage;
     }
