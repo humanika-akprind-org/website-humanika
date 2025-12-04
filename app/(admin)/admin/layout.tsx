@@ -8,6 +8,7 @@ import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/components/admin/layout/UserInfo";
 import { geistSans, geistMono } from "@/app/ui/fonts";
 import SidebarMobile from "@/components/admin/layout/SidebarMobile";
+import RefreshHandler from "@/components/admin/RefreshHandler";
 
 export const metadata: Metadata = {
   title: "Organizational Management System",
@@ -32,6 +33,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
+          <RefreshHandler />
           <div className="flex h-screen overflow-hidden">
             <Sidebar />
 

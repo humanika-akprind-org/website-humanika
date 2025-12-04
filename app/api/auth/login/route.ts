@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       user: result.user,
     });
 
-    return setAuthCookie(response, result.token!, 60 * 60 * 6); // 6 hours
+    return setAuthCookie(response, result.token!, 60 * 60 * 24 * 7); // 1 week
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
