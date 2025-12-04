@@ -57,11 +57,13 @@ interface StructureFormProps {
       | CreateOrganizationalStructureInput
       | UpdateOrganizationalStructureInput
   ) => Promise<void>;
+  isEdit?: boolean;
 }
 
 export default function StructureForm({
   structure,
   onSubmit,
+  isEdit = false,
 }: StructureFormProps) {
   const router = useRouter();
 
@@ -270,10 +272,11 @@ export default function StructureForm({
 
         <div className="flex justify-end space-x-3 pt-4">
           <CancelButton onClick={() => router.back()} disabled={isLoading} />
+
           <SubmitButton
             isSubmitting={isLoading}
-            text="Simpan"
-            loadingText="Menyimpan..."
+            text={isEdit ? "Update Structure" : "Add Structure"}
+            loadingText="Saving..."
           />
         </div>
       </form>

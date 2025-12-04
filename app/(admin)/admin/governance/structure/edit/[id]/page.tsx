@@ -27,7 +27,11 @@ export default function EditStructurePage() {
           <p className="text-red-600">{error}</p>
         </div>
       ) : structure ? (
-        <StructureForm structure={structure} onSubmit={handleSubmit} />
+        <StructureForm
+          structure={structure}
+          onSubmit={handleSubmit}
+          isEdit={true}
+        />
       ) : null}
     </div>
   );

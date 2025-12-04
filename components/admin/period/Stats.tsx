@@ -15,19 +15,19 @@ export default function PeriodStats({ periods }: PeriodStatsProps) {
       color: "blue",
     },
     {
-      title: "Aktif",
+      title: "Active",
       value: periods.filter((p) => p.isActive).length,
       icon: FiCheckCircle,
       color: "green",
     },
     {
-      title: "Tidak Aktif",
+      title: "Inactive",
       value: periods.filter((p) => !p.isActive).length,
       icon: FiClock,
       color: "yellow",
     },
     {
-      title: "Jumlah Tahun",
+      title: "Total Years",
       value: periods.reduce(
         (total, period) => total + (period.endYear - period.startYear + 1),
         0

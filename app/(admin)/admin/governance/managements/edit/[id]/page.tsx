@@ -27,7 +27,11 @@ export default function EditManagementPage() {
           <p className="text-red-600">{error}</p>
         </div>
       ) : management ? (
-        <ManagementForm management={management} onSubmit={handleSubmit} />
+        <ManagementForm
+          management={management}
+          onSubmit={handleSubmit}
+          isEdit={true}
+        />
       ) : null}
     </div>
   );

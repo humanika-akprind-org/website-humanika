@@ -29,7 +29,7 @@ export default function PeriodFilters({
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <SearchInput
-          placeholder="Cari period..."
+          placeholder="Search period..."
           value={searchTerm}
           onChange={onSearchChange}
         />
@@ -48,9 +48,9 @@ export default function PeriodFilters({
             value={statusFilter}
             onChange={onStatusFilterChange}
             options={[
-              { value: "all", label: "Semua Status" },
-              { value: "ACTIVE", label: "Aktif" },
-              { value: "INACTIVE", label: "Tidak Aktif" },
+              { value: "all", label: "All Status" },
+              { value: "ACTIVE", label: "Active" },
+              { value: "INACTIVE", label: "Inactive" },
             ]}
           />
           <DeleteSelectedButton

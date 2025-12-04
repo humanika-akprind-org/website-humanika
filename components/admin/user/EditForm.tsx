@@ -195,7 +195,7 @@ export default function UserEditForm({
               <SubmitButton
                 isSubmitting={isSubmitting}
                 text="Update User"
-                loadingText="Updating User..."
+                loadingText="Saving..."
               />
             </div>
           </div>

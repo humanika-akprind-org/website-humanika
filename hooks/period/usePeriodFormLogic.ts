@@ -1,19 +1,27 @@
 import { useRouter } from "next/navigation";
-import type { Period } from "@/types/period";
+import type { Period, PeriodFormData } from "@/types/period";
 import { usePeriodForm } from "./usePeriodForm";
 import { usePeriodSubmit } from "./usePeriodSubmit";
 import { usePeriodFormSubmit } from "./usePeriodFormSubmit";
 
-export function usePeriodFormLogic(period?: Period, isEdit: boolean = false) {
+interface UsePeriodFormLogicOptions {
+  period?: Period;
+  isEdit?: boolean;
+  onSubmit?: (data: PeriodFormData) => Promise<void>;
+}
+
+export function usePeriodFormLogic(options: UsePeriodFormLogicOptions = {}) {
+  const { period, isEdit = false, onSubmit } = options;
   const router = useRouter();
 
   const { formData, formErrors, handleChange, validateForm } =
     usePeriodForm(period);
   const { isSubmitting, alert, handleSubmit } = usePeriodSubmit(isEdit, period);
-  const { onSubmit } = usePeriodFormSubmit({
+  const { onSubmit: formOnSubmit } = usePeriodFormSubmit({
     validateForm,
     handleSubmit,
     formData,
+    onSubmit,
   });
 
   const handleBack = () => {
@@ -31,7 +39,7 @@ export function usePeriodFormLogic(period?: Period, isEdit: boolean = false) {
     alert,
 
     // Actions
-    onSubmit,
+    onSubmit: formOnSubmit,
     handleBack,
 
     // Edit mode

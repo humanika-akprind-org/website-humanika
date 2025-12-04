@@ -16,11 +16,13 @@ import CancelButton from "@/components/ui/CancelButton";
 interface ManagementFormProps {
   management?: Management;
   onSubmit: (data: ManagementServerData) => Promise<void>;
+  isEdit?: boolean;
 }
 
 const ManagementForm: React.FC<ManagementFormProps> = ({
   management,
   onSubmit,
+  isEdit = false,
 }) => {
   const router = useRouter();
 
@@ -56,13 +58,13 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
               value: user.id,
               label: `${user.name} (${user.email})`,
             }))}
-            placeholder="Pilih User"
+            placeholder="Select User"
             required
             icon={<FiUser className="text-gray-400" />}
           />
 
           <SelectInput
-            label="Periode"
+            label="Period"
             name="periodId"
             value={formData.periodId}
             onChange={(value: string) =>
@@ -72,13 +74,13 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
               value: period.id,
               label: period.name,
             }))}
-            placeholder="Pilih Periode"
+            placeholder="Select Period"
             required
             icon={<FiCalendar className="text-gray-400" />}
           />
 
           <SelectInput
-            label="Departemen"
+            label="Department"
             name="department"
             value={formData.department}
             onChange={(value: string) =>
@@ -91,13 +93,13 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
               value: dept,
               label: dept,
             }))}
-            placeholder="Pilih Departemen"
+            placeholder="Select Department"
             required
             icon={<FiHome className="text-gray-400" />}
           />
 
           <SelectInput
-            label="Posisi"
+            label="Position"
             name="position"
             value={formData.position}
             onChange={(value: string) =>
@@ -113,7 +115,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
         </div>
 
         <PhotoUpload
-          label="Foto Profil"
+          label="Photo"
           previewUrl={previewUrl}
           existingPhoto={existingPhoto}
           onFileChange={handleFileChange}
@@ -125,10 +127,11 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
 
         <div className="flex justify-end space-x-3 pt-4">
           <CancelButton onClick={() => router.back()} disabled={isLoading} />
+
           <SubmitButton
             isSubmitting={isLoading}
-            text="Simpan"
-            loadingText="Menyimpan..."
+            text={isEdit ? "Update Management" : "Add Management"}
+            loadingText="Saving..."
           />
         </div>
       </form>

@@ -104,7 +104,7 @@ export default function PeriodTable({
                 onClick={() => onSort("name")}
               >
                 <div className="flex items-center">
-                  Nama Period
+                  Name Period
                   <SortIcon
                     sortField={sortField}
                     sortDirection={sortDirection}

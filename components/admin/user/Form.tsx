@@ -173,8 +173,8 @@ export default function UserForm({ onSubmit }: UserFormProps) {
 
             <SubmitButton
               isSubmitting={isSubmitting}
-              text="Create User"
-              loadingText="Creating User..."
+              text="Add User"
+              loadingText="Saving..."
             />
           </div>
         </form>

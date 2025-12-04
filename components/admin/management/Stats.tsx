@@ -36,7 +36,7 @@ const ManagementStats: React.FC<ManagementStatsProps> = ({ managements }) => {
       color: "yellow",
     },
     {
-      title: "KWU",
+      title: "KEWIRAUSAHAAN",
       value: departmentStats.KWU,
       icon: FiShield,
       color: "purple",

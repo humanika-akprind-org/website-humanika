@@ -2,14 +2,20 @@
 
 import PeriodForm from "@/components/admin/period/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
 import { useCreatePeriod } from "@/hooks/period/useCreatePeriod";
 
 export default function AddPeriodPage() {
-  const { isSubmitting } = useCreatePeriod();
+  const { createPeriod, handleBack, isSubmitting, error } = useCreatePeriod();
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      {isSubmitting ? <LoadingForm /> : <PeriodForm />}
+      <PageHeader title="Add New Period" onBack={handleBack} />
+
+      {error && <Alert type="error" message={error} />}
+
+      {isSubmitting ? <LoadingForm /> : <PeriodForm onSubmit={createPeriod} />}
     </div>
   );
 }
