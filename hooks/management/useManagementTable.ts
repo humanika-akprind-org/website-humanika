@@ -77,16 +77,21 @@ export const useManagementTable = (
     return null;
   };
 
-  // Generate proxy image URL
-  const getProxyImageUrl = (photoUrl: string | null): string | null => {
-    if (!photoUrl) return null;
+  // Get image URL from management photo (file ID or URL)
+  const getImageUrl = (photoUrl: string | null | undefined): string => {
+    if (!photoUrl) return "";
 
-    const fileId = extractFileId(photoUrl);
-    if (!fileId) return null;
-
-    return `/api/drive-image?fileId=${fileId}${
-      accessToken ? `&accessToken=${accessToken}` : ""
-    }`;
+    if (photoUrl.includes("drive.google.com")) {
+      const fileIdMatch = photoUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+      }
+      return photoUrl;
+    } else if (photoUrl.match(/^[a-zA-Z0-9_-]+$/)) {
+      return `https://drive.google.com/uc?export=view&id=${photoUrl}`;
+    } else {
+      return photoUrl;
+    }
   };
 
   // Check if image has errored
@@ -315,7 +320,7 @@ export const useManagementTable = (
     getDepartmentLabel,
     getPositionLabel,
     extractFileId,
-    getProxyImageUrl,
+    getImageUrl,
     hasImageError,
     handleImageError,
   };

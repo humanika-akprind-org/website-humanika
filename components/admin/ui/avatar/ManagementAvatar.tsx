@@ -3,58 +3,29 @@ import Image from "next/image";
 
 interface ManagementAvatarProps {
   management: Management;
-  accessToken?: string;
 }
 
 export default function ManagementAvatar({
   management,
-  accessToken,
 }: ManagementAvatarProps) {
-  // Extract file ID from Google Drive URL for proxy image
-  const extractFileId = (url: string): string | null => {
-    if (!url) return null;
+  // Get image URL from management photo (file ID or URL)
+  const getImageUrl = (photoUrl: string | null | undefined): string => {
+    if (!photoUrl) return "";
 
-    // Handle direct file IDs
-    if (url.length === 33 && !url.includes("/")) {
-      return url;
-    }
-
-    // Handle Google Drive URLs
-    const patterns = [
-      /\/file\/d\/([a-zA-Z0-9_-]+)/,
-      /id=([a-zA-Z0-9_-]+)/,
-      /uc\?export=view&id=([a-zA-Z0-9_-]+)/,
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        return match[1];
+    if (photoUrl.includes("drive.google.com")) {
+      const fileIdMatch = photoUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
       }
+      return photoUrl;
+    } else if (photoUrl.match(/^[a-zA-Z0-9_-]+$/)) {
+      return `https://drive.google.com/uc?export=view&id=${photoUrl}`;
+    } else {
+      return photoUrl;
     }
-
-    return null;
   };
 
-  // Generate proxy image URL
-  const getProxyImageUrl = (photoUrl: string | null): string | null => {
-    if (!photoUrl) return null;
-
-    const fileId = extractFileId(photoUrl);
-    if (!fileId) return null;
-
-    // Validate fileId format (Google Drive file IDs are typically 33 characters)
-    if (fileId.length !== 33) return null;
-
-    let url = `/api/drive-image?fileId=${encodeURIComponent(fileId)}`;
-    if (accessToken) {
-      url += `&accessToken=${encodeURIComponent(accessToken)}`;
-    }
-
-    return url;
-  };
-
-  const imageUrl = getProxyImageUrl(management.photo || null);
+  const imageUrl = getImageUrl(management.photo);
 
   if (!imageUrl) {
     return (

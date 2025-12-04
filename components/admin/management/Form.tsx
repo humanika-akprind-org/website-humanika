@@ -10,7 +10,7 @@ import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import Alert from "@/components/admin/ui/alert/Alert";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
-import PhotoUpload from "@/components/admin/ui/file-upload/PhotoUpload";
+import PhotoUpload from "@/components/admin/ui/input/PhotoUpload";
 import CancelButton from "@/components/ui/CancelButton";
 
 interface ManagementFormProps {
@@ -29,7 +29,6 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
     setFormData,
     users,
     periods,
-    accessToken,
     isLoading,
     alert,
     previewUrl,
@@ -117,7 +116,6 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
           label="Foto Profil"
           previewUrl={previewUrl}
           existingPhoto={existingPhoto}
-          accessToken={accessToken}
           onFileChange={handleFileChange}
           onRemovePhoto={removePhoto}
           isLoading={isLoading}

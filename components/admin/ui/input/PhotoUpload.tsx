@@ -3,67 +3,27 @@
 import React, { useState } from "react";
 import Image from "next/image";
 
-// Helper function to extract file ID from various Google Drive URL formats
-const extractFileId = (url: string): string | null => {
-  if (!url) return null;
-
-  // Handle direct file IDs
-  if (url.length === 33 && !url.includes("/")) {
-    return url;
-  }
-
-  // Handle Google Drive URLs
-  const patterns = [
-    /\/file\/d\/([a-zA-Z0-9_-]+)/,
-    /id=([a-zA-Z0-9_-]+)/,
-    /uc\?export=view&id=([a-zA-Z0-9_-]+)/,
-  ];
-
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match && match[1]) {
-      return match[1];
-    }
-  }
-
-  return null;
-};
-
 // Helper function to get preview URL from photo (file ID or URL)
-const getPreviewUrl = (
-  photo: string | null | undefined,
-  accessToken: string
-): string | null => {
-  if (!photo) return null;
+const getPreviewUrl = (photo: string | null | undefined): string => {
+  if (!photo) return "";
 
-  if (isGoogleDrivePhoto(photo)) {
-    // Generate proxy image URL for preview
-    const fileId = extractFileId(photo);
-    if (!fileId) return null;
-
-    return `/api/drive-image?fileId=${fileId}${
-      accessToken ? `&accessToken=${accessToken}` : ""
-    }`;
+  if (photo.includes("drive.google.com")) {
+    const fileIdMatch = photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch) {
+      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
+    }
+    return photo;
+  } else if (photo.match(/^[a-zA-Z0-9_-]+$/)) {
+    return `/api/drive-image?fileId=${photo}`;
   } else {
-    // It's a direct URL or other format
     return photo;
   }
-};
-
-// Helper function to check if photo is from Google Drive (either URL or file ID)
-const isGoogleDrivePhoto = (photo: string | null | undefined): boolean => {
-  if (!photo) return false;
-  return (
-    photo.includes("drive.google.com") ||
-    photo.match(/^[a-zA-Z0-9_-]+$/) !== null
-  );
 };
 
 interface PhotoUploadProps {
   label: string;
   previewUrl: string | null;
   existingPhoto: string | null | undefined;
-  accessToken: string;
   onFileChange: (file: File) => void;
   onRemovePhoto: () => void;
   isLoading: boolean;
@@ -80,7 +40,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   label,
   previewUrl,
   existingPhoto,
-  accessToken,
   onFileChange,
   onRemovePhoto,
   isLoading,
@@ -94,17 +53,11 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
 }) => {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
-  // Check if image has errored
-  const hasImageError = (url: string | null): boolean => {
-    if (!url) return true;
-    return imageErrors.has(url);
-  };
+  const hasImageError = (url: string) => imageErrors.has(url);
 
-  // Handle image error
   const handleImageError = (url: string) => {
     setImageErrors((prev) => new Set(prev).add(url));
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -133,26 +86,21 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
         <div className="flex flex-col items-center">
           <div className="flex-shrink-0">
             {(() => {
-              // Get the proxy image URL
-              const proxyImageUrl = getPreviewUrl(
-                previewUrl || existingPhoto,
-                accessToken
-              );
-              const hasError = proxyImageUrl
-                ? hasImageError(proxyImageUrl)
-                : true;
+              // Get the image URL
+              const imageUrl = getPreviewUrl(previewUrl || existingPhoto);
+              const hasError = imageUrl ? hasImageError(imageUrl) : true;
 
               // Show image if URL exists and no error
-              if (proxyImageUrl && !hasError) {
+              if (imageUrl && !hasError) {
                 return (
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden">
                     <Image
-                      src={proxyImageUrl}
+                      src={imageUrl}
                       alt={alt}
                       width={64}
                       height={64}
                       className="w-full h-full object-cover rounded-full"
-                      onError={() => handleImageError(proxyImageUrl)}
+                      onError={() => handleImageError(imageUrl)}
                       unoptimized={true}
                     />
                   </div>
