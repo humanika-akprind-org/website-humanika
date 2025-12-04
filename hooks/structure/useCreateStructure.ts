@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { StructureApi } from "@/use-cases/api/structure";
-import type { CreateOrganizationalStructureInput } from "@/types/structure";
+import type {
+  CreateOrganizationalStructureInput,
+  UpdateOrganizationalStructureInput,
+} from "@/types/structure";
 
 export function useCreateStructure() {
   const router = useRouter();
@@ -9,13 +12,16 @@ export function useCreateStructure() {
   const [error, setError] = useState("");
 
   const createStructure = async (
-    formData: CreateOrganizationalStructureInput
+    formData: UpdateOrganizationalStructureInput
   ) => {
     setIsSubmitting(true);
     setError("");
 
     try {
-      await StructureApi.createStructure(formData);
+      // Cast to CreateOrganizationalStructureInput since name is required for creation
+      await StructureApi.createStructure(
+        formData as CreateOrganizationalStructureInput
+      );
       router.push("/admin/governance/structure");
     } catch (err) {
       console.error("Submission error:", err);

@@ -50,11 +50,13 @@ const getStructureImageUrl = (
   }
 };
 
-interface StructureFormProps<
-  T = CreateOrganizationalStructureInput | UpdateOrganizationalStructureInput
-> {
+interface StructureFormProps {
   structure?: OrganizationalStructure;
-  onSubmit: (data: T) => Promise<void>;
+  onSubmit: (
+    data:
+      | CreateOrganizationalStructureInput
+      | UpdateOrganizationalStructureInput
+  ) => Promise<void>;
 }
 
 export default function StructureForm({
