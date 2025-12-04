@@ -52,7 +52,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
     let aValue, bValue;
 
     switch (sortField) {
-      case "management":
+      case "photo":
         aValue = a.user?.name?.toLowerCase() || "";
         bValue = b.user?.name?.toLowerCase() || "";
         break;
@@ -131,14 +131,14 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("management")}
+                onClick={() => handleSort("photo")}
               >
                 <div className="flex items-center">
-                  Management
+                  Photo
                   <SortIcon
                     sortField={sortField}
                     sortDirection={sortDirection}
-                    field="management"
+                    field="photo"
                     iconType="arrow"
                   />
                 </div>
