@@ -26,6 +26,7 @@ export const useManagementForm = (
 
   const {
     uploadFile,
+    deleteFile,
     renameFile,
     isLoading: photoLoading,
     error: photoError,
@@ -49,6 +50,7 @@ export const useManagementForm = (
   const [existingPhoto, setExistingPhoto] = useState<string | null | undefined>(
     management?.photo
   );
+  const [removedPhoto, setRemovedPhoto] = useState(false);
 
   // Fetch access token
   useEffect(() => {
@@ -85,7 +87,12 @@ export const useManagementForm = (
   }, [photoError]);
 
   const removePhoto = () => {
-    // If it's a local file or no photo, just remove it
+    if (existingPhoto) {
+      // Mark photo as removed for deletion during form submission
+      setRemovedPhoto(true);
+    }
+
+    // Clear form state
     setFormData((prev) => ({ ...prev, photoFile: undefined }));
     setPreviewUrl(null);
     setExistingPhoto(null);
@@ -109,7 +116,37 @@ export const useManagementForm = (
       // Upload photo first if provided
       let photoUrl: string | null | undefined = existingPhoto;
 
+      // Handle photo deletion if marked for removal
+      if (removedPhoto) {
+        // Delete from Google Drive and set photoUrl to null
+        if (management?.photo) {
+          const fileId = getFileIdFromPhoto(management.photo);
+          if (fileId) {
+            try {
+              await deleteFile(fileId);
+            } catch (deleteError) {
+              console.warn("Failed to delete photo:", deleteError);
+              // Continue with submission even if delete fails
+            }
+          }
+        }
+        photoUrl = null;
+      }
+
       if (formData.photoFile) {
+        // Delete old photo from Google Drive if it exists and wasn't already removed
+        if (!removedPhoto && management?.photo) {
+          const fileId = getFileIdFromPhoto(management.photo);
+          if (fileId) {
+            try {
+              await deleteFile(fileId);
+            } catch (deleteError) {
+              console.warn("Failed to delete old photo:", deleteError);
+              // Continue with upload even if delete fails
+            }
+          }
+        }
+
         // Upload with temporary filename first
         const tempFileName = `temp_${Date.now()}`;
         const uploadedFileId = await uploadFile(
@@ -145,6 +182,7 @@ export const useManagementForm = (
         removePhoto();
       }
 
+      setRemovedPhoto(false);
       setAlert({
         type: "success",
         message: "Management created successfully!",
@@ -175,10 +213,26 @@ export const useManagementForm = (
 
     setFormData((prev) => ({ ...prev, photoFile: file }));
     setError(null);
+    setRemovedPhoto(false); // Reset removed state when new file is selected
 
     // Create preview URL
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+  };
+
+  // Helper function to get file ID from photo (either URL or file ID)
+  const getFileIdFromPhoto = (
+    photo: string | null | undefined
+  ): string | null => {
+    if (!photo) return null;
+
+    if (photo.includes("drive.google.com")) {
+      const fileIdMatch = photo.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      return fileIdMatch ? fileIdMatch[1] : null;
+    } else if (photo.match(/^[a-zA-Z0-9_-]+$/)) {
+      return photo;
+    }
+    return null;
   };
 
   return {
