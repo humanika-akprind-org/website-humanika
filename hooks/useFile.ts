@@ -138,7 +138,7 @@ export function useFile(accessToken?: string): {
         permission: {
           type: "anyone",
           role: "reader",
-          allowFileDiscovery: false,
+          allowFileDiscovery: true,
         },
       });
       return true;

@@ -28,6 +28,7 @@ export const useManagementForm = (
     uploadFile,
     deleteFile,
     renameFile,
+    setPublicAccess,
     isLoading: photoLoading,
     error: photoError,
   } = useFile(accessToken);
@@ -161,6 +162,12 @@ export const useManagementForm = (
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
           if (renameSuccess) {
+            // Set public access for the photo
+            const publicAccessSuccess = await setPublicAccess(uploadedFileId);
+            if (!publicAccessSuccess) {
+              console.warn("Failed to set public access for photo");
+              // Continue with submission even if setting public access fails
+            }
             photoUrl = uploadedFileId;
           } else {
             throw new Error("Failed to rename photo");

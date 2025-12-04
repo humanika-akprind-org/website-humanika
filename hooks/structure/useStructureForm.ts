@@ -33,6 +33,7 @@ export const useStructureForm = (
     uploadFile,
     deleteFile,
     renameFile,
+    setPublicAccess,
     isLoading: fileLoading,
     error: fileError,
   } = useFile(accessToken);
@@ -187,6 +188,12 @@ export const useStructureForm = (
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
           if (renameSuccess) {
+            // Set public access for the decree
+            const publicAccessSuccess = await setPublicAccess(uploadedFileId);
+            if (!publicAccessSuccess) {
+              console.warn("Failed to set public access for decree");
+              // Continue with submission even if setting public access fails
+            }
             decreeUrl = uploadedFileId;
           } else {
             throw new Error("Failed to rename decree");
@@ -228,6 +235,12 @@ export const useStructureForm = (
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
           if (renameSuccess) {
+            // Set public access for the structure image
+            const publicAccessSuccess = await setPublicAccess(uploadedFileId);
+            if (!publicAccessSuccess) {
+              console.warn("Failed to set public access for structure image");
+              // Continue with submission even if setting public access fails
+            }
             structureImageUrl = uploadedFileId;
           } else {
             throw new Error("Failed to rename structure image");
