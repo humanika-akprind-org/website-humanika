@@ -5,10 +5,23 @@ import ViewModal from "@/components/admin/ui/modal/ViewModal";
 
 interface StructureAvatarProps {
   structure: OrganizationalStructure;
+  size?: {
+    width: number;
+    height: number;
+  };
 }
 
-export default function StructureAvatar({ structure }: StructureAvatarProps) {
+export default function StructureAvatar({
+  structure,
+  size,
+}: StructureAvatarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Default size values
+  const defaultWidth = 192;
+  const defaultHeight = 192;
+  const customWidth = size?.width || defaultWidth;
+  const customHeight = size?.height || defaultHeight;
 
   // Get image URL from structure image (file ID or URL)
   const getImageUrl = (structureImage: string | null | undefined): string => {
@@ -39,7 +52,10 @@ export default function StructureAvatar({ structure }: StructureAvatarProps) {
 
   if (!imageUrl) {
     return (
-      <div className="flex-shrink-0 h-48 w-48 rounded-lg bg-gray-100 flex items-center justify-center mx-auto">
+      <div
+        className="flex-shrink-0 rounded-lg bg-gray-100 flex items-center justify-center mx-auto"
+        style={{ width: customWidth, height: customHeight }}
+      >
         <svg
           className="w-12 h-12 text-gray-400"
           fill="none"
@@ -59,13 +75,17 @@ export default function StructureAvatar({ structure }: StructureAvatarProps) {
 
   return (
     <>
-      <div className="flex-shrink-0 max-w-48 max-h-48 w-full h-auto rounded-lg overflow-hidden mx-auto">
+      <div
+        className="flex-shrink-0 w-full h-auto rounded-lg overflow-hidden mx-auto"
+        style={{ maxWidth: customWidth, maxHeight: customHeight }}
+      >
         <Image
           src={imageUrl}
           alt="Structure photo"
-          width={192}
-          height={192}
-          className="w-full h-auto max-w-48 max-h-48 rounded-lg object-contain cursor-pointer"
+          width={customWidth}
+          height={customHeight}
+          className="w-full h-auto rounded-lg object-contain cursor-pointer"
+          style={{ maxWidth: customWidth, maxHeight: customHeight }}
           onClick={handleImageClick}
           onError={(e) => {
             console.error("Image failed to load:", imageUrl, e);
