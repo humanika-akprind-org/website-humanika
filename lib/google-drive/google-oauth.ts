@@ -29,8 +29,9 @@ export const drive = google.drive({
  * Get Google access token from cookies
  * @returns The access token string or empty string if not found
  */
-export function getGoogleAccessToken(): string {
+export async function getGoogleAccessToken(): Promise<string> {
   const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken =
+    (await cookieStore).get("google_access_token")?.value || "";
   return accessToken;
 }

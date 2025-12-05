@@ -25,7 +25,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 
 async function AddFinancePage() {
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   try {
     // Fetch data directly from database to avoid API authentication issues

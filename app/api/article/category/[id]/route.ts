@@ -9,7 +9,7 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -17,7 +17,8 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const category = await getArticleCategoryById(params.id);
+    const { id } = await params;
+    const category = await getArticleCategoryById(id);
 
     if (!category) {
       return NextResponse.json(
@@ -38,7 +39,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -46,14 +47,10 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const body: UpdateArticleCategoryInput = await request.json();
 
-    const category = await updateArticleCategory(
-      params.id,
-      body,
-      user.id,
-      request
-    );
+    const category = await updateArticleCategory(id, body, user.id, request);
 
     return NextResponse.json(category);
   } catch (error) {
@@ -72,7 +69,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -80,7 +77,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await deleteArticleCategory(params.id, user.id, request);
+    const { id } = await params;
+    await deleteArticleCategory(id, user.id, request);
 
     return NextResponse.json({
       message: "Article category deleted successfully",

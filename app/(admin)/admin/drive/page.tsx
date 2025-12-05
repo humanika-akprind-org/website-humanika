@@ -5,7 +5,7 @@ import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 
 export default async function DashboardPage() {
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   let files = [];
   if (accessToken) {

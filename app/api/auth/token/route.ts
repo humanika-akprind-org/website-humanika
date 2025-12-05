@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const accessToken = getGoogleAccessToken();
+    const accessToken = await getGoogleAccessToken();
 
     return NextResponse.json({
       accessToken,

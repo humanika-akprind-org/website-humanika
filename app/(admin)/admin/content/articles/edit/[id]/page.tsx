@@ -17,13 +17,18 @@ import { notFound } from "next/navigation";
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 
-async function EditArticlePage({ params }: { params: { id: string } }) {
-  const accessToken = getGoogleAccessToken();
+async function EditArticlePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const accessToken = await getGoogleAccessToken();
+  const { id } = await params;
 
   try {
     // Fetch article data
     const article = await prisma.article.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         author: true,
         category: true,
@@ -74,7 +79,7 @@ async function EditArticlePage({ params }: { params: { id: string } }) {
 
       // Get existing article for logging
       const existingArticle = await prisma.article.findUnique({
-        where: { id: params.id },
+        where: { id: (await params).id },
       });
 
       if (!existingArticle) {
@@ -113,7 +118,7 @@ async function EditArticlePage({ params }: { params: { id: string } }) {
       }
 
       const updatedArticle = await prisma.article.update({
-        where: { id: params.id },
+        where: { id: (await params).id },
         data: articlePayload,
       });
 

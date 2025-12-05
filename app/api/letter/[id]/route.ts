@@ -9,7 +9,7 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const letter = await getLetter(params.id);
+    const letter = await getLetter((await params).id);
 
     if (!letter) {
       return NextResponse.json({ error: "Letter not found" }, { status: 404 });
@@ -35,7 +35,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -45,7 +45,7 @@ export async function PUT(
 
     const body: UpdateLetterInput = await request.json();
 
-    const letter = await updateLetter(params.id, body, user);
+    const letter = await updateLetter((await params).id, body, user);
 
     return NextResponse.json(letter);
   } catch (error) {
@@ -62,7 +62,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -70,7 +70,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await deleteLetter(params.id, user);
+    await deleteLetter((await params).id, user);
 
     return NextResponse.json({ message: "Letter deleted successfully" });
   } catch (error) {

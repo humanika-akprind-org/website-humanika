@@ -20,7 +20,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 async function AddDocumentPage() {
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   try {
     // Fetch users first (this is used to assign ownership).

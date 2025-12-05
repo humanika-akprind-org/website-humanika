@@ -17,7 +17,7 @@ import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 
 async function AddArticlePage() {
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   try {
     const [usersResponse, periods] = await Promise.all([

@@ -95,12 +95,12 @@ export function setAuthCookie(
   return response;
 }
 
-export function getAuthToken(): string | undefined {
-  return cookies().get(COOKIE_NAME)?.value;
+export async function getAuthToken(): Promise<string | undefined> {
+  return (await cookies()).get(COOKIE_NAME)?.value;
 }
 
-export function clearAuthCookies(): void {
-  cookies().delete(COOKIE_NAME);
+export async function clearAuthCookies(): Promise<void> {
+  (await cookies()).delete(COOKIE_NAME);
 }
 
 export async function invalidateToken(token: string): Promise<void> {
@@ -126,16 +126,8 @@ export async function invalidateToken(token: string): Promise<void> {
   }
 }
 
-export async function logoutUser(): Promise<void> {
-  const token = getAuthToken();
-  if (token) {
-    await invalidateToken(token);
-  }
-  clearAuthCookies();
-}
-
 export async function getCurrentUser() {
-  const token = getAuthToken();
+  const token = await getAuthToken();
   if (!token) return null;
 
   const decoded = verifyToken(token);

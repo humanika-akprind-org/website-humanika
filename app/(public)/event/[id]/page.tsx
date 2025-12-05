@@ -2,17 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { getEvent, getEvents } from "use-cases/api/event";
 import type { Event } from "types/event";
 import { FiSend } from "react-icons/fi";
 import PastEventCard from "@/components/public/event/PastEventCard";
 
-interface EventDetailProps {
-  params: { id: string };
-}
-
-export default function EventDetail({ params }: EventDetailProps) {
-  const { id } = params;
+export default function EventDetail() {
+  const params = useParams();
+  const id = params.id as string;
 
   // Helper function to get preview URL from image (file ID or URL)
   function getPreviewUrl(image: string | null | undefined): string {

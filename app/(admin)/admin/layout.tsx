@@ -25,7 +25,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   return (
     <html lang="en">

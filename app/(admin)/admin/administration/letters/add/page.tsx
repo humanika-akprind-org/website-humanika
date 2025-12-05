@@ -13,7 +13,7 @@ import { getPeriods } from "@/use-cases/api/period";
 import { getEvents } from "@/use-cases/api/event";
 
 async function AddLetterPage() {
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   try {
     const [periodsResponse, eventsResponse] = await Promise.all([

@@ -8,7 +8,6 @@ import type {
 } from "@/types/letter";
 import { Status, ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/enums";
-
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -18,14 +17,15 @@ import { notFound } from "next/navigation";
 import { getPeriods } from "@/use-cases/api/period";
 import { getEvents } from "@/use-cases/api/event";
 
-async function EditLetterPage({ params }: { params: { id: string } }) {
-  const accessToken = getGoogleAccessToken();
+async function EditLetterPage({ params }: { params: Promise<{ id: string }> }) {
+  const accessToken = await getGoogleAccessToken();
+  const { id } = await params;
 
   try {
     // Fetch letter data and related data
     const [letter, periodsResponse, eventsResponse] = await Promise.all([
       prisma.letter.findUnique({
-        where: { id: params.id },
+        where: { id: id },
         include: {
           createdBy: true,
           approvedBy: true,
@@ -84,7 +84,7 @@ async function EditLetterPage({ params }: { params: { id: string } }) {
       };
 
       await prisma.letter.update({
-        where: { id: params.id },
+        where: { id: (await params).id },
         data: submitData,
       });
 
@@ -127,7 +127,7 @@ async function EditLetterPage({ params }: { params: { id: string } }) {
       };
 
       await prisma.letter.update({
-        where: { id: params.id },
+        where: { id: id },
         data: submitData,
       });
 
@@ -135,7 +135,7 @@ async function EditLetterPage({ params }: { params: { id: string } }) {
       const existingApproval = await prisma.approval.findFirst({
         where: {
           entityType: ApprovalType.LETTER,
-          entityId: params.id,
+          entityId: id,
         },
       });
 
@@ -144,7 +144,7 @@ async function EditLetterPage({ params }: { params: { id: string } }) {
         await prisma.approval.create({
           data: {
             entityType: ApprovalType.LETTER,
-            entityId: params.id,
+            entityId: id,
             userId: user.id,
             status: StatusApproval.PENDING,
             note: "Letter submitted for approval",

@@ -4,10 +4,15 @@ import { getGoogleDriveFile } from "@/lib/google-drive/google-drive";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 
-async function EditDriveFilePage({ params }: { params: { id: string } }) {
-  const fileId = params.id;
+async function EditDriveFilePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const fileId = id;
 
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   let file = null;
   if (accessToken) {

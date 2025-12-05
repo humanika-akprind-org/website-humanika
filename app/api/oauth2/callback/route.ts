@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     //this stores the token in the oauth2Client
     //oauth2Client.setCredentials(tokens);
     //store the token in a cookie or a database
-    cookies().set({
+    (await cookies()).set({
       name: "google_access_token",
       value: tokens.access_token || "", // the access token
       httpOnly: true, // for security, the cookie is accessible only by the server

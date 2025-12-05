@@ -9,8 +9,13 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 
-async function EditGalleryPage({ params }: { params: { id: string } }) {
-  const accessToken = getGoogleAccessToken();
+async function EditGalleryPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const accessToken = await getGoogleAccessToken();
+  const { id } = await params;
 
   try {
     const [events, gallery] = await Promise.all([
@@ -35,7 +40,7 @@ async function EditGalleryPage({ params }: { params: { id: string } }) {
         orderBy: { startDate: "desc" },
       }),
       prisma.gallery.findUnique({
-        where: { id: params.id },
+        where: { id: id },
       }),
     ]);
 
@@ -59,7 +64,7 @@ async function EditGalleryPage({ params }: { params: { id: string } }) {
       }
 
       await prisma.gallery.update({
-        where: { id: params.id },
+        where: { id: (await params).id },
         data: {
           title: galleryData.title,
           eventId: galleryData.eventId,

@@ -11,13 +11,14 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 
-async function EditEventPage({ params }: { params: { id: string } }) {
-  const accessToken = getGoogleAccessToken();
+async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const accessToken = await getGoogleAccessToken();
 
   try {
     // Fetch event data
     const event = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         responsible: true,
         period: true,
@@ -93,7 +94,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
       };
 
       await prisma.event.update({
-        where: { id: params.id },
+        where: { id },
         data: eventPayload,
       });
 
@@ -152,7 +153,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
 
       // Update the event with PENDING status
       await prisma.event.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           ...eventPayload,
           status: "PENDING",
@@ -163,7 +164,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
       const existingApproval = await prisma.approval.findFirst({
         where: {
           entityType: "EVENT",
-          entityId: params.id,
+          entityId: id,
         },
       });
 
@@ -172,7 +173,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         await prisma.approval.create({
           data: {
             entityType: "EVENT",
-            entityId: params.id,
+            entityId: id,
             userId: user.id,
             status: "PENDING",
           },

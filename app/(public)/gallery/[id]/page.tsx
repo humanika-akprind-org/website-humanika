@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { getEvent, getEvents } from "@/use-cases/api/event";
 import { getGalleries } from "@/use-cases/api/gallery";
 import type { Event } from "@/types/event";
@@ -10,12 +11,9 @@ import { Status } from "@/types/enums";
 import AlbumGrid from "@/components/public/gallery/AlbumGrid";
 import GalleryGrid from "@/components/public/gallery/GalleryGrid";
 
-interface GalleryDetailProps {
-  params: { id: string };
-}
-
-export default function GalleryDetail({ params }: GalleryDetailProps) {
-  const { id } = params;
+export default function GalleryDetail() {
+  const params = useParams();
+  const id = params.id as string;
 
   // Helper function to get preview URL from image (file ID or URL)
   function getPreviewUrl(image: string | null | undefined): string {

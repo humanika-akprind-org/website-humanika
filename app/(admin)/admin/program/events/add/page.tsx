@@ -11,7 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 async function AddEventPage() {
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   try {
     const [usersResponse, periods] = await Promise.all([

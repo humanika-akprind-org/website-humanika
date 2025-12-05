@@ -9,7 +9,7 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const gallery = await getGallery(params.id);
+    const gallery = await getGallery((await params).id);
 
     if (!gallery) {
       return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
@@ -35,7 +35,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -45,7 +45,7 @@ export async function PUT(
 
     const body: UpdateGalleryInput = await request.json();
 
-    const gallery = await updateGallery(params.id, body, user);
+    const gallery = await updateGallery((await params).id, body, user);
 
     return NextResponse.json(gallery);
   } catch (error) {
@@ -62,7 +62,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -70,7 +70,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await deleteGallery(params.id, user);
+    await deleteGallery((await params).id, user);
 
     return NextResponse.json({ message: "Gallery deleted successfully" });
   } catch (error) {

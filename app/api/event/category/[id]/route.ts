@@ -8,7 +8,7 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Temporarily remove authentication check to allow public access
@@ -17,7 +17,7 @@ export async function GET(
     //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     // }
 
-    const categoryId = params.id;
+    const categoryId = (await params).id;
 
     if (!categoryId) {
       return NextResponse.json(
@@ -47,7 +47,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -55,7 +55,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const categoryId = params.id;
+    const categoryId = (await params).id;
 
     if (!categoryId) {
       return NextResponse.json(
@@ -99,7 +99,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -107,7 +107,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const categoryId = params.id;
+    const categoryId = (await params).id;
 
     if (!categoryId) {
       return NextResponse.json(

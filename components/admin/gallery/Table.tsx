@@ -37,10 +37,12 @@ export default function GalleryTable({
 
   const getFileIcon = (mimeType: string | undefined) => {
     if (!mimeType) return <FiImage className="text-gray-400" />;
-    if (mimeType.startsWith("image/"))
+    if (mimeType.startsWith("image/")) {
       return <FiImage className="text-blue-500" />;
-    if (mimeType.startsWith("video/"))
+    }
+    if (mimeType.startsWith("video/")) {
       return <FiImage className="text-red-500" />;
+    }
     return <FiImage className="text-gray-400" />;
   };
 
@@ -265,6 +267,7 @@ export default function GalleryTable({
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
+                          {/* eslint-disable-next-line curly */}
                           {gallery.image ? (
                             <Image
                               className="h-12 w-12 rounded-lg object-cover"

@@ -24,12 +24,12 @@ function getPreviewUrl(image: string | null | undefined): string {
   }
 }
 
-interface ArticleDetailProps {
-  params: { id: string };
-}
-
-export default async function ArticleDetail({ params }: ArticleDetailProps) {
-  const { id } = params;
+export default async function ArticleDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
   let article: Article | null = null;
   let error: string | null = null;

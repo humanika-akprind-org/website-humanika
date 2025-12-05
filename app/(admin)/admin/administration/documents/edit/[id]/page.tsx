@@ -18,13 +18,18 @@ import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 
-async function EditDocumentPage({ params }: { params: { id: string } }) {
-  const accessToken = getGoogleAccessToken();
+async function EditDocumentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const accessToken = await getGoogleAccessToken();
+  const { id } = await params;
 
   try {
     // Fetch document data
     const document = await prisma.document.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         user: true,
         event: true,
@@ -90,7 +95,7 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
       };
 
       await prisma.document.update({
-        where: { id: params.id },
+        where: { id: (await params).id },
         data: submitData,
       });
 
@@ -127,7 +132,7 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
 
       // Update the document with PENDING status
       await prisma.document.update({
-        where: { id: params.id },
+        where: { id: id },
         data: submitData,
       });
 
@@ -135,7 +140,7 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
       await prisma.approval.create({
         data: {
           entityType: ApprovalType.DOCUMENT,
-          entityId: params.id,
+          entityId: id,
           userId: user.id,
           status: StatusApproval.PENDING,
         },

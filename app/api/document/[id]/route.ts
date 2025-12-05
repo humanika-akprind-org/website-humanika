@@ -9,7 +9,7 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const document = await getDocument(params.id);
+    const document = await getDocument((await params).id);
 
     if (!document) {
       return NextResponse.json(
@@ -38,7 +38,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -48,7 +48,7 @@ export async function PUT(
 
     const body: UpdateDocumentInput = await request.json();
 
-    const document = await updateDocument(params.id, body, user);
+    const document = await updateDocument((await params).id, body, user);
 
     return NextResponse.json(document);
   } catch (error) {
@@ -65,7 +65,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -73,7 +73,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await deleteDocument(params.id, user);
+    await deleteDocument((await params).id, user);
 
     return NextResponse.json({ message: "Document deleted successfully" });
   } catch (error) {

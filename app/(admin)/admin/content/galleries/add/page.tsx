@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 async function AddGalleryPage() {
-  const accessToken = getGoogleAccessToken();
+  const accessToken = await getGoogleAccessToken();
 
   const handleSubmit = async (
     data: CreateGalleryInput | UpdateGalleryInput
