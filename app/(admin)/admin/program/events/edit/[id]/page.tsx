@@ -2,7 +2,7 @@ import { UserApi } from "@/use-cases/api/user";
 import { PeriodApi } from "@/use-cases/api/period";
 import EventForm from "@/components/admin/event/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { CreateEventInput, UpdateEventInput, Event } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
@@ -11,14 +11,14 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 
-async function EditEventPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const accessToken = await getGoogleAccessToken();
 
   try {
     // Fetch event data
     const event = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         responsible: true,
         period: true,
@@ -94,7 +94,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
       };
 
       await prisma.event.update({
-        where: { id: params.id },
+        where: { id },
         data: eventPayload,
       });
 
@@ -153,7 +153,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
 
       // Update the event with PENDING status
       await prisma.event.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           ...eventPayload,
           status: "PENDING",
@@ -164,7 +164,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
       const existingApproval = await prisma.approval.findFirst({
         where: {
           entityType: "EVENT",
-          entityId: params.id,
+          entityId: id,
         },
       });
 
@@ -173,7 +173,7 @@ async function EditEventPage({ params }: { params: { id: string } }) {
         await prisma.approval.create({
           data: {
             entityType: "EVENT",
-            entityId: params.id,
+            entityId: id,
             userId: user.id,
             status: "PENDING",
           },

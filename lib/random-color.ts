@@ -1,5 +1,5 @@
 // Generate random avatar color
-const colors = [
+export const colors = [
   // Reds
   "#EF4444",
   "#DC2626",

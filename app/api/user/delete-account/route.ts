@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser, logoutUser } from "@/lib/auth";
+import { getCurrentUser, clearAuthCookies } from "@/lib/auth";
 import { deleteAccount } from "@/services/user/user.service";
 
 export async function DELETE(_request: NextRequest) {
@@ -12,7 +12,7 @@ export async function DELETE(_request: NextRequest) {
     await deleteAccount(currentUser.id);
 
     // Log out the user after deletion
-    await logoutUser();
+    await clearAuthCookies();
 
     return NextResponse.json({ message: "Account deleted successfully" });
   } catch (error) {

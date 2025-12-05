@@ -9,7 +9,7 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const financeCategory = await getFinanceCategory(params.id);
+    const financeCategory = await getFinanceCategory((await params).id);
 
     if (!financeCategory) {
       return NextResponse.json(
@@ -38,7 +38,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -48,7 +48,13 @@ export async function PUT(
 
     const body: UpdateFinanceCategoryInput = await request.json();
 
-    const financeCategory = await updateFinanceCategory(params.id, body, user);
+    const financeCategory = await updateFinanceCategory(
+      (
+        await params
+      ).id,
+      body,
+      user
+    );
 
     return NextResponse.json(financeCategory);
   } catch (error) {
@@ -74,7 +80,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -82,7 +88,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await deleteFinanceCategory(params.id, user);
+    await deleteFinanceCategory((await params).id, user);
 
     return NextResponse.json({
       message: "Finance category deleted successfully",

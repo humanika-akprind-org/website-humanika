@@ -1,6 +1,6 @@
 import FinanceForm from "@/components/admin/finance/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceCategory } from "@/types/finance-category";
 import type { Period } from "@/types/period";
@@ -24,21 +24,19 @@ import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 
-interface EditFinancePageProps {
-  params: {
-    id: string;
-  };
-}
-
-async function EditFinancePage({ params }: EditFinancePageProps) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+async function EditFinancePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const accessToken = await getGoogleAccessToken();
 
   try {
     // Fetch data directly from database to avoid API authentication issues
     const [finance, categories, periodsData, eventsData] = await Promise.all([
       prisma.finance.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
           category: true,
           period: true,
@@ -453,7 +451,7 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
         };
 
         await prisma.finance.update({
-          where: { id: params.id },
+          where: { id },
           data: financeDataPrisma,
         });
 
@@ -517,7 +515,7 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
 
         // Update the finance with PENDING status
         await prisma.finance.update({
-          where: { id: params.id },
+          where: { id: (await params).id },
           data: financeDataPrisma,
         });
 
@@ -525,7 +523,7 @@ async function EditFinancePage({ params }: EditFinancePageProps) {
         await prisma.approval.create({
           data: {
             entityType: ApprovalType.FINANCE,
-            entityId: params.id,
+            entityId: (await params).id,
             userId: user.id,
             status: StatusApproval.PENDING,
           },

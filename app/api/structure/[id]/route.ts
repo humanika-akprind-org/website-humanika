@@ -9,7 +9,7 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const structure = await getStructure(params.id);
+    const structure = await getStructure((await params).id);
 
     return NextResponse.json(structure);
   } catch (error) {
@@ -37,7 +37,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -47,7 +47,7 @@ export async function PUT(
 
     const body: UpdateOrganizationalStructureInput = await request.json();
 
-    const structure = await updateStructure(params.id, body, user);
+    const structure = await updateStructure((await params).id, body, user);
 
     return NextResponse.json(structure);
   } catch (error) {
@@ -67,7 +67,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -75,7 +75,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await deleteStructure(params.id, user);
+    await deleteStructure((await params).id, user);
 
     return NextResponse.json({
       message: "Organizational structure deleted successfully",

@@ -6,6 +6,7 @@ import {
   Calendar,
   X,
   ArrowRight,
+  Search,
   // Tambahkan icon lain yang dibutuhkan
 } from "lucide-react";
 
@@ -17,5 +18,6 @@ export const Icons = {
   calendar: Calendar,
   close: X,
   arrowRight: ArrowRight,
+  search: Search,
   // Tambahkan mapping icon lainnya di sini
 };

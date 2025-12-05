@@ -27,11 +27,11 @@ const getStructureImageUrl = (
   if (structureImage.includes("drive.google.com")) {
     const fileIdMatch = structureImage.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
     if (fileIdMatch) {
-      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
     }
     return structureImage;
   } else if (structureImage.match(/^[a-zA-Z0-9_-]+$/)) {
-    return `https://drive.google.com/uc?export=view&id=${structureImage}`;
+    return `/api/drive-image?fileId=${structureImage}`;
   } else {
     return structureImage;
   }
@@ -65,7 +65,7 @@ function OrganizationalStructureImage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"/>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
       </div>
     );
   }

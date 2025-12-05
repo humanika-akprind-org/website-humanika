@@ -1,6 +1,6 @@
 import { Status, DocumentType as DocumentTypeEnum } from "./enums";
 import { User } from "./user";
-import { Event } from "./event";
+import type { Event } from "./event";
 import { Letter } from "./letter";
 import { Approval } from "./approval";
 import { DocumentType } from "./document-type";

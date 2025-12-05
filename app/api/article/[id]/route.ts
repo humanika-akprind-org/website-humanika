@@ -9,13 +9,14 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Keep fetching user if needed for future enhancements, but do not require authentication
     await getCurrentUser();
 
-    const article = await getArticleById(params.id);
+    const { id } = await params;
+    const article = await getArticleById(id);
 
     if (!article) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
@@ -33,7 +34,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -41,9 +42,10 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const body: UpdateArticleInput = await request.json();
 
-    const article = await updateArticle(params.id, body, user.id, request);
+    const article = await updateArticle(id, body, user.id, request);
 
     return NextResponse.json(article);
   } catch (error) {
@@ -60,7 +62,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -68,7 +70,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await deleteArticle(params.id, user.id, request);
+    const { id } = await params;
+    await deleteArticle(id, user.id, request);
 
     return NextResponse.json({ message: "Article deleted successfully" });
   } catch (error) {

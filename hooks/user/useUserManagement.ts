@@ -75,6 +75,11 @@ export function useUserManagement() {
       );
     }
 
+    // Position filter
+    if (filters.position && filters.position !== "all") {
+      filtered = filtered.filter((user) => user.position === filters.position);
+    }
+
     // Active status filter
     if (filters.isActive && filters.isActive !== "all") {
       filtered = filtered.filter(

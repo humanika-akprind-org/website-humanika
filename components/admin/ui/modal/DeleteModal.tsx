@@ -1,20 +1,19 @@
 import { FiX } from "react-icons/fi";
-import type { Period } from "@/types/period";
 
 interface DeleteModalProps {
   isOpen: boolean;
+  itemName?: string;
+  selectedCount?: number;
   onClose: () => void;
   onConfirm: () => void;
-  period?: Period | null;
-  selectedCount: number;
 }
 
 export default function DeleteModal({
   isOpen,
+  itemName,
+  selectedCount,
   onClose,
   onConfirm,
-  period,
-  selectedCount,
 }: DeleteModalProps) {
   if (!isOpen) return null;
 
@@ -24,7 +23,7 @@ export default function DeleteModal({
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">
-              Konfirmasi Penghapusan
+              Confirm Deletion
             </h2>
             <button
               onClick={onClose}
@@ -36,9 +35,9 @@ export default function DeleteModal({
         </div>
         <div className="p-6">
           <p className="text-gray-600">
-            {period
-              ? `Apakah Anda yakin ingin menghapus period "${period.name}"? Tindakan ini tidak dapat dibatalkan.`
-              : `Apakah Anda yakin ingin menghapus ${selectedCount} period terpilih? Tindakan ini tidak dapat dibatalkan.`}
+            {itemName
+              ? `Are you sure you want to delete ${itemName}? This action cannot be undone.`
+              : `Are you sure you want to delete ${selectedCount} selected items? This action cannot be undone.`}
           </p>
         </div>
         <div className="bg-gray-50 px-6 py-4 rounded-b-xl flex justify-end space-x-3">
@@ -46,13 +45,13 @@ export default function DeleteModal({
             className="px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
             onClick={onClose}
           >
-            Batal
+            Cancel
           </button>
           <button
             className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
             onClick={onConfirm}
           >
-            Hapus
+            Delete
           </button>
         </div>
       </div>

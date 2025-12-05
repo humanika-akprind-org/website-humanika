@@ -8,7 +8,7 @@ import {
 } from "@/services/period/period.service";
 
 interface Context {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(
@@ -16,7 +16,7 @@ export async function GET(
   context: Context
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -52,7 +52,7 @@ export async function PUT(
   context: Context
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -115,7 +115,7 @@ export async function DELETE(
   context: Context
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(

@@ -1,5 +1,9 @@
 import { LetterType, LetterPriority, Status } from "./enums";
 import { Approval } from "./approval";
+import type { User } from "./user";
+import type { Period } from "./period";
+import type { Event } from "./event";
+import type { Document } from "./document";
 
 export interface Letter {
   id: string;

@@ -23,22 +23,11 @@ export default function DropdownMenu({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (boundaryRef?.current) {
-        // If boundaryRef is provided, close if click is outside the boundary
-        if (
-          boundaryRef.current &&
-          !boundaryRef.current.contains(event.target as Node)
-        ) {
-          setIsOpen(false);
-        }
-      } else {
-        // Default behavior: close if click is outside the dropdown
-        if (
-          dropdownRef.current &&
-          !dropdownRef.current.contains(event.target as Node)
-        ) {
-          setIsOpen(false);
-        }
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
     }
 
@@ -46,7 +35,7 @@ export default function DropdownMenu({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [boundaryRef]);
+  }, []);
 
   const handleButtonClick = () => {
     if (buttonRef.current) {

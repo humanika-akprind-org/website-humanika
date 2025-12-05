@@ -1,26 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  FiUser,
-  FiMail,
-  FiKey,
-  FiUsers,
-  FiLock,
-  FiSave,
-  FiX,
-} from "react-icons/fi";
+import { useState } from "react";
+import { FiUser, FiMail, FiKey, FiUsers, FiLock, FiX } from "react-icons/fi";
 import { UserRole, Department, Position } from "@/types/enums";
 import { formatEnumValue } from "@/lib/utils";
-import { UserApi } from "@/use-cases/api/user";
-import type { User, UpdateUserData } from "@/types/user";
+import type { User } from "@/types/user";
 import TextInput from "../ui/input/TextInput";
 import SelectInput from "../ui/input/SelectInput";
 import PasswordInput from "../ui/input/PasswordInput";
-import Alert, { type AlertType } from "../ui/alert/Alert";
+import Alert from "../ui/alert/Alert";
 import SubmitButton from "../ui/button/SubmitButton";
-import DeleteModal from "./modal/DeleteModal";
+import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import UserInfoHeader from "../ui/UserInfoHeader";
+import { useRouter } from "next/navigation";
+import CancelButton from "@/components/ui/CancelButton";
+import { useEditUserForm } from "@/hooks/user/useEditUserForm";
 
 interface UserEditFormProps {
   userId: string;
@@ -35,167 +29,22 @@ export default function UserEditForm({
   onDelete,
   user: initialUser,
 }: UserEditFormProps): JSX.Element {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+
+  const {
+    user,
+    alert,
+    formData,
+    formErrors,
+    isSubmitting,
+    isDeleting,
+    handleChange,
+    updateFormData,
+    handleSubmit,
+    handleDelete,
+  } = useEditUserForm(userId, initialUser, onSuccess, onDelete);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [alert, setAlert] = useState<{
-    type: AlertType;
-    message: string;
-  } | null>(null);
-  const [formData, setFormData] = useState<UpdateUserData>({
-    name: "",
-    email: "",
-    username: "",
-    password: "",
-    role: UserRole.ANGGOTA,
-    department: undefined,
-    position: undefined,
-    isActive: true,
-  });
-
-  const [formErrors, setFormErrors] = useState<Partial<UpdateUserData>>({});
-
-  useEffect(() => {
-    if (initialUser) {
-      setUser(initialUser);
-      setFormData({
-        name: initialUser.name,
-        email: initialUser.email,
-        username: initialUser.username,
-        password: "",
-        role: initialUser.role,
-        department: initialUser.department || undefined,
-        position: initialUser.position || undefined,
-        isActive: initialUser.isActive,
-      });
-    } else {
-      const fetchUser = async () => {
-        try {
-          const response = await UserApi.getUserById(userId);
-
-          if (response.error) {
-            setAlert({ type: "error", message: response.error });
-          } else if (response.data) {
-            const userData = response.data;
-            setUser(userData);
-            setFormData({
-              name: userData.name,
-              email: userData.email,
-              username: userData.username,
-              password: "",
-              role: userData.role,
-              department: userData.department ?? undefined,
-              position: userData.position ?? undefined,
-              isActive: userData.isActive,
-            });
-          }
-        } catch (_error) {
-          setAlert({ type: "error", message: "Failed to fetch user data" });
-        }
-      };
-
-      fetchUser();
-    }
-  }, [userId, initialUser]);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "department" || name === "position"
-          ? value === ""
-            ? undefined
-            : value
-          : value,
-    }));
-
-    // Clear error when field is changed
-    if (formErrors[name as keyof UpdateUserData]) {
-      setFormErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
-
-  const validateForm = (): boolean => {
-    const errors: Partial<UpdateUserData> = {};
-
-    if (!formData.name?.trim()) {
-      errors.name = "Name is required";
-    }
-    if (!formData.email?.trim()) {
-      errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = "Email is invalid";
-    }
-    if (!formData.username?.trim()) {
-      errors.username = "Username is required";
-    }
-    if (formData.password && formData.password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-    setAlert(null);
-
-    try {
-      const response = await UserApi.updateUser(userId, formData);
-
-      if (response.error) {
-        setAlert({ type: "error", message: response.error });
-      } else {
-        setAlert({ type: "success", message: "User updated successfully!" });
-        setTimeout(() => {
-          onSuccess?.();
-        }, 1000);
-      }
-    } catch (_error) {
-      setAlert({
-        type: "error",
-        message: "Failed to update user. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    setAlert(null);
-
-    try {
-      const response = await UserApi.deleteUser(userId);
-
-      if (response.error) {
-        setAlert({ type: "error", message: response.error });
-        setShowDeleteModal(false);
-      } else {
-        setAlert({ type: "success", message: "User deleted successfully!" });
-        setTimeout(() => {
-          onDelete?.();
-        }, 1000);
-      }
-    } catch (_error) {
-      setAlert({
-        type: "error",
-        message: "Failed to delete user. Please try again.",
-      });
-      setShowDeleteModal(false);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   if (!user) {
     return (
@@ -253,7 +102,7 @@ export default function UserEditForm({
               name="role"
               value={formData.role || ""}
               onChange={(value: string) =>
-                setFormData((prev) => ({ ...prev, role: value as UserRole }))
+                updateFormData("role", value as UserRole)
               }
               options={Object.values(UserRole).map((role) => ({
                 value: role,
@@ -268,10 +117,10 @@ export default function UserEditForm({
               name="department"
               value={formData.department || ""}
               onChange={(value: string) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  department: value ? (value as Department) : undefined,
-                }))
+                updateFormData(
+                  "department",
+                  value ? (value as Department) : undefined
+                )
               }
               options={Object.values(Department).map((dept) => ({
                 value: dept,
@@ -286,10 +135,10 @@ export default function UserEditForm({
               name="position"
               value={formData.position || ""}
               onChange={(value: string) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  position: value ? (value as Position) : undefined,
-                }))
+                updateFormData(
+                  "position",
+                  value ? (value as Position) : undefined
+                )
               }
               options={Object.values(Position).map((pos) => ({
                 value: pos,
@@ -304,7 +153,7 @@ export default function UserEditForm({
               name="isActive"
               value={formData.isActive ? "true" : "false"}
               onChange={(value: string) =>
-                setFormData((prev) => ({ ...prev, isActive: value === "true" }))
+                updateFormData("isActive", value === "true")
               }
               options={[
                 { value: "true", label: "Active" },
@@ -337,20 +186,25 @@ export default function UserEditForm({
               {isDeleting ? "Deleting..." : "Delete User"}
             </button>
 
-            <SubmitButton
-              isSubmitting={isSubmitting}
-              text="Update User"
-              loadingText="Updating User..."
-              icon={<FiSave className="mr-2" />}
-            />
+            <div className="flex justify-end space-x-3">
+              <CancelButton
+                onClick={() => router.back()}
+                disabled={isSubmitting}
+              />
+
+              <SubmitButton
+                isSubmitting={isSubmitting}
+                text="Update User"
+                loadingText="Saving..."
+              />
+            </div>
           </div>
         </form>
       </div>
 
       <DeleteModal
         isOpen={showDeleteModal}
-        user={user}
-        selectedCount={1}
+        itemName={user?.name}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
       />

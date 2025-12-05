@@ -2,11 +2,10 @@ import { getGoogleDriveFiles } from "@/lib/google-drive/google-drive";
 import DriveTable from "@/components/admin/drive/Table";
 import PageHeader from "@/components/admin/drive/PageHeader";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 
 export default async function DashboardPage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = await getGoogleAccessToken();
 
   let files = [];
   if (accessToken) {

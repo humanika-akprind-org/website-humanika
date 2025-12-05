@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     //this stores the token in the oauth2Client
     //oauth2Client.setCredentials(tokens);
     //store the token in a cookie or a database
-    cookies().set({
+    (await cookies()).set({
       name: "google_access_token",
       value: tokens.access_token || "", // the access token
       httpOnly: true, // for security, the cookie is accessible only by the server
@@ -32,7 +32,9 @@ export async function GET(req: Request) {
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });
 
-    return NextResponse.redirect(new URL("/admin/dashboard/overview", req.url));
+    return NextResponse.redirect(
+      new URL("/admin/dashboard/overview?refresh=true", req.url)
+    );
   } catch (error) {
     return NextResponse.json({
       error: "Failed to exchange code for access token" + error,

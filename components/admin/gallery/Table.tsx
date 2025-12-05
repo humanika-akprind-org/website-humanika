@@ -14,7 +14,11 @@ interface GalleryTableProps {
   accessToken?: string;
 }
 
-export default function GalleryTable({ galleries, onDelete, accessToken }: GalleryTableProps) {
+export default function GalleryTable({
+  galleries,
+  onDelete,
+  accessToken,
+}: GalleryTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [selectedGalleries, setSelectedGalleries] = useState<string[]>([]);
@@ -33,15 +37,17 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
 
   const getFileIcon = (mimeType: string | undefined) => {
     if (!mimeType) return <FiImage className="text-gray-400" />;
-    if (mimeType.startsWith("image/")) return <FiImage className="text-blue-500" />;
-    if (mimeType.startsWith("video/")) return <FiImage className="text-red-500" />;
+    if (mimeType.startsWith("image/")) {
+      return <FiImage className="text-blue-500" />;
+    }
+    if (mimeType.startsWith("video/")) {
+      return <FiImage className="text-red-500" />;
+    }
     return <FiImage className="text-gray-400" />;
   };
 
   // Helper function to check if image is from Google Drive (either URL or file ID)
-  const isGoogleDriveImage = (
-    image: string | null | undefined
-  ): boolean => {
+  const isGoogleDriveImage = (image: string | null | undefined): boolean => {
     if (!image) return false;
     return (
       image.includes("drive.google.com") ||
@@ -72,12 +78,12 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
       // It's a full Google Drive URL, convert to direct image URL
       const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (fileIdMatch) {
-        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
       }
       return image;
     } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
       // It's a Google Drive file ID, construct direct URL
-      return `https://drive.google.com/uc?export=view&id=${image}`;
+      return `/api/drive-image?fileId=${image}`;
     } else {
       // It's a direct URL or other format
       return image;
@@ -87,9 +93,12 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
   const filteredGalleries = galleries.filter((gallery) => {
     const matchesSearch =
       gallery.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (gallery.event?.name || "").toLowerCase().includes(searchTerm.toLowerCase());
+      (gallery.event?.name || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
 
-    const matchesEvent = eventFilter === "all" || (gallery.event?.id === eventFilter);
+    const matchesEvent =
+      eventFilter === "all" || gallery.event?.id === eventFilter;
 
     return matchesSearch && matchesEvent;
   });
@@ -104,7 +113,9 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
 
   const handleSelectGallery = (id: string) => {
     if (selectedGalleries.includes(id)) {
-      setSelectedGalleries(selectedGalleries.filter((galleryId) => galleryId !== id));
+      setSelectedGalleries(
+        selectedGalleries.filter((galleryId) => galleryId !== id)
+      );
     } else {
       setSelectedGalleries([...selectedGalleries, id]);
     }
@@ -125,14 +136,17 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
       if (isBulkDelete) {
         // Delete files for all selected galleries
         for (const galleryId of selectedGalleries) {
-          const gallery = galleries.find(g => g.id === galleryId);
+          const gallery = galleries.find((g) => g.id === galleryId);
           if (gallery && isGoogleDriveImage(gallery.image)) {
             const fileId = getFileIdFromImage(gallery.image);
             if (fileId) {
               try {
                 await deleteFile(fileId);
               } catch (deleteError) {
-                console.warn(`Failed to delete file for gallery ${gallery.title}:`, deleteError);
+                console.warn(
+                  `Failed to delete file for gallery ${gallery.title}:`,
+                  deleteError
+                );
                 // Continue with other deletions even if one fails
               }
             }
@@ -148,7 +162,10 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
             try {
               await deleteFile(fileId);
             } catch (deleteError) {
-              console.warn(`Failed to delete file for gallery ${galleryToDelete.title}:`, deleteError);
+              console.warn(
+                `Failed to delete file for gallery ${galleryToDelete.title}:`,
+                deleteError
+              );
               // Continue with gallery deletion even if file deletion fails
             }
           }
@@ -193,7 +210,10 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
                   <input
                     type="checkbox"
                     className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 sm:left-6"
-                    checked={selectedGalleries.length === filteredGalleries.length && filteredGalleries.length > 0}
+                    checked={
+                      selectedGalleries.length === filteredGalleries.length &&
+                      filteredGalleries.length > 0
+                    }
                     onChange={handleSelectAll}
                   />
                 </th>
@@ -227,10 +247,7 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
                 >
                   Created
                 </th>
-                <th
-                  scope="col"
-                  className="relative py-3 pl-6 pr-4 sm:pr-6"
-                >
+                <th scope="col" className="relative py-3 pl-6 pr-4 sm:pr-6">
                   <span className="sr-only">Actions</span>
                 </th>
               </tr>
@@ -250,6 +267,7 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
+                          {/* eslint-disable-next-line curly */}
                           {gallery.image ? (
                             <Image
                               className="h-12 w-12 rounded-lg object-cover"
@@ -272,7 +290,9 @@ export default function GalleryTable({ galleries, onDelete, accessToken }: Galle
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{gallery.event?.name || "N/A"}</div>
+                      <div className="text-sm text-gray-900">
+                        {gallery.event?.name || "N/A"}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">

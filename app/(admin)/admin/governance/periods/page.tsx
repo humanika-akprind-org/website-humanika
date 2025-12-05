@@ -1,217 +1,77 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import type { Period } from "@/types/period";
-import {
-  getPeriods,
-  deletePeriod,
-  // reorderPeriods,
-} from "@/use-cases/api/period";
 import PeriodStats from "@/components/admin/period/Stats";
 import PeriodFilters from "@/components/admin/period/Filters";
 import PeriodTable from "@/components/admin/period/Table";
-import DeleteModal from "@/components/admin/period/modal/DeleteModal";
-import { FiPlus } from "react-icons/fi";
+import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/components/admin/ui/modal/ViewModal";
+import Loading from "@/components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/components/admin/ui/ManagementHeader";
+import AddButton from "@/components/admin/ui/button/AddButton";
+import ActiveChip from "@/components/admin/ui/chip/Active";
+import DateDisplay from "@/components/admin/ui/date/DateDisplay";
+import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
 
 export default function PeriodsPage() {
-  const router = useRouter();
-  const [periods, setPeriods] = useState<Period[]>([]);
-  const [filteredPeriods, setFilteredPeriods] = useState<Period[]>([]);
-  const [selectedPeriods, setSelectedPeriods] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [currentPeriod, setCurrentPeriod] = useState<Period | null>(null);
-  const [sortField, setSortField] = useState("name");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [loading, setLoading] = useState(true);
+  const {
+    periods,
+    filteredPeriods,
+    loading,
+    error,
+    success,
+    selectedPeriods,
+    searchTerm,
+    currentPage,
+    totalPages,
+    filters,
+    showDeleteModal,
+    showViewModal,
+    currentPeriod,
+    setSearchTerm,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentPeriod,
+    togglePeriodSelection,
+    toggleSelectAll,
+    handleViewPeriod,
+    handleAddPeriod,
+    handleEditPeriod,
+    handleDelete,
+    confirmDelete,
+    handleFilterChange,
+  } = usePeriodManagement();
 
-  useEffect(() => {
-    loadPeriods();
-  }, []);
-
-  const filterPeriods = useCallback(() => {
-    let result = [...periods];
-
-    // Apply search filter
-    if (searchTerm) {
-      result = result.filter((period) =>
-        period.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Apply status filter
-    if (statusFilter !== "all") {
-      result = result.filter((period) => {
-        if (statusFilter === "ACTIVE") return period.isActive;
-        if (statusFilter === "INACTIVE") return !period.isActive;
-        return true;
-      });
-    }
-
-    // Apply sorting
-    result.sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortField) {
-        case "name":
-          aValue = a.name;
-          bValue = b.name;
-          break;
-        case "createdAt":
-          aValue = a.createdAt;
-          bValue = b.createdAt;
-          break;
-        default:
-          aValue = a.name;
-          bValue = b.name;
-      }
-
-      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    setFilteredPeriods(result);
-  }, [periods, searchTerm, statusFilter, sortField, sortDirection]);
-
-  useEffect(() => {
-    filterPeriods();
-  }, [filterPeriods]);
-
-  const loadPeriods = async () => {
-    try {
-      setLoading(true);
-      const data = await getPeriods();
-      setPeriods(data);
-    } catch (error) {
-      console.error("Error loading periods:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const togglePeriodSelection = (id: string) => {
-    if (selectedPeriods.includes(id)) {
-      setSelectedPeriods(selectedPeriods.filter((periodId) => periodId !== id));
-    } else {
-      setSelectedPeriods([...selectedPeriods, id]);
-    }
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedPeriods.length === filteredPeriods.length) {
-      setSelectedPeriods([]);
-    } else {
-      setSelectedPeriods(filteredPeriods.map((period) => period.id));
-    }
-  };
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const handleAddPeriod = () => {
-    router.push("/admin/governance/periods/add");
-  };
-
-  const handleDelete = (period?: Period) => {
-    if (period) {
-      setCurrentPeriod(period);
-    }
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    try {
-      if (currentPeriod) {
-        // Delete single period
-        await deletePeriod(currentPeriod.id);
-        setPeriods(periods.filter((p) => p.id !== currentPeriod.id));
-      } else if (selectedPeriods.length > 0) {
-        // Delete multiple periods
-        const deletePromises = selectedPeriods.map((id) => deletePeriod(id));
-        await Promise.all(deletePromises);
-        setPeriods(periods.filter((p) => !selectedPeriods.includes(p.id)));
-        setSelectedPeriods([]);
-      }
-      setShowDeleteModal(false);
-      setCurrentPeriod(null);
-    } catch (error) {
-      console.error("Error deleting period:", error);
-    }
-  };
-
-  // const handleReorder = async (id: string, direction: "up" | "down") => {
-  //   const index = periods.findIndex((p) => p.id === id);
-  //   if (
-  //     (direction === "up" && index === 0) ||
-  //     (direction === "down" && index === periods.length - 1)
-  //   ) {
-  //     return;
-  //   }
-
-  //   const newPeriods = [...periods];
-  //   const targetIndex = direction === "up" ? index - 1 : index + 1;
-
-  //   // Swap positions
-  //   [newPeriods[index], newPeriods[targetIndex]] = [
-  //     newPeriods[targetIndex],
-  //     newPeriods[index],
-  //   ];
-
-  //   setPeriods(newPeriods);
-
-  //   try {
-  //     await reorderPeriods(newPeriods);
-  //   } catch (error) {
-  //     console.error("Error reordering periods:", error);
-  //     // Revert if API call fails
-  //     setPeriods([...periods]);
-  //   }
-  // };
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
 
   if (loading) {
-    return (
-      <div className="p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">
-            Management Period
-          </h1>
-          <p className="text-gray-600 mt-1">Kelola semua period organisasi</p>
-        </div>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center mt-4 md:mt-0"
-          onClick={handleAddPeriod}
-        >
-          <FiPlus className="mr-2" />
-          Tambah Period
-        </button>
+        <ManagementHeader
+          title="Period Management"
+          description="Manage all organization periods"
+        />
+        <AddButton onClick={handleAddPeriod} text="Add Period" />
       </div>
 
       <PeriodStats periods={periods} />
 
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
       <PeriodFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        statusFilter={filters.status}
+        onStatusFilterChange={(status) => handleFilterChange({ status })}
         selectedCount={selectedPeriods.length}
         onDeleteSelected={() => handleDelete()}
       />
@@ -221,22 +81,91 @@ export default function PeriodsPage() {
         selectedPeriods={selectedPeriods}
         onSelectPeriod={togglePeriodSelection}
         onSelectAll={toggleSelectAll}
+        onViewPeriod={handleViewPeriod}
+        onEditPeriod={handleEditPeriod}
         onDelete={handleDelete}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        onSort={handleSort}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
       />
 
       <DeleteModal
         isOpen={showDeleteModal}
+        itemName={currentPeriod?.name}
+        selectedCount={selectedPeriods.length}
         onClose={() => {
           setShowDeleteModal(false);
           setCurrentPeriod(null);
         }}
         onConfirm={confirmDelete}
-        period={currentPeriod}
-        selectedCount={selectedPeriods.length}
       />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Period Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentPeriod(null);
+        }}
+      >
+        {currentPeriod && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Name
+              </label>
+              <p className="mt-1 text-sm text-gray-900">{currentPeriod.name}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Start Year
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentPeriod.startYear}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  End Year
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentPeriod.endYear}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <div className="mt-1">
+                  <ActiveChip isActive={currentPeriod.isActive} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentPeriod.createdAt} />
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Updated At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentPeriod.updatedAt} />
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </ViewModal>
     </div>
   );
 }

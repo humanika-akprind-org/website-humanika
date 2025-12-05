@@ -28,10 +28,15 @@ export function useCreateUser() {
     }
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return {
     createUser,
     isSubmitting,
     error,
     setError,
+    handleBack,
   };
 }

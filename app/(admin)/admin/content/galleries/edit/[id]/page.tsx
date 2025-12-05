@@ -1,6 +1,6 @@
 import GalleryForm from "@/components/admin/gallery/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { UpdateGalleryInput } from "@/types/gallery";
 import type { Event } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
@@ -9,9 +9,13 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 
-async function EditGalleryPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+async function EditGalleryPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const accessToken = await getGoogleAccessToken();
+  const { id } = await params;
 
   try {
     const [events, gallery] = await Promise.all([
@@ -36,7 +40,7 @@ async function EditGalleryPage({ params }: { params: { id: string } }) {
         orderBy: { startDate: "desc" },
       }),
       prisma.gallery.findUnique({
-        where: { id: params.id },
+        where: { id: id },
       }),
     ]);
 
@@ -60,7 +64,7 @@ async function EditGalleryPage({ params }: { params: { id: string } }) {
       }
 
       await prisma.gallery.update({
-        where: { id: params.id },
+        where: { id: (await params).id },
         data: {
           title: galleryData.title,
           eventId: galleryData.eventId,

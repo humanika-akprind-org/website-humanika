@@ -2,17 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { getEvent, getEvents } from "use-cases/api/event";
 import type { Event } from "types/event";
 import { FiSend } from "react-icons/fi";
 import PastEventCard from "@/components/public/event/PastEventCard";
 
-interface EventDetailProps {
-  params: { id: string };
-}
-
-export default function EventDetail({ params }: EventDetailProps) {
-  const { id } = params;
+export default function EventDetail() {
+  const params = useParams();
+  const id = params.id as string;
 
   // Helper function to get preview URL from image (file ID or URL)
   function getPreviewUrl(image: string | null | undefined): string {
@@ -22,12 +20,12 @@ export default function EventDetail({ params }: EventDetailProps) {
       // It's a full Google Drive URL, convert to direct image URL
       const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (fileIdMatch) {
-        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
       }
       return image;
     } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
       // It's a Google Drive file ID, construct direct URL
-      return `https://drive.google.com/uc?export=view&id=${image}`;
+      return `/api/drive-image?fileId=${image}`;
     } else {
       // It's a direct URL or other format
       return image;

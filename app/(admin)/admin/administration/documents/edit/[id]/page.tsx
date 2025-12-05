@@ -3,7 +3,6 @@ import DocumentForm from "@/components/admin/document/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
-import { cookies } from "next/headers";
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
@@ -17,15 +16,20 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 
-async function EditDocumentPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+async function EditDocumentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const accessToken = await getGoogleAccessToken();
+  const { id } = await params;
 
   try {
     // Fetch document data
     const document = await prisma.document.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         user: true,
         event: true,
@@ -91,7 +95,7 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
       };
 
       await prisma.document.update({
-        where: { id: params.id },
+        where: { id: (await params).id },
         data: submitData,
       });
 
@@ -128,7 +132,7 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
 
       // Update the document with PENDING status
       await prisma.document.update({
-        where: { id: params.id },
+        where: { id: id },
         data: submitData,
       });
 
@@ -136,7 +140,7 @@ async function EditDocumentPage({ params }: { params: { id: string } }) {
       await prisma.approval.create({
         data: {
           entityType: ApprovalType.DOCUMENT,
-          entityId: params.id,
+          entityId: id,
           userId: user.id,
           status: StatusApproval.PENDING,
         },

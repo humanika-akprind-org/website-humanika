@@ -1,73 +1,38 @@
-import { UserApi } from "@/use-cases/api/user";
-import { PeriodApi } from "@/use-cases/api/period";
-import { ManagementApi } from "@/use-cases/api/management";
+"use client";
+
+import { useParams } from "next/navigation";
 import ManagementForm from "@/components/admin/management/Form";
-import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
-import type { ManagementServerData } from "@/types/management";
-import { FiArrowLeft } from "react-icons/fi";
-import Link from "next/link";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import Alert from "@/components/admin/ui/alert/Alert";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import { useEditManagement } from "@/hooks/management/useEditManagement";
 
-async function EditManagementPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+export default function EditManagementPage() {
+  const params = useParams();
+  const managementId = params.id as string;
 
-  try {
-    const [management, usersResponse, periods] = await Promise.all([
-      ManagementApi.getManagement(params.id),
-      UserApi.getUsers({ limit: 50 }),
-      PeriodApi.getPeriods(),
-    ]);
+  const { management, loading, error, alert, handleSubmit, handleBack } =
+    useEditManagement(managementId);
 
-    const users = usersResponse.data?.users || [];
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Edit Management" onBack={handleBack} />
 
-    const handleSubmit = async (data: ManagementServerData) => {
-      "use server";
-      await ManagementApi.updateManagement(params.id, data);
-    };
+      {alert && <Alert type={alert.type} message={alert.message} />}
 
-    return (
-      <AuthGuard accessToken={accessToken}>
-        <div className="p-6 max-w-4xl min-h-screen mx-auto">
-          <div className="flex items-center mb-6">
-            <Link
-              href="/admin/governance/managements"
-              className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-            >
-              <FiArrowLeft className="mr-1" />
-              Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Edit Management
-            </h1>
-          </div>
-          <ManagementForm
-            accessToken={accessToken}
-            users={users}
-            periods={periods}
-            management={management}
-            onSubmit={handleSubmit}
-          />
+      {loading ? (
+        <LoadingForm />
+      ) : error ? (
+        <div className="text-center py-8">
+          <p className="text-red-600">{error}</p>
         </div>
-      </AuthGuard>
-    );
-  } catch (error) {
-    console.error("Error loading management:", error);
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="text-center text-red-500">
-              <h2 className="text-xl font-semibold mb-4">
-                Error Loading Management
-              </h2>
-              <p>{error instanceof Error ? error.message : "Unknown error"}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      ) : management ? (
+        <ManagementForm
+          management={management}
+          onSubmit={handleSubmit}
+          isEdit={true}
+        />
+      ) : null}
+    </div>
+  );
 }
-
-export default EditManagementPage;

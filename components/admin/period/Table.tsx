@@ -1,18 +1,25 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { FiEye, FiEdit, FiTrash2, FiCalendar } from "react-icons/fi";
 import type { Period } from "@/types/period";
-import { FiEdit, FiTrash2, FiArrowUp, FiArrowDown, FiFile } from "react-icons/fi";
-
+import ActiveChip from "../ui/chip/Active";
+import Checkbox from "../ui/checkbox/Checkbox";
+import DropdownMenu, { DropdownMenuItem } from "../ui/dropdown/DropdownMenu";
+import Pagination from "../ui/pagination/Pagination";
+import EmptyState from "../ui/EmptyState";
+import SortIcon from "../ui/SortIcon";
 interface PeriodTableProps {
   periods: Period[];
   selectedPeriods: string[];
   onSelectPeriod: (id: string) => void;
   onSelectAll: () => void;
+  onViewPeriod: (period: Period) => void;
+  onEditPeriod: (period: Period) => void;
   onDelete: (period?: Period) => void;
-  sortField: string;
-  sortDirection: "asc" | "desc";
-  onSort: (field: string) => void;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 export default function PeriodTable({
@@ -20,41 +27,61 @@ export default function PeriodTable({
   selectedPeriods,
   onSelectPeriod,
   onSelectAll,
+  onViewPeriod,
+  onEditPeriod,
   onDelete,
-  sortField,
-  sortDirection,
-  onSort,
+  currentPage,
+  totalPages,
+  onPageChange,
 }: PeriodTableProps) {
-  const router = useRouter();
+  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
-  const handleEditPeriod = (id: string) => {
-    router.push(`/admin/governance/periods/edit/${id}`);
-  };
+  const [sortField, setSortField] = useState("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const getStatusClass = (isActive: boolean) =>
-    isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800";
+  // Sort periods
+  const sortedPeriods = [...periods].sort((a, b) => {
+    let aValue, bValue;
 
-  const getStatusText = (isActive: boolean) =>
-    isActive ? "Aktif" : "Tidak Aktif";
+    switch (sortField) {
+      case "name":
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+        break;
+      case "startYear":
+        aValue = a.startYear;
+        bValue = b.startYear;
+        break;
+      case "endYear":
+        aValue = a.endYear;
+        bValue = b.endYear;
+        break;
+      case "status":
+        aValue = a.isActive ? "active" : "inactive";
+        bValue = b.isActive ? "active" : "inactive";
+        break;
+      default:
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+    }
 
-  const formatDate = (date: Date) =>
-    new Date(date).toLocaleDateString("id-ID", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
 
-  const getSortIcon = (field: string) => {
-    if (sortField !== field) return null;
-    return sortDirection === "asc" ? (
-      <FiArrowUp size={14} />
-    ) : (
-      <FiArrowDown size={14} />
-    );
+  // Handle sort
+  const onSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+    <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -63,14 +90,12 @@ export default function PeriodTable({
                 scope="col"
                 className="pl-6 pr-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"
               >
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={
-                    periods.length > 0 &&
-                    selectedPeriods.length === periods.length
+                    sortedPeriods.length > 0 &&
+                    selectedPeriods.length === sortedPeriods.length
                   }
                   onChange={onSelectAll}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
                 />
               </th>
               <th
@@ -79,52 +104,78 @@ export default function PeriodTable({
                 onClick={() => onSort("name")}
               >
                 <div className="flex items-center">
-                  Nama Period
-                  {getSortIcon("name")}
+                  Name Period
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="name"
+                    iconType="arrow"
+                  />
                 </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => onSort("startYear")}
               >
-                Tahun
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Status
+                <div className="flex items-center">
+                  Start Year
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="startYear"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => onSort("createdAt")}
+                onClick={() => onSort("endYear")}
               >
                 <div className="flex items-center">
-                  Dibuat
-                  {getSortIcon("createdAt")}
+                  End Year
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="endYear"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => onSort("status")}
+              >
+                <div className="flex items-center">
+                  Status
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="status"
+                    iconType="arrow"
+                  />
                 </div>
               </th>
               <th
                 scope="col"
                 className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Aksi
-              </th>
+              />
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {periods.map((period) => (
+            {sortedPeriods.map((period, index) => (
               <tr
                 key={period.id}
+                ref={(el) => {
+                  rowRefs.current[index] = el;
+                }}
                 className="hover:bg-gray-50 transition-colors"
               >
                 <td className="pl-6 pr-2 py-4 whitespace-nowrap">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={selectedPeriods.includes(period.id)}
                     onChange={() => onSelectPeriod(period.id)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
                   />
                 </td>
                 <td className="px-4 py-4">
@@ -134,38 +185,43 @@ export default function PeriodTable({
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {period.startYear} - {period.endYear}
+                    {period.startYear}
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusClass(
-                      period.isActive
-                    )}`}
-                  >
-                    {getStatusText(period.isActive)}
-                  </span>
+                  <div className="text-sm text-gray-900">{period.endYear}</div>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(period.createdAt)}
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <ActiveChip isActive={period.isActive} />
                 </td>
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-                      onClick={() => handleEditPeriod(period.id)}
-                      title="Edit period"
+                  <DropdownMenu
+                    boundaryRef={{ current: rowRefs.current[index] }}
+                    isLastItem={index === sortedPeriods.length - 1}
+                    hasMultipleItems={sortedPeriods.length > 1}
+                  >
+                    <DropdownMenuItem
+                      onClick={() => onViewPeriod(period)}
+                      color="default"
                     >
-                      <FiEdit size={16} />
-                    </button>
-                    <button
-                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                      <FiEye className="mr-2" size={14} />
+                      View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onEditPeriod(period)}
+                      color="blue"
+                    >
+                      <FiEdit className="mr-2" size={14} />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => onDelete(period)}
-                      title="Hapus period"
+                      color="red"
                     >
-                      <FiTrash2 size={16} />
-                    </button>
-                  </div>
+                      <FiTrash2 className="mr-2" size={14} />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenu>
                 </td>
               </tr>
             ))}
@@ -173,27 +229,21 @@ export default function PeriodTable({
         </table>
       </div>
 
-      {periods.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-2">
-            <FiFile size={48} className="mx-auto" />
-          </div>
-          <p className="text-gray-500 text-lg font-medium">
-            Tidak ada period ditemukan
-          </p>
-          <p className="text-gray-400 mt-1">
-            Coba sesuaikan pencarian atau filter Anda
-          </p>
-        </div>
+      {sortedPeriods.length === 0 && (
+        <EmptyState
+          icon={<FiCalendar size={48} className="mx-auto" />}
+          title="No periods found"
+          description="Try adjusting your search or filter criteria"
+        />
       )}
 
       {periods.length > 0 && (
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
-          <p className="text-sm text-gray-700 mb-4 sm:mb-0">
-            Menampilkan <span className="font-medium">{periods.length}</span>{" "}
-            period
-          </p>
-        </div>
+        <Pagination
+          usersLength={periods.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
       )}
     </div>
   );

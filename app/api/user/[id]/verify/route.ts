@@ -4,10 +4,10 @@ import { verifyUser } from "@/services/user/user.service";
 // PATCH - Verify user account
 export async function PATCH(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const updatedUser = await verifyUser(id);
 

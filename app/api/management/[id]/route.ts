@@ -4,7 +4,7 @@ import { ManagementService } from "@/services/management/management.service";
 import type { ManagementServerData } from "@/types/management";
 
 interface RouteParams {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
@@ -14,7 +14,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const management = await ManagementService.getManagement(params.id);
+    const management = await ManagementService.getManagement((await params).id);
 
     return NextResponse.json({
       success: true,
@@ -43,7 +43,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const formData: ManagementServerData = await request.json();
 
     const management = await ManagementService.updateManagement(
-      params.id,
+      (
+        await params
+      ).id,
       formData,
       user
     );
@@ -79,7 +81,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get the management record first to access the photo URL
-    const management = await ManagementService.getManagement(params.id);
+    const management = await ManagementService.getManagement((await params).id);
 
     // Delete the photo from Google Drive if it exists
     if (management.photo) {
@@ -138,7 +140,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Delete the management record
-    await ManagementService.deleteManagement(params.id, user);
+    await ManagementService.deleteManagement((await params).id, user);
 
     return NextResponse.json({
       success: true,

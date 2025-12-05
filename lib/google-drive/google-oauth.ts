@@ -4,6 +4,7 @@ import {
   googleClientSecret,
   googleRedirectUri,
 } from "@/lib/config/config";
+import { cookies } from "next/headers";
 
 export const oauth2Client = new google.auth.OAuth2(
   googleClientId,
@@ -23,3 +24,14 @@ export const drive = google.drive({
   version: "v3",
   auth: oauth2Client,
 });
+
+/**
+ * Get Google access token from cookies
+ * @returns The access token string or empty string if not found
+ */
+export async function getGoogleAccessToken(): Promise<string> {
+  const cookieStore = cookies();
+  const accessToken =
+    (await cookieStore).get("google_access_token")?.value || "";
+  return accessToken;
+}

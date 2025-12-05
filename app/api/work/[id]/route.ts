@@ -10,7 +10,7 @@ import {
 // GET work program by ID
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -18,7 +18,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const workProgram = await getWorkProgram(params.id);
+    const workProgram = await getWorkProgram((await params).id);
 
     if (!workProgram) {
       return NextResponse.json(
@@ -40,7 +40,7 @@ export async function GET(
 // PUT update work program
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -50,7 +50,7 @@ export async function PUT(
 
     const body: UpdateWorkProgramInput = await request.json();
 
-    const workProgram = await updateWorkProgram(params.id, body, user);
+    const workProgram = await updateWorkProgram((await params).id, body, user);
 
     return NextResponse.json(workProgram);
   } catch (error) {
@@ -68,7 +68,7 @@ export async function PUT(
 // DELETE work program
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -76,7 +76,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await deleteWorkProgram(params.id, user);
+    await deleteWorkProgram((await params).id, user);
 
     return NextResponse.json({ message: "Work program deleted successfully" });
   } catch (error) {

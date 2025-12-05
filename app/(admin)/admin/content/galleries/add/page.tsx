@@ -1,6 +1,6 @@
 import GalleryForm from "@/components/admin/gallery/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { CreateGalleryInput, UpdateGalleryInput } from "@/types/gallery";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
@@ -9,10 +9,11 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 async function AddGalleryPage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = await getGoogleAccessToken();
 
-  const handleSubmit = async (data: CreateGalleryInput | UpdateGalleryInput) => {
+  const handleSubmit = async (
+    data: CreateGalleryInput | UpdateGalleryInput
+  ) => {
     "use server";
 
     const user = await getCurrentUser();

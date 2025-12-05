@@ -2,10 +2,10 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const fileId = params.id;
+    const fileId = (await params).id;
     const authHeader = request.headers.get("Authorization");
 
     if (!authHeader) {

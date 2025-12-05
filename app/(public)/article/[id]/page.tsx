@@ -12,24 +12,24 @@ function getPreviewUrl(image: string | null | undefined): string {
     // It's a full Google Drive URL, convert to direct image URL
     const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
     if (fileIdMatch) {
-      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
     }
     return image;
   } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
     // It's a Google Drive file ID, construct direct URL
-    return `https://drive.google.com/uc?export=view&id=${image}`;
+    return `/api/drive-image?fileId=${image}`;
   } else {
     // It's a direct URL or other format
     return image;
   }
 }
 
-interface ArticleDetailProps {
-  params: { id: string };
-}
-
-export default async function ArticleDetail({ params }: ArticleDetailProps) {
-  const { id } = params;
+export default async function ArticleDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
   let article: Article | null = null;
   let error: string | null = null;

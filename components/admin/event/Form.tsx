@@ -42,12 +42,12 @@ const getPreviewUrl = (thumbnail: string | null | undefined): string | null => {
     // It's a full Google Drive URL, convert to direct image URL
     const fileIdMatch = thumbnail.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
     if (fileIdMatch) {
-      return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
     }
     return thumbnail;
   } else if (thumbnail.match(/^[a-zA-Z0-9_-]+$/)) {
     // It's a Google Drive file ID, construct direct URL
-    return `https://drive.google.com/uc?export=view&id=${thumbnail}`;
+    return `/api/drive-image?fileId=${thumbnail}`;
   } else {
     // It's a direct URL or other format
     return thumbnail;

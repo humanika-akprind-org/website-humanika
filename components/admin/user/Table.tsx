@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   FiEye,
   FiEdit,
@@ -19,6 +19,7 @@ import Checkbox from "../ui/checkbox/Checkbox";
 import Pagination from "../ui/pagination/Pagination";
 import AddButton from "../ui/button/AddButton";
 import EmptyState from "../ui/EmptyState";
+import SortIcon from "../ui/SortIcon";
 
 export default function UserTable({
   users,
@@ -37,10 +38,58 @@ export default function UserTable({
   onPageChange,
   onAddUser,
 }: UserTableProps) {
+  const [sortField, setSortField] = useState("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
   // Filter users to exclude unverified users and current user
   const filteredUsers = users.filter(
     (user) => user.verifiedAccount && user.id !== currentUserId
   );
+
+  // Sort users
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    let aValue, bValue;
+
+    switch (sortField) {
+      case "name":
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+        break;
+      case "role":
+        aValue = a.role.toLowerCase();
+        bValue = b.role.toLowerCase();
+        break;
+      case "department":
+        aValue = a.department?.toLowerCase() || "";
+        bValue = b.department?.toLowerCase() || "";
+        break;
+      case "position":
+        aValue = a.position?.toLowerCase() || "";
+        bValue = b.position?.toLowerCase() || "";
+        break;
+      case "status":
+        aValue = a.isActive ? "active" : "inactive";
+        bValue = b.isActive ? "active" : "inactive";
+        break;
+      default:
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+    }
+
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Handle sort
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
   return (
@@ -55,41 +104,86 @@ export default function UserTable({
               >
                 <Checkbox
                   checked={
-                    filteredUsers.length > 0 &&
-                    selectedUsers.length === filteredUsers.length
+                    sortedUsers.length > 0 &&
+                    selectedUsers.length === sortedUsers.length
                   }
                   onChange={onSelectAll}
                 />
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("name")}
               >
-                User
+                <div className="flex items-center">
+                  User
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="name"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("role")}
               >
-                Role
+                <div className="flex items-center">
+                  Role
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="role"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("department")}
               >
-                Department
+                <div className="flex items-center">
+                  Department
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="department"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("position")}
               >
-                Position
+                <div className="flex items-center">
+                  Position
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="position"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("status")}
               >
-                Status
+                <div className="flex items-center">
+                  Status
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="status"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
@@ -98,7 +192,7 @@ export default function UserTable({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredUsers.map((user, index) => (
+            {sortedUsers.map((user, index) => (
               <tr
                 key={user.id}
                 ref={(el) => {
@@ -133,8 +227,8 @@ export default function UserTable({
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                   <DropdownMenu
                     boundaryRef={{ current: rowRefs.current[index] }}
-                    isLastItem={index === filteredUsers.length - 1}
-                    hasMultipleItems={filteredUsers.length > 1}
+                    isLastItem={index === sortedUsers.length - 1}
+                    hasMultipleItems={sortedUsers.length > 1}
                   >
                     <DropdownMenuItem
                       onClick={() => onViewUser(user.id)}

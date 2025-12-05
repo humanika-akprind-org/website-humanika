@@ -11,7 +11,6 @@ import Checkbox from "../../ui/checkbox/Checkbox";
 import Pagination from "../../ui/pagination/Pagination";
 import EmptyState from "../../ui/EmptyState";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
-
 export default function UserTable({
   users,
   selectedUsers,
@@ -131,7 +130,7 @@ export default function UserTable({
                       color="green"
                     >
                       <FiCheck className="mr-2" size={14} />
-                      Verify User
+                      Verify Account
                     </DropdownMenuItem>
                   </DropdownMenu>
                 </td>

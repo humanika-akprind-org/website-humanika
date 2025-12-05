@@ -9,16 +9,16 @@ import {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Temporarily remove authentication check to allow public access
-    // const user = await getCurrentUser();
-    // if (!user) {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // }
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const documentTypeId = params.id;
+    const documentTypeId = (await params).id;
 
     if (!documentTypeId) {
       return NextResponse.json(
@@ -48,7 +48,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -58,7 +58,7 @@ export async function PUT(
 
     const typedUser = user as User;
 
-    const documentTypeId = params.id;
+    const documentTypeId = (await params).id;
 
     if (!documentTypeId) {
       return NextResponse.json(
@@ -113,7 +113,7 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -123,7 +123,7 @@ export async function DELETE(
 
     const typedUser = user as User;
 
-    const documentTypeId = params.id;
+    const documentTypeId = (await params).id;
 
     if (!documentTypeId) {
       return NextResponse.json(

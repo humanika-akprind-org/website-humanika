@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import AuthGuard from "./AuthGuard";
 import type { ReactNode } from "react";
 
@@ -9,8 +9,7 @@ export interface WithAuthProps {
 
 export function withAuth<T extends object>(Component: React.ComponentType<T>) {
   return async function WithAuthWrapper(props: T) {
-    const cookieStore = cookies();
-    const accessToken = cookieStore.get("google_access_token")?.value || "";
+    const accessToken = await getGoogleAccessToken();
 
     return (
       <AuthGuard accessToken={accessToken}>

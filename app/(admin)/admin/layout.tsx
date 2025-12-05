@@ -3,11 +3,12 @@ import AuthProvider from "@/components/admin/auth/AuthProvider";
 import Sidebar from "@/components/admin/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import "./admin.css";
-import { cookies } from "next/headers";
+import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/components/admin/layout/UserInfo";
 import { geistSans, geistMono } from "@/app/ui/fonts";
 import SidebarMobile from "@/components/admin/layout/SidebarMobile";
+import RefreshHandler from "@/components/admin/RefreshHandler";
 
 export const metadata: Metadata = {
   title: "Organizational Management System",
@@ -24,8 +25,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("google_access_token")?.value || "";
+  const accessToken = await getGoogleAccessToken();
 
   return (
     <html lang="en">
@@ -33,6 +33,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
+          <RefreshHandler />
           <div className="flex h-screen overflow-hidden">
             <Sidebar />
 
