@@ -29,8 +29,20 @@ export async function GET(req: Request) {
       httpOnly: true, // for security, the cookie is accessible only by the server
       secure: isProduction, // send cookie over HTTPS only in production
       path: "/", // cookie is available on every route
-      maxAge: 60 * 60 * 24 * 7, // 1 week
+      maxAge: 60 * 60, // 1 hour (access token expires in 1 hour)
     });
+
+    // Store refresh token for long-term access
+    if (tokens.refresh_token) {
+      (await cookies()).set({
+        name: "google_refresh_token",
+        value: tokens.refresh_token,
+        httpOnly: true,
+        secure: isProduction,
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+    }
 
     return NextResponse.redirect(
       new URL("/admin/dashboard/overview?refresh=true", req.url)

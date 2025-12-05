@@ -11,7 +11,8 @@ const isValidImageUrl = (url: string): boolean => {
     return (
       /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) ||
       url.includes("drive.google.com") ||
-      url.startsWith("blob:")
+      url.startsWith("blob:") ||
+      url.startsWith("/api/drive-image")
     );
   } catch {
     return false;
@@ -99,6 +100,10 @@ function OrganizationalStructureImage() {
   const latestStructure = structures[0];
   const displayUrl = getStructureImageUrl(latestStructure.structure);
 
+  console.log("Structure data:", latestStructure);
+  console.log("Display URL:", displayUrl);
+  console.log("Is valid URL:", isValidImageUrl(displayUrl));
+
   return (
     <div className="flex items-center justify-center">
       {displayUrl && isValidImageUrl(displayUrl) ? (
@@ -112,12 +117,15 @@ function OrganizationalStructureImage() {
             onError={(e) => {
               console.error("Image failed to load:", displayUrl, e);
             }}
+            onLoad={() => {
+              console.log("Image loaded successfully:", displayUrl);
+            }}
           />
         </div>
       ) : (
         <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200">
           <svg
-            className="w-8 h-8 text-gray-500"
+            className="w-8 h-8 text-red-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

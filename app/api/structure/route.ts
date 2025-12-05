@@ -24,15 +24,27 @@ function validateCreateStructureInput(
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") as unknown as Status;
     const periodId = searchParams.get("periodId");
     const search = searchParams.get("search");
+
+    // Allow public access only for published structures
+    if (status === "PUBLISH") {
+      // Public access for published structures
+      const structures = await getStructures({
+        status,
+        periodId: periodId || undefined,
+        search: search || undefined,
+      });
+      return NextResponse.json(structures);
+    }
+
+    // Require authentication for other operations
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     // 1. Business logic
     const structures = await getStructures({
