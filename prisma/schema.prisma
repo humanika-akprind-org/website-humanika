@@ -453,19 +453,23 @@ model OrganizationalStructure {
 }
 
 model DepartmentTask {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik tugas departemen (auto-generated)
-  note       String // Catatan tugas departemen
-  department Department // Departemen yang memiliki tugas
-  userId     String?    @db.ObjectId // ID pengguna yang ditugaskan (opsional)
-  status     Status     @default(PENDING) // Status tugas departemen
-  createdAt  DateTime   @default(now()) // Waktu pembuatan tugas
-  updatedAt  DateTime   @updatedAt // Waktu terakhir update
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId // ID unik tugas departemen (auto-generated)
+  title          String // Judul tugas departemen
+  subtitle       String? // Subjudul tugas departemen (opsional)
+  note           String // Catatan tugas departemen
+  department     Department // Departemen yang memiliki tugas
+  userId         String?    @db.ObjectId // ID pengguna yang ditugaskan (opsional)
+  workProgramId  String?    @db.ObjectId // ID program kerja terkait (opsional)
+  status         Status     @default(PENDING) // Status tugas departemen
+  createdAt      DateTime   @default(now()) // Waktu pembuatan tugas
+  updatedAt      DateTime   @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan tugas departemen
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull) // Pengguna yang ditugaskan
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull) // Pengguna yang ditugaskan
+  workProgram WorkProgram? @relation(fields: [workProgramId], references: [id], onDelete: SetNull) // Program kerja terkait
   // approvals Approval[] @relation("DepartmentTaskApprovals") // Persetujuan untuk tugas departemen
 
-  @@index([department, userId, status])
+  @@index([department, userId, workProgramId, status])
   @@map("departmentTasks")
 }
 

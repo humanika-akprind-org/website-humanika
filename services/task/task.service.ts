@@ -178,6 +178,12 @@ export const updateDepartmentTask = async (
           email: true,
         },
       },
+      workProgram: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 
