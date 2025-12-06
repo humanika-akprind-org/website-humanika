@@ -25,7 +25,11 @@ export const getDepartmentTasks = async (filter: {
   }
   if (filter.userId) where.userId = filter.userId;
   if (filter.search) {
-    where.OR = [{ note: { contains: filter.search, mode: "insensitive" } }];
+    where.OR = [
+      { title: { contains: filter.search, mode: "insensitive" } },
+      { subtitle: { contains: filter.search, mode: "insensitive" } },
+      { note: { contains: filter.search, mode: "insensitive" } },
+    ];
   }
 
   const departmentTasks = await prisma.departmentTask.findMany({
@@ -36,6 +40,12 @@ export const getDepartmentTasks = async (filter: {
           id: true,
           name: true,
           email: true,
+        },
+      },
+      workProgram: {
+        select: {
+          id: true,
+          name: true,
         },
       },
     },
@@ -56,6 +66,12 @@ export const getDepartmentTask = async (id: string) => {
           email: true,
         },
       },
+      workProgram: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 
@@ -71,9 +87,14 @@ export const createDepartmentTask = async (
   user: UserWithId
 ) => {
   const departmentTaskData: Prisma.DepartmentTaskCreateInput = {
+    title: data.title,
+    subtitle: data.subtitle,
     note: data.note,
     department: data.department,
     ...(data.userId && { user: { connect: { id: data.userId } } }),
+    ...(data.workProgramId && {
+      workProgram: { connect: { id: data.workProgramId } },
+    }),
     status: data.status || "PENDING",
   };
 
@@ -87,6 +108,12 @@ export const createDepartmentTask = async (
           email: true,
         },
       },
+      workProgram: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 
@@ -96,12 +123,15 @@ export const createDepartmentTask = async (
     activityType: ActivityType.CREATE,
     entityType: "DepartmentTask",
     entityId: departmentTask.id,
-    description: `Created department task: ${departmentTask.note}`,
+    description: `Created department task: ${departmentTask.title}`,
     metadata: {
       newData: {
+        title: departmentTask.title,
+        subtitle: departmentTask.subtitle,
         note: departmentTask.note,
         department: departmentTask.department,
         userId: departmentTask.userId,
+        workProgramId: departmentTask.workProgramId,
         status: departmentTask.status,
       },
     },
@@ -125,11 +155,16 @@ export const updateDepartmentTask = async (
   }
 
   const departmentTaskData: Prisma.DepartmentTaskUncheckedUpdateInput = {};
+  if (data.title !== undefined) departmentTaskData.title = data.title;
+  if (data.subtitle !== undefined) departmentTaskData.subtitle = data.subtitle;
   if (data.note !== undefined) departmentTaskData.note = data.note;
   if (data.department !== undefined) {
     departmentTaskData.department = data.department;
   }
   if (data.userId !== undefined) departmentTaskData.userId = data.userId;
+  if (data.workProgramId !== undefined) {
+    departmentTaskData.workProgramId = data.workProgramId;
+  }
   if (data.status !== undefined) departmentTaskData.status = data.status;
 
   const departmentTask = await prisma.departmentTask.update({
@@ -152,18 +187,24 @@ export const updateDepartmentTask = async (
     activityType: ActivityType.UPDATE,
     entityType: "DepartmentTask",
     entityId: departmentTask.id,
-    description: `Updated department task: ${departmentTask.note}`,
+    description: `Updated department task: ${departmentTask.title}`,
     metadata: {
       oldData: {
+        title: existingTask.title,
+        subtitle: existingTask.subtitle,
         note: existingTask.note,
         department: existingTask.department,
         userId: existingTask.userId,
+        workProgramId: existingTask.workProgramId,
         status: existingTask.status,
       },
       newData: {
+        title: departmentTask.title,
+        subtitle: departmentTask.subtitle,
         note: departmentTask.note,
         department: departmentTask.department,
         userId: departmentTask.userId,
+        workProgramId: departmentTask.workProgramId,
         status: departmentTask.status,
       },
     },
@@ -192,12 +233,15 @@ export const deleteDepartmentTask = async (id: string, user: UserWithId) => {
     activityType: ActivityType.DELETE,
     entityType: "DepartmentTask",
     entityId: id,
-    description: `Deleted department task: ${departmentTask.note}`,
+    description: `Deleted department task: ${departmentTask.title}`,
     metadata: {
       oldData: {
+        title: departmentTask.title,
+        subtitle: departmentTask.subtitle,
         note: departmentTask.note,
         department: departmentTask.department,
         userId: departmentTask.userId,
+        workProgramId: departmentTask.workProgramId,
         status: departmentTask.status,
       },
       newData: null,

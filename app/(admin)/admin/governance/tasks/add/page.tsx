@@ -8,35 +8,45 @@ import type {
   UpdateDepartmentTaskInput,
 } from "@/types/task";
 import type { User } from "@/types/user";
+import type { WorkProgram } from "@/types/work";
 import { getUsers } from "@/use-cases/api/user";
+import { getWorkPrograms } from "@/use-cases/api/work";
 
 export const dynamic = "force-dynamic";
 
 export default function AddTaskPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [workPrograms, setWorkPrograms] = useState<WorkProgram[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await getUsers();
-        if (response.data) {
-          setUsers(response.data.users);
-        } else if (response.error) {
-          setError(response.error);
+        const [usersResponse, workPrograms] = await Promise.all([
+          getUsers(),
+          getWorkPrograms({}),
+        ]);
+
+        if (usersResponse.data) {
+          setUsers(usersResponse.data.users);
+        } else if (usersResponse.error) {
+          setError(usersResponse.error);
+          return;
         }
+
+        setWorkPrograms(workPrograms);
         setError(null);
       } catch (err) {
-        console.error("Error fetching users:", err);
-        setError("Failed to load users");
+        console.error("Error fetching data:", err);
+        setError("Failed to load data");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchData();
   }, []);
 
   const handleSubmit = async (
@@ -63,7 +73,11 @@ export default function AddTaskPage() {
 
   return (
     <div className="space-y-6">
-      <TaskForm onSubmit={handleSubmit} users={users} />
+      <TaskForm
+        onSubmit={handleSubmit}
+        users={users}
+        workPrograms={workPrograms}
+      />
     </div>
   );
 }

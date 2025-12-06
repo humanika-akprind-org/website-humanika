@@ -9,12 +9,14 @@ import type {
 } from "@/types/task";
 import { Department as DepartmentEnum, Status } from "@/types/enums";
 import type { User } from "@/types/user";
+import type { WorkProgram } from "@/types/work";
 import TextEditor from "@/components/admin/ui/text-area/TextEditor";
 import {
   FiArrowLeft,
   FiBriefcase,
   FiUser,
   FiCheckCircle,
+  FiFolder,
 } from "react-icons/fi";
 import Link from "next/link";
 
@@ -25,26 +27,38 @@ interface TaskFormProps {
   ) => Promise<void>;
   isLoading?: boolean;
   users: User[];
+  workPrograms?: WorkProgram[];
 }
 
-export default function TaskForm({ task, onSubmit, users }: TaskFormProps) {
+export default function TaskForm({
+  task,
+  onSubmit,
+  users,
+  workPrograms,
+}: TaskFormProps) {
   const router = useRouter();
   const [isLoadingState, setIsLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
+    title: "",
+    subtitle: "",
     note: "",
     department: DepartmentEnum.BPH,
     userId: "",
+    workProgramId: "",
     status: Status.DRAFT,
   });
 
   useEffect(() => {
     if (task) {
       setFormData({
+        title: task.title,
+        subtitle: task.subtitle || "",
         note: task.note,
         department: task.department,
         userId: task.userId || "",
+        workProgramId: task.workProgramId || "",
         status: task.status,
       });
     }
@@ -71,6 +85,9 @@ export default function TaskForm({ task, onSubmit, users }: TaskFormProps) {
 
     try {
       // Validate required fields
+      if (!formData.title.trim()) {
+        throw new Error("Please enter task title");
+      }
       if (!formData.note.trim()) {
         throw new Error("Please enter task note");
       }
@@ -82,6 +99,7 @@ export default function TaskForm({ task, onSubmit, users }: TaskFormProps) {
       const submitData = {
         ...formData,
         userId: formData.userId || undefined,
+        workProgramId: formData.workProgramId || undefined,
       };
 
       await onSubmit(submitData);
@@ -121,6 +139,49 @@ export default function TaskForm({ task, onSubmit, users }: TaskFormProps) {
         <div className="space-y-6">
           <div>
             <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Task Title *
+            </label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter task title"
+              required
+              disabled={isLoadingState}
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Wajib diisi dengan judul tugas yang jelas
+            </p>
+          </div>
+
+          <div>
+            <label
+              htmlFor="subtitle"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Task Subtitle
+            </label>
+            <input
+              type="text"
+              name="subtitle"
+              value={formData.subtitle}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter task subtitle (optional)"
+              disabled={isLoadingState}
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Opsional, sub judul tugas
+            </p>
+          </div>
+
+          <div>
+            <label
               htmlFor="note"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
@@ -139,7 +200,7 @@ export default function TaskForm({ task, onSubmit, users }: TaskFormProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label
                 htmlFor="department"
@@ -200,6 +261,37 @@ export default function TaskForm({ task, onSubmit, users }: TaskFormProps) {
               </div>
               <p className="mt-1 text-xs text-gray-500">
                 Opsional, pilih user yang ditugaskan
+              </p>
+            </div>
+
+            <div>
+              <label
+                htmlFor="workProgramId"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Work Program
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiFolder className="text-gray-400" />
+                </div>
+                <select
+                  name="workProgramId"
+                  value={formData.workProgramId}
+                  onChange={handleInputChange}
+                  className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoadingState}
+                >
+                  <option value="">Pilih Program Kerja (Opsional)</option>
+                  {(workPrograms || []).map((program) => (
+                    <option key={program.id} value={program.id}>
+                      {program.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Opsional, pilih program kerja
               </p>
             </div>
 

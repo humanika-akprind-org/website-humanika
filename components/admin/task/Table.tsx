@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
-import { FiCheckCircle, FiUser, FiEye } from "react-icons/fi";
+import { FiCheckCircle, FiUser, FiEye, FiFolder } from "react-icons/fi";
 import type { DepartmentTask } from "@/types/task";
 import type { Status } from "@/types/enums";
 import { Status as StatusEnum } from "@/types/enums";
@@ -92,9 +92,12 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
   // Filter tasks based on search term and filters
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.subtitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.note.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.user?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      task.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.workProgram?.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
       statusFilter === "all" || task.status === statusFilter;
@@ -196,6 +199,18 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                  Title
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Subtitle
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Task Note
                 </th>
                 <th
@@ -221,7 +236,7 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Created
+                  Work Program
                 </th>
                 <th
                   scope="col"
@@ -253,6 +268,16 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
                       />
                     </td>
                     <td className="px-4 py-4">
+                      <div className="text-sm text-gray-900 font-medium">
+                        {task.title}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="text-sm text-gray-600">
+                        {task.subtitle || "-"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
                       <div className="text-sm text-gray-900">
                         {task.note.length > 50
                           ? `${task.note
@@ -273,6 +298,12 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
                       <div className="flex items-center">
                         <FiUser className="mr-2 text-gray-400" size={14} />
                         {task.user?.name || "Unassigned"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <FiFolder className="mr-2 text-gray-400" size={14} />
+                        {task.workProgram?.name || "No Program"}
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -340,7 +371,7 @@ export default function TaskTable({ tasks, onDelete }: TaskTableProps) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center">
+                  <td colSpan={9} className="px-6 py-12 text-center">
                     <FiCheckCircle className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-4 text-sm font-medium text-gray-900">
                       No tasks found

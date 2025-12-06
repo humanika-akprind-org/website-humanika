@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     const body: CreateDepartmentTaskInput = await request.json();
 
-    if (!body.note || !body.department) {
+    if (!body.title || !body.note || !body.department) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }

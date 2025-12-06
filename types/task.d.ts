@@ -3,9 +3,12 @@ import type { Prisma } from "@prisma/client";
 
 export interface DepartmentTask {
   id: string;
+  title: string;
+  subtitle?: string;
   note: string;
   department: Department;
   userId?: string;
+  workProgramId?: string;
   status: Prisma.Status;
   createdAt: Date;
   updatedAt: Date;
@@ -14,12 +17,19 @@ export interface DepartmentTask {
     name: string;
     email: string;
   };
+  workProgram?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface CreateDepartmentTaskInput {
+  title: string;
+  subtitle?: string;
   note: string;
   department: Department;
   userId?: string;
+  workProgramId?: string;
   status?: Prisma.Status;
 }
 
