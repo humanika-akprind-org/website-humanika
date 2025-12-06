@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { getDepartmentTasks, deleteDepartmentTask } from "@/use-cases/api/task";
-import type { DepartmentTask, DepartmentTaskFilter } from "@/types/task";
-import type { Department, Status } from "@/types/enums";
+import type { DepartmentTask } from "@/types/task";
 
 interface UseTaskManagementReturn {
   tasks: DepartmentTask[];
@@ -32,45 +32,104 @@ interface UseTaskManagementReturn {
 }
 
 export function useTaskManagement(): UseTaskManagementReturn {
+  const router = useRouter();
+  const [allTasks, setAllTasks] = useState<DepartmentTask[]>([]);
   const [tasks, setTasks] = useState<DepartmentTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, _setTotalPages] = useState(1);
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState<Record<string, string>>({
+    department: "all",
+    status: "all",
+  });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [currentTask, setCurrentTask] = useState<DepartmentTask | null>(null);
 
-  const fetchTasks = useCallback(async () => {
+  const fetchAllTasks = useCallback(async () => {
     try {
       setLoading(true);
-      const filter: DepartmentTaskFilter = {
-        department:
-          filters.department !== "all"
-            ? (filters.department as Department)
-            : undefined,
-        status:
-          filters.status !== "all" ? (filters.status as Status) : undefined,
-        search: searchTerm || undefined,
-      };
-      const data = await getDepartmentTasks(filter);
-      setTasks(data);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching tasks:", err);
-      setError("Failed to load tasks");
+      setError("");
+      const data = await getDepartmentTasks();
+      setAllTasks(data);
+    } catch (_error) {
+      setError("Failed to fetch tasks");
     } finally {
       setLoading(false);
     }
-  }, [filters, searchTerm]);
+  }, []);
+
+  // Apply client-side filtering and pagination
+  useEffect(() => {
+    let filtered = allTasks;
+
+    // Search filter
+    if (debouncedSearchTerm) {
+      filtered = filtered.filter(
+        (task) =>
+          task.title
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
+          task.subtitle
+            ?.toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
+          task.note.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          task.department
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
+          task.user?.name
+            ?.toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
+          task.workProgram?.name
+            ?.toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase())
+      );
+    }
+
+    // Department filter
+    if (filters.department && filters.department !== "all") {
+      filtered = filtered.filter(
+        (task) => task.department === filters.department
+      );
+    }
+
+    // Status filter
+    if (filters.status && filters.status !== "all") {
+      filtered = filtered.filter((task) => task.status === filters.status);
+    }
+
+    // Apply pagination
+    const startIndex = (currentPage - 1) * 10;
+    const endIndex = startIndex + 10;
+    const paginatedTasks = filtered.slice(startIndex, endIndex);
+
+    setTasks(paginatedTasks);
+    setTotalPages(Math.ceil(filtered.length / 10));
+  }, [
+    allTasks,
+    debouncedSearchTerm,
+    currentPage,
+    filters.department,
+    filters.status,
+  ]);
 
   useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+    fetchAllTasks();
+  }, [fetchAllTasks]);
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const toggleTaskSelection = (id: string) => {
     setSelectedTasks((prev) =>
@@ -109,13 +168,11 @@ export function useTaskManagement(): UseTaskManagementReturn {
   };
 
   const handleAddTask = () => {
-    // Navigate to add task page
-    window.location.href = "/admin/governance/tasks/add";
+    router.push("/admin/governance/tasks/add");
   };
 
   const handleEditTask = (id: string) => {
-    // Navigate to edit task page
-    window.location.href = `/admin/governance/tasks/edit/${id}`;
+    router.push(`/admin/governance/tasks/edit/${id}`);
   };
 
   const handleDelete = (ids?: string[]) => {
@@ -149,6 +206,7 @@ export function useTaskManagement(): UseTaskManagementReturn {
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
   };
 
   return {

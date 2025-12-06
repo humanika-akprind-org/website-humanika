@@ -61,6 +61,10 @@ export default function TaskTable({
         aValue = a.status.toLowerCase();
         bValue = b.status.toLowerCase();
         break;
+      case "user":
+        aValue = a.user?.name?.toLowerCase() || "";
+        bValue = b.user?.name?.toLowerCase() || "";
+        break;
 
       default:
         aValue = a.title.toLowerCase();
@@ -81,20 +85,6 @@ export default function TaskTable({
       setSortDirection("asc");
     }
   };
-
-  if (tasks.length === 0) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
-        <FiCheckCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
-          No tasks found
-        </h3>
-        <p className="text-gray-500">
-          Get started by creating your first department task.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
@@ -146,9 +136,18 @@ export default function TaskTable({
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("user")}
               >
-                Assigned User
+                <div className="flex items-center">
+                  Assigned User
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="user"
+                    iconType="arrow"
+                  />
+                </div>
               </th>
               <th
                 scope="col"
