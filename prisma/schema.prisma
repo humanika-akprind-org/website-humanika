@@ -219,10 +219,11 @@ model WorkProgram {
   updatedAt      DateTime   @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan program kerja
-  period      Period    @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode program kerja
-  approvals Approval[] @relation("WorkProgramApprovals") // Persetujuan untuk program kerja
-  events      Event[] // Kegiatan yang termasuk dalam program kerja
-  responsible User      @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible") // Pengguna yang bertanggung jawab
+  period         Period         @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode program kerja
+  approvals      Approval[]     @relation("WorkProgramApprovals") // Persetujuan untuk program kerja
+  events         Event[] // Kegiatan yang termasuk dalam program kerja
+  departmentTasks DepartmentTask[] // Tugas departemen yang terkait
+  responsible    User           @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible") // Pengguna yang bertanggung jawab
 
   @@index([department, status, periodId])
   @@map("workPrograms")
