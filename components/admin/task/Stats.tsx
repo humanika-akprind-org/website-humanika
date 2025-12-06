@@ -8,73 +8,50 @@ import {
 } from "react-icons/fi";
 import type { DepartmentTask } from "@/types/task";
 import { Status } from "@/types/enums";
+import StatCard from "../ui/card/StatCard";
 
-interface StatsProps {
+interface TaskStatsProps {
   tasks: DepartmentTask[];
 }
 
-export default function Stats({ tasks }: StatsProps) {
-  // Calculate stats
-  const totalTasks = tasks.length;
-  const pendingTasks = tasks.filter(
-    (task) => task.status === Status.PENDING
-  ).length;
-  const completedTasks = tasks.filter(
-    (task) => task.status === Status.PUBLISH
-  ).length;
-  const draftTasks = tasks.filter(
-    (task) => task.status === Status.DRAFT
-  ).length;
+export default function TaskStats({ tasks }: TaskStatsProps) {
   const stats = [
     {
       title: "Total Tasks",
-      value: totalTasks.toString(),
+      value: tasks.length,
       icon: FiCheckCircle,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
+      color: "blue",
     },
     {
       title: "Pending Tasks",
-      value: pendingTasks.toString(),
+      value: tasks.filter((task) => task.status === Status.PENDING).length,
       icon: FiClock,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-100",
+      color: "yellow",
     },
     {
       title: "Completed Tasks",
-      value: completedTasks.toString(),
+      value: tasks.filter((task) => task.status === Status.PUBLISH).length,
       icon: FiTrendingUp,
-      color: "text-green-600",
-      bgColor: "bg-green-100",
+      color: "green",
     },
     {
       title: "Draft Tasks",
-      value: draftTasks.toString(),
+      value: tasks.filter((task) => task.status === Status.DRAFT).length,
       icon: FiFileText,
-      color: "text-gray-600",
-      bgColor: "bg-gray-100",
+      color: "gray",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {stats.map((stat, index) => (
-        <div
+        <StatCard
           key={index}
-          className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
-                {stat.value}
-              </p>
-            </div>
-            <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-              <stat.icon className={`w-6 h-6 ${stat.color}`} />
-            </div>
-          </div>
-        </div>
+          title={stat.title}
+          value={stat.value}
+          icon={stat.icon}
+          color={stat.color}
+        />
       ))}
     </div>
   );

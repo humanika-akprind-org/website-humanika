@@ -42,3 +42,5 @@ export interface DepartmentTaskFilter {
   userId?: string;
   search?: string;
 }
+
+export type TaskFilters = DepartmentTaskFilter;
