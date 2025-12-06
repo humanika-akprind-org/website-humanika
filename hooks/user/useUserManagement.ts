@@ -36,7 +36,7 @@ export function useUserManagement() {
       if (response.error) {
         setError(response.error);
       } else if (response.data) {
-        setAllUsers(response.data.users);
+        setAllUsers(response.data.users.filter((user) => user.verifiedAccount));
       }
     } catch (_error) {
       setError("Failed to fetch users");

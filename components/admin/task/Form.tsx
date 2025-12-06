@@ -17,6 +17,7 @@ import CancelButton from "@/components/ui/CancelButton";
 import Alert from "@/components/admin/ui/alert/Alert";
 import { FiBriefcase, FiUser, FiCheckCircle, FiFolder } from "react-icons/fi";
 import type { User } from "@/types/user";
+import type { WorkProgram } from "@/types/work";
 import { useTaskForm } from "@/hooks/task/useTaskForm";
 
 export interface CreateTaskData {
@@ -39,13 +40,13 @@ interface TaskFormProps {
   onSubmit: (
     data: CreateDepartmentTaskInput | UpdateDepartmentTaskInput
   ) => Promise<void>;
-  users?: User[];
+  isEdit?: boolean;
 }
 
 export default function TaskForm({
   task,
   onSubmit,
-  users = [],
+  isEdit = false,
 }: TaskFormProps) {
   const router = useRouter();
   const {
@@ -57,6 +58,8 @@ export default function TaskForm({
     handleChange,
     handleNoteChange,
     handleSubmit,
+    users,
+    workPrograms,
   } = useTaskForm(task, onSubmit);
 
   return (
@@ -126,7 +129,7 @@ export default function TaskForm({
               onChange={(value: string) =>
                 setFormData((prev) => ({ ...prev, userId: value }))
               }
-              options={users.map((user) => ({
+              options={users.map((user: User) => ({
                 value: user.id,
                 label: user.name,
               }))}
@@ -141,7 +144,10 @@ export default function TaskForm({
               onChange={(value: string) =>
                 setFormData((prev) => ({ ...prev, workProgramId: value }))
               }
-              options={[]} // TODO: Add work programs
+              options={workPrograms.map((workProgram: WorkProgram) => ({
+                value: workProgram.id,
+                label: workProgram.name,
+              }))}
               placeholder="Select a work program (optional)"
               icon={<FiFolder className="text-gray-400" />}
             />
@@ -170,7 +176,7 @@ export default function TaskForm({
 
             <SubmitButton
               isSubmitting={isSubmitting}
-              text={task ? "Update Task" : "Add Task"}
+              text={isEdit ? "Update Task" : "Add Task"}
               loadingText="Saving..."
             />
           </div>

@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Department, Status } from "@/types/enums";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
 } from "@/types/task";
 import type { AlertType } from "@/components/admin/ui/alert/Alert";
+import type { User } from "@/types/user";
+import type { WorkProgram } from "@/types/work";
+import { UserApi } from "@/use-cases/api/user";
+import { getWorkPrograms } from "@/use-cases/api/work";
 
 export interface TaskFormData {
   title: string;
@@ -35,6 +39,27 @@ export const useTaskForm = (
     type: AlertType;
     message: string;
   } | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [workPrograms, setWorkPrograms] = useState<WorkProgram[]>([]);
+
+  // Fetch initial data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [usersResponse, workProgramsResponse] = await Promise.all([
+          UserApi.getUsers({ limit: 50 }),
+          getWorkPrograms(),
+        ]);
+
+        setUsers(usersResponse.data?.users || []);
+        setWorkPrograms(workProgramsResponse);
+      } catch (err) {
+        console.error("Error loading form data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
   const [formData, setFormData] = useState<TaskFormData>({
     title: task?.title || "",
     subtitle: task?.subtitle || "",
@@ -125,5 +150,7 @@ export const useTaskForm = (
     handleNoteChange,
     validateForm,
     handleSubmit,
+    users,
+    workPrograms,
   };
 };

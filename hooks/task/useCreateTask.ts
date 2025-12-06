@@ -1,15 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createDepartmentTask } from "@/use-cases/api/task";
+import { useWorkPrograms } from "@/hooks/work-program/useWorkPrograms";
+import { UserApi } from "@/use-cases/api/user";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
 } from "@/types/task";
+import type { User } from "@/types/user";
 
 export function useCreateTask() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+
+  // Fetch work programs
+  const { workPrograms, isLoading } = useWorkPrograms();
+
+  // Fetch users
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await UserApi.getUsers({ allUsers: true });
+        if (response.data) {
+          setUsers(response.data.users);
+        }
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const createTask = async (
     formData: CreateDepartmentTaskInput | UpdateDepartmentTaskInput
@@ -42,5 +65,8 @@ export function useCreateTask() {
     error,
     setError,
     handleBack,
+    workPrograms,
+    users,
+    isLoading,
   };
 }

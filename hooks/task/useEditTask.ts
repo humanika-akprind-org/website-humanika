@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getDepartmentTask, updateDepartmentTask } from "@/use-cases/api/task";
 import { getUsers } from "@/use-cases/api/user";
+import { useWorkPrograms } from "@/hooks/work-program/useWorkPrograms";
 import type { DepartmentTask, UpdateDepartmentTaskInput } from "@/types/task";
 import type { User } from "@/types/user";
 
@@ -17,6 +18,9 @@ export function useEditTask(taskId: string) {
     type: AlertType;
     message: string;
   } | null>(null);
+
+  // Fetch work programs
+  const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,7 +74,8 @@ export function useEditTask(taskId: string) {
   return {
     task,
     users,
-    loading,
+    workPrograms,
+    loading: loading || workProgramsLoading,
     error,
     alert,
     handleSubmit,
