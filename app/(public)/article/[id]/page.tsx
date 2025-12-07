@@ -3,6 +3,7 @@ import { getArticle } from "use-cases/api/article";
 import type { Article } from "types/article";
 import Image from "next/image";
 import ArticleCard from "components/public/article/ArticleCard";
+import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 
 // Helper function to get preview URL from image (file ID or URL)
 function getPreviewUrl(image: string | null | undefined): string {
@@ -128,7 +129,7 @@ export default async function ArticleDetail({
 
         {/* Article Content */}
         <section className="max-w-2xl mx-auto prose prose-blue prose-lg mb-16">
-          <div dangerouslySetInnerHTML={{ __html: article.content }} />
+          <HtmlRenderer html={article.content} />
         </section>
 
         {/* Related Articles */}

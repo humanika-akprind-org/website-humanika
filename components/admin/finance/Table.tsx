@@ -19,6 +19,7 @@ import {
 } from "react-icons/fi";
 import SortIcon from "../ui/SortIcon";
 import type { Finance } from "@/types/finance";
+import HtmlRenderer from "../ui/HtmlRenderer";
 
 interface FinanceTableProps {
   finances: Finance[];
@@ -311,10 +312,7 @@ export default function FinanceTable({
                     />
                   </td>
                   <td className="px-4 py-4">
-                    <div
-                      className="text-sm font-medium text-gray-900"
-                      dangerouslySetInnerHTML={{ __html: finance.description }}
-                    />
+                    <HtmlRenderer html={finance.description} />
                     {finance.event && (
                       <div className="text-xs text-gray-500 mt-1">
                         Acara: {finance.event.name}

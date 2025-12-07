@@ -13,6 +13,7 @@ import DepartmentChip from "@/components/admin/ui/chip/Department";
 import StatusChip from "@/components/admin/ui/chip/Status";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import { useTaskManagement } from "@/hooks/task/useTaskManagement";
+import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 
 export default function TasksPage() {
   const {
@@ -162,8 +163,8 @@ export default function TasksPage() {
                 <label className="block text-sm font-medium text-gray-700">
                   Task Note
                 </label>
-                <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md">
-                  <div dangerouslySetInnerHTML={{ __html: currentTask.note }} />
+                <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">
+                  <HtmlRenderer html={currentTask.note} />
                 </div>
               </div>
 

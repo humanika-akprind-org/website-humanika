@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Event } from "@/types/event";
+import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 
 // Helper function to get preview URL from image (file ID or URL)
 function getPreviewUrl(image: string | null | undefined): string {
@@ -94,10 +95,7 @@ export default function EventCard({
         <h3 className="text-xl font-semibold mb-3 text-gray-800">
           {event.name}
         </h3>
-        <p
-          className="text-gray-600 mb-4 line-clamp-2"
-          dangerouslySetInnerHTML={{ __html: truncatedDescription }}
-        />
+        <HtmlRenderer html={truncatedDescription} />
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">{time || "Loading"}</span>
           <Link

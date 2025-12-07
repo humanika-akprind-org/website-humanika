@@ -60,6 +60,7 @@
     "crypto": "^1.0.1",
     "docx": "^9.5.1",
     "googleapis": "^144.0.0",
+    "html-react-parser": "^5.2.10",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",

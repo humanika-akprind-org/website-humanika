@@ -10,6 +10,7 @@ import type { Gallery } from "@/types/gallery";
 import { Status } from "@/types/enums";
 import AlbumGrid from "@/components/public/gallery/AlbumGrid";
 import GalleryGrid from "@/components/public/gallery/GalleryGrid";
+import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 
 export default function GalleryDetail() {
   const params = useParams();
@@ -99,11 +100,7 @@ export default function GalleryDetail() {
           <h1 className="text-4xl font-bold mb-4 text-gray-900">
             {album.title}
           </h1>
-          <div
-            className="text-lg text-gray-700 mb-8"
-            dangerouslySetInnerHTML={{ __html: album.description }}
-          />
-
+          <HtmlRenderer html={album.description} />
           {event.thumbnail ? (
             <div className="bg-white-0 rounded-xl mb-8 flex items-center justify-center w-full h-96 overflow-hidden relative">
               <Image

@@ -22,7 +22,7 @@ export const convertHtmlToText = (html: string): string => {
 
   // Handle other common HTML elements
   const elements = tmp.querySelectorAll(
-    "p, br, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, u, s, del, a, blockquote, img, hr, pre, code, span, table, tr, td, th"
+    "p, br, div, h1, h2, h3, h4, h5, h6, strong, b, em, i, u, s, del, a, blockquote, img, hr, pre, code, span, table"
   );
   elements.forEach((el) => {
     if (el.tagName === "BR") {
@@ -315,6 +315,20 @@ export function convertHtmlToDocxElements(html: string): DocxElement[] {
             rows: tableRows,
           });
         }
+      } else if (el.tagName === "TABLE") {
+        const rows = el.querySelectorAll("tr");
+        const tableRows = Array.from(rows).map((row) => {
+          const cells = row.querySelectorAll("td, th");
+          return {
+            children: Array.from(cells).map((cell) => ({
+              children: parseElementToTextRuns(cell),
+            })),
+          };
+        });
+        elements.push({
+          type: "table",
+          rows: tableRows,
+        });
       } else if (el.tagName === "A") {
         const textRuns = parseElementToTextRuns(el);
         if (textRuns.length) {
@@ -534,6 +548,20 @@ export function convertHtmlToPdfElements(html: string): PdfElement[] {
             rows: tableRows,
           });
         }
+      } else if (el.tagName === "TABLE") {
+        const rows = el.querySelectorAll("tr");
+        const tableRows = Array.from(rows).map((row) => {
+          const cells = row.querySelectorAll("td, th");
+          return {
+            children: Array.from(cells).map((cell) => ({
+              children: parseElementToPdfTextRuns(cell),
+            })),
+          };
+        });
+        elements.push({
+          type: "table",
+          rows: tableRows,
+        });
       } else if (el.tagName === "A") {
         const href = el.getAttribute("href") || "";
         const text = el.textContent || "";
