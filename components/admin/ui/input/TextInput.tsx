@@ -13,6 +13,7 @@ interface TextInputProps {
   icon?: React.ReactNode;
   error?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export default function TextInput({
@@ -26,6 +27,7 @@ export default function TextInput({
   icon,
   error,
   className,
+  disabled = false,
 }: TextInputProps) {
   return (
     <div className={cn("relative", className)}>
@@ -45,6 +47,7 @@ export default function TextInput({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          disabled={disabled}
           className={cn(
             "w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
             icon && "pl-10"

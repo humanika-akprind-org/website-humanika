@@ -19,7 +19,7 @@ export default function HtmlRenderer({
   };
 
   const options = {
-    replace: (domNode: any): any => {
+    replace: (domNode: DOMNode): React.ReactElement | null | undefined => {
       if (domNode instanceof Element) {
         // Handle table elements
         if (domNode.name === "table") {
