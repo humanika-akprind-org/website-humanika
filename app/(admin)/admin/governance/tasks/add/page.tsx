@@ -7,15 +7,8 @@ import Alert from "@/components/admin/ui/alert/Alert";
 import { useCreateTask } from "@/hooks/task/useCreateTask";
 
 export default function AddTaskPage() {
-  const {
-    createTask,
-    handleBack,
-    isSubmitting,
-    error,
-    workPrograms,
-    users,
-    isLoading,
-  } = useCreateTask();
+  const { createTask, handleBack, isSubmitting, error, isLoading } =
+    useCreateTask();
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -26,11 +19,7 @@ export default function AddTaskPage() {
       {isSubmitting || isLoading ? (
         <LoadingForm />
       ) : (
-        <TaskForm
-          onSubmit={createTask}
-          users={users}
-          workPrograms={workPrograms}
-        />
+        <TaskForm onSubmit={createTask} />
       )}
     </div>
   );

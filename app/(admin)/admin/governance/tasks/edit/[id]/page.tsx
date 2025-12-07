@@ -11,16 +11,8 @@ export default function EditTaskPage() {
   const params = useParams();
   const taskId = params.id as string;
 
-  const {
-    task,
-    users,
-    workPrograms,
-    loading,
-    error,
-    alert,
-    handleSubmit,
-    handleBack,
-  } = useEditTask(taskId);
+  const { task, loading, error, alert, handleSubmit, handleBack } =
+    useEditTask(taskId);
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -35,13 +27,7 @@ export default function EditTaskPage() {
           <p className="text-red-600">{error}</p>
         </div>
       ) : task ? (
-        <TaskForm
-          task={task}
-          onSubmit={handleSubmit}
-          users={users}
-          workPrograms={workPrograms}
-          isEdit={true}
-        />
+        <TaskForm task={task} onSubmit={handleSubmit} isEdit={true} />
       ) : null}
     </div>
   );

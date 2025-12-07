@@ -99,10 +99,7 @@ export default function TaskTable({
       {/* Export Buttons */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex justify-end gap-3">
-          <ExportPDFButton
-            tasks={sortedTasks}
-            convertHtmlToText={convertHtmlToText}
-          />
+          <ExportPDFButton tasks={sortedTasks} />
           <ExportWordButton
             tasks={sortedTasks}
             convertHtmlToText={convertHtmlToText}
@@ -245,18 +242,14 @@ export default function TaskTable({
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() =>
-                        exportSingleTaskToPDF(task, convertHtmlToText)
-                      }
+                      onClick={() => exportSingleTaskToPDF(task)}
                       color="green"
                     >
                       <FileText className="mr-2" size={14} />
                       Export PDF
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() =>
-                        exportSingleTaskToWord(task, convertHtmlToText)
-                      }
+                      onClick={() => exportSingleTaskToWord(task)}
                       color="orange"
                     >
                       <File className="mr-2" size={14} />

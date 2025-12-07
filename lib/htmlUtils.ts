@@ -125,14 +125,64 @@ function hslToHex(hsl: string): string | undefined {
   return ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
 }
 
+// Interface for docx TextRun
+interface DocxTextRun {
+  text: string;
+  bold?: boolean;
+  italics?: boolean;
+  underline?: object;
+  strike?: boolean;
+  color?: string;
+  highlight?:
+    | "black"
+    | "blue"
+    | "cyan"
+    | "darkBlue"
+    | "darkCyan"
+    | "darkGray"
+    | "darkGreen"
+    | "darkMagenta"
+    | "darkRed"
+    | "darkYellow"
+    | "green"
+    | "lightGray"
+    | "magenta"
+    | "none"
+    | "red"
+    | "white"
+    | "yellow";
+  style?: string;
+  size?: number;
+}
+
+// Interface for docx Paragraph
+interface DocxParagraphElement {
+  type: "paragraph";
+  children: DocxTextRun[];
+  alignment?: string;
+  indent?: { left: number };
+}
+
+// Interface for docx Table
+interface DocxTableElement {
+  type: "table";
+  rows: {
+    children: {
+      children: DocxTextRun[];
+    }[];
+  }[];
+}
+
+type DocxElement = DocxParagraphElement | DocxTableElement;
+
 // Function to parse element to TextRuns for docx
-function parseElementToTextRuns(element: Element): any[] {
-  const textRuns: any[] = [];
+function parseElementToTextRuns(element: Element): DocxTextRun[] {
+  const textRuns: DocxTextRun[] = [];
   const walk = (node: Node) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent || "";
       if (text.trim()) {
-        const run: any = { text };
+        const run: DocxTextRun = { text };
         // Check parent styles
         let parent = node.parentElement;
         while (parent) {
@@ -151,16 +201,13 @@ function parseElementToTextRuns(element: Element): any[] {
           if (parent.tagName === "SPAN") {
             const style = parent.getAttribute("style");
             if (style) {
-              const colorMatch = style.match(/color:\s*hsl\([^)]+\)/);
+              const colorMatch = style.match(/color:\s*(hsl\([^)]+\))/);
               if (colorMatch) {
-                const hex = hslToHex(colorMatch[0]);
+                const hex = hslToHex(colorMatch[1]);
                 if (hex) run.color = hex;
               }
-              const bgMatch = style.match(/background-color:\s*hsl\([^)]+\)/);
-              if (bgMatch) {
-                const hex = hslToHex(bgMatch[0]);
-                if (hex) run.highlight = hex;
-              }
+              // Note: docx library only supports specific highlight colors, not arbitrary hex colors
+              // So we skip setting highlight for docx
             }
           }
           parent = parent.parentElement;
@@ -191,10 +238,10 @@ function getAlignment(style: string | null): string | undefined {
 }
 
 // Function to convert HTML to docx Paragraphs and Tables
-export function convertHtmlToDocxElements(html: string): any[] {
+export function convertHtmlToDocxElements(html: string): DocxElement[] {
   const tmp = document.createElement("DIV");
   tmp.innerHTML = html;
-  const elements: any[] = [];
+  const elements: DocxElement[] = [];
 
   tmp.childNodes.forEach((node) => {
     if (node.nodeType === Node.ELEMENT_NODE) {
@@ -283,6 +330,228 @@ export function convertHtmlToDocxElements(html: string): any[] {
           elements.push({
             type: "paragraph",
             children: textRuns,
+          });
+        }
+      }
+    }
+  });
+
+  return elements;
+}
+
+// Interfaces for PDF elements
+export interface PdfTextRun {
+  text: string;
+  bold?: boolean;
+  italics?: boolean;
+  underline?: boolean;
+  strike?: boolean;
+  color?: string;
+  highlight?: string;
+  size?: number;
+}
+
+interface PdfParagraphElement {
+  type: "paragraph";
+  children: PdfTextRun[];
+  alignment?: "left" | "center" | "right" | "justify";
+  indent?: number;
+}
+
+interface PdfTableElement {
+  type: "table";
+  rows: {
+    children: {
+      children: PdfTextRun[];
+    }[];
+  }[];
+}
+
+interface PdfListElement {
+  type: "list";
+  items: PdfTextRun[][];
+  ordered?: boolean;
+}
+
+interface PdfLinkElement {
+  type: "link";
+  text: string;
+  url: string;
+}
+
+export type PdfElement =
+  | PdfParagraphElement
+  | PdfTableElement
+  | PdfListElement
+  | PdfLinkElement;
+
+// Function to parse element to PDF TextRuns
+function parseElementToPdfTextRuns(element: Element): PdfTextRun[] {
+  const textRuns: PdfTextRun[] = [];
+  const walk = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent || "";
+      if (text.trim()) {
+        const run: PdfTextRun = { text };
+        // Check parent styles
+        let parent = node.parentElement;
+        while (parent) {
+          if (parent.tagName === "STRONG" || parent.tagName === "B") {
+            run.bold = true;
+          }
+          if (parent.tagName === "EM" || parent.tagName === "I") {
+            run.italics = true;
+          }
+          if (parent.tagName === "U") {
+            run.underline = true;
+          }
+          if (parent.tagName === "S" || parent.tagName === "DEL") {
+            run.strike = true;
+          }
+          if (parent.tagName === "SPAN") {
+            const style = parent.getAttribute("style");
+            if (style) {
+              const colorMatch = style.match(/color:\s*(hsl\([^)]+\))/);
+              if (colorMatch) {
+                const hex = hslToHex(colorMatch[1]);
+                if (hex) run.color = hex;
+              }
+              // const bgMatch = style.match(/background-color:\s*(hsl\([^)]+\))/);
+              // if (bgMatch) {
+              //   const hex = hslToHex(bgMatch[1]);
+              //   if (hex) run.highlight = hex;
+              // }
+            }
+          }
+          parent = parent.parentElement;
+        }
+        textRuns.push(run);
+      }
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const el = node as Element;
+      if (el.tagName === "BR") {
+        textRuns.push({ text: "\n" });
+      } else {
+        el.childNodes.forEach(walk);
+      }
+    }
+  };
+  walk(element);
+  return textRuns;
+}
+
+// Function to convert HTML to PDF elements
+export function convertHtmlToPdfElements(html: string): PdfElement[] {
+  const tmp = document.createElement("DIV");
+  tmp.innerHTML = html;
+  const elements: PdfElement[] = [];
+
+  tmp.childNodes.forEach((node) => {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const el = node as Element;
+      if (el.tagName === "P" || el.tagName === "DIV") {
+        const alignment = getAlignment(el.getAttribute("style")) as
+          | "left"
+          | "center"
+          | "right"
+          | "justify"
+          | undefined;
+        const textRuns = parseElementToPdfTextRuns(el);
+        if (textRuns.length) {
+          elements.push({
+            type: "paragraph",
+            children: textRuns,
+            alignment: alignment || "left",
+          });
+        }
+      } else if (["H1", "H2", "H3", "H4", "H5", "H6"].includes(el.tagName)) {
+        const textRuns = parseElementToPdfTextRuns(el);
+        if (textRuns.length) {
+          elements.push({
+            type: "paragraph",
+            children: textRuns.map((run) => ({
+              ...run,
+              bold: true,
+              size: el.tagName === "H1" ? 18 : el.tagName === "H2" ? 16 : 14,
+            })),
+            alignment: "center",
+          });
+        }
+      } else if (el.tagName === "UL") {
+        const items: PdfTextRun[][] = [];
+        el.querySelectorAll("li").forEach((li) => {
+          const textRuns = parseElementToPdfTextRuns(li);
+          if (textRuns.length) {
+            items.push(textRuns);
+          }
+        });
+        if (items.length) {
+          elements.push({
+            type: "list",
+            items,
+            ordered: false,
+          });
+        }
+      } else if (el.tagName === "OL") {
+        const items: PdfTextRun[][] = [];
+        el.querySelectorAll("li").forEach((li) => {
+          const textRuns = parseElementToPdfTextRuns(li);
+          if (textRuns.length) {
+            items.push(textRuns);
+          }
+        });
+        if (items.length) {
+          elements.push({
+            type: "list",
+            items,
+            ordered: true,
+          });
+        }
+      } else if (el.tagName === "BLOCKQUOTE") {
+        const textRuns = parseElementToPdfTextRuns(el);
+        if (textRuns.length) {
+          elements.push({
+            type: "paragraph",
+            children: textRuns,
+            alignment: "left",
+            indent: 20,
+          });
+        }
+      } else if (el.tagName === "FIGURE" && el.classList.contains("table")) {
+        const tableEl = el.querySelector("table");
+        if (tableEl) {
+          const rows = tableEl.querySelectorAll("tr");
+          const tableRows = Array.from(rows).map((row) => {
+            const cells = row.querySelectorAll("td, th");
+            return {
+              children: Array.from(cells).map((cell) => ({
+                children: parseElementToPdfTextRuns(cell),
+              })),
+            };
+          });
+          elements.push({
+            type: "table",
+            rows: tableRows,
+          });
+        }
+      } else if (el.tagName === "A") {
+        const href = el.getAttribute("href") || "";
+        const text = el.textContent || "";
+        if (text) {
+          elements.push({
+            type: "link",
+            text,
+            url: href,
+          });
+        }
+      } else {
+        // Default to paragraph
+        const textRuns = parseElementToPdfTextRuns(el);
+        if (textRuns.length) {
+          elements.push({
+            type: "paragraph",
+            children: textRuns,
+            alignment: "left",
           });
         }
       }
