@@ -11,13 +11,8 @@ import AddButton from "../ui/button/AddButton";
 import DropdownMenuItem from "../ui/dropdown/DropdownMenuItem";
 import DropdownMenu from "../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../ui/chip/Department";
-import ExportPDFButton, {
-  exportSingleTaskToPDF,
-} from "../ui/button/ExportPDFButton";
-import ExportWordButton, {
-  exportSingleTaskToWord,
-} from "../ui/button/ExportWordButton";
-import { convertHtmlToText } from "@/lib/htmlUtils";
+import { exportSingleTaskToPDF } from "../ui/button/ExportPDFButton";
+import { exportSingleTaskToWord } from "../ui/button/ExportWordButton";
 
 interface TaskTableProps {
   tasks: DepartmentTask[];
@@ -96,16 +91,6 @@ export default function TaskTable({
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
-      {/* Export Buttons */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex justify-end gap-3">
-          <ExportPDFButton tasks={sortedTasks} />
-          <ExportWordButton
-            tasks={sortedTasks}
-            convertHtmlToText={convertHtmlToText}
-          />
-        </div>
-      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">

@@ -12,7 +12,6 @@ import { Status } from "@/types/enums";
 import { useStructureForm } from "@/hooks/structure/useStructureForm";
 import { FiFile } from "react-icons/fi";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
-import Alert from "@/components/admin/ui/alert/Alert";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import CancelButton from "@/components/ui/CancelButton";
@@ -72,7 +71,6 @@ export default function StructureForm({
     setFormData,
     periods,
     isLoading,
-    alert,
     previewUrl,
     existingDecree,
     existingStructureImage,
@@ -86,8 +84,6 @@ export default function StructureForm({
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      {alert && <Alert type={alert.type} message={alert.message} />}
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <TextInput

@@ -4,7 +4,6 @@ import type { Period, PeriodFormData } from "@/types/period";
 import { FiFileText, FiCalendar } from "react-icons/fi";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
-import Alert from "@/components/admin/ui/alert/Alert";
 import CancelButton from "@/components/ui/CancelButton";
 import CheckboxInput from "@/components/admin/ui/checkbox/CheckboxInput";
 import { usePeriodFormLogic } from "@/hooks/period/usePeriodFormLogic";
@@ -25,15 +24,12 @@ export default function PeriodForm({
     formErrors,
     handleChange,
     isSubmitting,
-    alert,
     onSubmit: formOnSubmit,
     handleBack,
   } = usePeriodFormLogic({ period, onSubmit });
 
   return (
     <div className="p-6 max-w-4xl min-h-screen mx-auto">
-      {alert && <Alert type={alert.type} message={alert.message} />}
-
       <form
         onSubmit={formOnSubmit}
         className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"

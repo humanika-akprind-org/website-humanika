@@ -14,7 +14,6 @@ import TextInput from "@/components/admin/ui/input/TextInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/components/ui/CancelButton";
-import Alert from "@/components/admin/ui/alert/Alert";
 import { FiBriefcase, FiUser, FiCheckCircle, FiFolder } from "react-icons/fi";
 import type { User } from "@/types/user";
 import type { WorkProgram } from "@/types/work";
@@ -51,7 +50,6 @@ export default function TaskForm({
   const router = useRouter();
   const {
     isSubmitting,
-    alert,
     formData,
     setFormData,
     formErrors,
@@ -64,8 +62,6 @@ export default function TaskForm({
 
   return (
     <>
-      {alert && <Alert type={alert.type} message={alert.message} />}
-
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

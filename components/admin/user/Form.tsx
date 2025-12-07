@@ -7,7 +7,6 @@ import TextInput from "@/components/admin/ui/input/TextInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import PasswordInput from "@/components/admin/ui/input/PasswordInput";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
-import Alert from "@/components/admin/ui/alert/Alert";
 import { useRouter } from "next/navigation";
 import CancelButton from "@/components/ui/CancelButton";
 import { useUserForm } from "@/hooks/user/useUserForm";
@@ -35,7 +34,6 @@ export default function UserForm({ onSubmit }: UserFormProps) {
   const router = useRouter();
   const {
     isSubmitting,
-    alert,
     formData,
     setFormData,
     formErrors,
@@ -46,8 +44,6 @@ export default function UserForm({ onSubmit }: UserFormProps) {
 
   return (
     <>
-      {alert && <Alert type={alert.type} message={alert.message} />}
-
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
