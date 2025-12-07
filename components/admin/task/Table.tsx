@@ -11,19 +11,13 @@ import AddButton from "../ui/button/AddButton";
 import DropdownMenuItem from "../ui/dropdown/DropdownMenuItem";
 import DropdownMenu from "../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../ui/chip/Department";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import {
-  Document,
-  Packer,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  WidthType,
-  TextRun,
-  ShadingType,
-} from "docx";
+import ExportPDFButton, {
+  exportSingleTaskToPDF,
+} from "../ui/button/ExportPDFButton";
+import ExportWordButton, {
+  exportSingleTaskToWord,
+} from "../ui/button/ExportWordButton";
+import { convertHtmlToText } from "@/lib/htmlUtils";
 
 interface TaskTableProps {
   tasks: DepartmentTask[];
@@ -100,352 +94,19 @@ export default function TaskTable({
     }
   };
 
-  // Function to convert HTML to plain text with formatting
-  const convertHtmlToText = (html: string): string => {
-    const tmp = document.createElement("DIV");
-    tmp.innerHTML = html;
-
-    // Handle common HTML elements
-    const elements = tmp.querySelectorAll(
-      "p, br, div, li, h1, h2, h3, h4, h5, h6, strong, b, em, i, u"
-    );
-    elements.forEach((el) => {
-      if (el.tagName === "BR") {
-        el.textContent = "\n";
-      } else if (el.tagName === "P" || el.tagName === "DIV") {
-        el.textContent = el.textContent + "\n\n";
-      } else if (el.tagName === "LI") {
-        el.textContent = "• " + el.textContent + "\n";
-      } else if (["H1", "H2", "H3", "H4", "H5", "H6"].includes(el.tagName)) {
-        el.textContent = el.textContent?.toUpperCase() + "\n\n";
-      } else if (el.tagName === "STRONG" || el.tagName === "B") {
-        el.textContent = el.textContent; // Keep as is for now
-      } else if (el.tagName === "EM" || el.tagName === "I") {
-        el.textContent = el.textContent; // Keep as is for now
-      }
-    });
-
-    return tmp.textContent || tmp.innerText || "";
-  };
-
-  // Export to PDF
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-
-    // Add title
-    doc.setFontSize(16);
-    doc.text("Task Report", 20, 10);
-
-    // Add generation date
-    doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 20);
-
-    const tableData = sortedTasks.map((task) => [
-      task.title,
-      task.subtitle || "",
-      task.department,
-      task.user?.name || "Unassigned",
-      task.status,
-    ]);
-
-    autoTable(doc, {
-      head: [["Task", "Subtitle", "Department", "Assigned User", "Status"]],
-      body: tableData,
-      startY: 30,
-      styles: {
-        fontSize: 8,
-        cellPadding: 3,
-      },
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontStyle: "bold",
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245],
-      },
-    });
-
-    doc.save("task-report.pdf");
-  };
-
-  // Export to Word
-  const exportToWord = () => {
-    const tableRows = [
-      new TableRow({
-        children: [
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [new TextRun({ text: "Task", bold: true })],
-              }),
-            ],
-            shading: { type: ShadingType.SOLID, color: "2980B9" },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [new TextRun({ text: "Subtitle", bold: true })],
-              }),
-            ],
-            shading: { type: ShadingType.SOLID, color: "2980B9" },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [new TextRun({ text: "Department", bold: true })],
-              }),
-            ],
-            shading: { type: ShadingType.SOLID, color: "2980B9" },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [new TextRun({ text: "Assigned User", bold: true })],
-              }),
-            ],
-            shading: { type: ShadingType.SOLID, color: "2980B9" },
-          }),
-          new TableCell({
-            children: [
-              new Paragraph({
-                children: [new TextRun({ text: "Status", bold: true })],
-              }),
-            ],
-            shading: { type: ShadingType.SOLID, color: "2980B9" },
-          }),
-        ],
-      }),
-      ...sortedTasks.map(
-        (task, index) =>
-          new TableRow({
-            children: [
-              new TableCell({
-                children: [new Paragraph(task.title)],
-                shading:
-                  index % 2 === 1
-                    ? { type: ShadingType.SOLID, color: "F5F5F5" }
-                    : undefined,
-              }),
-              new TableCell({
-                children: [new Paragraph(task.subtitle || "")],
-                shading:
-                  index % 2 === 1
-                    ? { type: ShadingType.SOLID, color: "F5F5F5" }
-                    : undefined,
-              }),
-              new TableCell({
-                children: [new Paragraph(task.department)],
-                shading:
-                  index % 2 === 1
-                    ? { type: ShadingType.SOLID, color: "F5F5F5" }
-                    : undefined,
-              }),
-              new TableCell({
-                children: [new Paragraph(task.user?.name || "Unassigned")],
-                shading:
-                  index % 2 === 1
-                    ? { type: ShadingType.SOLID, color: "F5F5F5" }
-                    : undefined,
-              }),
-              new TableCell({
-                children: [new Paragraph(task.status)],
-                shading:
-                  index % 2 === 1
-                    ? { type: ShadingType.SOLID, color: "F5F5F5" }
-                    : undefined,
-              }),
-            ],
-          })
-      ),
-    ];
-
-    const table = new Table({
-      width: { size: 100, type: WidthType.PERCENTAGE },
-      rows: tableRows,
-    });
-
-    const doc = new Document({
-      sections: [
-        {
-          children: [
-            new Paragraph({
-              text: "Task Report",
-              heading: "Heading1",
-            }),
-            new Paragraph({
-              text: `Generated on: ${new Date().toLocaleDateString()}`,
-            }),
-            new Paragraph(""),
-            table,
-          ],
-        },
-      ],
-    });
-
-    Packer.toBlob(doc).then((blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "task-report.docx";
-      a.click();
-      window.URL.revokeObjectURL(url);
-    });
-  };
-
-  // Export single task to PDF
-  const exportSingleTaskToPDF = (task: DepartmentTask) => {
-    const doc = new jsPDF();
-
-    // Add title
-    doc.setFontSize(18);
-    doc.text("Task Details", 20, 15);
-
-    // Add task information
-    doc.setFontSize(12);
-    let yPosition = 30;
-
-    doc.setFontSize(14);
-    doc.text("Title:", 20, yPosition);
-    doc.setFontSize(12);
-    doc.text(task.title, 50, yPosition);
-    yPosition += 10;
-
-    if (task.subtitle) {
-      doc.setFontSize(14);
-      doc.text("Subtitle:", 20, yPosition);
-      doc.setFontSize(12);
-      doc.text(task.subtitle, 50, yPosition);
-      yPosition += 10;
-    }
-
-    doc.setFontSize(14);
-    doc.text("Department:", 20, yPosition);
-    doc.setFontSize(12);
-    doc.text(task.department, 60, yPosition);
-    yPosition += 10;
-
-    doc.setFontSize(14);
-    doc.text("Assigned User:", 20, yPosition);
-    doc.setFontSize(12);
-    doc.text(task.user?.name || "Unassigned", 75, yPosition);
-    yPosition += 10;
-
-    if (task.workProgram) {
-      doc.setFontSize(14);
-      doc.text("Work Program:", 20, yPosition);
-      doc.setFontSize(12);
-      doc.text(task.workProgram.name, 70, yPosition);
-      yPosition += 10;
-    }
-
-    doc.setFontSize(14);
-    doc.text("Status:", 20, yPosition);
-    doc.setFontSize(12);
-    doc.text(task.status, 45, yPosition);
-    yPosition += 15;
-
-    // Add note section
-    doc.setFontSize(14);
-    doc.text("Note:", 20, yPosition);
-    yPosition += 8;
-
-    doc.setFontSize(12);
-    const noteLines = doc.splitTextToSize(convertHtmlToText(task.note), 170);
-    doc.text(noteLines, 20, yPosition);
-
-    // Add generation date at bottom
-    const pageHeight = doc.internal.pageSize.height;
-    doc.setFontSize(10);
-    doc.text(
-      `Generated on: ${new Date().toLocaleDateString()}`,
-      20,
-      pageHeight - 15
-    );
-
-    doc.save(`task-${task.id}.pdf`);
-  };
-
-  // Export single task to Word
-  const exportSingleTaskToWord = (task: DepartmentTask) => {
-    const doc = new Document({
-      sections: [
-        {
-          children: [
-            new Paragraph({
-              text: "Task Details",
-              heading: "Heading1",
-            }),
-            new Paragraph(""),
-            new Paragraph({
-              text: `Title: ${task.title}`,
-            }),
-            ...(task.subtitle
-              ? [new Paragraph({ text: `Subtitle: ${task.subtitle}` })]
-              : []),
-            new Paragraph({
-              text: `Department: ${task.department}`,
-            }),
-            new Paragraph({
-              text: `Assigned User: ${task.user?.name || "Unassigned"}`,
-            }),
-            ...(task.workProgram
-              ? [
-                  new Paragraph({
-                    text: `Work Program: ${task.workProgram.name}`,
-                  }),
-                ]
-              : []),
-            new Paragraph({
-              text: `Status: ${task.status}`,
-            }),
-            new Paragraph(""),
-            new Paragraph({
-              text: "Note:",
-              heading: "Heading2",
-            }),
-            ...convertHtmlToText(task.note)
-              .split("\n\n")
-              .filter((p) => p.trim())
-              .map((p) => new Paragraph({ text: p })),
-            new Paragraph(""),
-            new Paragraph({
-              text: `Generated on: ${new Date().toLocaleDateString()}`,
-            }),
-          ],
-        },
-      ],
-    });
-
-    Packer.toBlob(doc).then((blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `task-${task.id}.docx`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    });
-  };
-
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
       {/* Export Buttons */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex justify-end gap-3">
-          <button
-            onClick={exportToPDF}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Export PDF
-          </button>
-          <button
-            onClick={exportToWord}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <File className="h-4 w-4 mr-2" />
-            Export Word
-          </button>
+          <ExportPDFButton
+            tasks={sortedTasks}
+            convertHtmlToText={convertHtmlToText}
+          />
+          <ExportWordButton
+            tasks={sortedTasks}
+            convertHtmlToText={convertHtmlToText}
+          />
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -584,14 +245,18 @@ export default function TaskTable({
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => exportSingleTaskToPDF(task)}
+                      onClick={() =>
+                        exportSingleTaskToPDF(task, convertHtmlToText)
+                      }
                       color="green"
                     >
                       <FileText className="mr-2" size={14} />
                       Export PDF
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => exportSingleTaskToWord(task)}
+                      onClick={() =>
+                        exportSingleTaskToWord(task, convertHtmlToText)
+                      }
                       color="orange"
                     >
                       <File className="mr-2" size={14} />
