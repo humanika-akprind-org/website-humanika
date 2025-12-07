@@ -347,7 +347,7 @@ export default function ApprovalTable({
                               onRequestRevision(approval.id, note)
                             )
                           }
-                          color="blue"
+                          color="yellow"
                         >
                           <FiClock className="mr-2" size={14} />
                           Request Revision

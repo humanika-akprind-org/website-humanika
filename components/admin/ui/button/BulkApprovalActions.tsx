@@ -1,4 +1,5 @@
 import { FiCheck, FiX, FiClock, FiRotateCcw } from "react-icons/fi";
+import { Tooltip } from "@mui/material";
 
 interface BulkApprovalActionsProps {
   selectedCount: number;
@@ -33,57 +34,62 @@ export default function BulkApprovalActions({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-      <button
-        className={`px-8 py-3.5 border border-gray-200 rounded-lg transition-colors text-sm font-medium inline-flex items-center justify-center ${
-          isDisabledApprove
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-green-50 text-green-700 hover:bg-green-100"
-        }`}
-        onClick={onBulkApprove}
-        disabled={isDisabledApprove}
-        title="Approve"
-      >
-        <FiCheck size={14} />
-      </button>
+      <Tooltip title="Approve">
+        <button
+          className={`px-8 py-3.5 border border-gray-200 rounded-lg transition-colors text-sm font-medium inline-flex items-center justify-center ${
+            isDisabledApprove
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-green-50 text-green-700 hover:bg-green-100"
+          }`}
+          onClick={onBulkApprove}
+          disabled={isDisabledApprove}
+        >
+          <FiCheck size={14} />
+        </button>
+      </Tooltip>
 
-      <button
-        className={`px-8 py-3.5 border border-gray-200 rounded-lg transition-colors text-sm font-medium inline-flex items-center justify-center ${
-          isDisabledReject
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-red-50 text-red-700 hover:bg-red-100"
-        }`}
-        onClick={onBulkReject}
-        disabled={isDisabledReject}
-        title="Reject"
-      >
-        <FiX size={14} />
-      </button>
+      <Tooltip title="Reject">
+        <button
+          className={`px-8 py-3.5 border border-gray-200 rounded-lg transition-colors text-sm font-medium inline-flex items-center justify-center ${
+            isDisabledReject
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-red-50 text-red-700 hover:bg-red-100"
+          }`}
+          onClick={onBulkReject}
+          disabled={isDisabledReject}
+        >
+          <FiX size={14} />
+        </button>
+      </Tooltip>
 
-      <button
-        className={`px-8 py-3.5 border border-gray-200 rounded-lg transition-colors text-sm font-medium inline-flex items-center justify-center ${
-          isDisabledRevision
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-blue-50 text-blue-700 hover:bg-blue-100"
-        }`}
-        onClick={onBulkRequestRevision}
-        disabled={isDisabledRevision}
-        title="Request Revision"
-      >
-        <FiClock size={14} />
-      </button>
+      <Tooltip title="Request Revision">
+        <button
+          className={`px-8 py-3.5 border border-gray-200 rounded-lg transition-colors text-sm font-medium inline-flex items-center justify-center ${
+            isDisabledRevision
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
+          }`}
+          onClick={onBulkRequestRevision}
+          disabled={isDisabledRevision}
+          title="Request Revision"
+        >
+          <FiClock size={14} />
+        </button>
+      </Tooltip>
 
-      <button
-        className={`px-8 py-3.5 border border-gray-200 rounded-lg transition-colors text-sm font-medium inline-flex items-center justify-center ${
-          isDisabledReturn
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-purple-50 text-purple-700 hover:bg-purple-100"
-        }`}
-        onClick={onBulkReturn}
-        disabled={isDisabledReturn}
-        title="Return"
-      >
-        <FiRotateCcw size={14} />
-      </button>
+      <Tooltip title="Return">
+        <button
+          className={`px-8 py-3.5 border border-gray-200 rounded-lg transition-colors text-sm font-medium inline-flex items-center justify-center ${
+            isDisabledReturn
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-purple-50 text-purple-700 hover:bg-purple-100"
+          }`}
+          onClick={onBulkReturn}
+          disabled={isDisabledReturn}
+        >
+          <FiRotateCcw size={14} />
+        </button>
+      </Tooltip>
     </div>
   );
 }
