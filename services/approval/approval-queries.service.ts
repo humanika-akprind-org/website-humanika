@@ -16,7 +16,7 @@ export async function getApprovals(
   // Build where clause
   const where: Record<string, unknown> = {};
 
-  if (status) {
+  if (status && status !== "all") {
     where.status = status as StatusApproval;
   }
 

@@ -11,8 +11,8 @@ import AddButton from "../ui/button/AddButton";
 import DropdownMenuItem from "../ui/dropdown/DropdownMenuItem";
 import DropdownMenu from "../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../ui/chip/Department";
-import { exportSingleTaskToPDF } from "../ui/button/ExportPDFButton";
-import { exportSingleTaskToWord } from "../ui/button/ExportWordButton";
+import { exportSingleTaskToPDF } from "./export-button/ExportPDFButton";
+import { exportSingleTaskToWord } from "./export-button/ExportWordButton";
 
 interface TaskTableProps {
   tasks: DepartmentTask[];

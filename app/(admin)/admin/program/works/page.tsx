@@ -15,7 +15,7 @@ import StatusApprovalChip from "@/components/admin/ui/chip/StatusApproval";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 import { useWorkManagement } from "@/hooks/work-program/useWorkManagement";
-import ExportButtons from "@/components/admin/work/ExportButtons";
+import ExportButtons from "@/components/admin/work/export-button/ExportButtons";
 
 export default function WorkProgramPage() {
   const {
