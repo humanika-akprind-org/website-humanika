@@ -228,14 +228,14 @@ export default function TaskTable({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => exportSingleTaskToPDF(task)}
-                      color="green"
+                      color="red"
                     >
                       <FileText className="mr-2" size={14} />
                       Export PDF
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => exportSingleTaskToWord(task)}
-                      color="orange"
+                      color="blue"
                     >
                       <File className="mr-2" size={14} />
                       Export Word
