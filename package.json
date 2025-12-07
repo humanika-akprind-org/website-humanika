@@ -58,6 +58,7 @@
     "cookie": "^1.0.2",
     "cookies-next": "^4.2.0",
     "crypto": "^1.0.1",
+    "docx": "^9.5.1",
     "googleapis": "^144.0.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.3",
