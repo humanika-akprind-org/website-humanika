@@ -9,8 +9,56 @@ import {
   WidthType,
   TextRun,
   ShadingType,
+  AlignmentType,
 } from "docx";
 import type { DepartmentTask } from "@/types/task";
+import { convertHtmlToDocxElements } from "@/lib/htmlUtils";
+
+interface TextRunOptions {
+  text?: string;
+  bold?: boolean;
+  italics?: boolean;
+  underline?: object;
+  strike?: boolean;
+  color?: string;
+  highlight?:
+    | "black"
+    | "blue"
+    | "cyan"
+    | "darkBlue"
+    | "darkCyan"
+    | "darkGray"
+    | "darkGreen"
+    | "darkMagenta"
+    | "darkRed"
+    | "darkYellow"
+    | "green"
+    | "lightGray"
+    | "magenta"
+    | "none"
+    | "red"
+    | "white"
+    | "yellow";
+  size?: number;
+}
+
+interface DocxParagraphElement {
+  type: "paragraph";
+  children: TextRunOptions[];
+  alignment?: string;
+  indent?: { left: number };
+}
+
+interface DocxTableElement {
+  type: "table";
+  rows: {
+    children: {
+      children: TextRunOptions[];
+    }[];
+  }[];
+}
+
+type DocxElement = DocxParagraphElement | DocxTableElement;
 
 interface ExportWordButtonProps {
   tasks: DepartmentTask[];
@@ -156,10 +204,47 @@ export default function ExportWordButton({
   );
 }
 
-export function exportSingleTaskToWord(
-  task: DepartmentTask,
-  convertHtmlToText: (html: string) => string
-) {
+export function exportSingleTaskToWord(task: DepartmentTask) {
+  const elements: DocxElement[] = convertHtmlToDocxElements(task.note);
+  const noteElements = elements.map((el) => {
+    if (el.type === "paragraph") {
+      return new Paragraph({
+        children: el.children.map((run) => new TextRun(run)),
+        alignment:
+          el.alignment === "center"
+            ? AlignmentType.CENTER
+            : el.alignment === "right"
+            ? AlignmentType.RIGHT
+            : el.alignment === "both"
+            ? AlignmentType.JUSTIFIED
+            : AlignmentType.LEFT,
+        indent: el.indent,
+      });
+    } else if (el.type === "table") {
+      const rows = el.rows.map(
+        (row) =>
+          new TableRow({
+            children: row.children.map(
+              (cell) =>
+                new TableCell({
+                  children: cell.children.map(
+                    (run) =>
+                      new Paragraph({
+                        children: [new TextRun(run)],
+                      })
+                  ),
+                })
+            ),
+          })
+      );
+      return new Table({
+        rows,
+        width: { size: 100, type: WidthType.PERCENTAGE },
+      });
+    }
+    return new Paragraph({ text: "" });
+  });
+
   const doc = new Document({
     sections: [
       {
@@ -196,10 +281,7 @@ export function exportSingleTaskToWord(
             text: "Note:",
             heading: "Heading2",
           }),
-          ...convertHtmlToText(task.note)
-            .split("\n\n")
-            .filter((p) => p.trim())
-            .map((p) => new Paragraph({ text: p })),
+          ...noteElements,
           new Paragraph(""),
           new Paragraph({
             text: `Generated on: ${new Date().toLocaleDateString()}`,
