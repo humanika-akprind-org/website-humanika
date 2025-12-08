@@ -43,10 +43,12 @@ export default function WorkProgramApprovalPage() {
 
   return (
     <div>
-      <ManagementHeader
-        title="Work Program Approvals"
-        description="Manage all work program approval requests"
-      />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Work Program Approvals"
+          description="Manage all work program approval requests"
+        />
+      </div>
 
       {alert && <Alert type={alert.type} message={alert.message} />}
 
