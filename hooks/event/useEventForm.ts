@@ -7,6 +7,8 @@ import { useEventCategories } from "@/hooks/event-category/useEventCategories";
 import { eventThumbnailFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
+import { useUserManagement } from "@/hooks/user/useUserManagement";
+import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
 
 // Helper functions
 const isHtmlEmpty = (html: string): boolean => {
@@ -91,6 +93,10 @@ export const useEventForm = (
   const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
   const { categories: eventCategories, isLoading: categoriesLoading } =
     useEventCategories();
+
+  const { users: fetchedUsers, loading: usersLoading } = useUserManagement();
+  const { periods: fetchedPeriods, loading: periodsLoading } =
+    usePeriodManagement();
 
   const [formData, setFormData] = useState<EventFormData>({
     name: event?.name || "",
@@ -317,6 +323,10 @@ export const useEventForm = (
     eventCategories,
     categoriesLoading,
     photoLoading,
+    users: users || fetchedUsers,
+    periods: periods || fetchedPeriods,
+    usersLoading,
+    periodsLoading,
     handleInputChange,
     handleFileChange,
     removeThumbnail,

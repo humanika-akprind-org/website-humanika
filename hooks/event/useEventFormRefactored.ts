@@ -7,6 +7,8 @@ import { useEventCategories } from "@/hooks/event-category/useEventCategories";
 import { eventThumbnailFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
+import { useUserManagement } from "@/hooks/user/useUserManagement";
+import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
 
 // Helper function to check if HTML content is empty
 const isHtmlEmpty = (html: string): boolean => {
@@ -69,7 +71,7 @@ export interface EventFormData {
   thumbnailFile?: File;
 }
 
-export const useEventFormRefactored = (
+export const useEventForm = (
   event?: Event,
   onSubmit?: (data: CreateEventInput | UpdateEventInput) => Promise<void>,
   onSubmitForApproval?: (
@@ -91,6 +93,10 @@ export const useEventFormRefactored = (
   const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
   const { categories: eventCategories, isLoading: categoriesLoading } =
     useEventCategories();
+
+  const { users: fetchedUsers, loading: usersLoading } = useUserManagement();
+  const { periods: fetchedPeriods, loading: periodsLoading } =
+    usePeriodManagement();
 
   const [formData, setFormData] = useState<EventFormData>({
     name: event?.name || "",
@@ -315,11 +321,16 @@ export const useEventFormRefactored = (
     error,
     previewUrl,
     existingThumbnail,
+    removedThumbnail,
     workPrograms,
     workProgramsLoading,
     eventCategories,
     categoriesLoading,
     photoLoading,
+    users: users || fetchedUsers,
+    periods: periods || fetchedPeriods,
+    usersLoading,
+    periodsLoading,
     handleInputChange,
     handleDescriptionChange,
     handleFileChange,
