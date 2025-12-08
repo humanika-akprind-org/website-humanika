@@ -1,236 +1,47 @@
-import { UserApi } from "@/use-cases/api/user";
-import { PeriodApi } from "@/use-cases/api/period";
+"use client";
+
+import { useParams } from "next/navigation";
 import EventForm from "@/components/admin/event/Form";
-import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
-import type { CreateEventInput, UpdateEventInput, Event } from "@/types/event";
-import { FiArrowLeft } from "react-icons/fi";
-import Link from "next/link";
-import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { notFound } from "next/navigation";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
+import { useEditEvent } from "@/hooks/event/useEditEvent";
+import { useEventFormData } from "@/hooks/event/useEventFormData";
 
-async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const accessToken = await getGoogleAccessToken();
+export default function EditEventPage() {
+  const params = useParams();
+  const eventId = params.id as string;
 
-  try {
-    // Fetch event data
-    const event = await prisma.event.findUnique({
-      where: { id },
-      include: {
-        responsible: true,
-        period: true,
-        workProgram: true,
-      },
-    });
+  const { event, loading, error, updateEvent, handleBack } =
+    useEditEvent(eventId);
 
-    if (!event) {
-      notFound();
-    }
+  const {
+    users,
+    periods,
+    loading: formDataLoading,
+    error: formDataError,
+  } = useEventFormData();
 
-    // Transform event data to match Event type (convert null thumbnail to undefined)
-    const { thumbnail, ...eventWithoutThumbnail } = event;
-    const transformedEvent = {
-      ...eventWithoutThumbnail,
-      thumbnail: thumbnail === null ? undefined : thumbnail,
-    } as unknown as Event;
+  const isLoading = loading || formDataLoading;
+  const loadError = error || formDataError;
 
-    const [usersResponse, periods] = await Promise.all([
-      UserApi.getUsers({ limit: 50 }),
-      PeriodApi.getPeriods(),
-    ]);
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Edit Event" onBack={handleBack} />
 
-    const users = usersResponse.data?.users || [];
-    const periodsData = periods || [];
+      {loadError && <Alert type="error" message={loadError} />}
 
-    const handleSubmit = async (data: CreateEventInput | UpdateEventInput) => {
-      "use server";
-
-      const user = await getCurrentUser();
-      if (!user) {
-        throw new Error("Unauthorized");
-      }
-
-      // Cast data to UpdateEventInput since this is the edit page
-      const eventData = data as UpdateEventInput;
-
-      if (
-        !eventData.name ||
-        !eventData.department ||
-        !eventData.periodId ||
-        !eventData.responsibleId ||
-        !eventData.startDate ||
-        !eventData.endDate
-      ) {
-        throw new Error("Missing required fields");
-      }
-
-      // Generate slug from name
-      const slug = eventData.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-
-      const eventPayload = {
-        name: eventData.name,
-        slug,
-        thumbnail: eventData.thumbnail,
-        description: eventData.description || "",
-        goal: eventData.goal || "",
-        department: eventData.department,
-        periodId: eventData.periodId,
-        responsibleId: eventData.responsibleId,
-        startDate: new Date(eventData.startDate),
-        endDate: new Date(eventData.endDate),
-        funds: parseFloat(String(eventData.funds)) || 0,
-        remainingFunds: parseFloat(String(eventData.funds)) || 0,
-        usedFunds: eventData.usedFunds || 0,
-        workProgramId:
-          eventData.workProgramId && eventData.workProgramId.trim() !== ""
-            ? eventData.workProgramId
-            : undefined,
-      };
-
-      await prisma.event.update({
-        where: { id },
-        data: eventPayload,
-      });
-
-      redirect("/admin/program/events");
-    };
-
-    const handleSubmitForApproval = async (
-      data: CreateEventInput | UpdateEventInput
-    ) => {
-      "use server";
-
-      const user = await getCurrentUser();
-      if (!user) {
-        throw new Error("Unauthorized");
-      }
-
-      // Cast data to UpdateEventInput since this is the edit page
-      const eventData = data as UpdateEventInput;
-
-      if (
-        !eventData.name ||
-        !eventData.department ||
-        !eventData.periodId ||
-        !eventData.responsibleId ||
-        !eventData.startDate ||
-        !eventData.endDate
-      ) {
-        throw new Error("Missing required fields");
-      }
-
-      // Generate slug from name
-      const slug = eventData.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-
-      const eventPayload = {
-        name: eventData.name,
-        slug,
-        thumbnail: eventData.thumbnail,
-        description: eventData.description || "",
-        goal: eventData.goal || "",
-        department: eventData.department,
-        periodId: eventData.periodId,
-        responsibleId: eventData.responsibleId,
-        startDate: new Date(eventData.startDate),
-        endDate: new Date(eventData.endDate),
-        funds: parseFloat(String(eventData.funds)) || 0,
-        remainingFunds: parseFloat(String(eventData.funds)) || 0,
-        usedFunds: eventData.usedFunds || 0,
-        workProgramId:
-          eventData.workProgramId && eventData.workProgramId.trim() !== ""
-            ? eventData.workProgramId
-            : undefined,
-      };
-
-      // Update the event with PENDING status
-      await prisma.event.update({
-        where: { id },
-        data: {
-          ...eventPayload,
-          status: "PENDING",
-        },
-      });
-
-      // Check if approval already exists for this event
-      const existingApproval = await prisma.approval.findFirst({
-        where: {
-          entityType: "EVENT",
-          entityId: id,
-        },
-      });
-
-      if (!existingApproval) {
-        // Create approval record for the event if it doesn't exist
-        await prisma.approval.create({
-          data: {
-            entityType: "EVENT",
-            entityId: id,
-            userId: user.id,
-            status: "PENDING",
-          },
-        });
-      } else {
-        // Update existing approval status to PENDING
-        await prisma.approval.update({
-          where: { id: existingApproval.id },
-          data: {
-            status: "PENDING",
-          },
-        });
-      }
-
-      redirect("/admin/program/events");
-    };
-
-    return (
-      <AuthGuard accessToken={accessToken}>
-        <div className="p-6 max-w-4xl min-h-screen mx-auto">
-          <div className="flex items-center mb-6">
-            <Link
-              href="/admin/program/events"
-              className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-            >
-              <FiArrowLeft className="mr-1" />
-              Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-800">Edit Event</h1>
-          </div>
-          <EventForm
-            event={transformedEvent}
-            accessToken={accessToken}
-            users={users}
-            periods={periodsData}
-            onSubmit={handleSubmit}
-            onSubmitForApproval={handleSubmitForApproval}
-            isEditing={true}
-          />
-        </div>
-      </AuthGuard>
-    );
-  } catch (error) {
-    console.error("Error loading form data:", error);
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="text-center text-red-500">
-              <h2 className="text-xl font-semibold mb-4">Error Loading Form</h2>
-              <p>{error instanceof Error ? error.message : "Unknown error"}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      {isLoading ? (
+        <LoadingForm />
+      ) : event ? (
+        <EventForm
+          event={event}
+          onSubmit={updateEvent}
+          users={users}
+          periods={periods}
+          isEditing={true}
+        />
+      ) : null}
+    </div>
+  );
 }
-
-export default EditEventPage;

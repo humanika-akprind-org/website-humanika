@@ -1,136 +1,160 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { FiPlus } from "react-icons/fi";
-import EventTable from "@/components/admin/event/Table";
-import DeleteModal from "@/components/admin/event/modal/DeleteModal";
-import type { Event } from "@/types/event";
-import { useToast } from "@/hooks/use-toast";
+import EventCategoryStats from "@/components/admin/event/category/Stats";
+import EventCategoryFilters from "@/components/admin/event/category/Filters";
+import EventCategoryTable from "@/components/admin/event/category/Table";
+import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/components/admin/ui/modal/ViewModal";
+import Loading from "@/components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/components/admin/ui/ManagementHeader";
+import AddButton from "@/components/admin/ui/button/AddButton";
+import { useEventCategoryManagement } from "@/hooks/event-category/useEventCategoryManagement";
 
-export default function EventsPage() {
-  const [_events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    eventId: "",
-    eventName: "",
-  });
+export default function EventCategoriesPage() {
+  const {
+    categories,
+    loading,
+    error,
+    success,
+    selectedCategories,
+    searchTerm,
+    currentPage,
+    totalPages,
+    showDeleteModal,
+    showViewModal,
+    currentCategory,
+    setSearchTerm,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentCategory,
+    toggleCategorySelection,
+    toggleSelectAll,
+    handleAddCategory,
+    handleEditCategory,
+    handleViewCategory,
+    handleDelete,
+    confirmDelete,
+  } = useEventCategoryManagement();
 
-  const { toast } = useToast();
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
 
-  const fetchEvents = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/event");
-      if (response.ok) {
-        const data = await response.json();
-        setEvents(data || []);
-        setFilteredEvents(data || []);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch events",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch events",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
-  // Fetch events
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
-
-  const handleDelete = async (eventId: string) => {
-    try {
-      const response = await fetch(`/api/event/${eventId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Event deleted successfully",
-        });
-        fetchEvents(); // Refresh the list
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to delete event",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting event:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete event",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteModal({ isOpen: false, eventId: "", eventName: "" });
-    }
-  };
-
-  const closeDeleteModal = () => {
-    setDeleteModal({ isOpen: false, eventId: "", eventName: "" });
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Events Management
-          </h1>
-          <p className="text-gray-600">Manage and organize your events</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/admin/program/events/add"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <FiPlus className="h-4 w-4 mr-2" />
-            Add Event
-          </Link>
-        </div>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Event Categories"
+          description="Manage event categories and their details"
+        />
+        <AddButton onClick={handleAddCategory} text="Add Category" />
       </div>
 
-      {/* Events Table */}
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
+      <EventCategoryStats categories={categories} />
+
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <EventCategoryFilters
+        searchTerm={searchTerm}
+        selectedCategories={selectedCategories}
+        onSearchChange={setSearchTerm}
+        onDeleteSelected={() => handleDelete()}
+      />
+
+      <EventCategoryTable
+        categories={categories}
+        selectedCategories={selectedCategories}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onCategorySelect={toggleCategorySelection}
+        onSelectAll={toggleSelectAll}
+        onViewCategory={handleViewCategory}
+        onEditCategory={handleEditCategory}
+        onDeleteCategory={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddCategory={handleAddCategory}
+      />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentCategory?.name}
+        selectedCount={selectedCategories.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentCategory(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Event Category Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentCategory(null);
+        }}
+      >
+        {currentCategory && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Name
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {currentCategory.name}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {currentCategory.description || "No description"}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Created At
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {new Intl.DateTimeFormat("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(currentCategory.createdAt))}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Updated At
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {new Intl.DateTimeFormat("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(currentCategory.updatedAt))}
+              </p>
             </div>
           </div>
-        </div>
-      ) : (
-        <EventTable events={filteredEvents} onDelete={handleDelete} />
-      )}
-
-      {/* Delete Modal */}
-      <DeleteModal
-        isOpen={deleteModal.isOpen}
-        onClose={closeDeleteModal}
-        onConfirm={() => handleDelete(deleteModal.eventId)}
-        eventName={deleteModal.eventName}
-      />
+        )}
+      </ViewModal>
     </div>
   );
 }
