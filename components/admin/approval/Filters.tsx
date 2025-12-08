@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import SearchInput from "./SearchInput";
-import FilterButton from "../button/FilterButton";
-import SelectFilter from "./SelectFilter";
-import BulkApprovalActions from "../button/BulkApprovalActions";
+import SearchInput from "../ui/input/SearchInput";
+import FilterButton from "../ui/button/FilterButton";
+import SelectFilter from "../ui/input/SelectFilter";
+import BulkApprovalActions from "./BulkApprovalActions";
 
 interface ApprovalFiltersProps {
   filters: Record<string, string>;

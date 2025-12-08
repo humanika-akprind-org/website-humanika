@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { ApprovalApi } from "@/use-cases/api/approval";
 import type { ApprovalWithRelations as Approval } from "@/types/approval";
-import ApprovalFilters from "@/components/admin/ui/input/ApprovalFilters";
-import ApprovalTable from "@/components/admin/ui/table/ApprovalTable";
+import ApprovalFilters from "@/components/admin/approval/Filters";
+import ApprovalTable from "@/components/admin/approval/Table";
 import { StatusApproval } from "@/types/enums";
-import ApprovalActionModal from "@/components/admin/ui/modal/ApprovalActionModal";
+import ApprovalActionModal from "@/components/admin/approval/ActionModal";
 
 // Helper function to get entity name
 const getEntityName = (approval: Approval) => {

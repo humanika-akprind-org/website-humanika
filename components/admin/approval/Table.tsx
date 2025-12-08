@@ -3,16 +3,16 @@
 import { useState, useRef } from "react";
 import { FiCheck, FiX, FiClock, FiEye, FiRotateCcw } from "react-icons/fi";
 import type { ApprovalWithRelations as Approval } from "@/types/approval";
-import SortIcon from "../SortIcon";
-import StatusApproval from "../chip/StatusApproval";
-import Checkbox from "../checkbox/Checkbox";
-import Pagination from "../pagination/Pagination";
-import EmptyState from "../EmptyState";
-import DropdownMenuItem from "../dropdown/DropdownMenuItem";
-import DropdownMenu from "../dropdown/DropdownMenu";
-import ApprovalActionModal from "../modal/ApprovalActionModal";
-import ViewModal from "../modal/ViewModal";
-import HtmlRenderer from "../HtmlRenderer";
+import SortIcon from "../ui/SortIcon";
+import StatusApproval from "../ui/chip/StatusApproval";
+import Checkbox from "../ui/checkbox/Checkbox";
+import Pagination from "../ui/pagination/Pagination";
+import EmptyState from "../ui/EmptyState";
+import DropdownMenuItem from "../ui/dropdown/DropdownMenuItem";
+import DropdownMenu from "../ui/dropdown/DropdownMenu";
+import ApprovalActionModal from "./ActionModal";
+import ViewModal from "../ui/modal/ViewModal";
+import HtmlRenderer from "../ui/HtmlRenderer";
 
 interface ApprovalTableProps {
   approvals: Approval[];

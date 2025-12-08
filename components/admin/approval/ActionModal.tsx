@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
-import TextEditor from "../text-area/TextEditor";
+import TextEditor from "../ui/text-area/TextEditor";
 
 interface ApprovalActionModalProps {
   isOpen: boolean;
