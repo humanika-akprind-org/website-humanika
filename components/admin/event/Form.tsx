@@ -10,7 +10,6 @@ import {
   FiBriefcase,
   FiUser,
   FiFolder,
-  FiCalendar,
   FiTrendingUp,
   FiTrendingDown,
   FiCreditCard,
@@ -20,6 +19,7 @@ import TextInput from "@/components/admin/ui/input/TextInput";
 import CurrencyInput from "@/components/admin/ui/input/CurrencyInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import ImageUpload from "@/components/admin/ui/input/ImageUpload";
+import CalendarPicker from "@/components/admin/ui/date/CalendarPicker";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/components/ui/CancelButton";
 import { useEventForm } from "@/hooks/event/useEventForm";
@@ -165,24 +165,22 @@ export default function EventForm({
               disabled
             />
 
-            <TextInput
+            <CalendarPicker
               label="Start Date"
-              name="startDate"
-              type="date"
               value={formData.startDate}
-              onChange={handleInputChange}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, startDate: value }))
+              }
               required
-              icon={<FiCalendar className="text-gray-400" />}
             />
 
-            <TextInput
+            <CalendarPicker
               label="End Date"
-              name="endDate"
-              type="date"
               value={formData.endDate}
-              onChange={handleInputChange}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, endDate: value }))
+              }
               required
-              icon={<FiCalendar className="text-gray-400" />}
             />
 
             <SelectInput
