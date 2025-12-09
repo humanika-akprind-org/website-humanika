@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { updateEvent } from "@/use-cases/api/event";
+import { getEvent, updateEvent } from "@/use-cases/api/event";
 import type { CreateEventInput, UpdateEventInput, Event } from "@/types/event";
 
 export function useEditEvent(eventId: string) {
@@ -13,9 +13,8 @@ export function useEditEvent(eventId: string) {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        // For now, we'll need to implement the API call
-        // This would typically call an API to get the event by ID
-        setError("Event fetching not implemented yet");
+        const fetchedEvent = await getEvent(eventId);
+        _setEvent(fetchedEvent);
       } catch (err) {
         console.error("Error fetching event:", err);
         setError(err instanceof Error ? err.message : "Failed to load event");

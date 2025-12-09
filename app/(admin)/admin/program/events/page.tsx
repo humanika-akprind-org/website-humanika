@@ -1,42 +1,48 @@
 "use client";
 
-import EventCategoryStats from "@/components/admin/event/category/Stats";
-import EventCategoryFilters from "@/components/admin/event/category/Filters";
-import EventCategoryTable from "@/components/admin/event/category/Table";
+import { useState } from "react";
+import EventStats from "@/components/admin/event/Stats";
+import EventFilters from "@/components/admin/event/Filters";
+import EventTable from "@/components/admin/event/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";
 import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
 import ManagementHeader from "@/components/admin/ui/ManagementHeader";
 import AddButton from "@/components/admin/ui/button/AddButton";
-import { useEventCategoryManagement } from "@/hooks/event-category/useEventCategoryManagement";
+import { useEventManagement } from "@/hooks/event/useEventManagement";
 
-export default function EventCategoriesPage() {
+export default function EventsPage() {
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [workProgramFilter, setWorkProgramFilter] = useState("all");
+
   const {
-    categories,
+    events,
     loading,
     error,
     success,
-    selectedCategories,
+    selectedEvents,
     searchTerm,
     currentPage,
     totalPages,
     showDeleteModal,
     showViewModal,
-    currentCategory,
+    currentEvent,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
     setShowViewModal,
-    setCurrentCategory,
-    toggleCategorySelection,
+    setCurrentEvent,
+    toggleEventSelection,
     toggleSelectAll,
-    handleAddCategory,
-    handleEditCategory,
-    handleViewCategory,
+    handleAddEvent,
+    handleEditEvent,
+    handleViewEvent,
     handleDelete,
     confirmDelete,
-  } = useEventCategoryManagement();
+  } = useEventManagement();
 
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
@@ -52,66 +58,72 @@ export default function EventCategoriesPage() {
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <ManagementHeader
-          title="Event Categories"
-          description="Manage event categories and their details"
+          title="Events"
+          description="Manage events and their details"
         />
-        <AddButton onClick={handleAddCategory} text="Add Category" />
+        <AddButton onClick={handleAddEvent} text="Add Event" />
       </div>
 
-      <EventCategoryStats categories={categories} />
+      <EventStats events={events} />
 
       {alert && <Alert type={alert.type} message={alert.message} />}
 
-      <EventCategoryFilters
+      <EventFilters
         searchTerm={searchTerm}
-        selectedCategories={selectedCategories}
         onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        periodFilter={periodFilter}
+        onPeriodFilterChange={setPeriodFilter}
+        departmentFilter={departmentFilter}
+        onDepartmentFilterChange={setDepartmentFilter}
+        workProgramFilter={workProgramFilter}
+        onWorkProgramFilterChange={setWorkProgramFilter}
+        selectedCount={selectedEvents.length}
         onDeleteSelected={() => handleDelete()}
       />
 
-      <EventCategoryTable
-        categories={categories}
-        selectedCategories={selectedCategories}
+      <EventTable
+        events={events}
+        selectedEvents={selectedEvents}
         loading={loading}
         currentPage={currentPage}
         totalPages={totalPages}
-        onCategorySelect={toggleCategorySelection}
+        onEventSelect={toggleEventSelection}
         onSelectAll={toggleSelectAll}
-        onViewCategory={handleViewCategory}
-        onEditCategory={handleEditCategory}
-        onDeleteCategory={handleDelete}
+        onViewEvent={handleViewEvent}
+        onEditEvent={handleEditEvent}
+        onDeleteEvent={handleDelete}
         onPageChange={setCurrentPage}
-        onAddCategory={handleAddCategory}
+        onAddEvent={handleAddEvent}
       />
 
       <DeleteModal
         isOpen={showDeleteModal}
-        itemName={currentCategory?.name}
-        selectedCount={selectedCategories.length}
+        itemName={currentEvent?.name}
+        selectedCount={selectedEvents.length}
         onClose={() => {
           setShowDeleteModal(false);
-          setCurrentCategory(null);
+          setCurrentEvent(null);
         }}
         onConfirm={confirmDelete}
       />
 
       <ViewModal
         isOpen={showViewModal}
-        title="Event Category Details"
+        title="Event Details"
         onClose={() => {
           setShowViewModal(false);
-          setCurrentCategory(null);
+          setCurrentEvent(null);
         }}
       >
-        {currentCategory && (
+        {currentEvent && (
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Name
               </label>
-              <p className="mt-1 text-sm text-gray-900">
-                {currentCategory.name}
-              </p>
+              <p className="mt-1 text-sm text-gray-900">{currentEvent.name}</p>
             </div>
 
             <div>
@@ -119,7 +131,58 @@ export default function EventCategoriesPage() {
                 Description
               </label>
               <p className="mt-1 text-sm text-gray-900">
-                {currentCategory.description || "No description"}
+                {currentEvent.description || "No description"}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Department
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {currentEvent.department || "No department"}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Status
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {currentEvent.status}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Date Range
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {new Intl.DateTimeFormat("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }).format(new Date(currentEvent.startDate))}{" "}
+                -{" "}
+                {new Intl.DateTimeFormat("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }).format(new Date(currentEvent.endDate))}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Budget
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                }).format(currentEvent.funds || 0)}
               </p>
             </div>
 
@@ -134,7 +197,7 @@ export default function EventCategoriesPage() {
                   year: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
-                }).format(new Date(currentCategory.createdAt))}
+                }).format(new Date(currentEvent.createdAt))}
               </p>
             </div>
 
@@ -149,7 +212,7 @@ export default function EventCategoriesPage() {
                   year: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
-                }).format(new Date(currentCategory.updatedAt))}
+                }).format(new Date(currentEvent.updatedAt))}
               </p>
             </div>
           </div>

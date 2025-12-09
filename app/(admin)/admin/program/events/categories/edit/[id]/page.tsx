@@ -1,46 +1,29 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EventForm from "components/admin/event/Form";
-import LoadingForm from "components/admin/layout/loading/LoadingForm";
-import PageHeader from "components/admin/ui/PageHeader";
-import Alert from "components/admin/ui/alert/Alert";
-import { useEditEvent } from "hooks/event/useEditEvent";
-import { useEventFormData } from "hooks/event/useEventFormData";
+import EventCategoryForm from "@/components/admin/event/category/Form";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
+import { useEditEventCategory } from "@/hooks/event-category/useEditEventCategory";
 
-export default function EditEventPage() {
+export default function EditEventCategoryPage() {
   const params = useParams();
-  const eventId = params.id as string;
+  const categoryId = params.id as string;
 
-  const { event, loading, error, updateEvent, handleBack } =
-    useEditEvent(eventId);
-
-  const {
-    users,
-    periods,
-    loading: formDataLoading,
-    error: formDataError,
-  } = useEventFormData();
-
-  const isLoading = loading || formDataLoading;
-  const loadError = error || formDataError;
+  const { category, loading, error, updateEventCategory, handleBack } =
+    useEditEventCategory(categoryId);
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <PageHeader title="Edit Event" onBack={handleBack} />
+      <PageHeader title="Edit Event Category" onBack={handleBack} />
 
-      {loadError && <Alert type="error" message={loadError} />}
+      {error && <Alert type="error" message={error} />}
 
-      {isLoading ? (
+      {loading ? (
         <LoadingForm />
-      ) : event ? (
-        <EventForm
-          event={event}
-          onSubmit={updateEvent}
-          users={users}
-          periods={periods}
-          isEditing={true}
-        />
+      ) : category ? (
+        <EventCategoryForm category={category} onSubmit={updateEventCategory} />
       ) : null}
     </div>
   );

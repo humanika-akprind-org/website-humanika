@@ -10,6 +10,7 @@ import type {
 import { Department } from "@/types/enums";
 import TextEditor from "@/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/components/admin/ui/input/TextInput";
+import CurrencyInput from "@/components/admin/ui/input/CurrencyInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/components/ui/CancelButton";
@@ -23,7 +24,6 @@ import {
   FiUser,
 } from "react-icons/fi";
 import { useWorkForm } from "@/hooks/work-program/useWorkForm";
-import { formatCurrency, parseCurrency } from "@/lib/utils";
 
 interface WorkProgramFormProps {
   workProgram?: WorkProgram;
@@ -71,7 +71,6 @@ export default function WorkProgramForm({
               icon={<FiFileText className="text-gray-400" />}
               error={formErrors.name}
             />
-
             <SelectInput
               label="Department"
               name="department"
@@ -89,7 +88,6 @@ export default function WorkProgramForm({
               required
               icon={<FiBriefcase className="text-gray-400" />}
             />
-
             <TextInput
               label="Schedule/Timeline"
               name="schedule"
@@ -98,15 +96,13 @@ export default function WorkProgramForm({
               placeholder="e.g., 2024-01-01, Event Name, Period 2024-2025"
               icon={<FiCalendar className="text-gray-400" />}
             />
-
-            <TextInput
+            <CurrencyInput
               label="Budget (IDR)"
               name="funds"
-              value={formatCurrency(formData.funds)}
-              onChange={(e) => {
-                const parsedValue = parseCurrency(e.target.value);
+              value={formData.funds}
+              onChange={(value) => {
                 setFormData((prev) => {
-                  const newData = { ...prev, funds: parsedValue };
+                  const newData = { ...prev, funds: value };
                   newData.remainingFunds = newData.funds - newData.usedFunds;
                   return newData;
                 });
@@ -116,39 +112,32 @@ export default function WorkProgramForm({
               }}
               placeholder="Enter budget amount"
               required
-              type="text"
               icon={<FiTrendingUp className="text-gray-400" />}
               error={formErrors.funds}
             />
-
-            <TextInput
+            <CurrencyInput
               label="Used Funds (IDR)"
               name="usedFunds"
-              value={formatCurrency(formData.usedFunds)}
-              onChange={(e) => {
-                const parsedValue = parseCurrency(e.target.value);
+              value={formData.usedFunds}
+              onChange={(value) => {
                 setFormData((prev) => {
-                  const newData = { ...prev, usedFunds: parsedValue };
+                  const newData = { ...prev, usedFunds: value };
                   newData.remainingFunds = newData.funds - newData.usedFunds;
                   return newData;
                 });
               }}
               placeholder="Enter used funds amount"
-              type="text"
               icon={<FiTrendingDown className="text-gray-400" />}
             />
-
-            <TextInput
+            <CurrencyInput
               label="Remaining Funds (IDR)"
               name="remainingFunds"
-              value={formatCurrency(formData.remainingFunds)}
-              onChange={handleChange}
+              value={formData.remainingFunds}
+              onChange={() => {}}
               placeholder="Remaining funds"
-              type="text"
               icon={<FiCreditCard className="text-gray-400" />}
               disabled
             />
-
             <SelectInput
               label="Period"
               name="periodId"
@@ -174,7 +163,6 @@ export default function WorkProgramForm({
               required
               icon={<FiCalendar className="text-gray-400" />}
             />
-
             <SelectInput
               label="Responsible Person"
               name="responsibleId"
@@ -201,7 +189,6 @@ export default function WorkProgramForm({
               required
               icon={<FiUser className="text-gray-400" />}
             />
-
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Goals and Objectives *
