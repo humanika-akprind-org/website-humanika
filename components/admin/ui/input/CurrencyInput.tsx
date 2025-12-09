@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface CurrencyInputProps {
@@ -62,7 +61,11 @@ export default function CurrencyInput({
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label} {required && "*"}
       </label>
-      <div className="relative">
+      <div
+        className={`relative flex border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent ${
+          error ? "border-red-500" : ""
+        }`}
+      >
         {icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none user-select-none">
             {icon}
@@ -76,7 +79,7 @@ export default function CurrencyInput({
         >
           Rp
         </div>
-        <Input
+        <input
           type="text"
           name={name}
           required={required}
@@ -86,7 +89,7 @@ export default function CurrencyInput({
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            "w-full py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed",
+            "flex-1 py-2 text-sm rounded-lg focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed",
             "pl-10", // Always add padding for Rp prefix
             icon && "pl-16" // Add extra padding if icon is present
           )}
