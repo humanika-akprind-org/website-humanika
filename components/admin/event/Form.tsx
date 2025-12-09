@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
 import { Department as DepartmentEnum } from "@/types/enums";
 import type { User } from "@/types/user";
@@ -19,10 +20,40 @@ import TextEditor from "@/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import CurrencyInput from "@/components/admin/ui/input/CurrencyInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
-import ImageUpload from "@/components/admin/ui/input/ImageUpload";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/components/ui/CancelButton";
 import { useEventForm } from "@/hooks/event/useEventForm";
+
+// Helper function to validate image URL
+const isValidImageUrl = (url: string): boolean => {
+  try {
+    new URL(url);
+    return (
+      /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) ||
+      url.includes("drive.google.com") ||
+      url.startsWith("blob:")
+    );
+  } catch {
+    return false;
+  }
+};
+
+// Helper function to get preview URL from thumbnail (file ID or URL)
+const getThumbnailUrl = (thumbnail: string | null | undefined): string => {
+  if (!thumbnail) return "";
+
+  if (thumbnail.includes("drive.google.com")) {
+    const fileIdMatch = thumbnail.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch) {
+      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
+    }
+    return thumbnail;
+  } else if (thumbnail.match(/^[a-zA-Z0-9_-]+$/)) {
+    return `/api/drive-image?fileId=${thumbnail}`;
+  } else {
+    return thumbnail;
+  }
+};
 
 interface EventFormProps {
   event?: Event;
@@ -34,6 +65,7 @@ interface EventFormProps {
   users: User[];
   periods: Period[];
   isEditing?: boolean;
+  loading?: boolean;
 }
 
 export default function EventForm({
@@ -44,6 +76,7 @@ export default function EventForm({
   users,
   periods,
   isEditing = false,
+  loading = false,
 }: EventFormProps) {
   const router = useRouter();
   const {
@@ -84,14 +117,6 @@ export default function EventForm({
       setDateError("");
     }
   }, [formData.startDate, formData.endDate]);
-
-  const handleFileUpload = (file: File) => {
-    // Create a synthetic event to match the hook's expectation
-    const syntheticEvent = {
-      target: { files: [file] },
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-    handleFileChange(syntheticEvent);
-  };
 
   return (
     <>
@@ -260,7 +285,7 @@ export default function EventForm({
                 onChange={(data) =>
                   setFormData((prev) => ({ ...prev, description: data }))
                 }
-                disabled={isSubmitting}
+                disabled={loading}
                 height="200px"
               />
             </div>
@@ -278,38 +303,105 @@ export default function EventForm({
             </div>
 
             <div className="md:col-span-2">
-              <ImageUpload
-                label="Event Thumbnail"
-                previewUrl={previewUrl}
-                existingPhoto={existingThumbnail}
-                onFileChange={handleFileUpload}
-                onRemovePhoto={removeThumbnail}
-                isLoading={isSubmitting}
-                photoLoading={photoLoading}
-                helpText="Upload event thumbnail (max 5MB, format: JPG, PNG, GIF)"
-                alt="Event thumbnail"
-                previewSize="medium"
-                previewShape="square"
-              />
+              {/* Event Thumbnail Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Event Thumbnail
+                </label>
+                <div className="flex items-start space-x-4">
+                  {(previewUrl ||
+                    (existingThumbnail && existingThumbnail.trim() !== "")) && (
+                    <div className="flex flex-col items-center">
+                      <div className="flex-shrink-0">
+                        {(() => {
+                          // Get the display URL using the helper function
+                          const displayUrl = getThumbnailUrl(
+                            previewUrl || existingThumbnail
+                          );
+
+                          // Check if thumbnail exists and is a valid URL
+                          if (displayUrl && isValidImageUrl(displayUrl)) {
+                            return (
+                              <div className="w-60 h-60 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden">
+                                <Image
+                                  src={displayUrl}
+                                  alt={formData.name || "Event thumbnail"}
+                                  width={300}
+                                  height={300}
+                                  className="w-full h-full object-contain rounded-lg"
+                                  onError={(e) => {
+                                    console.error(
+                                      "Image failed to load:",
+                                      displayUrl,
+                                      e
+                                    );
+                                  }}
+                                />
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200">
+                                <svg
+                                  className="w-8 h-8 text-gray-500"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              </div>
+                            );
+                          }
+                        })()}
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          type="button"
+                          onClick={removeThumbnail}
+                          className="text-sm text-red-600 hover:text-red-800"
+                          disabled={isSubmitting}
+                        >
+                          Remove Thumbnail
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      disabled={isSubmitting || photoLoading}
+                    />
+                    <p className="text-sm text-gray-500 mt-1">
+                      Upload thumbnail (max 5MB, format: JPG, PNG, GIF)
+                    </p>
+                    {photoLoading && (
+                      <p className="text-sm text-blue-600 mt-1">
+                        Uploading thumbnail...
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="flex justify-end space-x-3">
-            <CancelButton
-              onClick={() => router.back()}
-              disabled={isSubmitting}
-            />
+            <CancelButton onClick={() => router.back()} disabled={loading} />
 
             <SubmitButton
-              isSubmitting={isSubmitting}
-              text={
-                onSubmitForApproval
-                  ? "Submit for Approval"
-                  : isEditing
-                  ? "Update Event"
-                  : "Create Event"
-              }
-              loadingText={onSubmitForApproval ? "Submitting..." : "Saving..."}
+              isSubmitting={isSubmitting || photoLoading}
+              text={isEditing ? "Update Event" : "Create Event"}
+              loadingText="Saving..."
             />
           </div>
         </form>

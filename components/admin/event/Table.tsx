@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
-import { FiCalendar, FiImage, FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { FiCalendar, FiEdit, FiTrash, FiEye } from "react-icons/fi";
 import type { Event } from "@/types/event";
 import { Status as StatusEnum } from "@/types/enums";
 import Checkbox from "../ui/checkbox/Checkbox";
@@ -11,6 +10,7 @@ import EmptyState from "../ui/EmptyState";
 import AddButton from "../ui/button/AddButton";
 import SortIcon from "../ui/SortIcon";
 import Pagination from "../ui/pagination/Pagination";
+import ThumbnailCell from "../ui/ThumbnailCell";
 
 interface EventTableProps {
   events: Event[];
@@ -222,31 +222,11 @@ const EventTable: React.FC<EventTableProps> = ({
                   />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      {event.thumbnail ? (
-                        <Image
-                          className="h-10 w-10 rounded-lg object-cover"
-                          src={event.thumbnail}
-                          alt={event.name}
-                          width={40}
-                          height={40}
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                          <FiImage className="h-5 w-5 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {event.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {event.category?.name || "No category"}
-                      </div>
-                    </div>
-                  </div>
+                  <ThumbnailCell
+                    thumbnail={event.thumbnail}
+                    name={event.name}
+                    categoryName={event.category?.name}
+                  />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                   {event.department || "No department"}

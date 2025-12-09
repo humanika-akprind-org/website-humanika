@@ -30,7 +30,12 @@ export default function AddEventPage() {
       {combinedLoading ? (
         <LoadingForm />
       ) : (
-        <EventForm onSubmit={createEvent} users={users} periods={periods} />
+        <EventForm
+          onSubmit={createEvent}
+          users={users}
+          periods={periods}
+          loading={combinedLoading}
+        />
       )}
     </div>
   );

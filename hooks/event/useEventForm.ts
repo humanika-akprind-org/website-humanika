@@ -9,6 +9,7 @@ import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
 import { useUserManagement } from "@/hooks/user/useUserManagement";
 import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
 
 // Helper functions
 const isHtmlEmpty = (html: string): boolean => {
@@ -83,6 +84,8 @@ export const useEventForm = (
   users?: User[],
   periods?: Period[]
 ) => {
+  const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
+
   const {
     uploadFile,
     deleteFile,
@@ -90,7 +93,18 @@ export const useEventForm = (
     setPublicAccess,
     isLoading: photoLoading,
     error: photoError,
-  } = useFile(accessToken);
+  } = useFile(accessToken || fetchedAccessToken);
+
+  // Fetch access token if not provided
+  useEffect(() => {
+    if (!accessToken) {
+      const fetchAccessToken = async () => {
+        const token = await getAccessTokenAction();
+        setFetchedAccessToken(token);
+      };
+      fetchAccessToken();
+    }
+  }, [accessToken]);
 
   const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
   const { categories: eventCategories, isLoading: categoriesLoading } =
@@ -213,6 +227,10 @@ export const useEventForm = (
       setError("Please select end date");
       return false;
     }
+    if (new Date(formData.startDate) > new Date(formData.endDate)) {
+      setError("Start date must be before end date");
+      return false;
+    }
     if (formData.funds <= 0) {
       setError("Funds must be greater than 0");
       return false;
@@ -222,10 +240,15 @@ export const useEventForm = (
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm() || !onSubmit) return;
+    console.log("Form submit triggered");
+    if (!validateForm() || !onSubmit) {
+      console.log("Validation failed or no onSubmit");
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
+    console.log("Starting form submission");
 
     try {
       let thumbnailUrl: string | null | undefined = existingThumbnail;
@@ -278,10 +301,14 @@ export const useEventForm = (
             if (publicAccessSuccess) {
               thumbnailUrl = uploadedFileId;
             } else {
-              throw new Error("Failed to set public access for thumbnail");
+              console.warn("Failed to set public access for thumbnail");
+              // Continue with submission even if setting public access fails
+              thumbnailUrl = uploadedFileId;
             }
           } else {
-            throw new Error("Failed to rename thumbnail");
+            console.warn("Failed to rename thumbnail");
+            // Continue with submission even if rename fails
+            thumbnailUrl = uploadedFileId;
           }
         } else {
           throw new Error("Failed to upload thumbnail");
@@ -328,6 +355,7 @@ export const useEventForm = (
     eventCategories,
     categoriesLoading,
     photoLoading,
+    accessToken: accessToken || fetchedAccessToken,
     users: users || fetchedUsers,
     periods: periods || fetchedPeriods,
     usersLoading,
