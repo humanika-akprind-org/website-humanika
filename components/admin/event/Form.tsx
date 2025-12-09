@@ -19,10 +19,10 @@ import TextInput from "@/components/admin/ui/input/TextInput";
 import CurrencyInput from "@/components/admin/ui/input/CurrencyInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import ImageUpload from "@/components/admin/ui/input/ImageUpload";
-import CalendarPicker from "@/components/admin/ui/date/CalendarPicker";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/components/ui/CancelButton";
 import { useEventForm } from "@/hooks/event/useEventForm";
+import DateInput from "../ui/date/DateInput";
 
 interface EventFormProps {
   event?: Event;
@@ -101,7 +101,6 @@ export default function EventForm({
               required
               icon={<FiBriefcase className="text-gray-400" />}
             />
-
             <SelectInput
               label="Department"
               name="department"
@@ -119,7 +118,6 @@ export default function EventForm({
               required
               icon={<FiBriefcase className="text-gray-400" />}
             />
-
             <CurrencyInput
               label="Budget (IDR)"
               name="funds"
@@ -139,7 +137,6 @@ export default function EventForm({
               icon={<FiTrendingUp className="text-gray-400" />}
               error={formErrors.funds}
             />
-
             <CurrencyInput
               label="Used Funds (IDR)"
               name="usedFunds"
@@ -154,7 +151,6 @@ export default function EventForm({
               placeholder="Enter used funds amount"
               icon={<FiTrendingDown className="text-gray-400" />}
             />
-
             <CurrencyInput
               label="Remaining Funds (IDR)"
               name="remainingFunds"
@@ -164,8 +160,7 @@ export default function EventForm({
               icon={<FiCreditCard className="text-gray-400" />}
               disabled
             />
-
-            <CalendarPicker
+            <DateInput
               label="Start Date"
               value={formData.startDate}
               onChange={(value) =>
@@ -173,8 +168,7 @@ export default function EventForm({
               }
               required
             />
-
-            <CalendarPicker
+            <DateInput
               label="End Date"
               value={formData.endDate}
               onChange={(value) =>
@@ -182,7 +176,6 @@ export default function EventForm({
               }
               required
             />
-
             <SelectInput
               label="Period"
               name="periodId"
@@ -197,7 +190,6 @@ export default function EventForm({
               required
               icon={<FiBriefcase className="text-gray-400" />}
             />
-
             <SelectInput
               label="Work Program"
               name="workProgramId"
@@ -212,7 +204,6 @@ export default function EventForm({
               placeholder="Select a work program (optional)"
               icon={<FiFolder className="text-gray-400" />}
             />
-
             <SelectInput
               label="Responsible Person"
               name="responsibleId"
@@ -227,7 +218,6 @@ export default function EventForm({
               required
               icon={<FiUser className="text-gray-400" />}
             />
-
             <SelectInput
               label="Category"
               name="categoryId"
@@ -242,7 +232,6 @@ export default function EventForm({
               placeholder="Select a category (optional)"
               icon={<FiFolder className="text-gray-400" />}
             />
-
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description *
@@ -256,7 +245,6 @@ export default function EventForm({
                 height="200px"
               />
             </div>
-
             <div className="md:col-span-2">
               <TextInput
                 label="Goal"
@@ -268,7 +256,6 @@ export default function EventForm({
                 icon={<FiBriefcase className="text-gray-400" />}
               />
             </div>
-
             <div className="md:col-span-2">
               <ImageUpload
                 label="Event Thumbnail"
