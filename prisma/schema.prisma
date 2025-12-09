@@ -243,9 +243,6 @@ model Event {
   periodId       String     @db.ObjectId // ID periode kegiatan
   startDate      DateTime // Tanggal dan waktu mulai kegiatan
   endDate        DateTime // Tanggal dan waktu selesai kegiatan
-  funds          Float // Dana yang dialokasikan untuk kegiatan
-  usedFunds      Float      @default(0) // Dana yang sudah digunakan
-  remainingFunds Float      @default(0) // Sisa dana kegiatan
   status         Status     @default(DRAFT) // Status kegiatan
   workProgramId  String?    @db.ObjectId // ID program kerja terkait (opsional)
   categoryId     String?    @db.ObjectId // ID kategori kegiatan

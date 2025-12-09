@@ -65,7 +65,6 @@ export interface EventFormData {
   responsibleId: string;
   startDate: string;
   endDate: string;
-  funds: number;
   workProgramId: string;
   categoryId: string;
   thumbnailFile?: File;
@@ -111,7 +110,6 @@ export const useEventForm = (
     endDate: event?.endDate
       ? new Date(event.endDate).toISOString().split("T")[0]
       : "",
-    funds: event?.funds || 0,
     workProgramId: event?.workProgram?.id || "",
     categoryId: event?.category?.id || "",
   });
@@ -213,10 +211,7 @@ export const useEventForm = (
       setError("Please select end date");
       return false;
     }
-    if (formData.funds <= 0) {
-      setError("Funds must be greater than 0");
-      return false;
-    }
+
     return true;
   };
 

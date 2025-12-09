@@ -6,17 +6,9 @@ import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
 import { Department as DepartmentEnum } from "@/types/enums";
 import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
-import {
-  FiBriefcase,
-  FiUser,
-  FiFolder,
-  FiTrendingUp,
-  FiTrendingDown,
-  FiCreditCard,
-} from "react-icons/fi";
+import { FiBriefcase, FiUser, FiFolder } from "react-icons/fi";
 import TextEditor from "@/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/components/admin/ui/input/TextInput";
-import CurrencyInput from "@/components/admin/ui/input/CurrencyInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import ImageUpload from "@/components/admin/ui/input/ImageUpload";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
@@ -71,7 +63,6 @@ export default function EventForm({
   );
 
   const [_dateError, setDateError] = useState<string>("");
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (formData.startDate && formData.endDate) {
@@ -118,48 +109,7 @@ export default function EventForm({
               required
               icon={<FiBriefcase className="text-gray-400" />}
             />
-            <CurrencyInput
-              label="Budget (IDR)"
-              name="funds"
-              value={formData.funds}
-              onChange={(value) => {
-                setFormData((prev) => {
-                  const newData = { ...prev, funds: value };
-                  newData.remainingFunds = newData.funds - newData.usedFunds;
-                  return newData;
-                });
-                if (formErrors.funds) {
-                  setFormErrors((prev) => ({ ...prev, funds: "" }));
-                }
-              }}
-              placeholder="Enter budget amount"
-              required
-              icon={<FiTrendingUp className="text-gray-400" />}
-              error={formErrors.funds}
-            />
-            <CurrencyInput
-              label="Used Funds (IDR)"
-              name="usedFunds"
-              value={formData.usedFunds}
-              onChange={(value) => {
-                setFormData((prev) => {
-                  const newData = { ...prev, usedFunds: value };
-                  newData.remainingFunds = newData.funds - newData.usedFunds;
-                  return newData;
-                });
-              }}
-              placeholder="Enter used funds amount"
-              icon={<FiTrendingDown className="text-gray-400" />}
-            />
-            <CurrencyInput
-              label="Remaining Funds (IDR)"
-              name="remainingFunds"
-              value={formData.remainingFunds}
-              onChange={() => {}}
-              placeholder="Remaining funds"
-              icon={<FiCreditCard className="text-gray-400" />}
-              disabled
-            />
+
             <DateInput
               label="Start Date"
               value={formData.startDate}

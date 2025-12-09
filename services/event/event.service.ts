@@ -173,11 +173,6 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
     responsible: { connect: { id: data.responsibleId } },
     startDate: new Date(data.startDate),
     endDate: new Date(data.endDate),
-    funds:
-      typeof data.funds === "string" ? parseFloat(data.funds) : data.funds || 0,
-    usedFunds: 0,
-    remainingFunds:
-      typeof data.funds === "string" ? parseFloat(data.funds) : data.funds || 0,
   };
 
   // Only include workProgramId if it's provided and not empty
@@ -253,7 +248,6 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
         responsibleId: event.responsibleId,
         startDate: event.startDate,
         endDate: event.endDate,
-        funds: event.funds,
       },
     },
   });
@@ -291,7 +285,6 @@ export const updateEvent = async (
         existingEvent.startDate.getTime()) ||
     (data.endDate !== undefined &&
       new Date(data.endDate).getTime() !== existingEvent.endDate.getTime()) ||
-    (data.funds !== undefined && data.funds !== existingEvent.funds) ||
     (data.responsibleId !== undefined &&
       data.responsibleId !== existingEvent.responsibleId) ||
     (data.workProgramId !== undefined &&
@@ -331,20 +324,6 @@ export const updateEvent = async (
         note: "Event submitted for approval",
       },
     });
-  }
-
-  // Calculate remaining funds if funds or usedFunds is updated
-  if (data.funds !== undefined || data.usedFunds !== undefined) {
-    const currentEvent = await prisma.event.findUnique({
-      where: { id },
-    });
-
-    if (currentEvent) {
-      const funds = data.funds !== undefined ? data.funds : currentEvent.funds;
-      const usedFunds =
-        data.usedFunds !== undefined ? data.usedFunds : currentEvent.usedFunds;
-      updateData.remainingFunds = funds - usedFunds;
-    }
   }
 
   // Handle slug generation if name is updated
@@ -411,8 +390,6 @@ export const updateEvent = async (
         status: existingEvent.status,
         startDate: existingEvent.startDate,
         endDate: existingEvent.endDate,
-        funds: existingEvent.funds,
-        usedFunds: existingEvent.usedFunds,
       },
       newData: {
         name: event.name,
@@ -420,8 +397,6 @@ export const updateEvent = async (
         status: event.status,
         startDate: event.startDate,
         endDate: event.endDate,
-        funds: event.funds,
-        usedFunds: event.usedFunds,
       },
     },
   });
@@ -457,8 +432,6 @@ export const deleteEvent = async (id: string, user: UserWithId) => {
         status: existingEvent.status,
         startDate: existingEvent.startDate,
         endDate: existingEvent.endDate,
-        funds: existingEvent.funds,
-        usedFunds: existingEvent.usedFunds,
       },
       newData: null,
     },

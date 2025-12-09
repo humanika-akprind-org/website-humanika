@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { FiCalendar, FiEdit, FiTrash, FiEye } from "react-icons/fi";
 import type { Event } from "@/types/event";
-import { Status as StatusEnum } from "@/types/enums";
 import Checkbox from "../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../ui/dropdown/DropdownMenu";
 import EmptyState from "../ui/EmptyState";
@@ -11,6 +10,7 @@ import AddButton from "../ui/button/AddButton";
 import SortIcon from "../ui/SortIcon";
 import Pagination from "../ui/pagination/Pagination";
 import ThumbnailCell from "../ui/ThumbnailCell";
+import StatusChip from "../ui/chip/Status";
 
 interface EventTableProps {
   events: Event[];
@@ -57,6 +57,18 @@ const EventTable: React.FC<EventTableProps> = ({
         aValue = a.department?.toLowerCase() || "";
         bValue = b.department?.toLowerCase() || "";
         break;
+      case "period":
+        aValue = a.period?.name?.toLowerCase() || "";
+        bValue = b.period?.name?.toLowerCase() || "";
+        break;
+      case "workProgram":
+        aValue = a.workProgram?.name?.toLowerCase() || "";
+        bValue = b.workProgram?.name?.toLowerCase() || "";
+        break;
+      case "responsible":
+        aValue = a.responsible?.name?.toLowerCase() || "";
+        bValue = b.responsible?.name?.toLowerCase() || "";
+        break;
       case "status":
         aValue = a.status.toLowerCase();
         bValue = b.status.toLowerCase();
@@ -65,10 +77,7 @@ const EventTable: React.FC<EventTableProps> = ({
         aValue = new Date(a.startDate).getTime();
         bValue = new Date(b.startDate).getTime();
         break;
-      case "funds":
-        aValue = a.funds || 0;
-        bValue = b.funds || 0;
-        break;
+
       default:
         aValue = a.name.toLowerCase();
         bValue = b.name.toLowerCase();
@@ -158,6 +167,51 @@ const EventTable: React.FC<EventTableProps> = ({
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("period")}
+              >
+                <div className="flex items-center">
+                  Period
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="period"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("workProgram")}
+              >
+                <div className="flex items-center">
+                  Work Program
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="workProgram"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("responsible")}
+              >
+                <div className="flex items-center">
+                  Responsible
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="responsible"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort("status")}
               >
                 <div className="flex items-center">
@@ -181,21 +235,6 @@ const EventTable: React.FC<EventTableProps> = ({
                     sortField={sortField}
                     sortDirection={sortDirection}
                     field="startDate"
-                    iconType="arrow"
-                  />
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("funds")}
-              >
-                <div className="flex items-center">
-                  Budget
-                  <SortIcon
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                    field="funds"
                     iconType="arrow"
                   />
                 </div>
@@ -231,20 +270,17 @@ const EventTable: React.FC<EventTableProps> = ({
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                   {event.department || "No department"}
                 </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {event.period?.name || "No period"}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {event.workProgram?.name || "No work program"}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {event.responsible?.name || "No responsible person"}
+                </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                      event.status === StatusEnum.PUBLISH
-                        ? "bg-green-100 text-green-800"
-                        : event.status === StatusEnum.DRAFT
-                        ? "bg-gray-100 text-gray-800"
-                        : event.status === StatusEnum.PRIVATE
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {event.status}
-                  </span>
+                  <StatusChip status={event.status} />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Intl.DateTimeFormat("id-ID", {
@@ -259,14 +295,7 @@ const EventTable: React.FC<EventTableProps> = ({
                     year: "numeric",
                   }).format(new Date(event.endDate))}
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Intl.NumberFormat("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  }).format(event.funds || 0)}
-                </td>
+
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                   <DropdownMenu
                     boundaryRef={{ current: rowRefs.current[index] }}

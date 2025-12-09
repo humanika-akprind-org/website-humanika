@@ -166,20 +166,6 @@ export default function EventsPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Budget
-              </label>
-              <p className="mt-1 text-sm text-gray-900">
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                }).format(currentEvent.funds || 0)}
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
                 Description
               </label>
               <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">

@@ -66,9 +66,6 @@ export interface EventFormData {
   responsibleId: string;
   startDate: string;
   endDate: string;
-  funds: number;
-  usedFunds: number;
-  remainingFunds: number;
   workProgramId: string;
   categoryId: string;
   thumbnailFile?: File;
@@ -127,9 +124,6 @@ export const useEventForm = (
     endDate: event?.endDate
       ? new Date(event.endDate).toISOString().split("T")[0]
       : "",
-    funds: event?.funds || 0,
-    usedFunds: event?.usedFunds || 0,
-    remainingFunds: event?.remainingFunds || 0,
     workProgramId: event?.workProgram?.id || "",
     categoryId: event?.category?.id || "",
   });
@@ -231,10 +225,7 @@ export const useEventForm = (
       setError("Start date must be before end date");
       return false;
     }
-    if (formData.funds <= 0) {
-      setError("Funds must be greater than 0");
-      return false;
-    }
+
     return true;
   };
 
@@ -315,7 +306,7 @@ export const useEventForm = (
         }
       }
 
-      const { thumbnailFile: _, remainingFunds: __, ...dataToSend } = formData;
+      const { thumbnailFile: _, ...dataToSend } = formData;
       const submitData = {
         ...dataToSend,
         thumbnail: thumbnailUrl,
@@ -325,7 +316,6 @@ export const useEventForm = (
           formData.workProgramId && formData.workProgramId.trim() !== ""
             ? formData.workProgramId
             : undefined,
-        ...(event && { usedFunds: formData.usedFunds }),
       };
 
       if (onSubmitForApproval) {
