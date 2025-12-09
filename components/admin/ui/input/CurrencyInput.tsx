@@ -86,7 +86,7 @@ export default function CurrencyInput({
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            "w-full py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+            "w-full py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed",
             "pl-10", // Always add padding for Rp prefix
             icon && "pl-16" // Add extra padding if icon is present
           )}

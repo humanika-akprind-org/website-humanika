@@ -44,7 +44,7 @@ export default function SelectInput({
         <Select value={value} onValueChange={onChange}>
           <SelectTrigger
             className={cn(
-              "w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              "w-full px-4 py-2 pl-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed",
               icon && "pl-10"
             )}
           >

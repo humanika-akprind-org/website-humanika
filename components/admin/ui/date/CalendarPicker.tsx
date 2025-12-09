@@ -55,8 +55,6 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
     }
   }, [value]);
 
-  const formatDate = (date: Date): string => date.toISOString().split("T")[0];
-
   const formatDisplayDate = (dateString: string): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -96,7 +94,11 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
   };
 
   const handleDateSelect = (date: Date) => {
-    const formattedDate = formatDate(date);
+    // Create date string in YYYY-MM-DD format to avoid timezone issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
     onChange(formattedDate);
     setIsOpen(false);
   };
@@ -151,20 +153,20 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
       </label>
 
       <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+          <FiCalendar className="text-gray-400" />
+        </div>
         <input
           type="text"
           readOnly
           value={formatDisplayDate(value)}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${
+          className={`w-full px-4 py-2 pl-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${
             error ? "border-red-500" : ""
           }`}
           onClick={() => !disabled && setIsOpen(!isOpen)}
         />
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          <FiCalendar className="text-gray-400" />
-        </div>
       </div>
 
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
