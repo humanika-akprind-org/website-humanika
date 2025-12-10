@@ -83,15 +83,20 @@ export default function EventForm({
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <TextInput
-              label="Event Name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter event name"
-              required
-              icon={<FiBriefcase className="text-gray-400" />}
-            />
+            <div>
+              <TextInput
+                label="Event Name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Enter event name"
+                required
+                icon={<FiBriefcase className="text-gray-400" />}
+              />
+              <small className="text-gray-500">
+                Event name must be unique because it is used as a slug.
+              </small>
+            </div>
             <SelectInput
               label="Department"
               name="department"

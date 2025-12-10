@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { OrganizationalStructure } from "@/types/structure";
-import StructureAvatar from "@/components/admin/ui/avatar/StructureAvatar";
+import StructureAvatar from "@/components/admin/ui/avatar/ImageView";
 
 export default function AboutPage() {
   const [structures, setStructures] = useState<OrganizationalStructure[]>([]);

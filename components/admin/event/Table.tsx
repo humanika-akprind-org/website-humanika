@@ -11,6 +11,8 @@ import SortIcon from "../ui/SortIcon";
 import Pagination from "../ui/pagination/Pagination";
 import ThumbnailCell from "../ui/ThumbnailCell";
 import StatusChip from "../ui/chip/Status";
+import StatusApproval from "../ui/chip/StatusApproval";
+import DepartmentChip from "../ui/chip/Department";
 
 interface EventTableProps {
   events: Event[];
@@ -65,10 +67,7 @@ const EventTable: React.FC<EventTableProps> = ({
         aValue = a.workProgram?.name?.toLowerCase() || "";
         bValue = b.workProgram?.name?.toLowerCase() || "";
         break;
-      case "responsible":
-        aValue = a.responsible?.name?.toLowerCase() || "";
-        bValue = b.responsible?.name?.toLowerCase() || "";
-        break;
+
       case "status":
         aValue = a.status.toLowerCase();
         bValue = b.status.toLowerCase();
@@ -152,6 +151,21 @@ const EventTable: React.FC<EventTableProps> = ({
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("startDate")}
+              >
+                <div className="flex items-center">
+                  Date Range
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="startDate"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort("department")}
               >
                 <div className="flex items-center">
@@ -197,21 +211,6 @@ const EventTable: React.FC<EventTableProps> = ({
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("responsible")}
-              >
-                <div className="flex items-center">
-                  Responsible
-                  <SortIcon
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                    field="responsible"
-                    iconType="arrow"
-                  />
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort("status")}
               >
                 <div className="flex items-center">
@@ -226,18 +225,9 @@ const EventTable: React.FC<EventTableProps> = ({
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("startDate")}
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                <div className="flex items-center">
-                  Date Range
-                  <SortIcon
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                    field="startDate"
-                    iconType="arrow"
-                  />
-                </div>
+                Approval
               </th>
               <th
                 scope="col"
@@ -267,21 +257,6 @@ const EventTable: React.FC<EventTableProps> = ({
                     categoryName={event.category?.name}
                   />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {event.department || "No department"}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {event.period?.name || "No period"}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {event.workProgram?.name || "No work program"}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {event.responsible?.name || "No responsible person"}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <StatusChip status={event.status} />
-                </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Intl.DateTimeFormat("id-ID", {
                     day: "2-digit",
@@ -294,6 +269,31 @@ const EventTable: React.FC<EventTableProps> = ({
                     month: "2-digit",
                     year: "numeric",
                   }).format(new Date(event.endDate))}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <DepartmentChip department={event.department} />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {event.period?.name || "No period"}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {event.workProgram?.name || "No work program"}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <StatusChip status={event.status} />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <StatusApproval
+                    status={
+                      event.approvals.length > 0
+                        ? event.approvals.sort(
+                            (a, b) =>
+                              new Date(b.createdAt).getTime() -
+                              new Date(a.createdAt).getTime()
+                          )[0].status
+                        : "PENDING"
+                    }
+                  />
                 </td>
 
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">

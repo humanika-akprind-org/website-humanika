@@ -1,20 +1,23 @@
-import type { OrganizationalStructure } from "@/types/structure";
 import Image from "next/image";
 import { useState } from "react";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 
-interface StructureAvatarProps {
-  structure: OrganizationalStructure;
+interface ImageViewProps {
+  imageUrl?: string | null;
+  alt?: string;
   size?: {
     width: number;
     height: number;
   };
+  modalTitle?: string;
 }
 
-export default function StructureAvatar({
-  structure,
+export default function ImageView({
+  imageUrl,
+  alt = "Image",
   size,
-}: StructureAvatarProps) {
+  modalTitle = "Image Preview",
+}: ImageViewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Default size values
@@ -23,24 +26,24 @@ export default function StructureAvatar({
   const customWidth = size?.width || defaultWidth;
   const customHeight = size?.height || defaultHeight;
 
-  // Get image URL from structure image (file ID or URL)
-  const getImageUrl = (structureImage: string | null | undefined): string => {
-    if (!structureImage) return "";
+  // Get image URL from imageUrl prop (file ID or URL)
+  const getImageUrl = (imageUrl: string | null | undefined): string => {
+    if (!imageUrl) return "";
 
-    if (structureImage.includes("drive.google.com")) {
-      const fileIdMatch = structureImage.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (imageUrl.includes("drive.google.com")) {
+      const fileIdMatch = imageUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (fileIdMatch) {
         return `/api/drive-image?fileId=${fileIdMatch[1]}`;
       }
-      return structureImage;
-    } else if (structureImage.match(/^[a-zA-Z0-9_-]+$/)) {
-      return `/api/drive-image?fileId=${structureImage}`;
+      return imageUrl;
+    } else if (imageUrl.match(/^[a-zA-Z0-9_-]+$/)) {
+      return `/api/drive-image?fileId=${imageUrl}`;
     } else {
-      return structureImage;
+      return imageUrl;
     }
   };
 
-  const imageUrl = getImageUrl(structure.structure);
+  const processedImageUrl = getImageUrl(imageUrl);
 
   const handleImageClick = () => {
     setIsModalOpen(true);
@@ -76,37 +79,40 @@ export default function StructureAvatar({
   return (
     <>
       <div
-        className="flex-shrink-0 w-full h-auto rounded-lg overflow-hidden mx-auto"
-        style={{ maxWidth: customWidth, maxHeight: customHeight }}
+        className="flex-shrink-0 rounded-lg overflow-hidden mx-auto"
+        style={{ width: customWidth, height: customHeight }}
       >
         <Image
-          src={imageUrl}
-          alt="Structure photo"
+          src={processedImageUrl}
+          alt={alt}
           width={customWidth}
           height={customHeight}
-          className="w-full h-auto rounded-lg object-contain cursor-pointer"
-          style={{ maxWidth: customWidth, maxHeight: customHeight }}
+          className="w-full h-full rounded-lg object-contain cursor-pointer"
           onClick={handleImageClick}
           onError={(e) => {
-            console.error("Image failed to load:", imageUrl, e);
+            console.error("Image failed to load:", processedImageUrl, e);
           }}
         />
       </div>
 
       <ViewModal
         isOpen={isModalOpen}
-        title="Structure Image"
+        title={modalTitle}
         onClose={handleCloseModal}
       >
         <div className="flex justify-center">
           <Image
-            src={imageUrl}
-            alt="Structure photo - enlarged"
+            src={processedImageUrl}
+            alt={`${alt} - enlarged`}
             width={600}
             height={400}
-            className="max-w-full max-h-100 object-contain rounded-lg"
+            className="max-w-full max-h-full object-contain rounded-lg"
             onError={(e) => {
-              console.error("Image failed to load in modal:", imageUrl, e);
+              console.error(
+                "Image failed to load in modal:",
+                processedImageUrl,
+                e
+              );
             }}
           />
         </div>
