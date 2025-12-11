@@ -359,8 +359,6 @@ model Article {
   content     String // Isi artikel
   authorId    String    @db.ObjectId // ID penulis artikel
   periodId    String?   @db.ObjectId // ID periode terkait (opsional)
-  isPublished Boolean   @default(false) // Status publikasi artikel
-  publishedAt DateTime? // Tanggal publikasi artikel
   status      Status    @default(DRAFT) // Status artikel
   categoryId  String?   @db.ObjectId // ID kategori artikel
   createdAt   DateTime  @default(now()) // Waktu pembuatan artikel
@@ -372,7 +370,7 @@ model Article {
   period   Period?          @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode terkait
   // approvals Approval[]     @relation("ArticleApprovals") // Persetujuan untuk artikel
 
-  @@index([isPublished, authorId, status])
+  @@index([authorId, status])
   @@map("articles")
 }
 
