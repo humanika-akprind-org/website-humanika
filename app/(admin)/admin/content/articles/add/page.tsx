@@ -1,150 +1,42 @@
-import { UserApi } from "@/use-cases/api/user";
-import { PeriodApi } from "@/use-cases/api/period";
+"use client";
+
 import ArticleForm from "@/components/admin/article/Form";
-import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
-import type {
-  CreateArticleInput,
-  UpdateArticleInput,
-  Article,
-} from "@/types/article";
-import { FiArrowLeft } from "react-icons/fi";
-import Link from "next/link";
-import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { logActivity } from "@/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
+import { useCreateArticle } from "@/hooks/article/useCreateArticle";
+import { useArticleFormData } from "@/hooks/article/useArticleFormData";
 
-async function AddArticlePage() {
-  const accessToken = await getGoogleAccessToken();
+export default function AddArticlePage() {
+  const { createArticle, handleBack, isSubmitting, error, isLoading } =
+    useCreateArticle();
 
-  try {
-    const [usersResponse, periods] = await Promise.all([
-      UserApi.getUsers({ limit: 50 }),
-      PeriodApi.getPeriods(),
-    ]);
+  const {
+    users,
+    periods,
+    loading: formDataLoading,
+    error: formDataError,
+  } = useArticleFormData();
 
-    const users = usersResponse.data?.users || [];
-    const periodsData = periods || [];
+  const combinedLoading = isSubmitting || isLoading || formDataLoading;
+  const loadError = error || formDataError;
 
-    const handleSubmit = async (
-      data: CreateArticleInput | UpdateArticleInput
-    ) => {
-      "use server";
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Add New Article" onBack={handleBack} />
 
-      const user = await getCurrentUser();
-      if (!user) {
-        throw new Error("Unauthorized");
-      }
+      {loadError && <Alert type="error" message={loadError} />}
 
-      // Cast data to CreateArticleInput since this is the add page
-      const articleData = data as CreateArticleInput;
-
-      if (
-        !articleData.title ||
-        !articleData.content ||
-        !articleData.authorId ||
-        !articleData.categoryId
-      ) {
-        throw new Error("Missing required fields");
-      }
-
-      // Generate slug from title
-      const slug = articleData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-
-      const articlePayload: Omit<
-        Article,
-        | "id"
-        | "author"
-        | "category"
-        | "period"
-        | "status"
-        | "createdAt"
-        | "updatedAt"
-      > = {
-        title: articleData.title,
-        slug,
-        thumbnail: articleData.thumbnail,
-        content: articleData.content,
-        authorId: articleData.authorId,
-        categoryId: articleData.categoryId,
-        isPublished: articleData.isPublished || false,
-        publishedAt: articleData.publishedAt,
-      };
-
-      // Only include periodId if it's provided and not empty
-      if (articleData.periodId && articleData.periodId.trim() !== "") {
-        articlePayload.periodId = articleData.periodId;
-      }
-
-      const createdArticle = await prisma.article.create({
-        data: articlePayload,
-      });
-
-      // Log activity
-      await logActivity({
-        userId: user.id,
-        activityType: ActivityType.CREATE,
-        entityType: "Article",
-        entityId: createdArticle.id,
-        description: `Created article: ${createdArticle.title}`,
-        metadata: {
-          oldData: null,
-          newData: {
-            title: createdArticle.title,
-            slug: createdArticle.slug,
-            categoryId: createdArticle.categoryId,
-            authorId: createdArticle.authorId,
-          },
-        },
-      });
-
-      redirect("/admin/content/articles");
-    };
-
-    return (
-      <AuthGuard accessToken={accessToken}>
-        <div className="p-6 max-w-4xl min-h-screen mx-auto">
-          <div className="flex items-center mb-6">
-            <Link
-              href="/admin/content/articles"
-              className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-            >
-              <FiArrowLeft className="mr-1" />
-              Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Add New Article
-            </h1>
-          </div>
-          <ArticleForm
-            accessToken={accessToken}
-            users={users}
-            periods={periodsData}
-            onSubmit={handleSubmit}
-          />
-        </div>
-      </AuthGuard>
-    );
-  } catch (error) {
-    console.error("Error loading form data:", error);
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="text-center text-red-500">
-              <h2 className="text-xl font-semibold mb-4">Error Loading Form</h2>
-              <p>{error instanceof Error ? error.message : "Unknown error"}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      {combinedLoading ? (
+        <LoadingForm />
+      ) : (
+        <ArticleForm
+          onSubmit={createArticle}
+          users={users}
+          periods={periods}
+          loading={combinedLoading}
+        />
+      )}
+    </div>
+  );
 }
-
-export default AddArticlePage;

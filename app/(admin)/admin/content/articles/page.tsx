@@ -1,136 +1,241 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { FiPlus } from "react-icons/fi";
-import ArticleTable from "@/components/admin/article/Table";
-import DeleteModal from "@/components/admin/article/modal/DeleteModal";
-import type { Article } from "@/types/article";
-import { useToast } from "@/hooks/use-toast";
+import ArticleStats from "components/admin/article/Stats";
+import ArticleFilters from "components/admin/article/Filters";
+import ArticleTable from "components/admin/article/Table";
+import DeleteModal from "components/admin/ui/modal/DeleteModal";
+import ViewModal from "components/admin/ui/modal/ViewModal";
+import Loading from "components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "components/admin/ui/alert/Alert";
+import ManagementHeader from "components/admin/ui/ManagementHeader";
+import AddButton from "components/admin/ui/button/AddButton";
+import HtmlRenderer from "components/admin/ui/HtmlRenderer";
+import StatusChip from "components/admin/ui/chip/Status";
+import DateDisplay from "components/admin/ui/date/DateDisplay";
+import ImageView from "components/admin/ui/avatar/ImageView";
+import { useArticleManagement } from "hooks/article/useArticleManagement";
 
 export default function ArticlesPage() {
-  const [_articles, setArticles] = useState<Article[]>([]);
-  const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    articleId: "",
-    articleName: "",
-  });
+  const {
+    articles,
+    loading,
+    error,
+    success,
+    selectedArticles,
+    searchTerm,
+    statusFilter,
+    periodFilter,
+    categoryFilter,
+    currentPage,
+    totalPages,
+    showDeleteModal,
+    showViewModal,
+    currentArticle,
+    setSearchTerm,
+    setStatusFilter,
+    setPeriodFilter,
+    setCategoryFilter,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentArticle,
+    toggleArticleSelection,
+    toggleSelectAll,
+    handleAddArticle,
+    handleEditArticle,
+    handleViewArticle,
+    handleDelete,
+    confirmDelete,
+  } = useArticleManagement();
 
-  const { toast } = useToast();
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
 
-  const fetchArticles = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/article");
-      if (response.ok) {
-        const data = await response.json();
-        setArticles(data || []);
-        setFilteredArticles(data || []);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch articles",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching articles:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch articles",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
-  // Fetch articles
-  useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
-
-  const handleDelete = async (articleId: string) => {
-    try {
-      const response = await fetch(`/api/article/${articleId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Article deleted successfully",
-        });
-        fetchArticles(); // Refresh the list
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to delete article",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting article:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete article",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteModal({ isOpen: false, articleId: "", articleName: "" });
-    }
-  };
-
-  const closeDeleteModal = () => {
-    setDeleteModal({ isOpen: false, articleId: "", articleName: "" });
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Articles Management
-          </h1>
-          <p className="text-gray-600">Manage and organize your articles</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/admin/content/articles/add"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <FiPlus className="h-4 w-4 mr-2" />
-            Add Article
-          </Link>
-        </div>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Articles"
+          description="Manage articles and their details"
+        />
+        <AddButton onClick={handleAddArticle} text="Add Article" />
       </div>
 
-      {/* Articles Table */}
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <ArticleTable articles={filteredArticles} onDelete={handleDelete} />
-      )}
+      <ArticleStats articles={articles} />
 
-      {/* Delete Modal */}
-      <DeleteModal
-        isOpen={deleteModal.isOpen}
-        onClose={closeDeleteModal}
-        onConfirm={() => handleDelete(deleteModal.articleId)}
-        articleName={deleteModal.articleName}
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <ArticleFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        periodFilter={periodFilter}
+        onPeriodFilterChange={setPeriodFilter}
+        categoryFilter={categoryFilter}
+        onCategoryFilterChange={setCategoryFilter}
+        selectedArticles={selectedArticles}
+        onDeleteSelected={() => handleDelete()}
       />
+
+      <ArticleTable
+        articles={articles}
+        selectedArticles={selectedArticles}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onArticleSelect={toggleArticleSelection}
+        onSelectAll={toggleSelectAll}
+        onViewArticle={handleViewArticle}
+        onEditArticle={handleEditArticle}
+        onDeleteArticle={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddArticle={handleAddArticle}
+      />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentArticle?.title}
+        selectedCount={selectedArticles.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentArticle(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Article Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentArticle(null);
+        }}
+      >
+        {currentArticle && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900">
+                  {currentArticle.title}
+                </h4>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentArticle.category?.name || "No category"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <div className="mt-1">
+                  <StatusChip status={currentArticle.status} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Author
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentArticle.author?.name || "No author"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Period
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentArticle.period?.name || "No period"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Published
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentArticle.isPublished ? "Yes" : "No"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Published At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentArticle.publishedAt
+                    ? new Intl.DateTimeFormat("id-ID", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      }).format(new Date(currentArticle.publishedAt))
+                    : "Not published"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentArticle.createdAt} />
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Updated At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentArticle.updatedAt} />
+                </p>
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Content
+              </label>
+              <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">
+                <HtmlRenderer html={currentArticle.content || "No content"} />
+              </div>
+            </div>
+
+            {currentArticle.thumbnail && (
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Thumbnail
+                </label>
+                <div className="mt-2">
+                  <ImageView
+                    imageUrl={currentArticle.thumbnail}
+                    alt={`Article thumbnail for ${currentArticle.title}`}
+                    size={{ width: 300, height: 200 }}
+                    modalTitle={`Article Thumbnail - ${currentArticle.title}`}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </ViewModal>
     </div>
   );
 }

@@ -1,57 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { FiArrowLeft } from "react-icons/fi";
 import ArticleCategoryForm from "@/components/admin/article/category/Form";
-import type {
-  CreateArticleCategoryInput,
-  UpdateArticleCategoryInput,
-} from "@/types/article-category";
-import { createArticleCategory } from "@/use-cases/api/article-category";
-import { useToast } from "@/hooks/use-toast";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
+import { useCreateArticleCategory } from "@/hooks/article-category/useCreateArticleCategory";
 
 export default function AddArticleCategoryPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async (
-    data: CreateArticleCategoryInput | UpdateArticleCategoryInput
-  ) => {
-    setIsLoading(true);
-    try {
-      await createArticleCategory(data as CreateArticleCategoryInput);
-      toast({
-        title: "Success",
-        description: "Article category created successfully",
-      });
-      // Redirect is handled in the form
-    } catch (error) {
-      console.error("Error creating category:", error);
-      throw error; // Re-throw to let the form handle it
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { createArticleCategory, handleBack, isSubmitting, error, isLoading } =
+    useCreateArticleCategory();
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center mb-6">
-        <Link
-          href="/admin/content/articles/categories"
-          className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-        >
-          <FiArrowLeft className="mr-1" />
-          Back
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Add New Article Category
-        </h1>
-      </div>
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Add New Article Category" onBack={handleBack} />
 
-      {/* Form */}
-      <ArticleCategoryForm onSubmit={handleSubmit} isLoading={isLoading} />
+      {error && <Alert type="error" message={error} />}
+
+      {isSubmitting || isLoading ? (
+        <LoadingForm />
+      ) : (
+        <ArticleCategoryForm onSubmit={createArticleCategory} />
+      )}
     </div>
   );
 }
