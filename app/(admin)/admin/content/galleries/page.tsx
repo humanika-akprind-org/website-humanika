@@ -9,7 +9,6 @@ import Loading from "components/admin/layout/loading/Loading";
 import Alert, { type AlertType } from "components/admin/ui/alert/Alert";
 import ManagementHeader from "components/admin/ui/ManagementHeader";
 import AddButton from "components/admin/ui/button/AddButton";
-import HtmlRenderer from "components/admin/ui/HtmlRenderer";
 import DateDisplay from "components/admin/ui/date/DateDisplay";
 import ImageView from "components/admin/ui/avatar/ImageView";
 import { useGalleryManagement } from "hooks/gallery/useGalleryManagement";
@@ -150,17 +149,6 @@ export default function GalleriesPage() {
                 <p className="mt-1 text-sm text-gray-900">
                   <DateDisplay date={currentGallery.updatedAt} />
                 </p>
-              </div>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Description
-              </label>
-              <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">
-                <HtmlRenderer
-                  html={currentGallery.gallery || "No description"}
-                />
               </div>
             </div>
 

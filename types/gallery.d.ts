@@ -1,29 +1,24 @@
 import { Status } from "./enums";
 import { GalleryCategory } from "./gallery-category";
+import { Event } from "./event";
 
 export interface Gallery {
   id: string;
   title: string;
-  image: string;
   eventId: string;
-  gallery?: string | null;
+  event?: Event;
   categoryId?: string | null;
-  category?: GalleryCategory | null;
+  category?: GalleryCategory;
+  image: string;
   createdAt: Date;
   updatedAt: Date;
-  event?: {
-    id: string;
-    name: string;
-  };
 }
 
 export interface CreateGalleryInput {
   title: string;
-  image: string;
   eventId: string;
-  gallery?: string | null;
   categoryId?: string;
-  file?: File;
+  image: string;
 }
 
 export interface UpdateGalleryInput extends Partial<CreateGalleryInput> {}

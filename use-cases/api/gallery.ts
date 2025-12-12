@@ -55,8 +55,8 @@ export const createGallery = async (
   const formData = new FormData();
   formData.append("title", data.title);
   formData.append("eventId", data.eventId);
-  if (data.file) {
-    formData.append("file", data.file);
+  if (data.image) {
+    formData.append("image", data.image);
   }
 
   const response = await fetch(`${API_URL}/gallery`, {
