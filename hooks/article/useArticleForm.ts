@@ -11,6 +11,7 @@ import type { Period } from "@/types/period";
 import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
 import { useArticleCategoryManagement } from "@/hooks/article-category/useArticleCategoryManagement";
 import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import { type User } from "@/types/user";
 
 // Helper functions
 const isHtmlEmpty = (html: string): boolean => {
@@ -72,7 +73,8 @@ export const useArticleForm = (
   article?: Article,
   onSubmit?: (data: CreateArticleInput | UpdateArticleInput) => Promise<void>,
   accessToken?: string,
-  periods?: Period[]
+  periods?: Period[],
+  currentUser?: User | null
 ) => {
   const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
 
@@ -105,7 +107,7 @@ export const useArticleForm = (
   const [formData, setFormData] = useState<ArticleFormData>({
     title: article?.title || "",
     content: article?.content || "",
-    authorId: article?.author?.id || "",
+    authorId: article?.author?.id || currentUser?.id || "",
     categoryId: article?.category?.id || "",
     periodId: article?.period?.id || "",
     status: article?.status || Status.DRAFT,
