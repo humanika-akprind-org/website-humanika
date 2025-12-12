@@ -7,7 +7,7 @@ import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import { getPeriods } from "@/use-cases/api/period";
 import { getEvents } from "@/use-cases/api/event";

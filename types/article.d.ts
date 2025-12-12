@@ -28,8 +28,6 @@ export interface CreateArticleInput {
   authorId: string;
   categoryId: string;
   periodId?: string;
-  isPublished?: boolean;
-  publishedAt?: Date;
 }
 
 export interface UpdateArticleInput extends Partial<CreateArticleInput> {

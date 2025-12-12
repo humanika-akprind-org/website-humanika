@@ -11,7 +11,6 @@ import type { Period } from "@/types/period";
 import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
 import { useArticleCategoryManagement } from "@/hooks/article-category/useArticleCategoryManagement";
 import { getAccessTokenAction } from "@/lib/actions/accessToken";
-import { getCurrentUser } from "@/lib/auth";
 
 // Helper functions
 const isHtmlEmpty = (html: string): boolean => {
@@ -65,8 +64,6 @@ export interface ArticleFormData {
   authorId: string;
   categoryId: string;
   periodId: string;
-  isPublished: boolean;
-  publishedAt: string;
   status: Status;
   thumbnailFile?: File;
 }
@@ -111,23 +108,8 @@ export const useArticleForm = (
     authorId: article?.author?.id || "",
     categoryId: article?.category?.id || "",
     periodId: article?.period?.id || "",
-    isPublished: false,
-    publishedAt: "",
     status: article?.status || Status.DRAFT,
   });
-
-  // Set current user as author for new articles
-  useEffect(() => {
-    if (!article) {
-      const setCurrentUserAsAuthor = async () => {
-        const currentUser = await getCurrentUser();
-        if (currentUser) {
-          setFormData((prev) => ({ ...prev, authorId: currentUser.id }));
-        }
-      };
-      setCurrentUserAsAuthor();
-    }
-  }, [article]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -291,9 +273,6 @@ export const useArticleForm = (
           formData.periodId && formData.periodId.trim() !== ""
             ? formData.periodId
             : undefined,
-        publishedAt: formData.publishedAt
-          ? new Date(formData.publishedAt)
-          : undefined,
       };
 
       await onSubmit(submitData);

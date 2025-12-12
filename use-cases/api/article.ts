@@ -17,9 +17,6 @@ export const getArticles = async (
   if (filter?.periodId) params.append("periodId", filter.periodId);
   if (filter?.categoryId) params.append("categoryId", filter.categoryId);
   if (filter?.authorId) params.append("authorId", filter.authorId);
-  if (filter?.isPublished !== undefined) {
-    params.append("isPublished", filter.isPublished.toString());
-  }
   if (filter?.search) params.append("search", filter.search);
 
   const response = await fetch(`${API_URL}/article?${params.toString()}`, {
@@ -84,12 +81,17 @@ export const createArticle = async (
       // If we can't parse the error response, use the status text
       errorMessage = response.statusText || errorMessage;
     }
-    console.error("Article creation failed:", {
-      status: response.status,
-      statusText: response.statusText,
+    console.error(
+      "Article creation failed:",
+      "status:",
+      response.status,
+      "statusText:",
+      response.statusText,
+      "errorMessage:",
       errorMessage,
-      data,
-    });
+      "data:",
+      data
+    );
     throw new Error(errorMessage);
   }
 

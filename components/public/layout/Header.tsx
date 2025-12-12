@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { NavLink } from "./NavLink";
 import Image from "next/image";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { MobileHeaderClient } from "./MobileHeader";
 import { UserDropdown } from "./UserDropdown";
 

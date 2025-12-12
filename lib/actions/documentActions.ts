@@ -6,7 +6,7 @@ import type {
 import { Status, ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/enums";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 
 export async function handleDocumentSubmit(

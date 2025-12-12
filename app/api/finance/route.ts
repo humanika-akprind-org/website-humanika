@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { CreateFinanceInput } from "@/types/finance";
 import type { FinanceType, Status } from "@/types/enums";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { getFinances, createFinance } from "@/services/finance/finance.service";
 
 function extractFinanceQueryParams(request: NextRequest) {

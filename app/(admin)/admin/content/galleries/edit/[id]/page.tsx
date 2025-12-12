@@ -6,7 +6,7 @@ import type { Event } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { redirect, notFound } from "next/navigation";
 
 async function EditGalleryPage({

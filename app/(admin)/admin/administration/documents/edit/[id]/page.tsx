@@ -13,7 +13,7 @@ import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";

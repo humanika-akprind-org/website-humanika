@@ -166,29 +166,30 @@ export default function ArticlesPage() {
                 </p>
               </div>
 
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Published
+                  Content
                 </label>
-                <p className="mt-1 text-sm text-gray-900">
-                  {currentArticle.isPublished ? "Yes" : "No"}
-                </p>
+                <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">
+                  <HtmlRenderer html={currentArticle.content || "No content"} />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Published At
-                </label>
-                <p className="mt-1 text-sm text-gray-900">
-                  {currentArticle.publishedAt
-                    ? new Intl.DateTimeFormat("id-ID", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      }).format(new Date(currentArticle.publishedAt))
-                    : "Not published"}
-                </p>
-              </div>
+              {currentArticle.thumbnail && (
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Thumbnail
+                  </label>
+                  <div className="mt-2">
+                    <ImageView
+                      imageUrl={currentArticle.thumbnail}
+                      alt={`Article thumbnail for ${currentArticle.title}`}
+                      size={{ width: 300, height: 200 }}
+                      modalTitle={`Article Thumbnail - ${currentArticle.title}`}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -208,31 +209,6 @@ export default function ArticlesPage() {
                 </p>
               </div>
             </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Content
-              </label>
-              <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">
-                <HtmlRenderer html={currentArticle.content || "No content"} />
-              </div>
-            </div>
-
-            {currentArticle.thumbnail && (
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700">
-                  Thumbnail
-                </label>
-                <div className="mt-2">
-                  <ImageView
-                    imageUrl={currentArticle.thumbnail}
-                    alt={`Article thumbnail for ${currentArticle.title}`}
-                    size={{ width: 300, height: 200 }}
-                    modalTitle={`Article Thumbnail - ${currentArticle.title}`}
-                  />
-                </div>
-              </div>
-            )}
           </div>
         )}
       </ViewModal>

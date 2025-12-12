@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { CreateArticleInput } from "@/types/article";
 import type { Status } from "@/types/enums";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { getArticles, createArticle } from "@/services/article/article.service";
 
 export async function GET(request: NextRequest) {

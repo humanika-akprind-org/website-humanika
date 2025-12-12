@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { UpdateArticleInput } from "@/types/article";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import {
   getArticleById,
   updateArticle,

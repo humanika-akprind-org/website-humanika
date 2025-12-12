@@ -12,7 +12,6 @@ export default function AddArticlePage() {
     useCreateArticle();
 
   const {
-    users,
     periods,
     loading: formDataLoading,
     error: formDataError,
@@ -32,7 +31,6 @@ export default function AddArticlePage() {
       ) : (
         <ArticleForm
           onSubmit={createArticle}
-          users={users}
           periods={periods}
           loading={combinedLoading}
         />

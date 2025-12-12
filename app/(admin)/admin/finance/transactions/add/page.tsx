@@ -20,7 +20,7 @@ import { Status } from "@/types/enums";
 import { StatusApproval } from "@/types/enums";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 

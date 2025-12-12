@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { ActivityType } from "@/types/enums";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import {
   getActivities,
   createActivity,
