@@ -221,8 +221,6 @@ export default function EventForm({
                 isLoading={isSubmitting}
                 photoLoading={photoLoading}
                 alt={formData.name || "Event thumbnail"}
-                customWidth={240}
-                customHeight={240}
               />
             </div>
           </div>

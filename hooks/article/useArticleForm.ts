@@ -7,12 +7,11 @@ import type {
 import { Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { articleFolderId } from "@/lib/config/config";
-import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
-import { useUserManagement } from "@/hooks/user/useUserManagement";
 import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
 import { useArticleCategoryManagement } from "@/hooks/article-category/useArticleCategoryManagement";
 import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import { getCurrentUser } from "@/lib/auth";
 
 // Helper functions
 const isHtmlEmpty = (html: string): boolean => {
@@ -76,7 +75,6 @@ export const useArticleForm = (
   article?: Article,
   onSubmit?: (data: CreateArticleInput | UpdateArticleInput) => Promise<void>,
   accessToken?: string,
-  users?: User[],
   periods?: Period[]
 ) => {
   const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
@@ -104,7 +102,6 @@ export const useArticleForm = (
   const { categories: articleCategories, loading: categoriesLoading } =
     useArticleCategoryManagement();
 
-  const { users: fetchedUsers, loading: usersLoading } = useUserManagement();
   const { periods: fetchedPeriods, loading: periodsLoading } =
     usePeriodManagement();
 
@@ -118,6 +115,19 @@ export const useArticleForm = (
     publishedAt: "",
     status: article?.status || Status.DRAFT,
   });
+
+  // Set current user as author for new articles
+  useEffect(() => {
+    if (!article) {
+      const setCurrentUserAsAuthor = async () => {
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          setFormData((prev) => ({ ...prev, authorId: currentUser.id }));
+        }
+      };
+      setCurrentUserAsAuthor();
+    }
+  }, [article]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -195,10 +205,6 @@ export const useArticleForm = (
     }
     if (isHtmlEmpty(formData.content)) {
       setError("Please enter article content");
-      return false;
-    }
-    if (!formData.authorId) {
-      setError("Please select author");
       return false;
     }
     if (!formData.categoryId) {
@@ -311,9 +317,7 @@ export const useArticleForm = (
     categoriesLoading,
     photoLoading,
     accessToken: accessToken || fetchedAccessToken,
-    users: users || fetchedUsers,
     periods: periods || fetchedPeriods,
-    usersLoading,
     periodsLoading,
     handleInputChange,
     handleFileChange,

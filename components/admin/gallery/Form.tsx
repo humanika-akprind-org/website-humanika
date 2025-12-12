@@ -124,10 +124,6 @@ export default function GalleryForm({
                 isLoading={isSubmitting}
                 photoLoading={photoLoading}
                 alt={formData.title || "Gallery image"}
-                customWidth={240}
-                customHeight={240}
-                accept="image/*"
-                helpText="Upload image (max 5MB, format: JPG, PNG, GIF)"
               />
             </div>
           </div>

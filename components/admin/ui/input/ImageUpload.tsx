@@ -1,7 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { Crop } from "lucide-react";
+import ImageCropper from "./ImageCropper";
 
 interface ImageUploadProps {
   label: string;
@@ -18,8 +20,6 @@ interface ImageUploadProps {
   showRemoveButton?: boolean;
   previewSize?: "small" | "medium" | "large"; // default "medium"
   previewShape?: "square" | "rectangle"; // default "square"
-  customWidth?: number; // custom width in pixels
-  customHeight?: number; // custom height in pixels
   className?: string;
 }
 
@@ -34,9 +34,52 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   maxSize = 5 * 1024 * 1024, // 5MB default
   alt = "Image",
   className = "",
-  customWidth,
-  customHeight,
 }) => {
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+
+  // Function to handle cropped image upload
+  const handleCroppedImageUpload = useCallback(
+    async (croppedImg: string) => {
+      try {
+        // Convert base64/data URL to blob
+        const response = await fetch(croppedImg);
+        const blob = await response.blob();
+
+        // Create a File object from the blob
+        const file = new File([blob], "cropped-image.jpg", {
+          type: "image/jpeg",
+        });
+
+        // Create a synthetic event to pass to onFileChange
+        const syntheticEvent = {
+          target: {
+            files: [file],
+          },
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+        // Call the parent's onFileChange with the cropped image
+        onFileChange(syntheticEvent);
+      } catch (error) {
+        console.error("Error uploading cropped image:", error);
+      }
+    },
+    [onFileChange]
+  );
+
+  // Effect to handle cropped image upload
+  useEffect(() => {
+    if (croppedImage) {
+      handleCroppedImageUpload(croppedImage);
+    }
+  }, [croppedImage, handleCroppedImageUpload]);
+
+  // Effect to clear cropped image when preview URL changes
+  useEffect(() => {
+    setCroppedImage(null);
+  }, [previewUrl]);
+
   // Helper function to validate image URL
   const isValidImageUrl = (url: string): boolean => {
     // Handle relative URLs
@@ -77,9 +120,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   };
 
-  const imgWidth = customWidth || 320;
-  const imgHeight = customHeight || 240;
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -89,6 +129,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         );
         return;
       }
+      // Reset crop-related state when new file is selected
+      setCroppedImage(null);
+      setCropModalOpen(false);
     }
     onFileChange(e);
   };
@@ -103,8 +146,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           <div className="flex flex-col items-center">
             <div className="flex-shrink-0">
               {(() => {
-                // Get the display URL using the helper function
-                const displayUrl = getPreviewUrl(previewUrl || existingPhoto);
+                // Prioritize cropped image, then preview URL, then existing photo
+                const displayUrl =
+                  croppedImage || getPreviewUrl(previewUrl || existingPhoto);
 
                 // Check if thumbnail exists and is a valid URL
                 if (displayUrl && isValidImageUrl(displayUrl)) {
@@ -112,22 +156,40 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     <div
                       className="bg-gray-200 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden"
                       style={{
-                        width: imgWidth,
-                        height: imgHeight,
-                        maxWidth: 320,
-                        maxHeight: 240,
+                        width: 480,
+                        height: 270,
                       }}
                     >
-                      <Image
-                        src={displayUrl}
-                        alt={alt}
-                        width={imgWidth}
-                        height={imgHeight}
-                        className="w-full h-full object-contain rounded-lg"
-                        onError={(e) => {
-                          console.error("Image failed to load:", displayUrl, e);
-                        }}
-                      />
+                      {displayUrl.startsWith("blob:") ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={displayUrl}
+                          alt={alt}
+                          className="w-full h-full object-contain rounded-lg"
+                          onError={(e) => {
+                            console.error(
+                              "Image failed to load:",
+                              displayUrl,
+                              e
+                            );
+                          }}
+                        />
+                      ) : (
+                        <Image
+                          src={displayUrl}
+                          alt={alt}
+                          width={480}
+                          height={270}
+                          className="w-full h-full object-contain rounded-lg"
+                          onError={(e) => {
+                            console.error(
+                              "Image failed to load:",
+                              displayUrl,
+                              e
+                            );
+                          }}
+                        />
+                      )}
                     </div>
                   );
                 } else {
@@ -152,6 +214,23 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               })()}
             </div>
             <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const displayUrl = getPreviewUrl(previewUrl || existingPhoto);
+                  if (displayUrl && isValidImageUrl(displayUrl)) {
+                    setOriginalImage(displayUrl);
+                    setCropModalOpen(true);
+                  }
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800"
+                disabled={
+                  isLoading || !getPreviewUrl(previewUrl || existingPhoto)
+                }
+              >
+                <Crop className="w-4 h-4 inline mr-1" />
+                Crop Image
+              </button>
               <button
                 type="button"
                 onClick={onRemovePhoto}
@@ -182,6 +261,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           )}
         </div>
       </div>
+
+      {/* Crop Modal */}
+      <ImageCropper
+        isOpen={cropModalOpen}
+        onClose={() => setCropModalOpen(false)}
+        imageSrc={originalImage}
+        onCropComplete={(croppedImg) => setCroppedImage(croppedImg)}
+        aspect={16 / 9}
+      />
     </div>
   );
 };

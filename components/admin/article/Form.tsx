@@ -8,9 +8,8 @@ import type {
   UpdateArticleInput,
 } from "@/types/article";
 import { Status } from "@/types/enums";
-import type { User } from "@/types/user";
 import type { Period } from "@/types/period";
-import { FiBriefcase, FiUser, FiFolder } from "react-icons/fi";
+import { FiBriefcase, FiFolder } from "react-icons/fi";
 import TextEditor from "@/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
@@ -23,7 +22,6 @@ interface ArticleFormProps {
   article?: Article;
   onSubmit: (data: CreateArticleInput | UpdateArticleInput) => Promise<void>;
   accessToken?: string;
-  users: User[];
   periods: Period[];
   isEditing?: boolean;
   loading?: boolean;
@@ -33,7 +31,6 @@ export default function ArticleForm({
   article,
   onSubmit,
   accessToken,
-  users,
   periods,
   isEditing = false,
   loading = false,
@@ -51,7 +48,7 @@ export default function ArticleForm({
     handleFileChange,
     removeThumbnail,
     handleSubmit,
-  } = useArticleForm(article, onSubmit, accessToken, users, periods);
+  } = useArticleForm(article, onSubmit, accessToken, periods);
 
   return (
     <>
@@ -84,21 +81,6 @@ export default function ArticleForm({
               }))}
               required
               icon={<FiBriefcase className="text-gray-400" />}
-            />
-
-            <SelectInput
-              label="Author"
-              name="authorId"
-              value={formData.authorId}
-              onChange={(value: string) =>
-                setFormData((prev) => ({ ...prev, authorId: value }))
-              }
-              options={(users || []).map((user) => ({
-                value: user.id,
-                label: user.name,
-              }))}
-              required
-              icon={<FiUser className="text-gray-400" />}
             />
 
             <SelectInput
@@ -155,8 +137,6 @@ export default function ArticleForm({
                 isLoading={isSubmitting}
                 photoLoading={photoLoading}
                 alt={formData.title || "Article thumbnail"}
-                customWidth={240}
-                customHeight={240}
               />
             </div>
           </div>
