@@ -119,14 +119,7 @@ export default function GalleryForm({
                 label="Gallery Image"
                 previewUrl={previewUrl}
                 existingPhoto={existingImage}
-                onFileChange={(file) => {
-                  const syntheticEvent = {
-                    target: { files: [file] },
-                    preventDefault: () => {},
-                    stopPropagation: () => {},
-                  } as unknown as React.ChangeEvent<HTMLInputElement>;
-                  handleFileChange(syntheticEvent);
-                }}
+                onFileChange={handleFileChange}
                 onRemovePhoto={removeImage}
                 isLoading={isSubmitting}
                 photoLoading={photoLoading}

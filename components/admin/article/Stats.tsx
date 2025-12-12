@@ -19,7 +19,8 @@ export default function Stats({ articles }: StatsProps) {
     },
     {
       title: "Published Articles",
-      value: articles.filter((article) => article.isPublished).length,
+      value: articles.filter((article) => article.status === Status.PUBLISH)
+        .length,
       icon: FiEye,
       color: "green",
     },

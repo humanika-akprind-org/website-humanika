@@ -216,15 +216,7 @@ export default function EventForm({
                 label="Event Thumbnail"
                 previewUrl={previewUrl}
                 existingPhoto={existingThumbnail}
-                onFileChange={(file) => {
-                  // Create a proper synthetic event for handleFileChange
-                  const syntheticEvent = {
-                    target: { files: [file] },
-                    preventDefault: () => {},
-                    stopPropagation: () => {},
-                  } as unknown as React.ChangeEvent<HTMLInputElement>;
-                  handleFileChange(syntheticEvent);
-                }}
+                onFileChange={handleFileChange}
                 onRemovePhoto={removeThumbnail}
                 isLoading={isSubmitting}
                 photoLoading={photoLoading}

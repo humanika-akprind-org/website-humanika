@@ -15,8 +15,6 @@ export interface Article {
   category: ArticleCategory;
   periodId?: string | null;
   period?: Period | null;
-  isPublished: boolean;
-  publishedAt?: Date | null;
   status: Status;
   createdAt: Date;
   updatedAt: Date;
@@ -43,6 +41,5 @@ export interface ArticleFilter {
   periodId?: string;
   categoryId?: string;
   authorId?: string;
-  isPublished?: boolean;
   search?: string;
 }

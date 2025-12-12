@@ -36,7 +36,6 @@ export async function getArticles(filter?: {
   if (filter?.periodId) where.periodId = filter.periodId;
   if (filter?.categoryId) where.categoryId = filter.categoryId;
   if (filter?.authorId) where.authorId = filter.authorId;
-  if (filter?.isPublished !== undefined) where.isPublished = filter.isPublished;
   if (filter?.search) {
     where.OR = [
       { title: { contains: filter.search, mode: "insensitive" } },
@@ -79,8 +78,6 @@ export async function createArticle(
     content: data.content,
     author: { connect: { id: data.authorId } },
     category: { connect: { id: data.categoryId } },
-    isPublished: data.isPublished || false,
-    publishedAt: data.publishedAt,
   };
 
   // Only include periodId if it's provided and not empty
@@ -124,9 +121,7 @@ export async function createArticle(
   return article;
 }
 
-export async function getArticleById(
-  id: string
-): Promise<
+export async function getArticleById(id: string): Promise<
   | (ArticleWithPartialAuthor & {
       relatedArticles?: ArticleWithPartialAuthor[];
     })
@@ -159,7 +154,7 @@ export async function getArticleById(
       id: {
         not: id,
       },
-      isPublished: true,
+      status: "PUBLISH",
     },
     take: 4, // Limit to 4 related articles
     include: {
@@ -174,7 +169,7 @@ export async function getArticleById(
       period: true,
     },
     orderBy: {
-      publishedAt: "desc",
+      createdAt: "desc",
     },
   });
 
@@ -216,8 +211,6 @@ export async function updateArticle(
   } else if (data.periodId === "") {
     updateData.periodId = null;
   }
-  if (data.isPublished !== undefined) updateData.isPublished = data.isPublished;
-  if (data.publishedAt !== undefined) updateData.publishedAt = data.publishedAt;
   if (data.status) updateData.status = data.status;
 
   const article = await prisma.article.update({

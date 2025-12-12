@@ -114,10 +114,8 @@ export const useArticleForm = (
     authorId: article?.author?.id || "",
     categoryId: article?.category?.id || "",
     periodId: article?.period?.id || "",
-    isPublished: article?.isPublished || false,
-    publishedAt: article?.publishedAt
-      ? new Date(article.publishedAt).toISOString().split("T")[0]
-      : "",
+    isPublished: false,
+    publishedAt: "",
     status: article?.status || Status.DRAFT,
   });
 
@@ -283,13 +281,13 @@ export const useArticleForm = (
       const submitData = {
         ...dataToSend,
         thumbnail: thumbnailUrl,
-        publishedAt: formData.publishedAt
-          ? new Date(formData.publishedAt)
-          : undefined,
         periodId:
           formData.periodId && formData.periodId.trim() !== ""
             ? formData.periodId
             : undefined,
+        publishedAt: formData.publishedAt
+          ? new Date(formData.publishedAt)
+          : undefined,
       };
 
       await onSubmit(submitData);

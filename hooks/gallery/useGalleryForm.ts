@@ -138,12 +138,7 @@ export const useGalleryForm = (
         return;
       }
 
-      if (!file.type.startsWith("image/")) {
-        setError("Please select an image file");
-        return;
-      }
-
-      setFormData((prev) => ({ ...prev, thumbnailFile: file }));
+      setFormData((prev) => ({ ...prev, imageFile: file }));
       setError(null);
 
       const url = URL.createObjectURL(file);

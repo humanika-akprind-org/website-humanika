@@ -34,6 +34,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   maxSize = 5 * 1024 * 1024, // 5MB default
   alt = "Image",
   className = "",
+  customWidth,
+  customHeight,
 }) => {
   // Helper function to validate image URL
   const isValidImageUrl = (url: string): boolean => {
@@ -75,6 +77,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   };
 
+  const imgWidth = customWidth || 320;
+  const imgHeight = customHeight || 240;
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -104,12 +109,20 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 // Check if thumbnail exists and is a valid URL
                 if (displayUrl && isValidImageUrl(displayUrl)) {
                   return (
-                    <div className="w-80 h-60 bg-gray-200 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden">
+                    <div
+                      className="bg-gray-200 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden"
+                      style={{
+                        width: imgWidth,
+                        height: imgHeight,
+                        maxWidth: 320,
+                        maxHeight: 240,
+                      }}
+                    >
                       <Image
                         src={displayUrl}
                         alt={alt}
-                        width={400}
-                        height={300}
+                        width={imgWidth}
+                        height={imgHeight}
                         className="w-full h-full object-contain rounded-lg"
                         onError={(e) => {
                           console.error("Image failed to load:", displayUrl, e);
