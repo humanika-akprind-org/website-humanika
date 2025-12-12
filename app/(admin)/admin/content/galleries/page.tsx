@@ -1,143 +1,183 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { FiPlus } from "react-icons/fi";
+import GalleryStats from "components/admin/gallery/Stats";
+import GalleryFilters from "components/admin/gallery/Filters";
 import GalleryTable from "@/components/admin/gallery/Table";
-import type { Gallery } from "@/types/gallery";
-import { useToast } from "@/hooks/use-toast";
+import DeleteModal from "components/admin/ui/modal/DeleteModal";
+import ViewModal from "components/admin/ui/modal/ViewModal";
+import Loading from "components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "components/admin/ui/alert/Alert";
+import ManagementHeader from "components/admin/ui/ManagementHeader";
+import AddButton from "components/admin/ui/button/AddButton";
+import HtmlRenderer from "components/admin/ui/HtmlRenderer";
+import DateDisplay from "components/admin/ui/date/DateDisplay";
+import ImageView from "components/admin/ui/avatar/ImageView";
+import { useGalleryManagement } from "hooks/gallery/useGalleryManagement";
 
 export default function GalleriesPage() {
-  const [_galleries, setGalleries] = useState<Gallery[]>([]);
-  const [filteredGalleries, setFilteredGalleries] = useState<Gallery[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [_deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    galleryId: "",
-    galleryName: "",
-  });
-  const [accessToken, setAccessToken] = useState<string>("");
+  const {
+    galleries,
+    loading,
+    error,
+    success,
+    selectedGalleries,
+    searchTerm,
+    eventFilter,
+    currentPage,
+    totalPages,
+    showDeleteModal,
+    showViewModal,
+    currentGallery,
+    setSearchTerm,
+    setEventFilter,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentGallery,
+    toggleGallerySelection,
+    toggleSelectAll,
+    handleAddGallery,
+    handleEditGallery,
+    handleViewGallery,
+    handleDelete,
+    confirmDelete,
+  } = useGalleryManagement();
 
-  const { toast } = useToast();
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
 
-  // Get access token on component mount
-  useEffect(() => {
-    const getToken = async () => {
-      try {
-        // Get token from cookies (server-side rendered)
-        const response = await fetch('/api/auth/token');
-        if (response.ok) {
-          const data = await response.json();
-          setAccessToken(data.accessToken || '');
-        } else {
-          console.error('Failed to get access token from API');
-        }
-      } catch (error) {
-        console.error('Failed to get access token:', error);
-      }
-    };
-    getToken();
-  }, []);
-
-  const fetchGalleries = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/gallery");
-      if (response.ok) {
-        const data = await response.json();
-        setGalleries(data || []);
-        setFilteredGalleries(data || []);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch galleries",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching galleries:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch galleries",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
-  // Fetch galleries
-  useEffect(() => {
-    fetchGalleries();
-  }, [fetchGalleries]);
-
-  const handleDelete = async (galleryId: string) => {
-    try {
-      const response = await fetch(`/api/gallery/${galleryId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Gallery deleted successfully",
-        });
-        fetchGalleries(); // Refresh the list
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to delete gallery",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting gallery:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete gallery",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteModal({ isOpen: false, galleryId: "", galleryName: "" });
-    }
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Gallery Management
-          </h1>
-          <p className="text-gray-600">Manage and organize your gallery files</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/admin/content/galleries/add"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <FiPlus className="h-4 w-4 mr-2" />
-            Add Gallery
-          </Link>
-        </div>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Galleries"
+          description="Manage galleries and their details"
+        />
+        <AddButton onClick={handleAddGallery} text="Add Gallery" />
       </div>
 
-      {/* Galleries Table */}
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
+      <GalleryStats galleries={galleries} />
+
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <GalleryFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        eventFilter={eventFilter}
+        onEventFilterChange={setEventFilter}
+        selectedCount={selectedGalleries.length}
+        onDeleteSelected={() => handleDelete()}
+      />
+
+      <GalleryTable
+        galleries={galleries}
+        selectedGalleries={selectedGalleries}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onGallerySelect={toggleGallerySelection}
+        onSelectAll={toggleSelectAll}
+        onViewGallery={handleViewGallery}
+        onEditGallery={handleEditGallery}
+        onDeleteGallery={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddGallery={handleAddGallery}
+      />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentGallery?.title}
+        selectedCount={selectedGalleries.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentGallery(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Gallery Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentGallery(null);
+        }}
+      >
+        {currentGallery && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900">
+                  {currentGallery.title}
+                </h4>
+              </div>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Event
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentGallery.event?.name || "No event"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentGallery.createdAt} />
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Updated At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentGallery.updatedAt} />
+                </p>
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">
+                <HtmlRenderer
+                  html={currentGallery.gallery || "No description"}
+                />
+              </div>
+            </div>
+
+            {currentGallery.image && (
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Image
+                </label>
+                <div className="mt-2">
+                  <ImageView
+                    imageUrl={currentGallery.image}
+                    alt={`Gallery image for ${currentGallery.title}`}
+                    size={{ width: 300, height: 200 }}
+                    modalTitle={`Gallery Image - ${currentGallery.title}`}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      ) : (
-        <GalleryTable galleries={filteredGalleries} onDelete={handleDelete} accessToken={accessToken} />
-      )}
+        )}
+      </ViewModal>
     </div>
   );
 }

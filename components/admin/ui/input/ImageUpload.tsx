@@ -7,7 +7,7 @@ interface ImageUploadProps {
   label: string;
   previewUrl: string | null;
   existingPhoto: string | null | undefined;
-  onFileChange: (file: File) => void;
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemovePhoto: () => void;
   isLoading: boolean;
   photoLoading: boolean;
@@ -78,20 +78,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file size
       if (file.size > maxSize) {
-        alert(`File size must be less than ${maxSize / (1024 * 1024)}MB`);
+        alert(
+          `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`
+        );
         return;
       }
-
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        alert("Please select an image file");
-        return;
-      }
-
-      onFileChange(file);
     }
+    onFileChange(e);
   };
 
   return (

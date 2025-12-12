@@ -93,7 +93,7 @@ async function EditGalleryPage({
             accessToken={accessToken}
             events={events as unknown as Event[]}
             onSubmit={handleSubmit}
-            isLoading={false}
+            loading={false}
           />
         </div>
       </AuthGuard>

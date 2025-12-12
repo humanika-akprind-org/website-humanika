@@ -1,22 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import EventStats from "@/components/admin/event/Stats";
-import EventFilters from "@/components/admin/event/Filters";
-import EventTable from "@/components/admin/event/Table";
-import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/components/admin/ui/modal/ViewModal";
-import Loading from "@/components/admin/layout/loading/Loading";
-import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/components/admin/ui/ManagementHeader";
-import AddButton from "@/components/admin/ui/button/AddButton";
-import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
-import DepartmentChip from "@/components/admin/ui/chip/Department";
-import StatusChip from "@/components/admin/ui/chip/Status";
-import StatusApprovalChip from "@/components/admin/ui/chip/StatusApproval";
-import DateDisplay from "@/components/admin/ui/date/DateDisplay";
-import ImageView from "@/components/admin/ui/avatar/ImageView";
-import { useEventManagement } from "@/hooks/event/useEventManagement";
+import EventStats from "components/admin/event/Stats";
+import EventFilters from "components/admin/event/Filters";
+import EventTable from "components/admin/event/Table";
+import DeleteModal from "components/admin/ui/modal/DeleteModal";
+import ViewModal from "components/admin/ui/modal/ViewModal";
+import Loading from "components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "components/admin/ui/alert/Alert";
+import ManagementHeader from "components/admin/ui/ManagementHeader";
+import AddButton from "components/admin/ui/button/AddButton";
+import HtmlRenderer from "components/admin/ui/HtmlRenderer";
+import DepartmentChip from "components/admin/ui/chip/Department";
+import StatusChip from "components/admin/ui/chip/Status";
+import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
+import DateDisplay from "components/admin/ui/date/DateDisplay";
+import ImageView from "components/admin/ui/avatar/ImageView";
+import { useEventManagement } from "hooks/event/useEventManagement";
 
 export default function EventsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
