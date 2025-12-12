@@ -52,17 +52,13 @@ export const getGallery = async (id: string): Promise<Gallery> => {
 export const createGallery = async (
   data: CreateGalleryInput
 ): Promise<Gallery> => {
-  const formData = new FormData();
-  formData.append("title", data.title);
-  formData.append("eventId", data.eventId);
-  if (data.image) {
-    formData.append("image", data.image);
-  }
-
   const response = await fetch(`${API_URL}/gallery`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     credentials: "include",
-    body: formData,
+    body: JSON.stringify(data),
   });
 
   if (!response.ok) {
