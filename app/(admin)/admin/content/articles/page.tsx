@@ -176,7 +176,7 @@ export default function ArticlesPage() {
               </div>
 
               {currentArticle.thumbnail && (
-                <div className="mt-6">
+                <div className="md:col-span-2 mt-6">
                   <label className="block text-sm font-medium text-gray-700">
                     Thumbnail
                   </label>

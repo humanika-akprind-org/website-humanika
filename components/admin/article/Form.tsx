@@ -17,12 +17,14 @@ import ImageUpload from "@/components/admin/ui/input/ImageUpload";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/components/ui/CancelButton";
 import { useArticleForm } from "@/hooks/article/useArticleForm";
+import { type User } from "@/types/user";
 
 interface ArticleFormProps {
   article?: Article;
   onSubmit: (data: CreateArticleInput | UpdateArticleInput) => Promise<void>;
   accessToken?: string;
   periods: Period[];
+  currentUser?: User | null;
   isEditing?: boolean;
   loading?: boolean;
 }
@@ -32,6 +34,7 @@ export default function ArticleForm({
   onSubmit,
   accessToken,
   periods,
+  currentUser,
   isEditing = false,
   loading = false,
 }: ArticleFormProps) {
@@ -48,7 +51,7 @@ export default function ArticleForm({
     handleFileChange,
     removeThumbnail,
     handleSubmit,
-  } = useArticleForm(article, onSubmit, accessToken, periods);
+  } = useArticleForm(article, onSubmit, accessToken, periods, currentUser);
 
   return (
     <>

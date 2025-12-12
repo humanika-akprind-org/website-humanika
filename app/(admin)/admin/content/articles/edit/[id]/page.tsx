@@ -17,6 +17,7 @@ export default function EditArticlePage() {
 
   const {
     periods,
+    currentUser,
     loading: formDataLoading,
     error: formDataError,
   } = useArticleFormData();
@@ -37,6 +38,7 @@ export default function EditArticlePage() {
           article={article}
           onSubmit={updateArticle}
           periods={periods}
+          currentUser={currentUser}
           isEditing={true}
         />
       ) : null}

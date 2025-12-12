@@ -13,6 +13,7 @@ export default function AddArticlePage() {
 
   const {
     periods,
+    currentUser,
     loading: formDataLoading,
     error: formDataError,
   } = useArticleFormData();
@@ -32,6 +33,7 @@ export default function AddArticlePage() {
         <ArticleForm
           onSubmit={createArticle}
           periods={periods}
+          currentUser={currentUser}
           loading={combinedLoading}
         />
       )}

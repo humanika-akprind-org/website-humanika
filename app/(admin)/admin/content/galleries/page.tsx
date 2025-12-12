@@ -23,6 +23,7 @@ export default function GalleriesPage() {
     selectedGalleries,
     searchTerm,
     eventFilter,
+    categoryFilter,
     currentPage,
     totalPages,
     showDeleteModal,
@@ -30,6 +31,7 @@ export default function GalleriesPage() {
     currentGallery,
     setSearchTerm,
     setEventFilter,
+    setCategoryFilter,
     setCurrentPage,
     setShowDeleteModal,
     setShowViewModal,
@@ -72,6 +74,8 @@ export default function GalleriesPage() {
         onSearchChange={setSearchTerm}
         eventFilter={eventFilter}
         onEventFilterChange={setEventFilter}
+        categoryFilter={categoryFilter}
+        onCategoryFilterChange={setCategoryFilter}
         selectedCount={selectedGalleries.length}
         onDeleteSelected={() => handleDelete()}
       />

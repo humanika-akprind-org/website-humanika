@@ -65,6 +65,10 @@ const ArticleTable: React.FC<ArticleTableProps> = ({
         aValue = a.status.toLowerCase();
         bValue = b.status.toLowerCase();
         break;
+      case "author":
+        aValue = a.author?.name?.toLowerCase() || "";
+        bValue = b.author?.name?.toLowerCase() || "";
+        break;
       default:
         aValue = a.title.toLowerCase();
         bValue = b.title.toLowerCase();
@@ -183,6 +187,21 @@ const ArticleTable: React.FC<ArticleTableProps> = ({
               </th>
               <th
                 scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("author")}
+              >
+                <div className="flex items-center">
+                  Author
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="author"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
                 className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               />
             </tr>
@@ -217,6 +236,9 @@ const ArticleTable: React.FC<ArticleTableProps> = ({
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <StatusChip status={article.status} />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {article.author?.name || "Unknown"}
                 </td>
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                   <DropdownMenu
