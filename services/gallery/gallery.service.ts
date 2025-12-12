@@ -9,22 +9,26 @@ type UserWithId = Pick<User, "id">;
 export type CreateGalleryInput = {
   title: string;
   eventId: string;
+  categoryId?: string;
   image: string;
 };
 
 export type UpdateGalleryInput = {
   title?: string;
   eventId?: string;
+  categoryId?: string;
   image?: string;
 };
 
 export const getGalleries = async (filter: {
   eventId?: string;
+  categoryId?: string;
   search?: string;
 }) => {
   const where: Prisma.GalleryWhereInput = {};
 
   if (filter.eventId) where.eventId = filter.eventId;
+  if (filter.categoryId) where.categoryId = filter.categoryId;
   if (filter.search) {
     where.OR = [
       { title: { contains: filter.search, mode: "insensitive" } },
@@ -36,6 +40,7 @@ export const getGalleries = async (filter: {
     where,
     include: {
       event: true,
+      category: true,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -48,6 +53,7 @@ export const getGallery = async (id: string) => {
     where: { id },
     include: {
       event: true,
+      category: true,
     },
   });
 
@@ -58,14 +64,21 @@ export const createGallery = async (
   data: CreateGalleryInput,
   user: UserWithId
 ) => {
+  const galleryData: Prisma.GalleryCreateInput = {
+    title: data.title,
+    event: { connect: { id: data.eventId } },
+    image: data.image,
+  };
+
+  if (data.categoryId) {
+    galleryData.category = { connect: { id: data.categoryId } };
+  }
+
   const gallery = await prisma.gallery.create({
-    data: {
-      title: data.title,
-      eventId: data.eventId,
-      image: data.image,
-    },
+    data: galleryData,
     include: {
       event: true,
+      category: true,
     },
   });
 
@@ -80,6 +93,7 @@ export const createGallery = async (
       newData: {
         title: gallery.title,
         eventId: gallery.eventId,
+        categoryId: gallery.categoryId,
         image: gallery.image,
       },
     },
@@ -106,6 +120,7 @@ export const updateGallery = async (
 
   if (data.title !== undefined) updateData.title = data.title;
   if (data.eventId !== undefined) updateData.eventId = data.eventId;
+  if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
   if (data.image !== undefined) updateData.image = data.image;
 
   const gallery = await prisma.gallery.update({
@@ -127,11 +142,13 @@ export const updateGallery = async (
       oldData: {
         title: existingGallery.title,
         eventId: existingGallery.eventId,
+        categoryId: existingGallery.categoryId,
         image: existingGallery.image,
       },
       newData: {
         title: gallery.title,
         eventId: gallery.eventId,
+        categoryId: gallery.categoryId,
         image: gallery.image,
       },
     },
@@ -165,6 +182,7 @@ export const deleteGallery = async (id: string, user: UserWithId) => {
       oldData: {
         title: existingGallery.title,
         eventId: existingGallery.eventId,
+        categoryId: existingGallery.categoryId,
         image: existingGallery.image,
       },
       newData: null,

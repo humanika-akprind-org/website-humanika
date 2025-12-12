@@ -166,6 +166,10 @@ export const useGalleryForm = (
       setError("Please select an event");
       return false;
     }
+    if (!formData.imageFile && !existingImage) {
+      setError("Please upload an image");
+      return false;
+    }
 
     return true;
   };

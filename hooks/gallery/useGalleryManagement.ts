@@ -12,6 +12,7 @@ export function useGalleryManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -31,7 +32,7 @@ export function useGalleryManagement() {
 
   useEffect(() => {
     setTotalPages(Math.ceil(filteredGalleries.length / 10));
-  }, [filteredGalleries, currentPage]);
+  }, [filteredGalleries]);
 
   // Debounce search term
   useEffect(() => {
@@ -112,6 +113,7 @@ export function useGalleryManagement() {
     selectedGalleries,
     searchTerm,
     eventFilter,
+    categoryFilter,
     currentPage,
     totalPages,
     showDeleteModal,
@@ -119,6 +121,7 @@ export function useGalleryManagement() {
     currentGallery,
     setSearchTerm,
     setEventFilter,
+    setCategoryFilter,
     setCurrentPage,
     setShowDeleteModal,
     setShowViewModal,
