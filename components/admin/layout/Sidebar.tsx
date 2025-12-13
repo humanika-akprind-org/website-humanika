@@ -3,20 +3,23 @@
 import {
   Home,
   Users,
-  Calendar,
+  CalendarClock,
+  CalendarRange,
   Settings,
-  Building,
-  Target,
-  BookOpen,
-  DollarSign,
-  Camera,
+  Network,
+  MonitorCog,
+  Newspaper,
+  Landmark,
+  Images,
   BarChart3,
   Activity,
   User,
   ClipboardList,
-  Shield,
-  FolderOpen,
-  Mail,
+  UserCog,
+  SquareLibrary,
+  FileText,
+  BookCheck,
+  BookText,
 } from "lucide-react";
 import { LogoutButton } from "@/components/admin/auth/LogoutButton";
 import Image from "next/image";
@@ -78,7 +81,7 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={Calendar} title="Periods">
+        <NavDropdown icon={CalendarClock} title="Periods">
           <NavDropdownItem href="/admin/governance/periods">
             All Period
           </NavDropdownItem>
@@ -87,7 +90,7 @@ export default function Sidebar() {
           </NavDropdownItem>
         </NavDropdown>
 
-        <NavDropdown icon={Shield} title="Managements">
+        <NavDropdown icon={UserCog} title="Managements">
           <NavDropdownItem href="/admin/governance/managements">
             All Management
           </NavDropdownItem>
@@ -96,7 +99,7 @@ export default function Sidebar() {
           </NavDropdownItem>
         </NavDropdown>
 
-        <NavDropdown icon={Building} title="Organizational Structure">
+        <NavDropdown icon={Network} title="Organizational Structure">
           <NavDropdownItem href="/admin/governance/structure">
             All Structure
           </NavDropdownItem>
@@ -140,7 +143,7 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={Target} title="Work Programs">
+        <NavDropdown icon={MonitorCog} title="Work Programs">
           <NavDropdownItem href="/admin/program/works">
             All Programs
           </NavDropdownItem>
@@ -152,7 +155,7 @@ export default function Sidebar() {
           </NavDropdownItem>
         </NavDropdown>
 
-        <NavDropdown icon={Calendar} title="Events">
+        <NavDropdown icon={CalendarRange} title="Events">
           <NavDropdownItem href="/admin/program/events">
             All Events
           </NavDropdownItem>
@@ -174,22 +177,31 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={FolderOpen} title="Documents">
-          <NavDropdownItem href="/admin/administration/documents">
-            All Documents
+        <NavDropdown icon={BookText} title="Proposals">
+          <NavDropdownItem href="/admin/administration/proposals">
+            All Proposals
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/documents/add">
+          <NavDropdownItem href="/admin/administration/proposals/add">
             Add New
           </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/documents/types">
-            Document Type
-          </NavDropdownItem>
-          <NavDropdownItem href="/admin/administration/documents/approval">
+          <NavDropdownItem href="/admin/administration/proposals/approval">
             Approval
           </NavDropdownItem>
         </NavDropdown>
 
-        <NavDropdown icon={Mail} title="Letter">
+        <NavDropdown icon={BookCheck} title="Accountability Reports">
+          <NavDropdownItem href="/admin/administration/accountability-reports">
+            All Accountability Reports
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/accountability-reports/add">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/accountability-reports/approval">
+            Approval
+          </NavDropdownItem>
+        </NavDropdown>
+
+        <NavDropdown icon={FileText} title="Letter">
           <NavDropdownItem href="/admin/administration/letters">
             All Letter
           </NavDropdownItem>
@@ -201,6 +213,18 @@ export default function Sidebar() {
           </NavDropdownItem>
         </NavDropdown>
 
+        <NavDropdown icon={SquareLibrary} title="Documents">
+          <NavDropdownItem href="/admin/administration/documents">
+            All Documents
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/documents/add">
+            Add New
+          </NavDropdownItem>
+          <NavDropdownItem href="/admin/administration/documents/types">
+            Document Type
+          </NavDropdownItem>
+        </NavDropdown>
+
         {/* Content & Media Section */}
         <div className="mt-6 mb-2">
           <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
@@ -208,7 +232,7 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={BookOpen} title="Articles">
+        <NavDropdown icon={Newspaper} title="Articles">
           <NavDropdownItem href="/admin/content/articles">
             All Article
           </NavDropdownItem>
@@ -220,7 +244,7 @@ export default function Sidebar() {
           </NavDropdownItem>
         </NavDropdown>
 
-        <NavDropdown icon={Camera} title="Galleries">
+        <NavDropdown icon={Images} title="Galleries">
           <NavDropdownItem href="/admin/content/galleries">
             All Gallery
           </NavDropdownItem>
@@ -239,7 +263,7 @@ export default function Sidebar() {
           </h3>
         </div>
 
-        <NavDropdown icon={DollarSign} title="Transactions">
+        <NavDropdown icon={Landmark} title="Transactions">
           <NavDropdownItem href="/admin/finance/transactions">
             All Transaction
           </NavDropdownItem>
