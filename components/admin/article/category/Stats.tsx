@@ -17,11 +17,8 @@ export default function ArticleCategoryStats({
       color: "blue",
     },
     {
-      title: "Total Articles",
-      value: categories.reduce(
-        (sum, category) => sum + (category._count?.articles || 0),
-        0
-      ),
+      title: "With Description",
+      value: categories.filter((category) => category.description).length,
       icon: FiFileText,
       color: "green",
     },

@@ -1,6 +1,6 @@
 "use client";
 
-import { FiCalendar, FiCheckCircle } from "react-icons/fi";
+import { FiCalendar, FiCheckCircle, FiFileText, FiClock } from "react-icons/fi";
 import type { Event } from "@/types/event";
 import { Status } from "@/types/enums";
 import StatCard from "../ui/card/StatCard";
@@ -22,6 +22,18 @@ export default function Stats({ events }: StatsProps) {
       value: events.filter((event) => event.status === Status.PUBLISH).length,
       icon: FiCheckCircle,
       color: "orange",
+    },
+    {
+      title: "Draft Events",
+      value: events.filter((event) => event.status === Status.DRAFT).length,
+      icon: FiFileText,
+      color: "green",
+    },
+    {
+      title: "Pending Events",
+      value: events.filter((event) => event.status === Status.PENDING).length,
+      icon: FiClock,
+      color: "yellow",
     },
   ];
 

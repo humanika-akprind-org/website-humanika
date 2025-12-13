@@ -1,4 +1,4 @@
-import { FiTag, FiFileText, FiClock } from "react-icons/fi";
+import { FiTag, FiFileText } from "react-icons/fi";
 import type { GalleryCategory } from "@/types/gallery-category";
 import StatCard from "../../ui/card/StatCard";
 
@@ -14,12 +14,6 @@ export default function GalleryCategoryStats({
     (category) => category.description && category.description.trim() !== ""
   ).length;
 
-  const recentCategories = categories.filter((category) => {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return new Date(category.createdAt) >= thirtyDaysAgo;
-  }).length;
-
   const stats = [
     {
       title: "Total Categories",
@@ -32,12 +26,6 @@ export default function GalleryCategoryStats({
       value: categoriesWithDescription,
       icon: FiFileText,
       color: "green",
-    },
-    {
-      title: "Recent (30 days)",
-      value: recentCategories,
-      icon: FiClock,
-      color: "purple",
     },
   ];
 

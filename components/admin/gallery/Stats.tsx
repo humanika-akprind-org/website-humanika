@@ -1,6 +1,6 @@
 "use client";
 
-import { FiImage, FiVideo, FiFile } from "react-icons/fi";
+import { FiImage, FiFolder, FiInbox } from "react-icons/fi";
 import type { Gallery } from "@/types/gallery";
 import StatCard from "../ui/card/StatCard";
 
@@ -12,8 +12,12 @@ export default function Stats({ galleries }: StatsProps) {
   // Calculate stats
   const totalGalleries = galleries.length;
   const totalImages = galleries.length; // Assuming all are images for now
-  const totalVideos = 0; // No videos for now
-  const totalDocuments = 0; // No documents for now
+  const totalGalleriesWithCategory = galleries.filter(
+    (g) => g.categoryId
+  ).length;
+  const totalGalleriesWithoutCategory = galleries.filter(
+    (g) => !g.categoryId
+  ).length;
 
   const stats = [
     {
@@ -29,15 +33,15 @@ export default function Stats({ galleries }: StatsProps) {
       color: "green",
     },
     {
-      title: "Videos",
-      value: totalVideos,
-      icon: FiVideo,
+      title: "With Category",
+      value: totalGalleriesWithCategory,
+      icon: FiFolder,
       color: "purple",
     },
     {
-      title: "Documents",
-      value: totalDocuments,
-      icon: FiFile,
+      title: "Without Category",
+      value: totalGalleriesWithoutCategory,
+      icon: FiInbox,
       color: "orange",
     },
   ];
