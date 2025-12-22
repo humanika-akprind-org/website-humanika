@@ -104,11 +104,6 @@ export default function DocumentForm({
             icon={<FiFolder className="text-gray-400" />}
             disabled={isLoadingState || documentTypesLoading}
           />
-          {documentTypesLoading && (
-            <p className="text-sm text-gray-500 mt-1">
-              Memuat document types...
-            </p>
-          )}
 
           {onSubmitForApproval ? null : (
             <SelectInput

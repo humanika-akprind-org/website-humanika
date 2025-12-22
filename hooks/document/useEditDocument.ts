@@ -48,10 +48,10 @@ export function useEditDocument(id: string) {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch(`/api/document/${id}/approve`, {
+      const response = await fetch(`/api/document/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, status: "PENDING" }),
       });
       if (!response.ok) {
         throw new Error("Failed to update document for approval");

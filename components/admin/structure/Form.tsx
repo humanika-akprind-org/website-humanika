@@ -15,6 +15,7 @@ import TextInput from "@/components/admin/ui/input/TextInput";
 import CancelButton from "@/components/ui/CancelButton";
 import ImageUpload from "@/components/admin/ui/input/ImageUpload";
 import FileUpload from "@/components/admin/ui/input/FileUpload";
+import { FiBriefcase, FiCalendar } from "react-icons/fi";
 
 interface StructureFormProps {
   structure?: OrganizationalStructure;
@@ -76,6 +77,7 @@ export default function StructureForm({
               label: period.name,
             }))}
             placeholder="Pilih Periode"
+            icon={<FiCalendar className="text-gray-400" />}
             required
           />
 
@@ -90,6 +92,7 @@ export default function StructureForm({
               value: status,
               label: status,
             }))}
+            icon={<FiBriefcase className="text-gray-400" />}
             required
           />
         </div>
