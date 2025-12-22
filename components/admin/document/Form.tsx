@@ -110,20 +110,23 @@ export default function DocumentForm({
             </p>
           )}
 
-          <SelectInput
-            label="Status"
-            name="status"
-            value={formData.status}
-            onChange={(value) => handleSelectChange("status", value)}
-            options={Object.values(Status).map((status) => ({
-              value: status,
-              label:
-                status.charAt(0).toUpperCase() + status.slice(1).toLowerCase(),
-            }))}
-            placeholder="Select status"
-            icon={<FiBriefcase className="text-gray-400" />}
-            disabled={isLoadingState}
-          />
+          {onSubmitForApproval ? null : (
+            <SelectInput
+              label="Status"
+              name="status"
+              value={formData.status}
+              onChange={(value) => handleSelectChange("status", value)}
+              options={Object.values(Status).map((status) => ({
+                value: status,
+                label:
+                  status.charAt(0).toUpperCase() +
+                  status.slice(1).toLowerCase(),
+              }))}
+              placeholder="Select status"
+              icon={<FiBriefcase className="text-gray-400" />}
+              disabled={isLoadingState}
+            />
+          )}
 
           <SelectInput
             label="Related Event"

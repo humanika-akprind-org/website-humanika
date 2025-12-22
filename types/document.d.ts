@@ -40,6 +40,8 @@ export interface CreateDocumentInput {
 
 export interface UpdateDocumentInput extends Partial<CreateDocumentInput> {
   status?: Status;
+  eventId?: string | null;
+  letterId?: string | null;
 }
 
 export interface DocumentFilter {

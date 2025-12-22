@@ -21,6 +21,11 @@ interface ImageUploadProps {
   previewSize?: "small" | "medium" | "large"; // default "medium"
   previewShape?: "square" | "rectangle"; // default "square"
   className?: string;
+  previewWidth?: number;
+  previewHeight?: number;
+  aspect?: number;
+  removeButtonText?: string;
+  loadingText?: string;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -34,6 +39,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   maxSize = 5 * 1024 * 1024, // 5MB default
   alt = "Image",
   className = "",
+  previewWidth = 480,
+  previewHeight = 270,
+  aspect = 16 / 9,
+  removeButtonText = "Hapus Thumbnail",
+  loadingText = "Mengupload thumbnail...",
 }) => {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
@@ -156,8 +166,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     <div
                       className="bg-gray-200 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden"
                       style={{
-                        width: 480,
-                        height: 270,
+                        width: previewWidth,
+                        height: previewHeight,
                       }}
                     >
                       {displayUrl.startsWith("blob:") ? (
@@ -178,8 +188,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                         <Image
                           src={displayUrl}
                           alt={alt}
-                          width={480}
-                          height={270}
+                          width={previewWidth}
+                          height={previewHeight}
                           className="w-full h-full object-contain rounded-lg"
                           onError={(e) => {
                             console.error(
@@ -237,7 +247,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 className="text-sm text-red-600 hover:text-red-800"
                 disabled={isLoading}
               >
-                Hapus Thumbnail
+                {removeButtonText}
               </button>
             </div>
           </div>
@@ -255,9 +265,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             Upload thumbnail (max 5MB, format: JPG, PNG, GIF)
           </p>
           {photoLoading && (
-            <p className="text-sm text-blue-600 mt-1">
-              Mengupload thumbnail...
-            </p>
+            <p className="text-sm text-blue-600 mt-1">{loadingText}</p>
           )}
         </div>
       </div>
@@ -268,7 +276,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         onClose={() => setCropModalOpen(false)}
         imageSrc={originalImage}
         onCropComplete={(croppedImg) => setCroppedImage(croppedImg)}
-        aspect={16 / 9}
+        aspect={aspect}
       />
     </div>
   );

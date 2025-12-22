@@ -101,6 +101,7 @@ export function useDocumentForm({
       }
 
       setFormData((prev) => ({ ...prev, documentFile: file }));
+      setExistingDocument(null); // Hide existing file display when new file is selected
       setError(null);
       setRemovedDocument(false); // Reset removed state when new file is selected
     }
@@ -151,21 +152,6 @@ export function useDocumentForm({
       }
 
       if (formData.documentFile) {
-        if (
-          !removedDocument &&
-          document?.document &&
-          isGoogleDriveDocument(document.document)
-        ) {
-          const fileId = getFileIdFromDocument(document.document);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old document:", deleteError);
-            }
-          }
-        }
-
         // Upload with temporary filename first
         const tempFileName = `temp_${Date.now()}`;
         const uploadedFileId = await uploadFile(
@@ -194,6 +180,22 @@ export function useDocumentForm({
             // Continue with submission even if rename fails
             documentUrl = uploadedFileId;
           }
+
+          // Delete old document after successful upload
+          if (
+            !removedDocument &&
+            document?.document &&
+            isGoogleDriveDocument(document.document)
+          ) {
+            const fileId = getFileIdFromDocument(document.document);
+            if (fileId) {
+              try {
+                await deleteFile(fileId);
+              } catch (deleteError) {
+                console.warn("Failed to delete old document:", deleteError);
+              }
+            }
+          }
         } else {
           throw new Error("Failed to upload document");
         }
@@ -206,8 +208,8 @@ export function useDocumentForm({
       const submitData = {
         ...dataToSend,
         document: documentUrl,
-        eventId: formData.eventId || undefined,
-        letterId: formData.letterId || undefined,
+        eventId: formData.eventId ? formData.eventId : null,
+        letterId: formData.letterId ? formData.letterId : null,
       };
 
       if (onSubmitForApproval) {
