@@ -28,7 +28,7 @@ export async function getApprovals(
   const total = await prisma.approval.count({ where });
 
   // Get approvals with related data
-  const approvals = (await prisma.approval.findMany({
+  const rawApprovals = await prisma.approval.findMany({
     where,
     skip,
     take: limit,
@@ -85,7 +85,22 @@ export async function getApprovals(
         },
       },
     },
-  })) as ApprovalWithRelations[];
+  });
+
+  const approvals = rawApprovals.map((approval) => {
+    const nameApproval =
+      approval.workProgram?.name ||
+      approval.event?.name ||
+      approval.finance?.name ||
+      approval.document?.name ||
+      approval.letter?.regarding ||
+      "";
+
+    return {
+      ...approval,
+      nameApproval,
+    };
+  }) as ApprovalWithRelations[];
 
   const pages = Math.ceil(total / limit);
 
@@ -159,7 +174,20 @@ export async function findApprovalById(
     },
   });
 
-  return result as ApprovalWithRelations | null;
+  if (!result) return null;
+
+  const nameApproval =
+    result.workProgram?.name ||
+    result.event?.name ||
+    result.finance?.name ||
+    result.document?.name ||
+    result.letter?.regarding ||
+    "";
+
+  return {
+    ...result,
+    nameApproval,
+  };
 }
 
 export async function findApprovalByEntity(
@@ -182,8 +210,8 @@ export async function createApprovalRecord(data: {
   userId: string;
   status: StatusApproval;
   note?: string;
-}) {
-  return await prisma.approval.create({
+}): Promise<ApprovalWithRelations> {
+  const approval = await prisma.approval.create({
     data,
     include: {
       user: {
@@ -195,8 +223,62 @@ export async function createApprovalRecord(data: {
           department: true,
         },
       },
+      workProgram: {
+        select: {
+          id: true,
+          name: true,
+          department: true,
+          status: true,
+        },
+      },
+      event: {
+        select: {
+          id: true,
+          name: true,
+          department: true,
+          status: true,
+        },
+      },
+      finance: {
+        select: {
+          id: true,
+          name: true,
+          amount: true,
+          type: true,
+          status: true,
+        },
+      },
+      document: {
+        select: {
+          id: true,
+          name: true,
+          documentTypeId: true,
+          status: true,
+        },
+      },
+      letter: {
+        select: {
+          id: true,
+          regarding: true,
+          type: true,
+          status: true,
+        },
+      },
     },
   });
+
+  const nameApproval =
+    approval.workProgram?.name ||
+    approval.event?.name ||
+    approval.finance?.name ||
+    approval.document?.name ||
+    approval.letter?.regarding ||
+    "";
+
+  return {
+    ...approval,
+    nameApproval,
+  };
 }
 
 export async function updateApprovalRecord(
@@ -206,7 +288,7 @@ export async function updateApprovalRecord(
     note?: string;
   }
 ): Promise<ApprovalWithRelations> {
-  return await prisma.approval.update({
+  const approval = await prisma.approval.update({
     where: { id },
     data,
     include: {
@@ -262,6 +344,19 @@ export async function updateApprovalRecord(
       },
     },
   });
+
+  const nameApproval =
+    approval.workProgram?.name ||
+    approval.event?.name ||
+    approval.finance?.name ||
+    approval.document?.name ||
+    approval.letter?.regarding ||
+    "";
+
+  return {
+    ...approval,
+    nameApproval,
+  };
 }
 
 export async function deleteApprovalRecord(id: string) {

@@ -31,7 +31,7 @@ export const useDocumentApproval = (documentType?: string) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     status: "",
-    entityType: "DOCUMENT", // Fixed to documents only
+    entityType: "DOCUMENT",
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -77,18 +77,19 @@ export const useDocumentApproval = (documentType?: string) => {
             uniqueApprovalsMap
           ) as Approval[];
 
-          // Filter by document type if provided
-          let filteredApprovals = uniqueApprovals;
-          if (docType) {
-            filteredApprovals = uniqueApprovals.filter((approval) => {
-              const approvalDocType = approval.document?.documentType?.name
-                ?.toLowerCase()
-                .replace(/[\s\-]/g, "");
-              return (
-                approvalDocType === docType.toLowerCase().replace(/[\s\-]/g, "")
-              );
-            });
-          }
+          // Filter based on documentType parameter if provided
+          const filteredApprovals = uniqueApprovals.filter((approval) => {
+            if (!docType) {
+              // If no documentType specified, show all documents
+              return true;
+            }
+            const approvalDocType = approval.document?.documentType?.name
+              ?.toLowerCase()
+              .replace(/[\s\-]/g, "");
+            return (
+              approvalDocType === docType.toLowerCase().replace(/[\s\-]/g, "")
+            );
+          });
 
           // Sort by createdAt descending to show latest first
           filteredApprovals.sort(

@@ -35,7 +35,7 @@ export default function DocumentApprovalPage() {
     handleBulkReturn,
     handleBulkActionConfirm,
     closeActionModal,
-  } = useDocumentApproval("accountabilityreport");
+  } = useDocumentApproval();
 
   if (loading) {
     return <LoadingApproval />;
