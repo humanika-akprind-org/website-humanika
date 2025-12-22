@@ -93,6 +93,7 @@ export default function DocumentsPage() {
         }}
         selectedCount={selectedDocuments.length}
         onDeleteSelected={() => handleDelete()}
+        showTypeFilter={false}
       />
 
       <DocumentTable

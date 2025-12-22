@@ -18,6 +18,7 @@ interface DocumentFiltersProps {
   onUserFilterChange: (user: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
+  showTypeFilter?: boolean;
 }
 
 export default function DocumentFilters({
@@ -31,6 +32,7 @@ export default function DocumentFilters({
   onUserFilterChange,
   selectedCount,
   onDeleteSelected,
+  showTypeFilter = true,
 }: DocumentFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -66,21 +68,23 @@ export default function DocumentFilters({
               })),
             ]}
           />
-          <SelectFilter
-            label="Type"
-            value={typeFilter}
-            onChange={onTypeFilterChange}
-            options={[
-              { value: "all", label: "All Types" },
-              ...Object.values(DocumentType).map((type) => ({
-                value: type,
-                label: type
-                  .replace(/_/g, " ")
-                  .toLowerCase()
-                  .replace(/\b\w/g, (l) => l.toUpperCase()),
-              })),
-            ]}
-          />
+          {showTypeFilter && (
+            <SelectFilter
+              label="Type"
+              value={typeFilter}
+              onChange={onTypeFilterChange}
+              options={[
+                { value: "all", label: "All Types" },
+                ...Object.values(DocumentType).map((type) => ({
+                  value: type,
+                  label: type
+                    .replace(/_/g, " ")
+                    .toLowerCase()
+                    .replace(/\b\w/g, (l) => l.toUpperCase()),
+                })),
+              ]}
+            />
+          )}
           <SelectFilter
             label="User"
             value={userFilter}
