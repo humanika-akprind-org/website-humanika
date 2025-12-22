@@ -1,65 +1,243 @@
 "use client";
 
-export default function DevelopmentPage() {
+import { useState } from "react";
+import DocumentStats from "@/components/admin/document/Stats";
+import DocumentFilters from "@/components/admin/document/Filters";
+import DocumentTable from "@/components/admin/document/Table";
+import DeleteModal from "components/admin/ui/modal/DeleteModal";
+import ViewModal from "components/admin/ui/modal/ViewModal";
+import Loading from "components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "components/admin/ui/alert/Alert";
+import ManagementHeader from "components/admin/ui/ManagementHeader";
+import AddButton from "components/admin/ui/button/AddButton";
+import StatusChip from "components/admin/ui/chip/Status";
+import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
+import DateDisplay from "components/admin/ui/date/DateDisplay";
+import { useDocumentManagement } from "@/hooks/document/useDocumentManagement";
+
+export default function DocumentsPage() {
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [userFilter, setUserFilter] = useState("all");
+
+  const {
+    documents,
+    loading,
+    error,
+    success,
+    selectedDocuments,
+    searchTerm,
+    currentPage,
+    totalPages,
+    showDeleteModal,
+    showViewModal,
+    currentDocument,
+    setSearchTerm,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentDocument,
+    setStatusFilter: setStatusFilterHook,
+    setTypeFilter: setTypeFilterHook,
+    setUserFilter: setUserFilterHook,
+    toggleDocumentSelection,
+    toggleSelectAll,
+    handleAddDocument,
+    handleEditDocument,
+    handleViewDocument,
+    handleDelete,
+    confirmDelete,
+  } = useDocumentManagement();
+
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 rounded-lg">
-      <div className="text-center max-w-md mx-auto">
-        <div className="mx-auto w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-8">
-          <svg
-            className="w-20 h-20 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-500 mb-2">
-            Page Not Built Yet
-          </h1>
-          <p className="text-gray-400">
-            This page has not been developed by the engineering team.
-          </p>
-        </div>
-
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <div className="flex items-start">
-            <svg
-              className="w-5 h-5 text-yellow-500 mt-0.5 mr-2 flex-shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <p className="text-yellow-700 text-sm">
-              <span className="font-medium">Development Status:</span> This page
-              is on the product roadmap but has not been scheduled for
-              implementation.
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-2 text-xs text-gray-400">
-          <p>Last updated: {new Date().toLocaleDateString()}</p>
-          <div className="inline-flex items-center bg-gray-100 px-3 py-1 rounded-full">
-            <span className="h-2 w-2 bg-gray-400 rounded-full mr-2" />
-            STATUS: NOT STARTED
-          </div>
-        </div>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Documents Management"
+          description="Manage and organize your documents"
+        />
+        <AddButton onClick={handleAddDocument} text="Add Document" />
       </div>
+
+      <DocumentStats documents={documents} />
+
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <DocumentFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={(value) => {
+          setStatusFilter(value);
+          setStatusFilterHook(value);
+        }}
+        typeFilter={typeFilter}
+        onTypeFilterChange={(value) => {
+          setTypeFilter(value);
+          setTypeFilterHook(value);
+        }}
+        userFilter={userFilter}
+        onUserFilterChange={(value) => {
+          setUserFilter(value);
+          setUserFilterHook(value);
+        }}
+        selectedCount={selectedDocuments.length}
+        onDeleteSelected={() => handleDelete()}
+      />
+
+      <DocumentTable
+        documents={documents}
+        selectedDocuments={selectedDocuments}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onDocumentSelect={toggleDocumentSelection}
+        onSelectAll={toggleSelectAll}
+        onViewDocument={handleViewDocument}
+        onEditDocument={handleEditDocument}
+        onDeleteDocument={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddDocument={handleAddDocument}
+      />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentDocument?.name}
+        selectedCount={selectedDocuments.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentDocument(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Document Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentDocument(null);
+        }}
+      >
+        {currentDocument && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900">
+                  {currentDocument.name}
+                </h4>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Type
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentDocument.documentType?.name || "No type"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <div className="mt-1">
+                  <StatusChip status={currentDocument.status} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  User
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentDocument.user?.name || "No user"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Version
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentDocument.version}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Approval
+                </label>
+                <div className="mt-1">
+                  {currentDocument.approvals &&
+                  currentDocument.approvals.length > 0 ? (
+                    (() => {
+                      const latestApproval = currentDocument.approvals.sort(
+                        (a, b) =>
+                          new Date(b.updatedAt).getTime() -
+                          new Date(a.updatedAt).getTime()
+                      )[0];
+                      return (
+                        <StatusApprovalChip status={latestApproval.status} />
+                      );
+                    })()
+                  ) : (
+                    <span className="text-xs text-gray-400">No approvals</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentDocument.createdAt} />
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Updated At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentDocument.updatedAt} />
+                </p>
+              </div>
+            </div>
+
+            {currentDocument.document && (
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Document
+                </label>
+                <div className="mt-2">
+                  <a
+                    href={currentDocument.document}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    View Document
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </ViewModal>
     </div>
   );
 }
