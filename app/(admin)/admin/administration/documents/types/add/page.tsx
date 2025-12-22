@@ -1,57 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { FiArrowLeft } from "react-icons/fi";
 import DocumentTypeForm from "@/components/admin/document/type/Form";
-import type {
-  CreateDocumentTypeInput,
-  UpdateDocumentTypeInput,
-} from "@/types/document-type";
-import { createDocumentType } from "@/use-cases/api/document-type";
-import { useToast } from "@/hooks/use-toast";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
+import { useCreateDocumentType } from "@/hooks/document-type/useCreateDocumentType";
 
 export default function AddDocumentTypePage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async (
-    data: CreateDocumentTypeInput | UpdateDocumentTypeInput
-  ) => {
-    setIsLoading(true);
-    try {
-      await createDocumentType(data as CreateDocumentTypeInput);
-      toast({
-        title: "Success",
-        description: "Document type created successfully",
-      });
-      // Redirect is handled in the form
-    } catch (error) {
-      console.error("Error creating type:", error);
-      throw error; // Re-throw to let the form handle it
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { createDocumentType, handleBack, isSubmitting, error } =
+    useCreateDocumentType();
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center mb-6">
-        <Link
-          href="/admin/administration/documents/types"
-          className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-        >
-          <FiArrowLeft className="mr-1" />
-          Back
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Add New Document Type
-        </h1>
-      </div>
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Add New Document Type" onBack={handleBack} />
 
-      {/* Form */}
-      <DocumentTypeForm onSubmit={handleSubmit} isSubmitting={isLoading} />
+      {error && <Alert type="error" message={error} />}
+
+      {isSubmitting ? (
+        <LoadingForm />
+      ) : (
+        <DocumentTypeForm onSubmit={createDocumentType} />
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { FiFile, FiSend } from "react-icons/fi";
+import { FiFile, FiBriefcase, FiFolder, FiCalendar } from "react-icons/fi";
 import type {
   Document,
   CreateDocumentInput,
@@ -12,6 +12,10 @@ import { Status } from "@/types/enums";
 import type { User } from "@/types/user";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
+import TextInput from "@/components/admin/ui/input/TextInput";
+import SelectInput from "@/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/components/ui/CancelButton";
 import { useDocumentForm } from "@/hooks/document/useDocumentForm";
 import { useDocumentTypes } from "@/hooks/document-type/useDocumentTypes";
 
@@ -21,7 +25,7 @@ interface DocumentFormProps {
   onSubmitForApproval?: (
     data: CreateDocumentInput | UpdateDocumentInput
   ) => Promise<void>;
-  isLoading?: boolean;
+  loading?: boolean;
   accessToken: string;
   users?: User[];
   events: Event[];
@@ -35,7 +39,6 @@ export default function DocumentForm({
   accessToken,
   users: _users,
   events,
-  letters,
 }: DocumentFormProps) {
   const router = useRouter();
 
@@ -59,6 +62,12 @@ export default function DocumentForm({
     onSubmitForApproval,
   });
 
+  const handleSelectChange = (name: string, value: string) => {
+    handleInputChange({
+      target: { name, value },
+    } as React.ChangeEvent<HTMLSelectElement>);
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       {error && (
@@ -70,107 +79,65 @@ export default function DocumentForm({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Document Name *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter document name"
-              required
-              disabled={isLoadingState}
-            />
-          </div>
+          <TextInput
+            label="Document Name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder="Enter document name"
+            required
+            icon={<FiBriefcase className="text-gray-400" />}
+            disabled={isLoadingState}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Type *
-            </label>
-            <select
-              name="documentTypeId"
-              value={formData.documentTypeId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-              disabled={isLoadingState || documentTypesLoading}
-            >
-              <option value="">Pilih Type</option>
-              {documentTypes.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
-            {documentTypesLoading && (
-              <p className="text-sm text-gray-500 mt-1">
-                Memuat document types...
-              </p>
-            )}
-          </div>
+          <SelectInput
+            label="Type"
+            name="documentTypeId"
+            value={formData.documentTypeId}
+            onChange={(value) => handleSelectChange("documentTypeId", value)}
+            options={documentTypes.map((type) => ({
+              value: type.id,
+              label: type.name,
+            }))}
+            placeholder="Select type"
+            required
+            icon={<FiFolder className="text-gray-400" />}
+            disabled={isLoadingState || documentTypesLoading}
+          />
+          {documentTypesLoading && (
+            <p className="text-sm text-gray-500 mt-1">
+              Memuat document types...
+            </p>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState}
-            >
-              {Object.values(Status).map((status) => (
-                <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() +
-                    status.slice(1).toLowerCase()}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectInput
+            label="Status"
+            name="status"
+            value={formData.status}
+            onChange={(value) => handleSelectChange("status", value)}
+            options={Object.values(Status).map((status) => ({
+              value: status,
+              label:
+                status.charAt(0).toUpperCase() + status.slice(1).toLowerCase(),
+            }))}
+            placeholder="Select status"
+            icon={<FiBriefcase className="text-gray-400" />}
+            disabled={isLoadingState}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Related Event
-            </label>
-            <select
-              name="eventId"
-              value={formData.eventId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState}
-            >
-              <option value="">Pilih Event (Opsional)</option>
-              {events.map((event) => (
-                <option key={event.id} value={event.id}>
-                  {event.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Related Letter
-            </label>
-            <select
-              name="letterId"
-              value={formData.letterId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState}
-            >
-              <option value="">Pilih Letter (Opsional)</option>
-              {letters.map((letter) => (
-                <option key={letter.id} value={letter.id}>
-                  {letter.number} - {letter.regarding}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectInput
+            label="Related Event"
+            name="eventId"
+            value={formData.eventId}
+            onChange={(value) => handleSelectChange("eventId", value)}
+            options={events.map((event) => ({
+              value: event.id,
+              label: event.name,
+            }))}
+            placeholder="Pilih Event (Opsional)"
+            icon={<FiCalendar className="text-gray-400" />}
+            disabled={isLoadingState}
+          />
         </div>
 
         <div>
@@ -218,30 +185,22 @@ export default function DocumentForm({
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
+          <CancelButton
             onClick={() => router.back()}
             disabled={isLoadingState}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            Batal
-          </button>
-          <button
-            type="submit"
-            disabled={isLoadingState || fileLoading}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          >
-            <FiSend className="mr-2" />
-            {isLoadingState
-              ? onSubmitForApproval
-                ? "Mengajukan..."
-                : "Menyimpan..."
-              : onSubmitForApproval
-              ? "Simpan"
-              : document
-              ? "Update Document"
-              : "Create Document"}
-          </button>
+          />
+
+          <SubmitButton
+            isSubmitting={isLoadingState || fileLoading}
+            text={
+              onSubmitForApproval
+                ? "Simpan"
+                : document
+                ? "Update Document"
+                : "Create Document"
+            }
+            loadingText={onSubmitForApproval ? "Mengajukan..." : "Menyimpan..."}
+          />
         </div>
       </form>
     </div>

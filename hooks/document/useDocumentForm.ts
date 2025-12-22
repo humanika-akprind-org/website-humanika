@@ -8,10 +8,19 @@ import type {
 import { Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { documentFolderId } from "@/lib/config/config";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+
+// Helper functions
+const isGoogleDriveDocument = (doc: string | null | undefined): boolean => {
+  if (!doc) return false;
+  return (
+    doc.includes("drive.google.com") || doc.match(/^[a-zA-Z0-9_-]+$/) !== null
+  );
+};
 
 interface UseDocumentFormProps {
   document?: Document;
-  accessToken: string;
+  accessToken?: string;
   onSubmit: (data: CreateDocumentInput | UpdateDocumentInput) => Promise<void>;
   onSubmitForApproval?: (
     data: CreateDocumentInput | UpdateDocumentInput
@@ -25,6 +34,8 @@ export function useDocumentForm({
   onSubmitForApproval,
 }: UseDocumentFormProps) {
   const router = useRouter();
+  const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
+
   const {
     uploadFile,
     deleteFile,
@@ -32,7 +43,18 @@ export function useDocumentForm({
     setPublicAccess,
     isLoading: fileLoading,
     error: fileError,
-  } = useFile(accessToken);
+  } = useFile(accessToken || fetchedAccessToken);
+
+  // Fetch access token if not provided
+  useEffect(() => {
+    if (!accessToken) {
+      const fetchAccessToken = async () => {
+        const token = await getAccessTokenAction();
+        setFetchedAccessToken(token);
+      };
+      fetchAccessToken();
+    }
+  }, [accessToken]);
 
   const [formData, setFormData] = useState({
     name: document?.name || "",
@@ -85,12 +107,10 @@ export function useDocumentForm({
   };
 
   const removeDocument = () => {
-    if (existingDocument) {
-      // Mark document as removed for deletion during form submission
+    if (isGoogleDriveDocument(existingDocument)) {
       setRemovedDocument(true);
     }
 
-    // Clear form state
     setFormData((prev) => ({ ...prev, documentFile: undefined }));
     setExistingDocument(null);
   };
@@ -107,7 +127,7 @@ export function useDocumentForm({
       }
 
       // Check if access token is available
-      if (!accessToken) {
+      if (!(accessToken || fetchedAccessToken)) {
         throw new Error(
           "Authentication required. Please log in to Google Drive."
         );
@@ -117,15 +137,13 @@ export function useDocumentForm({
       let documentUrl: string | null | undefined = existingDocument;
 
       if (removedDocument) {
-        // Delete from Google Drive and set documentUrl to null
-        if (document?.document) {
+        if (document?.document && isGoogleDriveDocument(document.document)) {
           const fileId = getFileIdFromDocument(document.document);
           if (fileId) {
             try {
               await deleteFile(fileId);
             } catch (deleteError) {
               console.warn("Failed to delete document:", deleteError);
-              // Continue with submission even if delete fails
             }
           }
         }
@@ -133,15 +151,17 @@ export function useDocumentForm({
       }
 
       if (formData.documentFile) {
-        // Delete old document from Google Drive if it exists and wasn't already removed
-        if (!removedDocument && document?.document) {
+        if (
+          !removedDocument &&
+          document?.document &&
+          isGoogleDriveDocument(document.document)
+        ) {
           const fileId = getFileIdFromDocument(document.document);
           if (fileId) {
             try {
               await deleteFile(fileId);
             } catch (deleteError) {
               console.warn("Failed to delete old document:", deleteError);
-              // Continue with upload even if delete fails
             }
           }
         }
@@ -155,22 +175,24 @@ export function useDocumentForm({
         );
 
         if (uploadedFileId) {
-          // Rename the file using the renameFile hook
           const finalFileName = `document-${formData.name
             .replace(/\s+/g, "-")
             .toLowerCase()}-${Date.now()}`;
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
           if (renameSuccess) {
-            // Set the file to public access
             const publicAccessSuccess = await setPublicAccess(uploadedFileId);
             if (publicAccessSuccess) {
               documentUrl = uploadedFileId;
             } else {
-              throw new Error("Failed to set public access for document");
+              console.warn("Failed to set public access for document");
+              // Continue with submission even if setting public access fails
+              documentUrl = uploadedFileId;
             }
           } else {
-            throw new Error("Failed to rename document");
+            console.warn("Failed to rename document");
+            // Continue with submission even if rename fails
+            documentUrl = uploadedFileId;
           }
         } else {
           throw new Error("Failed to upload document");
@@ -227,6 +249,7 @@ export function useDocumentForm({
     existingDocument,
     fileLoading,
     errors,
+    accessToken: accessToken || fetchedAccessToken,
     handleInputChange,
     handleFileChange,
     removeDocument,
