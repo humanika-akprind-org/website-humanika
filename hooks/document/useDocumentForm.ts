@@ -25,6 +25,7 @@ interface UseDocumentFormProps {
   onSubmitForApproval?: (
     data: CreateDocumentInput | UpdateDocumentInput
   ) => Promise<void>;
+  fixedDocumentTypeId?: string;
 }
 
 export function useDocumentForm({
@@ -32,6 +33,7 @@ export function useDocumentForm({
   accessToken,
   onSubmit,
   onSubmitForApproval,
+  fixedDocumentTypeId,
 }: UseDocumentFormProps) {
   const router = useRouter();
   const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
@@ -58,7 +60,7 @@ export function useDocumentForm({
 
   const [formData, setFormData] = useState({
     name: document?.name || "",
-    documentTypeId: document?.documentTypeId || "",
+    documentTypeId: fixedDocumentTypeId || document?.documentTypeId || "",
     status: document?.status || Status.DRAFT,
     eventId: document?.eventId || "",
     letterId: document?.letterId || "",

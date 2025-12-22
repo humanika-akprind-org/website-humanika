@@ -31,6 +31,7 @@ interface DocumentFormProps {
   users?: User[];
   events: Event[];
   letters: Letter[];
+  fixedDocumentType?: string;
 }
 
 export default function DocumentForm({
@@ -40,11 +41,21 @@ export default function DocumentForm({
   accessToken,
   users: _users,
   events,
+  fixedDocumentType,
 }: DocumentFormProps) {
   const router = useRouter();
 
   // Fetch document types
   const { documentTypes, isLoading: documentTypesLoading } = useDocumentTypes();
+
+  // Find documentTypeId for fixedDocumentType
+  const fixedDocumentTypeId = fixedDocumentType
+    ? documentTypes.find(
+        (type) =>
+          type.name.toLowerCase().replace(/[\s\-]/g, "") ===
+          fixedDocumentType.toLowerCase().replace(/[\s\-]/g, "")
+      )?.id || ""
+    : "";
 
   const {
     formData,
@@ -61,6 +72,7 @@ export default function DocumentForm({
     accessToken,
     onSubmit,
     onSubmitForApproval,
+    fixedDocumentTypeId,
   });
 
   const handleSelectChange = (name: string, value: string) => {

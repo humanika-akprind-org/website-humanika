@@ -47,7 +47,11 @@ export default function DocumentTable({
 
   // Filter documents by type if typeFilter is provided
   const filteredDocuments = typeFilter
-    ? documents.filter((doc) => doc.documentType?.name === typeFilter)
+    ? documents.filter(
+        (doc) =>
+          doc.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
+          typeFilter.toLowerCase().replace(/[\s\-]/g, "")
+      )
     : documents;
 
   // Sort documents

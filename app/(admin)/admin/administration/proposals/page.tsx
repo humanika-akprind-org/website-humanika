@@ -109,7 +109,7 @@ export default function DocumentsPage() {
         onDeleteDocument={handleDelete}
         onPageChange={setCurrentPage}
         onAddDocument={handleAddDocument}
-        typeFilter="PROPOSAL"
+        typeFilter="proposal"
       />
 
       <DeleteModal
