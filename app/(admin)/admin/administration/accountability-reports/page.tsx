@@ -109,6 +109,7 @@ export default function DocumentsPage() {
         onDeleteDocument={handleDelete}
         onPageChange={setCurrentPage}
         onAddDocument={handleAddDocument}
+        typeFilter="ACCOUNTABILITY-REPORT"
       />
 
       <DeleteModal

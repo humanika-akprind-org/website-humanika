@@ -24,6 +24,7 @@ interface DocumentTableProps {
   onDeleteDocument: (document?: Document) => void;
   onPageChange: (page: number) => void;
   onAddDocument: () => void;
+  typeFilter?: string;
 }
 
 export default function DocumentTable({
@@ -39,12 +40,18 @@ export default function DocumentTable({
   onDeleteDocument,
   onPageChange,
   onAddDocument,
+  typeFilter,
 }: DocumentTableProps) {
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
+  // Filter documents by type if typeFilter is provided
+  const filteredDocuments = typeFilter
+    ? documents.filter((doc) => doc.documentType?.name === typeFilter)
+    : documents;
+
   // Sort documents
-  const sortedDocuments = [...documents].sort((a, b) => {
+  const sortedDocuments = [...filteredDocuments].sort((a, b) => {
     let aValue, bValue;
 
     switch (sortField) {
