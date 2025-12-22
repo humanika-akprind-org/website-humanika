@@ -15,7 +15,7 @@ import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
 import DateDisplay from "components/admin/ui/date/DateDisplay";
 import { useDocumentManagement } from "@/hooks/document/useDocumentManagement";
 
-export default function DocumentsPage() {
+export default function ProposalsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [userFilter, setUserFilter] = useState("all");
@@ -63,13 +63,13 @@ export default function DocumentsPage() {
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <ManagementHeader
-          title="Documents Management"
-          description="Manage and organize your documents"
+          title="Proposal Management"
+          description="Manage and organize your proposals"
         />
-        <AddButton onClick={handleAddDocument} text="Add Document" />
+        <AddButton onClick={handleAddDocument} text="Add Proposal" />
       </div>
 
-      <DocumentStats documents={documents} />
+      <DocumentStats documents={documents} typeFilter="proposal" />
 
       {alert && <Alert type={alert.type} message={alert.message} />}
 

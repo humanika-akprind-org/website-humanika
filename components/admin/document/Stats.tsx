@@ -12,31 +12,43 @@ import StatCard from "../ui/card/StatCard";
 
 interface StatsProps {
   documents: Document[];
+  typeFilter?: string;
 }
 
-export default function Stats({ documents }: StatsProps) {
+export default function Stats({ documents, typeFilter }: StatsProps) {
+  const filteredDocuments = typeFilter
+    ? documents.filter(
+        (doc) =>
+          doc.documentType?.name.toLowerCase().replace(/[\s\-]/g, "") ===
+          typeFilter
+      )
+    : documents;
+
   const stats = [
     {
       title: "Total Documents",
-      value: documents.length,
+      value: filteredDocuments.length,
       icon: FiFileText,
       color: "blue",
     },
     {
       title: "Published",
-      value: documents.filter((doc) => doc.status === Status.PUBLISH).length,
+      value: filteredDocuments.filter((doc) => doc.status === Status.PUBLISH)
+        .length,
       icon: FiCheckCircle,
       color: "green",
     },
     {
       title: "Drafts",
-      value: documents.filter((doc) => doc.status === Status.DRAFT).length,
+      value: filteredDocuments.filter((doc) => doc.status === Status.DRAFT)
+        .length,
       icon: FiTrendingUp,
       color: "yellow",
     },
     {
       title: "Archived",
-      value: documents.filter((doc) => doc.status === Status.ARCHIVE).length,
+      value: filteredDocuments.filter((doc) => doc.status === Status.ARCHIVE)
+        .length,
       icon: FiArchive,
       color: "red",
     },

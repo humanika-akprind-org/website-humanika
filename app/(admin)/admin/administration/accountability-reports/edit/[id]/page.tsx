@@ -70,6 +70,7 @@ export default function EditDocumentPage() {
           events={events}
           letters={letters}
           loading={combinedLoading}
+          fixedDocumentType="accountabilityreport"
         />
       ) : null}
     </div>
