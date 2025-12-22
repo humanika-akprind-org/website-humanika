@@ -31,7 +31,11 @@ export default function AddDocumentPage() {
     error: formDataError,
   } = useDocumentFormData();
 
-  const { documentTypes, isLoading: documentTypesLoading } = useDocumentTypes();
+  const {
+    documentTypes,
+    isLoading: documentTypesLoading,
+    error: documentTypesError,
+  } = useDocumentTypes();
 
   const [accessToken, setAccessToken] = useState<string>("");
 
@@ -65,22 +69,29 @@ export default function AddDocumentPage() {
     }
   }, [documentTypes, documentTypesLoading]);
 
-  const combinedLoading = isSubmitting || isLoading || formDataLoading;
-  const loadError = error || formDataError;
+  const combinedLoading =
+    isSubmitting || isLoading || formDataLoading || documentTypesLoading;
+  const loadError = error || formDataError || documentTypesError;
 
   const handleRedirectToAddType = () => {
     router.push("/admin/administration/documents/types/add");
   };
 
+  // Check if ACCOUNTABILITY-REPORT document type exists
+  const accountabilityReportType = documentTypes.find(
+    (type) =>
+      type.name.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport"
+  );
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <PageHeader title="Add New Document" onBack={handleBack} />
+      <PageHeader title="Add New Accountability" onBack={handleBack} />
 
       {loadError && <Alert type="error" message={loadError} />}
 
       {combinedLoading ? (
         <LoadingForm />
-      ) : (
+      ) : accountabilityReportType ? (
         <DocumentForm
           onSubmit={createDocument}
           onSubmitForApproval={createDocumentForApproval}
@@ -90,6 +101,13 @@ export default function AddDocumentPage() {
           loading={combinedLoading}
           fixedDocumentType="accountabilityreport"
         />
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+          <p className="text-gray-600">
+            Document type ACCOUNTABILITY REPORT is required to add
+            accountability reports.
+          </p>
+        </div>
       )}
 
       <WarningModal

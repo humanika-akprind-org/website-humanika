@@ -25,7 +25,8 @@ interface UseDocumentFormProps {
   onSubmitForApproval?: (
     data: CreateDocumentInput | UpdateDocumentInput
   ) => Promise<void>;
-  fixedDocumentTypeId?: string;
+  fixedDocumentType?: string;
+  documentTypes?: { id: string; name: string }[];
 }
 
 export function useDocumentForm({
@@ -33,7 +34,8 @@ export function useDocumentForm({
   accessToken,
   onSubmit,
   onSubmitForApproval,
-  fixedDocumentTypeId,
+  fixedDocumentType,
+  documentTypes,
 }: UseDocumentFormProps) {
   const router = useRouter();
   const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
@@ -58,9 +60,24 @@ export function useDocumentForm({
     }
   }, [accessToken]);
 
+  // Compute initial documentTypeId
+  const initialDocumentTypeId = (() => {
+    if (document?.documentTypeId) return document.documentTypeId;
+    if (fixedDocumentType && documentTypes) {
+      return (
+        documentTypes.find(
+          (type) =>
+            type.name.toLowerCase().replace(/[\s\-]/g, "") ===
+            fixedDocumentType.toLowerCase().replace(/[\s\-]/g, "")
+        )?.id || ""
+      );
+    }
+    return "";
+  })();
+
   const [formData, setFormData] = useState({
     name: document?.name || "",
-    documentTypeId: fixedDocumentTypeId || document?.documentTypeId || "",
+    documentTypeId: initialDocumentTypeId,
     status: document?.status || Status.DRAFT,
     eventId: document?.eventId || "",
     letterId: document?.letterId || "",
@@ -206,9 +223,29 @@ export function useDocumentForm({
       // Submit form data with document URL (exclude documentFile for server action)
       const { documentFile: _, ...dataToSend } = formData;
 
+      // For onSubmitForApproval on proposal/accountability report pages, ensure documentTypeId is set
+      let finalDocumentTypeId = dataToSend.documentTypeId;
+      if (onSubmitForApproval && fixedDocumentType) {
+        const normalizedFixed = fixedDocumentType
+          .toLowerCase()
+          .replace(/[\s\-]/g, "");
+        if (
+          normalizedFixed === "proposal" ||
+          normalizedFixed === "accountabilityreport"
+        ) {
+          finalDocumentTypeId =
+            documentTypes?.find(
+              (type) =>
+                type.name.toLowerCase().replace(/[\s\-]/g, "") ===
+                normalizedFixed
+            )?.id || "";
+        }
+      }
+
       // Prepare data to send
       const submitData = {
         ...dataToSend,
+        documentTypeId: finalDocumentTypeId,
         document: documentUrl,
         eventId: formData.eventId ? formData.eventId : null,
         letterId: formData.letterId ? formData.letterId : null,
@@ -223,7 +260,18 @@ export function useDocumentForm({
       // Reset form state after successful submission
       setRemovedDocument(false);
 
-      router.push("/admin/administration/documents");
+      let redirectPath = "/admin/administration/documents";
+      if (fixedDocumentType) {
+        const normalized = fixedDocumentType
+          .toLowerCase()
+          .replace(/[\s\-]/g, "");
+        if (normalized === "proposal") {
+          redirectPath = "/admin/administration/proposals";
+        } else if (normalized === "accountabilityreport") {
+          redirectPath = "/admin/administration/accountability-reports";
+        }
+      }
+      router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save document");
     } finally {

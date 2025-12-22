@@ -45,15 +45,6 @@ export default function DocumentForm({
   // Fetch document types
   const { documentTypes, isLoading: documentTypesLoading } = useDocumentTypes();
 
-  // Find documentTypeId for fixedDocumentType
-  const fixedDocumentTypeId = fixedDocumentType
-    ? documentTypes.find(
-        (type) =>
-          type.name.toLowerCase().replace(/[\s\-]/g, "") ===
-          fixedDocumentType.toLowerCase().replace(/[\s\-]/g, "")
-      )?.id || ""
-    : "";
-
   const {
     formData,
     isLoadingState,
@@ -69,7 +60,8 @@ export default function DocumentForm({
     accessToken,
     onSubmit,
     onSubmitForApproval,
-    fixedDocumentTypeId,
+    fixedDocumentType,
+    documentTypes,
   });
 
   const handleSelectChange = (name: string, value: string) => {
@@ -77,6 +69,36 @@ export default function DocumentForm({
       target: { name, value },
     } as React.ChangeEvent<HTMLSelectElement>);
   };
+
+  // Determine if the Type select should be hidden
+  const normalizedFixed = fixedDocumentType
+    ?.toLowerCase()
+    .replace(/[\s\-]/g, "");
+  const hideTypeSelect =
+    normalizedFixed === "proposal" ||
+    normalizedFixed === "accountabilityreport";
+
+  // Dynamic label and placeholder based on fixedDocumentType
+  const getDynamicLabel = (type?: string) => {
+    if (!type) return "Document Name";
+    if (type.toLowerCase() === "proposal") return "Proposal Name";
+    if (type.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport") {
+      return "Accountability Report Name";
+    }
+    return "Document Name";
+  };
+
+  const getDynamicPlaceholder = (type?: string) => {
+    if (!type) return "Enter document name";
+    if (type.toLowerCase() === "proposal") return "Enter proposal name";
+    if (type.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport") {
+      return "Enter accountability report name";
+    }
+    return "Enter document name";
+  };
+
+  const documentLabel = getDynamicLabel(fixedDocumentType);
+  const documentPlaceholder = getDynamicPlaceholder(fixedDocumentType);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -90,30 +112,32 @@ export default function DocumentForm({
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <TextInput
-            label="Document Name"
+            label={documentLabel}
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            placeholder="Enter document name"
+            placeholder={documentPlaceholder}
             required
             icon={<FiBriefcase className="text-gray-400" />}
             disabled={isLoadingState}
           />
 
-          <SelectInput
-            label="Type"
-            name="documentTypeId"
-            value={formData.documentTypeId}
-            onChange={(value) => handleSelectChange("documentTypeId", value)}
-            options={documentTypes.map((type) => ({
-              value: type.id,
-              label: type.name,
-            }))}
-            placeholder="Select type"
-            required
-            icon={<FiFolder className="text-gray-400" />}
-            disabled={isLoadingState || documentTypesLoading}
-          />
+          {!hideTypeSelect && (
+            <SelectInput
+              label="Type"
+              name="documentTypeId"
+              value={formData.documentTypeId}
+              onChange={(value) => handleSelectChange("documentTypeId", value)}
+              options={documentTypes.map((type) => ({
+                value: type.id,
+                label: type.name,
+              }))}
+              placeholder="Select type"
+              required
+              icon={<FiFolder className="text-gray-400" />}
+              disabled={isLoadingState || documentTypesLoading}
+            />
+          )}
 
           <SelectInput
             label="Status"

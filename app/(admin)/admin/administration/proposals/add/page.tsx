@@ -70,15 +70,20 @@ export default function AddDocumentPage() {
     router.push("/admin/administration/documents/types/add");
   };
 
+  // Check if PROPOSAL document type exists
+  const proposalType = documentTypes.find(
+    (type) => type.name.toLowerCase().replace(/[\s\-]/g, "") === "proposal"
+  );
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <PageHeader title="Add New Document" onBack={handleBack} />
+      <PageHeader title="Add New Proposal" onBack={handleBack} />
 
       {loadError && <Alert type="error" message={loadError} />}
 
       {combinedLoading ? (
         <LoadingForm />
-      ) : (
+      ) : proposalType ? (
         <DocumentForm
           onSubmit={createDocument}
           onSubmitForApproval={createDocumentForApproval}
@@ -88,6 +93,12 @@ export default function AddDocumentPage() {
           loading={combinedLoading}
           fixedDocumentType="proposal"
         />
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+          <p className="text-gray-600">
+            Document type PROPOSAL is required to add proposals.
+          </p>
+        </div>
       )}
 
       <WarningModal

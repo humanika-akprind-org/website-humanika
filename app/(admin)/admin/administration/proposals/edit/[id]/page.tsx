@@ -53,7 +53,7 @@ export default function EditDocumentPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <PageHeader title="Edit Document" onBack={handleBack} />
+      <PageHeader title="Edit Proposal" onBack={handleBack} />
 
       {loadError && <Alert type="error" message={loadError} />}
 
