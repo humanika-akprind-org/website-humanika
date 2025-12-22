@@ -45,8 +45,8 @@ export default function DocumentApprovalPage() {
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <ManagementHeader
-          title="Document Approvals"
-          description="Manage all document approval requests"
+          title="Proposal Approvals"
+          description="Manage all proposal approval requests"
         />
       </div>
 

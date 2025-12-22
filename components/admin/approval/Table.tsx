@@ -69,14 +69,23 @@ export default function ApprovalTable({
   // Helper function to get entity name
   const getEntityName = (approval: Approval) => {
     switch (approval.entityType) {
-      case "WORK_PROGRAM":
-        return approval.workProgram?.name || "Work Program";
+      case "NAME_APPROVAL":
+        return approval.nameApproval?.name || "Name Approval";
       case "EVENT":
         return approval.event?.name || "Event";
       case "FINANCE":
         return approval.finance?.name || "Finance";
       case "DOCUMENT":
-        return approval.document?.name || "Document";
+        const docName = approval.document?.name || "Document";
+        const docTypeValue = approval.document?.documentType?.name
+          ?.toLowerCase()
+          .replace(/[\s\-]/g, "");
+        if (docTypeValue === "proposal") {
+          return `Proposal: ${docName}`;
+        } else if (docTypeValue === "accountabilityreport") {
+          return `Accountability Report: ${docName}`;
+        }
+        return docName;
       case "LETTER":
         return approval.letter?.regarding || "Letter";
       default:
@@ -89,7 +98,7 @@ export default function ApprovalTable({
     let aValue, bValue;
 
     switch (sortField) {
-      case "workProgram":
+      case "nameApproval":
         aValue = getEntityName(a).toLowerCase();
         bValue = getEntityName(b).toLowerCase();
         break;
@@ -208,14 +217,14 @@ export default function ApprovalTable({
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("workProgram")}
+                onClick={() => handleSort("nameApproval")}
               >
                 <div className="flex items-center">
-                  Work Program
+                  Name Approval
                   <SortIcon
                     sortField={sortField}
                     sortDirection={sortDirection}
-                    field="workProgram"
+                    field="nameApproval"
                     iconType="arrow"
                   />
                 </div>
@@ -290,7 +299,7 @@ export default function ApprovalTable({
                   <div className="text-sm text-gray-900 font-medium">
                     {getEntityName(approval)}
                   </div>
-                  <div className="text-sm text-gray-500">Work Program</div>
+                  <div className="text-sm text-gray-500">Name Approval</div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
@@ -382,8 +391,8 @@ export default function ApprovalTable({
       {sortedApprovals.length === 0 && (
         <EmptyState
           icon={<FiCheck size={48} className="mx-auto" />}
-          title="No work program approvals found"
-          description="No work program approval requests at the moment"
+          title="No Name approvals found"
+          description="No Name approval requests at the moment"
         />
       )}
 

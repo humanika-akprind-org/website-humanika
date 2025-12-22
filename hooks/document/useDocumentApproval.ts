@@ -21,7 +21,7 @@ const getEntityName = (approval: Approval) => {
   }
 };
 
-export const useDocumentApproval = () => {
+export const useDocumentApproval = (documentType?: string) => {
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState<{
@@ -43,55 +43,74 @@ export const useDocumentApproval = () => {
     action: "",
   });
 
-  const fetchApprovals = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await ApprovalApi.getApprovals({
-        status: filters.status,
-        entityType: filters.entityType,
-        page: currentPage,
-        limit: 10,
-      });
+  const fetchApprovals = useCallback(
+    async (docType?: string) => {
+      try {
+        setLoading(true);
+        const response = await ApprovalApi.getApprovals({
+          status: filters.status,
+          entityType: filters.entityType,
+          page: currentPage,
+          limit: 10,
+        });
 
-      if (response.error) {
-        setAlert({ type: "error", message: response.error });
-      } else if (response.data) {
-        // Group approvals by document ID and keep only the latest one per document
-        const uniqueApprovalsMap = response.data.approvals.reduce(
-          (acc, approval) => {
-            const documentId = approval.document?.id || approval.entityId;
-            if (
-              !acc[documentId] ||
-              new Date(approval.createdAt) > new Date(acc[documentId].createdAt)
-            ) {
-              acc[documentId] = approval;
-            }
-            return acc;
-          },
-          {} as Record<string, Approval>
-        );
+        if (response.error) {
+          setAlert({ type: "error", message: response.error });
+        } else if (response.data) {
+          // Group approvals by document ID and keep only the latest one per document
+          const uniqueApprovalsMap = response.data.approvals.reduce(
+            (acc, approval) => {
+              const documentId = approval.document?.id || approval.entityId;
+              if (
+                !acc[documentId] ||
+                new Date(approval.createdAt) >
+                  new Date(acc[documentId].createdAt)
+              ) {
+                acc[documentId] = approval;
+              }
+              return acc;
+            },
+            {} as Record<string, Approval>
+          );
 
-        const uniqueApprovals = Object.values(uniqueApprovalsMap) as Approval[];
+          const uniqueApprovals = Object.values(
+            uniqueApprovalsMap
+          ) as Approval[];
 
-        // Sort by createdAt descending to show latest first
-        uniqueApprovals.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+          // Filter by document type if provided
+          let filteredApprovals = uniqueApprovals;
+          if (docType) {
+            filteredApprovals = uniqueApprovals.filter((approval) => {
+              const approvalDocType = approval.document?.documentType?.name
+                ?.toLowerCase()
+                .replace(/[\s\-]/g, "");
+              return (
+                approvalDocType === docType.toLowerCase().replace(/[\s\-]/g, "")
+              );
+            });
+          }
 
-        setApprovals(uniqueApprovals);
-        setTotalPages(1); // Disable pagination for unique approvals
+          // Sort by createdAt descending to show latest first
+          filteredApprovals.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+
+          setApprovals(filteredApprovals);
+          setTotalPages(1); // Disable pagination for unique approvals
+        }
+      } catch (_error) {
+        setAlert({ type: "error", message: "Failed to fetch approvals" });
+      } finally {
+        setLoading(false);
       }
-    } catch (_error) {
-      setAlert({ type: "error", message: "Failed to fetch approvals" });
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, currentPage]);
+    },
+    [filters, currentPage]
+  );
 
   useEffect(() => {
-    fetchApprovals();
-  }, [fetchApprovals]);
+    fetchApprovals(documentType);
+  }, [fetchApprovals, documentType]);
 
   const handleApprove = async (approvalId: string, note?: string) => {
     try {
