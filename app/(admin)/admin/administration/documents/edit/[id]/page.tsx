@@ -24,7 +24,6 @@ export default function EditDocumentPage() {
   } = useEditDocument(id);
 
   const {
-    users,
     events,
     letters,
     loading: formDataLoading,
@@ -66,7 +65,6 @@ export default function EditDocumentPage() {
           onSubmit={updateDocument}
           onSubmitForApproval={updateDocumentForApproval}
           accessToken={accessToken}
-          users={users}
           events={events}
           letters={letters}
           loading={combinedLoading}

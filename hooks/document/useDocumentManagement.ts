@@ -4,7 +4,15 @@ import { deleteDocument } from "@/use-cases/api/document";
 import type { Document } from "@/types/document";
 import { useDocuments } from "./useDocuments";
 
-export function useDocumentManagement() {
+interface UseDocumentManagementOptions {
+  addPath?: string;
+  editPath?: string;
+}
+
+export function useDocumentManagement(
+  options: UseDocumentManagementOptions = {}
+) {
+  const { addPath, editPath } = options;
   const router = useRouter();
   const { documents, isLoading, error, fetchDocuments } = useDocuments();
 
@@ -68,11 +76,11 @@ export function useDocumentManagement() {
   };
 
   const handleAddDocument = () => {
-    router.push("/admin/administration/documents/add");
+    router.push(addPath || "/admin/administration/documents/add");
   };
 
   const handleEditDocument = (id: string) => {
-    router.push(`/admin/administration/documents/edit/${id}`);
+    router.push(editPath || `/admin/administration/documents/edit/${id}`);
   };
 
   const handleViewDocument = (document: Document) => {

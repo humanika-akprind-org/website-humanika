@@ -25,7 +25,6 @@ export default function AddDocumentPage() {
   } = useCreateDocument();
 
   const {
-    users,
     events,
     letters,
     loading: formDataLoading,
@@ -86,7 +85,6 @@ export default function AddDocumentPage() {
           onSubmit={createDocument}
           onSubmitForApproval={createDocumentForApproval}
           accessToken={accessToken}
-          users={users}
           events={events}
           letters={letters}
           loading={combinedLoading}

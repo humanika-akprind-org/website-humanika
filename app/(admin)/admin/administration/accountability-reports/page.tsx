@@ -47,7 +47,10 @@ export default function AccountabilityReportsPage() {
     handleViewDocument,
     handleDelete,
     confirmDelete,
-  } = useDocumentManagement();
+  } = useDocumentManagement({
+    addPath: "/admin/administration/accountability-reports/add",
+    editPath: "/admin/administration/accountability-reports/edit",
+  });
 
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }

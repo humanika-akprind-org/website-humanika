@@ -47,7 +47,10 @@ export default function ProposalsPage() {
     handleViewDocument,
     handleDelete,
     confirmDelete,
-  } = useDocumentManagement();
+  } = useDocumentManagement({
+    addPath: "/admin/administration/proposals/add",
+    editPath: "/admin/administration/proposals/edit",
+  });
 
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }

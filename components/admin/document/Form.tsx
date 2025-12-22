@@ -9,7 +9,6 @@ import type {
   UpdateDocumentInput,
 } from "@/types/document";
 import { Status } from "@/types/enums";
-import type { User } from "@/types/user";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
 import TextInput from "@/components/admin/ui/input/TextInput";
@@ -28,7 +27,6 @@ interface DocumentFormProps {
   ) => Promise<void>;
   loading?: boolean;
   accessToken: string;
-  users?: User[];
   events: Event[];
   letters: Letter[];
   fixedDocumentType?: string;
@@ -39,7 +37,6 @@ export default function DocumentForm({
   onSubmit,
   onSubmitForApproval,
   accessToken,
-  users: _users,
   events,
   fixedDocumentType,
 }: DocumentFormProps) {

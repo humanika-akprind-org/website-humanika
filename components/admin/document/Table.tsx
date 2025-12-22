@@ -1,4 +1,11 @@
-import { FiFileText, FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import {
+  FiFileText,
+  FiEdit,
+  FiTrash,
+  FiEye,
+  FiClipboard,
+  FiTarget,
+} from "react-icons/fi";
 import type { Document } from "@/types/document";
 
 import Checkbox from "../ui/checkbox/Checkbox";
@@ -113,6 +120,38 @@ export default function DocumentTable({
   const handleAddDocument = () => {
     onAddDocument();
   };
+
+  // Determine empty state props based on typeFilter
+  const emptyStateProps = (() => {
+    if (typeFilter === "proposal") {
+      return {
+        icon: <FiClipboard size={48} className="mx-auto" />,
+        title: "No proposals found",
+        description: "Try adjusting your search or filter criteria",
+        actionButton: (
+          <AddButton onClick={handleAddDocument} text="Add Proposal" />
+        ),
+      };
+    } else if (typeFilter === "accountabilityreport") {
+      return {
+        icon: <FiTarget size={48} className="mx-auto" />,
+        title: "No accountability reports found",
+        description: "Try adjusting your search or filter criteria",
+        actionButton: (
+          <AddButton onClick={handleAddDocument} text="Add Accountability" />
+        ),
+      };
+    } else {
+      return {
+        icon: <FiFileText size={48} className="mx-auto" />,
+        title: "No documents found",
+        description: "Try adjusting your search or filter criteria",
+        actionButton: (
+          <AddButton onClick={handleAddDocument} text="Add Document" />
+        ),
+      };
+    }
+  })();
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
@@ -287,12 +326,10 @@ export default function DocumentTable({
 
       {sortedDocuments.length === 0 && !loading && (
         <EmptyState
-          icon={<FiFileText size={48} className="mx-auto" />}
-          title="No documents found"
-          description="Try adjusting your search or filter criteria"
-          actionButton={
-            <AddButton onClick={handleAddDocument} text="Add Document" />
-          }
+          icon={emptyStateProps.icon}
+          title={emptyStateProps.title}
+          description={emptyStateProps.description}
+          actionButton={emptyStateProps.actionButton}
         />
       )}
 
