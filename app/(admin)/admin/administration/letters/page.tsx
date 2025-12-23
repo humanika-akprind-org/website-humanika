@@ -1,136 +1,261 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { FiPlus } from "react-icons/fi";
+import LetterStats from "@/components/admin/letter/Stats";
+import LetterFilters from "@/components/admin/letter/Filters";
 import LetterTable from "@/components/admin/letter/Table";
-import DeleteModal from "@/components/admin/letter/modal/DeleteModal";
-import type { Letter } from "@/types/letter";
-import { useToast } from "@/hooks/use-toast";
+import DeleteModal from "components/admin/ui/modal/DeleteModal";
+import ViewModal from "components/admin/ui/modal/ViewModal";
+import Loading from "components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "components/admin/ui/alert/Alert";
+import ManagementHeader from "components/admin/ui/ManagementHeader";
+import AddButton from "components/admin/ui/button/AddButton";
+import HtmlRenderer from "components/admin/ui/HtmlRenderer";
+import TypeChip from "components/admin/ui/chip/Type";
+import PriorityChip from "components/admin/ui/chip/Priority";
+import StatusChip from "components/admin/ui/chip/Status";
+import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
+import DateDisplay from "components/admin/ui/date/DateDisplay";
+import { useLetterManagement } from "@/hooks/letter/useLetterManagement";
+import type { LetterFilter } from "@/types/letter";
 
 export default function LettersPage() {
-  const [_letters, setLetters] = useState<Letter[]>([]);
-  const [filteredLetters, setFilteredLetters] = useState<Letter[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    letterId: "",
-    letterName: "",
-  });
+  const {
+    letters,
+    loading,
+    error,
+    success,
+    selectedLetters,
+    currentPage,
+    totalPages,
+    showDeleteModal,
+    showViewModal,
+    currentLetter,
+    setSearchTerm,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentLetter,
+    setTypeFilter,
+    setPriorityFilter,
+    toggleLetterSelection,
+    toggleSelectAll,
+    handleAddLetter,
+    handleEditLetter,
+    handleViewLetter,
+    handleDelete,
+    confirmDelete,
+  } = useLetterManagement();
 
-  const { toast } = useToast();
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
 
-  const fetchLetters = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/letter");
-      if (response.ok) {
-        const data = await response.json();
-        setLetters(data || []);
-        setFilteredLetters(data || []);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch letters",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching letters:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch letters",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+  const handleFilterChange = (filter: LetterFilter) => {
+    if (filter.type !== undefined) setTypeFilter(filter.type || "all");
+    if (filter.priority !== undefined) {
+      setPriorityFilter(filter.priority || "all");
     }
-  }, [toast]);
-
-  // Fetch letters
-  useEffect(() => {
-    fetchLetters();
-  }, [fetchLetters]);
-
-  const handleDelete = async (letterId: string) => {
-    try {
-      const response = await fetch(`/api/letter/${letterId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Letter deleted successfully",
-        });
-        fetchLetters(); // Refresh the list
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to delete letter",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting letter:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete letter",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteModal({ isOpen: false, letterId: "", letterName: "" });
-    }
+    if (filter.search !== undefined) setSearchTerm(filter.search || "");
   };
 
-  const closeDeleteModal = () => {
-    setDeleteModal({ isOpen: false, letterId: "", letterName: "" });
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Letters Management
-          </h1>
-          <p className="text-gray-600">Manage and organize your letters</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/admin/administration/letters/add"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <FiPlus className="h-4 w-4 mr-2" />
-            Add Letter
-          </Link>
-        </div>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Letters Management"
+          description="Manage and organize your letters"
+        />
+        <AddButton onClick={handleAddLetter} text="Add Letter" />
       </div>
 
-      {/* Letters Table */}
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <LetterTable letters={filteredLetters} onDelete={handleDelete} />
-      )}
+      <LetterStats letters={letters} />
 
-      {/* Delete Modal */}
-      <DeleteModal
-        isOpen={deleteModal.isOpen}
-        onClose={closeDeleteModal}
-        onConfirm={() => handleDelete(deleteModal.letterId)}
-        letterTitle={deleteModal.letterName}
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <LetterFilters onFilter={handleFilterChange} isLoading={loading} />
+
+      <LetterTable
+        letters={letters}
+        selectedLetters={selectedLetters}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onLetterSelect={toggleLetterSelection}
+        onSelectAll={toggleSelectAll}
+        onViewLetter={handleViewLetter}
+        onEditLetter={handleEditLetter}
+        onDeleteLetter={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddLetter={handleAddLetter}
       />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentLetter?.regarding}
+        selectedCount={selectedLetters.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentLetter(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Letter Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentLetter(null);
+        }}
+      >
+        {currentLetter && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900">
+                  {currentLetter.regarding}
+                </h4>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Type
+                </label>
+                <div className="mt-1">
+                  <TypeChip type={currentLetter.type} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Priority
+                </label>
+                <div className="mt-1">
+                  <PriorityChip priority={currentLetter.priority} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <div className="mt-1">
+                  <StatusChip status={currentLetter.status} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Origin
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentLetter.origin}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Destination
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentLetter.destination}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Date
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {new Intl.DateTimeFormat("id-ID", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  }).format(new Date(currentLetter.date))}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Approval
+                </label>
+                <div className="mt-1">
+                  {currentLetter.approvals &&
+                  currentLetter.approvals.length > 0 ? (
+                    (() => {
+                      const latestApproval = currentLetter.approvals.sort(
+                        (a, b) =>
+                          new Date(b.updatedAt).getTime() -
+                          new Date(a.updatedAt).getTime()
+                      )[0];
+                      return (
+                        <StatusApprovalChip status={latestApproval.status} />
+                      );
+                    })()
+                  ) : (
+                    <span className="text-xs text-gray-400">No approvals</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentLetter.createdAt} />
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Updated At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentLetter.updatedAt} />
+                </p>
+              </div>
+            </div>
+
+            {currentLetter.body && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Body
+                </label>
+                <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">
+                  <HtmlRenderer html={currentLetter.body || "No body"} />
+                </div>
+              </div>
+            )}
+
+            {currentLetter.letter && (
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Letter File
+                </label>
+                <div className="mt-2">
+                  <a
+                    href={currentLetter.letter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    View Letter File
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </ViewModal>
     </div>
   );
 }

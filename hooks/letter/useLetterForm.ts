@@ -227,11 +227,15 @@ export function useLetterForm({
       // Prepare data to send
       const submitData = {
         ...dataToSend,
-        letter: letterUrl,
+        letter: letterUrl || undefined,
         date: new Date(formData.date).toISOString(),
-        periodId: formData.periodId ? formData.periodId : null,
-        eventId: formData.eventId ? formData.eventId : null,
+        periodId: formData.periodId || undefined,
+        eventId: formData.eventId || undefined,
       };
+
+      // Convert empty strings to undefined for optional fields
+      if (submitData.periodId === "") submitData.periodId = undefined;
+      if (submitData.eventId === "") submitData.eventId = undefined;
 
       if (onSubmitForApproval) {
         await onSubmitForApproval(submitData);
