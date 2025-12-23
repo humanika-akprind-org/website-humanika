@@ -7,12 +7,13 @@ import { useDocuments } from "./useDocuments";
 interface UseDocumentManagementOptions {
   addPath?: string;
   editPath?: string;
+  excludeTypes?: string[];
 }
 
 export function useDocumentManagement(
   options: UseDocumentManagementOptions = {}
 ) {
-  const { addPath, editPath } = options;
+  const { addPath, editPath, excludeTypes } = options;
   const router = useRouter();
   const { documents, isLoading, error, fetchDocuments } = useDocuments();
 
@@ -42,8 +43,18 @@ export function useDocumentManagement(
       statusFilter === "all" || document.status === statusFilter;
     const matchesType = typeFilter === "all" || document.type === typeFilter;
     const matchesUser = userFilter === "all" || document.userId === userFilter;
+    const notExcluded = !excludeTypes?.some(
+      (excludeType) =>
+        excludeType === document.type.toLowerCase().replace(/[\s\-]/g, "")
+    );
 
-    return matchesSearch && matchesStatus && matchesType && matchesUser;
+    return (
+      matchesSearch &&
+      matchesStatus &&
+      matchesType &&
+      matchesUser &&
+      notExcluded
+    );
   });
 
   useEffect(() => {

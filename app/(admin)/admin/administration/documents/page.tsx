@@ -47,7 +47,9 @@ export default function DocumentsPage() {
     handleViewDocument,
     handleDelete,
     confirmDelete,
-  } = useDocumentManagement();
+  } = useDocumentManagement({
+    excludeTypes: ["proposal", "accountabilityreport"],
+  });
 
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }

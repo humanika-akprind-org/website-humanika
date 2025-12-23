@@ -85,8 +85,13 @@ export const useDocumentApproval = (
             uniqueApprovalsMap
           ) as Approval[];
 
+          // Filter out approvals where entityType is "DOCUMENT"
+          const filteredByEntity = uniqueApprovals.filter(
+            (approval) => approval.entityType !== "DOCUMENT"
+          );
+
           // Filter based on documentType parameter if provided
-          const filteredApprovals = uniqueApprovals.filter((approval) => {
+          const filteredApprovals = filteredByEntity.filter((approval) => {
             if (!docType) {
               // If no documentType specified, show all documents
               return true;
