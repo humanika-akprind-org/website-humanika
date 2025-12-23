@@ -107,12 +107,16 @@ enum LetterPriority {
 // EVENT: Kegiatan/acara
 // FINANCE: Transaksi keuangan
 // DOCUMENT: Dokumen
+// DOCUMENT_PROPOSAL: Dokumen proposal
+// DOCUMENT_ACCOUNTABILITY_REPORT: Dokumen laporan pertanggungjawaban
 // LETTER: Surat
 enum ApprovalType {
   WORK_PROGRAM // Program kerja
   EVENT // Kegiatan/acara
   FINANCE // Transaksi keuangan
   DOCUMENT // Dokumen
+  DOCUMENT_PROPOSAL // Dokumen proposal
+  DOCUMENT_ACCOUNTABILITY_REPORT // Dokumen laporan pertanggungjawaban
   LETTER // Surat
 }
 

@@ -3,7 +3,11 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/types/document";
-import type { Status, DocumentType as DocumentTypeEnum } from "@/types/enums";
+import {
+  type Status,
+  type DocumentType as DocumentTypeEnum,
+  ApprovalType,
+} from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
@@ -214,10 +218,20 @@ export const createDocument = async (
       : undefined,
   };
 
+  // Determine entityType based on documentType
+  const entityType =
+    document.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
+    "proposal"
+      ? ApprovalType.DOCUMENT_PROPOSAL
+      : document.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
+        "accountabilityreport"
+      ? ApprovalType.DOCUMENT_ACCOUNTABILITY_REPORT
+      : ApprovalType.DOCUMENT;
+
   // Always create approval record with PENDING status
   await prisma.approval.create({
     data: {
-      entityType: "DOCUMENT",
+      entityType,
       entityId: document.id,
       userId: user.id,
       status: "PENDING",
@@ -254,7 +268,7 @@ export const updateDocument = async (
   // Check if document exists with approval
   const existingDocument = await prisma.document.findUnique({
     where: { id },
-    include: { approvals: true },
+    include: { approvals: true, documentType: true },
   });
 
   if (!existingDocument) {
@@ -303,10 +317,18 @@ export const updateDocument = async (
 
   // Handle status change to PENDING - create approval record
   if (data.status === "PENDING") {
+    // Determine entityType based on documentType
+    const entityType =
+      existingDocument.documentType?.name
+        ?.toLowerCase()
+        .replace(/[\s\-]/g, "") === "proposal"
+        ? ApprovalType.DOCUMENT_PROPOSAL
+        : ApprovalType.DOCUMENT;
+
     // Create approval record for the document
     await prisma.approval.create({
       data: {
-        entityType: "DOCUMENT",
+        entityType,
         entityId: id,
         userId: user.id, // Current user submitting for approval
         status: "PENDING",

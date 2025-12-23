@@ -1,6 +1,7 @@
 "use client";
 
 import { useDocumentApproval } from "hooks/document/useDocumentApproval";
+import { ApprovalType } from "types/enums";
 import ApprovalFilters from "components/admin/approval/Filters";
 import ApprovalTable from "components/admin/approval/Table";
 import ApprovalActionModal from "components/admin/approval/ActionModal";
@@ -35,7 +36,10 @@ export default function DocumentApprovalPage() {
     handleBulkReturn,
     handleBulkActionConfirm,
     closeActionModal,
-  } = useDocumentApproval();
+  } = useDocumentApproval(
+    undefined,
+    ApprovalType.DOCUMENT_ACCOUNTABILITY_REPORT
+  );
 
   if (loading) {
     return <LoadingApproval />;

@@ -7,6 +7,7 @@ import ApprovalActionModal from "components/admin/approval/ActionModal";
 import Alert from "components/admin/ui/alert/Alert";
 import LoadingApproval from "components/admin/layout/loading/LoadingApproval";
 import ManagementHeader from "components/admin/ui/ManagementHeader";
+import { ApprovalType } from "@/types/enums";
 
 export default function DocumentApprovalPage() {
   const {
@@ -35,7 +36,7 @@ export default function DocumentApprovalPage() {
     handleBulkReturn,
     handleBulkActionConfirm,
     closeActionModal,
-  } = useDocumentApproval();
+  } = useDocumentApproval(undefined, ApprovalType.DOCUMENT_PROPOSAL);
 
   if (loading) {
     return <LoadingApproval />;

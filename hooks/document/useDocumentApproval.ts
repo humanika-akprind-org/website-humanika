@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { ApprovalApi } from "use-cases/api/approval";
+import { ApprovalType } from "types/enums";
 import type { ApprovalWithRelations as Approval } from "types/approval";
 import { StatusApproval } from "types/enums";
 
@@ -14,6 +15,10 @@ const getEntityName = (approval: Approval) => {
       return approval.finance?.name || "Finance";
     case "DOCUMENT":
       return approval.document?.name || "Document";
+    case "DOCUMENT_PROPOSAL":
+      return approval.document?.name || "Document Proposal";
+    case "DOCUMENT_ACCOUNTABILITY_REPORT":
+      return approval.document?.name || "Accountability Report";
     case "LETTER":
       return approval.letter?.regarding || "Letter";
     default:
@@ -21,7 +26,10 @@ const getEntityName = (approval: Approval) => {
   }
 };
 
-export const useDocumentApproval = (documentType?: string) => {
+export const useDocumentApproval = (
+  documentType?: string,
+  entityType?: string
+) => {
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState<{
@@ -31,7 +39,7 @@ export const useDocumentApproval = (documentType?: string) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     status: "",
-    entityType: "DOCUMENT",
+    entityType: entityType || ApprovalType.DOCUMENT,
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
