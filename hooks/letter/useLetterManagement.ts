@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Letter } from "@/types/letter";
 import { useToast } from "@/hooks/use-toast";
@@ -31,7 +31,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
   const [typeFilter, setTypeFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
 
-  const fetchLetters = async () => {
+  const fetchLetters = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -39,7 +39,6 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
       if (response.ok) {
         const data = await response.json();
         setLetters(data || []);
-        setFilteredLetters(data || []);
       } else {
         const errorMsg = "Failed to fetch letters";
         setError(errorMsg);
@@ -61,34 +60,35 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   // Apply client-side filtering and pagination
-  const filteredLettersData = letters.filter((letter) => {
-    const matchesSearch =
-      letter.regarding
-        .toLowerCase()
-        .includes(debouncedSearchTerm.toLowerCase()) ||
-      letter.origin.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-      letter.destination
-        .toLowerCase()
-        .includes(debouncedSearchTerm.toLowerCase()) ||
-      (letter.number &&
-        letter.number
-          .toLowerCase()
-          .includes(debouncedSearchTerm.toLowerCase()));
-
-    const matchesType = typeFilter === "all" || letter.type === typeFilter;
-    const matchesPriority =
-      priorityFilter === "all" || letter.priority === priorityFilter;
-
-    return matchesSearch && matchesType && matchesPriority;
-  });
-
   useEffect(() => {
-    setFilteredLetters(filteredLettersData);
-    setTotalPages(Math.ceil(filteredLettersData.length / 10));
-  }, [filteredLettersData, currentPage]);
+    const filtered = letters.filter((letter) => {
+      const matchesSearch =
+        letter.regarding
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()) ||
+        letter.origin
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()) ||
+        letter.destination
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()) ||
+        (letter.number &&
+          letter.number
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()));
+
+      const matchesType = typeFilter === "all" || letter.type === typeFilter;
+      const matchesPriority =
+        priorityFilter === "all" || letter.priority === priorityFilter;
+
+      return matchesSearch && matchesType && matchesPriority;
+    });
+    setFilteredLetters(filtered);
+    setTotalPages(Math.ceil(filtered.length / 10));
+  }, [letters, debouncedSearchTerm, typeFilter, priorityFilter]);
 
   // Debounce search term
   useEffect(() => {
@@ -102,7 +102,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
   // Initial fetch
   useEffect(() => {
     fetchLetters();
-  }, []);
+  }, [fetchLetters]);
 
   const toggleLetterSelection = (id: string) => {
     if (selectedLetters.includes(id)) {

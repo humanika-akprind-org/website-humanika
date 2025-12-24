@@ -79,7 +79,6 @@ export function useDocumentForm({
     name: document?.name || "",
     documentTypeId: initialDocumentTypeId,
     status: document?.status || Status.DRAFT,
-    eventId: document?.eventId || "",
     letterId: document?.letterId || "",
     documentFile: undefined as File | undefined,
   });
@@ -247,7 +246,6 @@ export function useDocumentForm({
         ...dataToSend,
         documentTypeId: finalDocumentTypeId,
         document: documentUrl,
-        eventId: formData.eventId ? formData.eventId : null,
         letterId: formData.letterId ? formData.letterId : null,
       };
 

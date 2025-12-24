@@ -102,6 +102,12 @@ enum LetterPriority {
   URGENT // Mendesak
 }
 
+enum LetterClassification {
+  GENERAL // Biasa
+  CONFIDENTIAL // Rahasia
+  HIGHLY_CONFIDENTIAL // Sangat Rahasia
+}
+
 // Enum untuk jenis entitas yang memerlukan persetujuan
 // WORK_PROGRAM: Program kerja
 // EVENT: Kegiatan/acara
@@ -285,24 +291,24 @@ model EventCategory {
 model Document {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId // ID unik dokumen (auto-generated)
   name           String // Nama dokumen
-  eventId        String?  @db.ObjectId // ID kegiatan terkait (opsional)
+  // eventId        String?  @db.ObjectId // ID kegiatan terkait (opsional)
   letterId       String?  @db.ObjectId // ID surat terkait (opsional)
   documentTypeId String   @db.ObjectId // ID tipe dokumen
   status         Status   @default(PENDING) // Status dokumen
   document       String? // URL dokumen
   userId         String   @db.ObjectId // ID pengguna yang mengunggah
-  version        Int      @default(1) // Versi dokumen
-  parentId       String?  @db.ObjectId // ID dokumen induk (untuk versioning)
-  isCurrent      Boolean  @default(true) // Apakah ini versi terbaru
+  // version        Int      @default(1) // Versi dokumen
+  // parentId       String?  @db.ObjectId // ID dokumen induk (untuk versioning)
+  // isCurrent      Boolean  @default(true) // Apakah ini versi terbaru
   createdAt      DateTime @default(now()) // Waktu pembuatan dokumen
   updatedAt      DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan dokumen
-  event           Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
+  // event           Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
   user            User         @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang mengunggah
   letter          Letter?      @relation(fields: [letterId], references: [id], onDelete: Cascade) // Surat terkait
   documentType    DocumentType @relation(fields: [documentTypeId], references: [id], onDelete: Cascade) // Tipe dokumen
-  previousVersion Document?    @relation("DocumentVersions", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Versi sebelumnya
+  // previousVersion Document?    @relation("DocumentVersions", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Versi sebelumnya
   nextVersions    Document[]   @relation("DocumentVersions") // Versi selanjutnya
   approvals       Approval[]   @relation("DocumentApprovals") // Persetujuan untuk transaksi
 
@@ -554,6 +560,7 @@ model Letter {
   regarding    String // Perihal surat
   origin       String // Asal surat
   destination  String // Tujuan surat
+  classification LetterClassification? // Klasifikasi surat (biasa, rahasia, sangat rahasia)
   date         DateTime // Tanggal surat
   type         LetterType // Tipe surat
   priority     LetterPriority @default(NORMAL) // Prioritas surat

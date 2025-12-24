@@ -17,12 +17,14 @@ export function useLetterFormData() {
         const periodsData =
           periodsRes.status === "fulfilled"
             ? await periodsRes.value.json()
-            : [];
+            : null;
         const eventsData =
-          eventsRes.status === "fulfilled" ? await eventsRes.value.json() : [];
+          eventsRes.status === "fulfilled"
+            ? await eventsRes.value.json()
+            : null;
 
-        setPeriods(periodsData || []);
-        setEvents(eventsData || []);
+        setPeriods(periodsData?.data || []);
+        setEvents(eventsData?.data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {

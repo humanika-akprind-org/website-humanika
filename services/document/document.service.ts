@@ -160,10 +160,6 @@ export const createDocument = async (
     user: { connect: { id: user.id } },
   };
 
-  if (data.eventId) {
-    documentData.event = { connect: { id: data.eventId } };
-  }
-
   if (data.letterId) {
     documentData.letter = { connect: { id: data.letterId } };
   }
@@ -278,7 +274,6 @@ export const updateDocument = async (
   // Check if there are changes to the document (excluding status)
   const hasChanges =
     (data.name !== undefined && data.name !== existingDocument.name) ||
-    (data.eventId !== undefined && data.eventId !== existingDocument.eventId) ||
     (data.letterId !== undefined &&
       data.letterId !== existingDocument.letterId) ||
     (data.documentTypeId !== undefined &&
@@ -309,7 +304,6 @@ export const updateDocument = async (
   }
 
   if (data.name !== undefined) updateData.name = data.name;
-  if (data.eventId !== undefined) updateData.eventId = data.eventId;
   if (data.letterId !== undefined) updateData.letterId = data.letterId;
   if (data.documentTypeId) updateData.documentTypeId = data.documentTypeId;
   if (data.document !== undefined) updateData.document = data.document;

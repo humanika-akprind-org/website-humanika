@@ -174,15 +174,6 @@ export default function ProposalsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Version
-                </label>
-                <p className="mt-1 text-sm text-gray-900">
-                  {currentDocument.version}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
                   Approval
                 </label>
                 <div className="mt-1">
