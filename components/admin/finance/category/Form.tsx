@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import type {
   FinanceCategory,
@@ -8,6 +8,14 @@ import type {
   UpdateFinanceCategoryInput,
 } from "@/types/finance-category";
 import { FinanceType } from "@/types/enums";
+
+import TextInput from "@/components/admin/ui/input/TextInput";
+import { Textarea } from "@/components/ui/textarea";
+import SelectInput from "@/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/components/ui/CancelButton";
+import { FiTag } from "react-icons/fi";
+import { useFinanceCategoryForm } from "@/hooks/finance-category/useFinanceCategoryForm";
 
 interface FinanceCategoryFormProps {
   category?: FinanceCategory;
@@ -20,170 +28,89 @@ interface FinanceCategoryFormProps {
 export default function FinanceCategoryForm({
   category,
   onSubmit,
+  isLoading = false,
 }: FinanceCategoryFormProps) {
   const router = useRouter();
+  const {
+    isSubmitting,
+    formData,
+    formErrors,
+    handleChange,
+    handleSelectChange,
+    handleSubmit,
+  } = useFinanceCategoryForm(category, onSubmit);
 
-  const [formData, setFormData] = useState({
-    name: category?.name || "",
-    description: category?.description || "",
-    type: category?.type || FinanceType.INCOME,
-  });
-
-  const [isLoadingState, setIsLoadingState] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoadingState(true);
-    setError(null);
-
-    try {
-      // Validate required fields
-      if (!formData.name.trim()) {
-        throw new Error("Please enter category name");
-      }
-      if (!formData.type) {
-        throw new Error("Please select category type");
-      }
-
-      await onSubmit(formData);
-
-      router.push("/admin/finance/transactions/categories");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save category");
-    } finally {
-      setIsLoadingState(false);
-    }
-  };
+  const typeOptions = Object.values(FinanceType).map((type) => ({
+    value: type,
+    label: type === FinanceType.INCOME ? "Pemasukan" : "Pengeluaran",
+  }));
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
-          <h3 className="font-medium">Error</h3>
-          <p className="text-sm">{error}</p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category Name *
-            </label>
-            <input
-              type="text"
+    <>
+      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 gap-6 mb-6">
+            <TextInput
+              label="Category Name"
               name="name"
               value={formData.name}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={handleChange}
               placeholder="Enter category name"
               required
-              disabled={isLoadingState}
+              icon={<FiTag className="text-gray-400" />}
+              error={formErrors.name}
+              disabled={isLoading || isSubmitting}
+            />
+
+            <div>
+              <SelectInput
+                label="Type"
+                name="type"
+                value={formData.type}
+                onChange={(value) => handleSelectChange("type", value)}
+                options={typeOptions}
+                placeholder="Pilih Type"
+                disabled={isLoading || isSubmitting}
+              />
+              {formErrors.type && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.type}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <Textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Enter category description (optional)"
+                disabled={isLoading || isSubmitting}
+                rows={4}
+                maxLength={500}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Optional description up to 500 characters.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3">
+            <CancelButton
+              onClick={() => router.back()}
+              disabled={isLoading || isSubmitting}
+            />
+
+            <SubmitButton
+              isSubmitting={isSubmitting}
+              text={category ? "Update Category" : "Save Category"}
+              loadingText="Saving..."
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Type *
-            </label>
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-              disabled={isLoadingState}
-            >
-              <option value="">Pilih Type</option>
-              {Object.values(FinanceType).map((type) => (
-                <option key={type} value={type}>
-                  {type === FinanceType.INCOME ? "Pemasukan" : "Pengeluaran"}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={3}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter category description (optional)"
-              disabled={isLoadingState}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            disabled={isLoadingState}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            Batal
-          </button>
-          <button
-            type="submit"
-            disabled={isLoadingState}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
-          >
-            {isLoadingState ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Menyimpan...
-              </>
-            ) : (
-              "Simpan"
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </>
   );
 }

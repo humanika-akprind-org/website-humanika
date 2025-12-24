@@ -233,6 +233,7 @@ model WorkProgram {
   approvals       Approval[]       @relation("WorkProgramApprovals") // Persetujuan untuk program kerja
   events          Event[] // Kegiatan yang termasuk dalam program kerja
   departmentTasks DepartmentTask[] // Tugas departemen yang terkait
+  finances        Finance[] // Transaksi keuangan yang terkait dengan program kerja
   responsible     User             @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "WorkProgramResponsible") // Pengguna yang bertanggung jawab
 
   @@index([department, status, periodId])
@@ -411,29 +412,31 @@ model FinanceCategory {
 }
 
 model Finance {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String // Nama transaksi
-  amount      Float // Jumlah nominal transaksi
-  description String // Deskripsi transaksi
-  date        DateTime // Tanggal transaksi
-  type        FinanceType // Tipe transaksi (pemasukan/pengeluaran)
-  periodId    String      @db.ObjectId
-  eventId     String?     @db.ObjectId
-  userId      String      @db.ObjectId
-  status      Status      @default(PENDING) // Status transaksi
-  proof       String? // URL file bukti transaksi
-  categoryId  String?     @db.ObjectId // ID kategori keuangan
-  createdAt   DateTime    @default(now()) // Waktu pembuatan transaksi
-  updatedAt   DateTime    @updatedAt // Waktu terakhir update
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String // Nama transaksi
+  amount        Float // Jumlah nominal transaksi
+  description   String // Deskripsi transaksi
+  date          DateTime // Tanggal transaksi
+  type          FinanceType // Tipe transaksi (pemasukan/pengeluaran)
+  userId        String      @db.ObjectId
+  status        Status      @default(PENDING) // Status transaksi
+  proof         String? // URL file bukti transaksi
+  categoryId    String?     @db.ObjectId // ID kategori keuangan
+  workProgramId String?     @db.ObjectId // ID program kerja terkait (opsional)
+  createdAt     DateTime    @default(now()) // Waktu pembuatan transaksi
+  updatedAt     DateTime    @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan transaksi keuangan
-  category  FinanceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori keuangan
-  period    Period           @relation(fields: [periodId], references: [id], onDelete: Cascade) // Periode transaksi
-  event     Event?           @relation(fields: [eventId], references: [id], onDelete: SetNull) // Kegiatan terkait (opsional)
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang membuat transaksi
-  approvals Approval[]       @relation("FinanceApprovals") // Persetujuan untuk transaksi
+  category    FinanceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori keuangan
+  workProgram WorkProgram?     @relation(fields: [workProgramId], references: [id], onDelete: SetNull) // Program kerja terkait (opsional)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang membuat transaksi
+  approvals   Approval[]       @relation("FinanceApprovals") // Persetujuan untuk transaksi
+  Period      Period?          @relation(fields: [periodId], references: [id])
+  periodId    String?          @db.ObjectId
+  Event       Event?           @relation(fields: [eventId], references: [id])
+  eventId     String?          @db.ObjectId
 
-  @@index([date, type, status, periodId])
+  @@index([date, type, status])
   @@map("finances")
 }
 
