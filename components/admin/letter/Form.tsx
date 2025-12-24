@@ -8,11 +8,16 @@ import type {
   CreateLetterInput,
   UpdateLetterInput,
 } from "@/types/letter";
-import { LetterType, LetterPriority } from "@/types/enums";
+import {
+  LetterType,
+  LetterPriority,
+  LetterClassification,
+} from "@/types/enums";
 import type { Period } from "@/types/period";
 import type { Event } from "@/types/event";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
+import DateInput from "@/components/admin/ui/date/DateInput";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/components/ui/CancelButton";
 import FileUpload from "@/components/admin/ui/input/FileUpload";
@@ -103,14 +108,15 @@ export default function LetterForm({
             disabled={isLoadingState}
           />
 
-          <TextInput
+          <DateInput
             label="Date"
-            name="date"
-            type="date"
             value={formData.date}
-            onChange={handleInputChange}
+            onChange={(value) =>
+              handleInputChange({
+                target: { name: "date", value },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
             required
-            icon={<FiCalendar className="text-gray-400" />}
             error={errors.date}
             disabled={isLoadingState}
           />

@@ -112,9 +112,6 @@ async function AddFinancePage() {
       period: event.period,
       startDate: event.startDate,
       endDate: event.endDate,
-      funds: event.funds,
-      usedFunds: event.usedFunds,
-      remainingFunds: event.remainingFunds,
       status: event.status as Status,
       workProgramId: event.workProgramId,
       workProgram: event.workProgram

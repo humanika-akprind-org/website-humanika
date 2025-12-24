@@ -229,9 +229,6 @@ async function EditFinancePage({
             period: finance.event.period,
             startDate: finance.event.startDate,
             endDate: finance.event.endDate,
-            funds: finance.event.funds,
-            usedFunds: finance.event.usedFunds,
-            remainingFunds: finance.event.remainingFunds,
             status: finance.event.status as Status,
             workProgramId: finance.event.workProgramId,
             workProgram: finance.event.workProgram
@@ -343,9 +340,6 @@ async function EditFinancePage({
       period: event.period,
       startDate: event.startDate,
       endDate: event.endDate,
-      funds: event.funds,
-      usedFunds: event.usedFunds,
-      remainingFunds: event.remainingFunds,
       status: event.status as Status,
       workProgramId: event.workProgramId,
       workProgram: event.workProgram
