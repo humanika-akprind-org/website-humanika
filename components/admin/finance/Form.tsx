@@ -9,9 +9,8 @@ import type {
 } from "@/types/finance";
 import { FinanceType, Status } from "@/types/enums";
 import type { User } from "@/types/user";
-import type { Period } from "@/types/period";
 import type { FinanceCategory } from "@/types/finance-category";
-import type { Event } from "@/types/event";
+import type { WorkProgram } from "@/types/work";
 import { FiBriefcase } from "react-icons/fi";
 import TextEditor from "components/admin/ui/text-area/TextEditor";
 import TextInput from "components/admin/ui/input/TextInput";
@@ -32,9 +31,8 @@ interface FinanceFormProps {
   isLoading?: boolean;
   accessToken: string;
   users: User[];
-  periods: Period[];
   categories: FinanceCategory[];
-  events: Event[];
+  workPrograms: WorkProgram[];
 }
 
 export default function FinanceForm({
@@ -43,9 +41,8 @@ export default function FinanceForm({
   onSubmitForApproval,
   accessToken,
   users: _users,
-  periods,
   categories,
-  events,
+  workPrograms,
 }: FinanceFormProps) {
   const router = useRouter();
   const {
@@ -66,9 +63,8 @@ export default function FinanceForm({
     onSubmitForApproval,
     accessToken,
     users: _users,
-    periods,
     categories,
-    events,
+    workPrograms,
   });
 
   return (
@@ -148,32 +144,17 @@ export default function FinanceForm({
             />
 
             <SelectInput
-              label="Period"
-              name="periodId"
-              value={formData.periodId}
+              label="Work Program"
+              name="workProgramId"
+              value={formData.workProgramId}
               onChange={(value: string) =>
-                setFormData((prev) => ({ ...prev, periodId: value }))
+                setFormData((prev) => ({ ...prev, workProgramId: value }))
               }
-              options={periods.map((period) => ({
-                value: period.id,
-                label: period.name,
+              options={workPrograms.map((workProgram) => ({
+                value: workProgram.id,
+                label: workProgram.name,
               }))}
-              required
-              icon={<FiBriefcase className="text-gray-400" />}
-            />
-
-            <SelectInput
-              label="Event"
-              name="eventId"
-              value={formData.eventId}
-              onChange={(value: string) =>
-                setFormData((prev) => ({ ...prev, eventId: value }))
-              }
-              options={events.map((event) => ({
-                value: event.id,
-                label: event.name,
-              }))}
-              placeholder="Select event (optional)"
+              placeholder="Select work program (optional)"
               icon={<FiBriefcase className="text-gray-400" />}
             />
 

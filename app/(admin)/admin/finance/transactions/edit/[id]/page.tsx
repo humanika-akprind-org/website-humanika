@@ -3,12 +3,7 @@ import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceCategory } from "@/types/finance-category";
-import type { Period } from "@/types/period";
-import type { Event } from "@/types/event";
-import type { Gallery } from "@/types/gallery";
 import type { Finance } from "@/types/finance";
-import type { Letter } from "@/types/letter";
-import type { Document } from "@/types/document";
 import type {
   Department,
   FinanceType,
@@ -23,6 +18,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { type WorkProgram } from "@/types/work";
 
 async function EditFinancePage({
   params,
@@ -34,14 +30,14 @@ async function EditFinancePage({
 
   try {
     // Fetch data directly from database to avoid API authentication issues
-    const [finance, categories, periodsData, eventsData] = await Promise.all([
+    const [finance, categories, workProgramsData] = await Promise.all([
       prisma.finance.findUnique({
         where: { id },
         include: {
           category: true,
-          period: true,
-          event: {
+          workProgram: {
             include: {
+              period: true,
               responsible: {
                 select: {
                   id: true,
@@ -58,30 +54,6 @@ async function EditFinancePage({
                   createdAt: true,
                   updatedAt: true,
                   avatarColor: true,
-                },
-              },
-              period: true,
-              workProgram: {
-                include: {
-                  period: true,
-                  responsible: {
-                    select: {
-                      id: true,
-                      name: true,
-                      email: true,
-                      username: true,
-                      role: true,
-                      department: true,
-                      position: true,
-                      isActive: true,
-                      verifiedAccount: true,
-                      attemptLogin: true,
-                      blockExpires: true,
-                      createdAt: true,
-                      updatedAt: true,
-                      avatarColor: true,
-                    },
-                  },
                 },
               },
             },
@@ -109,12 +81,10 @@ async function EditFinancePage({
       prisma.financeCategory.findMany({
         orderBy: { createdAt: "desc" },
       }),
-      prisma.period.findMany({
+      prisma.workProgram.findMany({
         orderBy: { createdAt: "desc" },
-      }),
-      prisma.event.findMany({
-        orderBy: { startDate: "desc" },
         include: {
+          period: true,
           responsible: {
             select: {
               id: true,
@@ -133,35 +103,6 @@ async function EditFinancePage({
               avatarColor: true,
             },
           },
-          period: true,
-          workProgram: {
-            include: {
-              period: true,
-              responsible: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  username: true,
-                  role: true,
-                  department: true,
-                  position: true,
-                  isActive: true,
-                  verifiedAccount: true,
-                  attemptLogin: true,
-                  blockExpires: true,
-                  createdAt: true,
-                  updatedAt: true,
-                  avatarColor: true,
-                },
-              },
-            },
-          },
-          approvals: true,
-          galleries: true,
-          finances: true,
-          letters: true,
-          documents: true,
         },
       }),
     ]);
@@ -179,8 +120,7 @@ async function EditFinancePage({
       date: finance.date,
       categoryId: finance.categoryId!,
       type: finance.type as FinanceType,
-      periodId: finance.periodId,
-      eventId: finance.eventId,
+      workProgramId: finance.workProgramId,
       userId: finance.userId,
       status: finance.status as Status,
       proof: finance.proof,
@@ -197,89 +137,40 @@ async function EditFinancePage({
             updatedAt: finance.category.updatedAt,
           }
         : undefined,
-      period: finance.period,
-      event: finance.event
+      workProgram: finance.workProgram
         ? {
-            id: finance.event.id,
-            name: finance.event.name,
-            slug: finance.event.slug,
-            thumbnail: finance.event.thumbnail || undefined,
-            description: finance.event.description || "",
-            responsibleId: finance.event.responsibleId,
+            id: finance.workProgram.id,
+            name: finance.workProgram.name,
+            department: finance.workProgram.department as Department,
+            schedule: finance.workProgram.schedule,
+            status: finance.workProgram.status as Status,
+            funds: finance.workProgram.funds,
+            usedFunds: finance.workProgram.usedFunds,
+            remainingFunds: finance.workProgram.remainingFunds,
+            goal: finance.workProgram.goal,
+            periodId: finance.workProgram.periodId,
+            period: finance.workProgram.period,
+            responsibleId: finance.workProgram.responsibleId,
             responsible: {
-              id: finance.event.responsible.id,
-              name: finance.event.responsible.name,
-              email: finance.event.responsible.email,
-              username: finance.event.responsible.username,
-              role: finance.event.responsible.role as UserRole,
-              department: finance.event.responsible
+              id: finance.workProgram.responsible.id,
+              name: finance.workProgram.responsible.name,
+              email: finance.workProgram.responsible.email,
+              username: finance.workProgram.responsible.username,
+              role: finance.workProgram.responsible.role as UserRole,
+              department: finance.workProgram.responsible
                 .department as Department | null,
-              position: finance.event.responsible.position as Position | null,
-              isActive: finance.event.responsible.isActive,
-              verifiedAccount: finance.event.responsible.verifiedAccount,
-              attemptLogin: finance.event.responsible.attemptLogin,
-              blockExpires: finance.event.responsible.blockExpires,
-              createdAt: finance.event.responsible.createdAt,
-              updatedAt: finance.event.responsible.updatedAt,
-              avatarColor: finance.event.responsible.avatarColor,
+              position: finance.workProgram.responsible
+                .position as Position | null,
+              isActive: finance.workProgram.responsible.isActive,
+              verifiedAccount: finance.workProgram.responsible.verifiedAccount,
+              attemptLogin: finance.workProgram.responsible.attemptLogin,
+              blockExpires: finance.workProgram.responsible.blockExpires,
+              createdAt: finance.workProgram.responsible.createdAt,
+              updatedAt: finance.workProgram.responsible.updatedAt,
+              avatarColor: finance.workProgram.responsible.avatarColor,
             },
-            goal: finance.event.goal || "",
-            department: finance.event.department as Department,
-            periodId: finance.event.periodId,
-            period: finance.event.period,
-            startDate: finance.event.startDate,
-            endDate: finance.event.endDate,
-            status: finance.event.status as Status,
-            workProgramId: finance.event.workProgramId,
-            workProgram: finance.event.workProgram
-              ? {
-                  id: finance.event.workProgram.id,
-                  name: finance.event.workProgram.name,
-                  department: finance.event.workProgram
-                    .department as Department,
-                  schedule: finance.event.workProgram.schedule,
-                  status: finance.event.workProgram.status as Status,
-                  funds: finance.event.workProgram.funds,
-                  usedFunds: finance.event.workProgram.usedFunds,
-                  remainingFunds: finance.event.workProgram.remainingFunds,
-                  goal: finance.event.workProgram.goal,
-                  periodId: finance.event.workProgram.periodId,
-                  period: finance.event.workProgram.period,
-                  responsibleId: finance.event.workProgram.responsibleId,
-                  responsible: {
-                    id: finance.event.workProgram.responsible.id,
-                    name: finance.event.workProgram.responsible.name,
-                    email: finance.event.workProgram.responsible.email,
-                    username: finance.event.workProgram.responsible.username,
-                    role: finance.event.workProgram.responsible
-                      .role as UserRole,
-                    department: finance.event.workProgram.responsible
-                      .department as Department | null,
-                    position: finance.event.workProgram.responsible
-                      .position as Position | null,
-                    isActive: finance.event.workProgram.responsible.isActive,
-                    verifiedAccount:
-                      finance.event.workProgram.responsible.verifiedAccount,
-                    attemptLogin:
-                      finance.event.workProgram.responsible.attemptLogin,
-                    blockExpires:
-                      finance.event.workProgram.responsible.blockExpires,
-                    createdAt: finance.event.workProgram.responsible.createdAt,
-                    updatedAt: finance.event.workProgram.responsible.updatedAt,
-                    avatarColor:
-                      finance.event.workProgram.responsible.avatarColor,
-                  },
-                  createdAt: finance.event.workProgram.createdAt,
-                  updatedAt: finance.event.workProgram.updatedAt,
-                }
-              : null,
-            approvals: [],
-            galleries: [],
-            finances: [],
-            letters: [],
-            documents: [],
-            createdAt: finance.event.createdAt,
-            updatedAt: finance.event.updatedAt,
+            createdAt: finance.workProgram.createdAt,
+            updatedAt: finance.workProgram.updatedAt,
           }
         : null,
       user: {
@@ -310,98 +201,40 @@ async function EditFinancePage({
       updatedAt: cat.updatedAt,
     }));
 
-    // Transform data to match expected types
-    const transformedEvents: Event[] = eventsData.map((event) => ({
-      id: event.id,
-      name: event.name,
-      slug: event.slug,
-      thumbnail: event.thumbnail || undefined,
-      description: event.description || "",
-      responsibleId: event.responsibleId,
-      responsible: {
-        id: event.responsible.id,
-        name: event.responsible.name,
-        email: event.responsible.email,
-        username: event.responsible.username,
-        role: event.responsible.role as UserRole,
-        department: event.responsible.department as Department | null,
-        position: event.responsible.position as Position | null,
-        isActive: event.responsible.isActive,
-        verifiedAccount: event.responsible.verifiedAccount,
-        attemptLogin: event.responsible.attemptLogin,
-        blockExpires: event.responsible.blockExpires,
-        createdAt: event.responsible.createdAt,
-        updatedAt: event.responsible.updatedAt,
-        avatarColor: event.responsible.avatarColor,
-      },
-      goal: event.goal || "",
-      department: event.department as Department,
-      periodId: event.periodId,
-      period: event.period,
-      startDate: event.startDate,
-      endDate: event.endDate,
-      status: event.status as Status,
-      workProgramId: event.workProgramId,
-      workProgram: event.workProgram
-        ? {
-            id: event.workProgram.id,
-            name: event.workProgram.name,
-            department: event.workProgram.department as Department,
-            schedule: event.workProgram.schedule,
-            status: event.workProgram.status as Status,
-            funds: event.workProgram.funds,
-            usedFunds: event.workProgram.usedFunds,
-            remainingFunds: event.workProgram.remainingFunds,
-            goal: event.workProgram.goal,
-            periodId: event.workProgram.periodId,
-            period: event.workProgram.period,
-            responsibleId: event.workProgram.responsibleId,
-            responsible: {
-              id: event.workProgram.responsible.id,
-              name: event.workProgram.responsible.name,
-              email: event.workProgram.responsible.email,
-              username: event.workProgram.responsible.username,
-              role: event.workProgram.responsible.role as UserRole,
-              department: event.workProgram.responsible
-                .department as Department | null,
-              position: event.workProgram.responsible
-                .position as Position | null,
-              isActive: event.workProgram.responsible.isActive,
-              verifiedAccount: event.workProgram.responsible.verifiedAccount,
-              attemptLogin: event.workProgram.responsible.attemptLogin,
-              blockExpires: event.workProgram.responsible.blockExpires,
-              createdAt: event.workProgram.responsible.createdAt,
-              updatedAt: event.workProgram.responsible.updatedAt,
-              avatarColor: event.workProgram.responsible.avatarColor,
-            },
-            createdAt: event.workProgram.createdAt,
-            updatedAt: event.workProgram.updatedAt,
-          }
-        : null,
-      approvals: event.approvals.map((approval) => ({
-        ...approval,
-        entityType: approval.entityType as ApprovalType,
-        note: approval.note || undefined,
-        createdAt: approval.createdAt.toISOString(),
-        updatedAt: approval.updatedAt.toISOString(),
-      })),
-      galleries: event.galleries as Gallery[],
-      finances: event.finances as Finance[],
-      letters: event.letters as Letter[],
-      documents: event.documents as Document[],
-      createdAt: event.createdAt,
-      updatedAt: event.updatedAt,
-    }));
-
-    const transformedPeriods: Period[] = periodsData.map((period) => ({
-      id: period.id,
-      name: period.name,
-      startYear: period.startYear,
-      endYear: period.endYear,
-      isActive: period.isActive,
-      createdAt: period.createdAt,
-      updatedAt: period.updatedAt,
-    }));
+    const transformedWorkPrograms: WorkProgram[] = workProgramsData.map(
+      (workProgram) => ({
+        id: workProgram.id,
+        name: workProgram.name,
+        department: workProgram.department as Department,
+        schedule: workProgram.schedule,
+        status: workProgram.status as Status,
+        funds: workProgram.funds,
+        usedFunds: workProgram.usedFunds,
+        remainingFunds: workProgram.remainingFunds,
+        goal: workProgram.goal,
+        periodId: workProgram.periodId,
+        period: workProgram.period,
+        responsibleId: workProgram.responsibleId,
+        responsible: {
+          id: workProgram.responsible.id,
+          name: workProgram.responsible.name,
+          email: workProgram.responsible.email,
+          username: workProgram.responsible.username,
+          role: workProgram.responsible.role as UserRole,
+          department: workProgram.responsible.department as Department | null,
+          position: workProgram.responsible.position as Position | null,
+          isActive: workProgram.responsible.isActive,
+          verifiedAccount: workProgram.responsible.verifiedAccount,
+          attemptLogin: workProgram.responsible.attemptLogin,
+          blockExpires: workProgram.responsible.blockExpires,
+          createdAt: workProgram.responsible.createdAt,
+          updatedAt: workProgram.responsible.updatedAt,
+          avatarColor: workProgram.responsible.avatarColor,
+        },
+        createdAt: workProgram.createdAt,
+        updatedAt: workProgram.updatedAt,
+      })
+    );
 
     const handleSubmit = async (
       data: CreateFinanceInput | UpdateFinanceInput
@@ -422,7 +255,7 @@ async function EditFinancePage({
         !financeData.type ||
         !financeData.date ||
         !financeData.categoryId ||
-        !financeData.periodId
+        !financeData.workProgramId
       ) {
         throw new Error("Missing required fields");
       }
@@ -436,12 +269,8 @@ async function EditFinancePage({
           date: new Date(financeData.date),
           categoryId: financeData.categoryId,
           type: financeData.type,
-          periodId: financeData.periodId,
+          workProgramId: financeData.workProgramId,
           proof: financeData.proof,
-          ...(financeData.eventId &&
-            financeData.eventId.trim() !== "" && {
-              eventId: financeData.eventId,
-            }),
         };
 
         await prisma.finance.update({
@@ -484,7 +313,7 @@ async function EditFinancePage({
         !financeData.type ||
         !financeData.date ||
         !financeData.categoryId ||
-        !financeData.periodId
+        !financeData.workProgramId
       ) {
         throw new Error("Missing required fields");
       }
@@ -498,13 +327,9 @@ async function EditFinancePage({
           date: new Date(financeData.date),
           categoryId: financeData.categoryId,
           type: financeData.type,
-          periodId: financeData.periodId,
+          workProgramId: financeData.workProgramId,
           status: Status.PENDING,
           proof: financeData.proof,
-          ...(financeData.eventId &&
-            financeData.eventId.trim() !== "" && {
-              eventId: financeData.eventId,
-            }),
         };
 
         // Update the finance with PENDING status
@@ -559,8 +384,7 @@ async function EditFinancePage({
             accessToken={accessToken}
             users={[]}
             categories={transformedCategories}
-            periods={transformedPeriods}
-            events={transformedEvents}
+            workPrograms={transformedWorkPrograms}
             onSubmit={handleSubmit}
             onSubmitForApproval={handleSubmitForApproval}
           />

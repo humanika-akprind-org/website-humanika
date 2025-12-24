@@ -15,11 +15,14 @@ export const getFinances = async (
 
   if (filter?.type) params.append("type", filter.type);
   if (filter?.status) params.append("status", filter.status.toString());
-  if (filter?.periodId) params.append("periodId", filter.periodId);
   if (filter?.categoryId) params.append("categoryId", filter.categoryId);
-  if (filter?.eventId) params.append("eventId", filter.eventId);
+  if (filter?.workProgramId) {
+    params.append("workProgramId", filter.workProgramId);
+  }
   if (filter?.search) params.append("search", filter.search);
-  if (filter?.startDate) params.append("startDate", filter.startDate.toISOString());
+  if (filter?.startDate) {
+    params.append("startDate", filter.startDate.toISOString());
+  }
   if (filter?.endDate) params.append("endDate", filter.endDate.toISOString());
 
   const response = await fetch(`${API_URL}/finance?${params.toString()}`, {

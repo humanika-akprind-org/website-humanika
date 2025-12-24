@@ -178,7 +178,6 @@ model Period {
 
   // Relations - Data yang terkait dengan periode
   managements              Management[] // Jabatan manajemen dalam periode ini
-  finances                 Finance[] // Transaksi keuangan dalam periode ini
   letters                  Letter[] // Surat yang dibuat dalam periode ini
   workPrograms             WorkProgram[] // Program kerja dalam periode ini
   events                   Event[] // Kegiatan dalam periode ini
@@ -266,7 +265,6 @@ model Event {
   category    EventCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori kegiatan
   approvals   Approval[]     @relation("EventApprovals") // Persetujuan untuk kegiatan
   galleries   Gallery[] // Galeri foto kegiatan
-  finances    Finance[] // Transaksi keuangan kegiatan
   letters     Letter[] // Surat yang terkait dengan kegiatan
   responsible User           @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "EventResponsible") // Pengguna yang bertanggung jawab
 
@@ -431,10 +429,6 @@ model Finance {
   workProgram WorkProgram?     @relation(fields: [workProgramId], references: [id], onDelete: SetNull) // Program kerja terkait (opsional)
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang membuat transaksi
   approvals   Approval[]       @relation("FinanceApprovals") // Persetujuan untuk transaksi
-  Period      Period?          @relation(fields: [periodId], references: [id])
-  periodId    String?          @db.ObjectId
-  Event       Event?           @relation(fields: [eventId], references: [id])
-  eventId     String?          @db.ObjectId
 
   @@index([date, type, status])
   @@map("finances")

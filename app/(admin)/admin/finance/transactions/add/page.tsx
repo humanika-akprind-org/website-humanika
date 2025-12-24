@@ -3,12 +3,6 @@ import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceCategory } from "@/types/finance-category";
-import type { Period } from "@/types/period";
-import type { Event } from "@/types/event";
-import type { Gallery } from "@/types/gallery";
-import type { Finance } from "@/types/finance";
-import type { Letter } from "@/types/letter";
-import type { Document } from "@/types/document";
 import type {
   Department,
   FinanceType,
@@ -23,52 +17,22 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { type WorkProgram } from "@/types/work";
 
 async function AddFinancePage() {
   const accessToken = await getGoogleAccessToken();
 
   try {
     // Fetch data directly from database to avoid API authentication issues
-    const [categories, periodsData, eventsData] = await Promise.all([
+    const [categories, workProgramsData] = await Promise.all([
       prisma.financeCategory.findMany({
         orderBy: { createdAt: "desc" },
       }),
-      prisma.period.findMany({
+      prisma.workProgram.findMany({
         orderBy: { createdAt: "desc" },
-      }),
-      prisma.event.findMany({
-        orderBy: { startDate: "desc" },
         include: {
-          responsible: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              username: true,
-              role: true,
-              department: true,
-              position: true,
-              isActive: true,
-              verifiedAccount: true,
-              attemptLogin: true,
-              blockExpires: true,
-              createdAt: true,
-              updatedAt: true,
-              avatarColor: true,
-            },
-          },
           period: true,
-          workProgram: {
-            include: {
-              period: true,
-              responsible: true,
-            },
-          },
-          approvals: true,
-          galleries: true,
-          finances: true,
-          letters: true,
-          documents: true,
+          responsible: true,
         },
       }),
     ]);
@@ -83,86 +47,40 @@ async function AddFinancePage() {
       updatedAt: cat.updatedAt,
     }));
 
-    const transformedEvents: Event[] = eventsData.map((event) => ({
-      id: event.id,
-      name: event.name,
-      slug: event.slug,
-      thumbnail: event.thumbnail || undefined,
-      description: event.description || "",
-      responsibleId: event.responsibleId,
-      responsible: {
-        id: event.responsible.id,
-        name: event.responsible.name,
-        email: event.responsible.email,
-        username: event.responsible.username,
-        role: event.responsible.role as UserRole,
-        department: event.responsible.department as Department | null,
-        position: event.responsible.position as Position | null,
-        isActive: event.responsible.isActive,
-        verifiedAccount: event.responsible.verifiedAccount,
-        attemptLogin: event.responsible.attemptLogin,
-        blockExpires: event.responsible.blockExpires,
-        createdAt: event.responsible.createdAt,
-        updatedAt: event.responsible.updatedAt,
-        avatarColor: event.responsible.avatarColor,
-      },
-      goal: event.goal || "",
-      department: event.department as Department,
-      periodId: event.periodId,
-      period: event.period,
-      startDate: event.startDate,
-      endDate: event.endDate,
-      status: event.status as Status,
-      workProgramId: event.workProgramId,
-      workProgram: event.workProgram
-        ? {
-            ...event.workProgram,
-            department: event.workProgram.department as Department,
-            status: event.workProgram.status as Status,
-            responsible: {
-              id: event.workProgram.responsible.id,
-              name: event.workProgram.responsible.name,
-              email: event.workProgram.responsible.email,
-              username: event.workProgram.responsible.username,
-              role: event.workProgram.responsible.role as UserRole,
-              department: event.workProgram.responsible
-                .department as Department | null,
-              position: event.workProgram.responsible
-                .position as Position | null,
-              isActive: event.workProgram.responsible.isActive,
-              verifiedAccount: event.workProgram.responsible.verifiedAccount,
-              attemptLogin: event.workProgram.responsible.attemptLogin,
-              blockExpires: event.workProgram.responsible.blockExpires,
-              createdAt: event.workProgram.responsible.createdAt,
-              updatedAt: event.workProgram.responsible.updatedAt,
-              avatarColor: event.workProgram.responsible.avatarColor,
-            },
-          }
-        : null,
-      approvals: event.approvals.map((approval) => ({
-        ...approval,
-        entityType: approval.entityType as ApprovalType,
-        note: approval.note || undefined,
-        createdAt: approval.createdAt.toISOString(),
-        updatedAt: approval.updatedAt.toISOString(),
-      })),
-      galleries: event.galleries as Gallery[],
-      finances: event.finances as Finance[],
-      letters: event.letters as Letter[],
-      documents: event.documents as Document[],
-      createdAt: event.createdAt,
-      updatedAt: event.updatedAt,
-    }));
-
-    const transformedPeriods: Period[] = periodsData.map((period) => ({
-      id: period.id,
-      name: period.name,
-      startYear: period.startYear,
-      endYear: period.endYear,
-      isActive: period.isActive,
-      createdAt: period.createdAt,
-      updatedAt: period.updatedAt,
-    }));
+    const transformedWorkPrograms: WorkProgram[] = workProgramsData.map(
+      (workProgram) => ({
+        id: workProgram.id,
+        name: workProgram.name,
+        department: workProgram.department as Department,
+        schedule: workProgram.schedule,
+        status: workProgram.status as Status,
+        funds: workProgram.funds,
+        usedFunds: workProgram.usedFunds,
+        remainingFunds: workProgram.remainingFunds,
+        goal: workProgram.goal,
+        periodId: workProgram.periodId,
+        period: workProgram.period,
+        responsibleId: workProgram.responsibleId,
+        responsible: {
+          id: workProgram.responsible.id,
+          name: workProgram.responsible.name,
+          email: workProgram.responsible.email,
+          username: workProgram.responsible.username,
+          role: workProgram.responsible.role as UserRole,
+          department: workProgram.responsible.department as Department | null,
+          position: workProgram.responsible.position as Position | null,
+          isActive: workProgram.responsible.isActive,
+          verifiedAccount: workProgram.responsible.verifiedAccount,
+          attemptLogin: workProgram.responsible.attemptLogin,
+          blockExpires: workProgram.responsible.blockExpires,
+          createdAt: workProgram.responsible.createdAt,
+          updatedAt: workProgram.responsible.updatedAt,
+          avatarColor: workProgram.responsible.avatarColor,
+        },
+        createdAt: workProgram.createdAt,
+        updatedAt: workProgram.updatedAt,
+      })
+    );
 
     const handleSubmit = async (
       data: CreateFinanceInput | UpdateFinanceInput
@@ -182,7 +100,6 @@ async function AddFinancePage() {
         !financeData.amount ||
         !financeData.categoryId ||
         !financeData.type ||
-        !financeData.periodId ||
         !financeData.date
       ) {
         throw new Error("Missing required fields");
@@ -197,12 +114,11 @@ async function AddFinancePage() {
           date: new Date(financeData.date),
           categoryId: financeData.categoryId,
           type: financeData.type,
-          periodId: financeData.periodId,
           userId: user.id,
           proof: financeData.proof,
-          ...(financeData.eventId &&
-            financeData.eventId.trim() !== "" && {
-              eventId: financeData.eventId,
+          ...(financeData.workProgramId &&
+            financeData.workProgramId.trim() !== "" && {
+              workProgramId: financeData.workProgramId,
             }),
         };
 
@@ -244,7 +160,7 @@ async function AddFinancePage() {
         !financeData.amount ||
         !financeData.categoryId ||
         !financeData.type ||
-        !financeData.periodId ||
+        !financeData.workProgramId ||
         !financeData.date
       ) {
         throw new Error("Missing required fields");
@@ -259,14 +175,10 @@ async function AddFinancePage() {
           date: new Date(financeData.date),
           categoryId: financeData.categoryId,
           type: financeData.type,
-          periodId: financeData.periodId,
+          workProgramId: financeData.workProgramId,
           userId: user.id,
           status: Status.PENDING,
           proof: financeData.proof,
-          ...(financeData.eventId &&
-            financeData.eventId.trim() !== "" && {
-              eventId: financeData.eventId,
-            }),
         };
 
         // Create the finance with PENDING status
@@ -319,8 +231,7 @@ async function AddFinancePage() {
             accessToken={accessToken}
             users={[]}
             categories={transformedCategories}
-            periods={transformedPeriods}
-            events={transformedEvents}
+            workPrograms={transformedWorkPrograms}
             onSubmit={handleSubmit}
             onSubmitForApproval={handleSubmitForApproval}
           />

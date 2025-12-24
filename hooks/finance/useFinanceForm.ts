@@ -8,9 +8,8 @@ import { FinanceType, Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { financeFolderId } from "@/lib/config/config";
 import type { User } from "@/types/user";
-import type { Period } from "@/types/period";
 import type { FinanceCategory } from "@/types/finance-category";
-import type { Event } from "@/types/event";
+import { type WorkProgram } from "@/types/work";
 
 // Helper function to check if HTML content is empty
 const isHtmlEmpty = (html: string): boolean => {
@@ -70,9 +69,8 @@ interface UseFinanceFormProps {
   ) => Promise<void>;
   accessToken: string;
   users: User[];
-  periods: Period[];
   categories: FinanceCategory[];
-  events: Event[];
+  workPrograms: WorkProgram[];
 }
 
 export const useFinanceForm = ({
@@ -81,9 +79,8 @@ export const useFinanceForm = ({
   onSubmitForApproval,
   accessToken,
   users: _users,
-  periods: _periods,
   categories: _categories,
-  events: _events,
+  workPrograms: _workPrograms,
 }: UseFinanceFormProps) => {
   const {
     uploadFile,
@@ -103,8 +100,7 @@ export const useFinanceForm = ({
       : "",
     categoryId: finance?.categoryId || "",
     type: finance?.type || FinanceType.EXPENSE,
-    periodId: finance?.periodId || "",
-    eventId: finance?.eventId || "",
+    workProgramId: finance?.workProgramId || "",
     status: finance?.status || Status.DRAFT,
     proofFile: undefined as File | undefined,
   });
@@ -204,9 +200,6 @@ export const useFinanceForm = ({
       if (!formData.categoryId) {
         throw new Error("Please select a category");
       }
-      if (!formData.periodId) {
-        throw new Error("Please select a period");
-      }
       if (!formData.date) {
         throw new Error("Please select date");
       }
@@ -287,9 +280,9 @@ export const useFinanceForm = ({
         ...dataToSend,
         proof: proofUrl,
         date: new Date(formData.date),
-        eventId:
-          formData.eventId && formData.eventId.trim() !== ""
-            ? formData.eventId
+        workProgramId:
+          formData.workProgramId && formData.workProgramId.trim() !== ""
+            ? formData.workProgramId
             : undefined,
       };
 
