@@ -7,7 +7,7 @@ import type {
 import { FinanceType, Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { financeFolderId } from "@/lib/config/config";
-import type { User } from "@/types/user";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
 import type { FinanceCategory } from "@/types/finance-category";
 import { type WorkProgram } from "@/types/work";
 
@@ -67,8 +67,7 @@ interface UseFinanceFormProps {
   onSubmitForApproval?: (
     data: CreateFinanceInput | UpdateFinanceInput
   ) => Promise<void>;
-  accessToken: string;
-  users: User[];
+  accessToken?: string;
   categories: FinanceCategory[];
   workPrograms: WorkProgram[];
 }
@@ -78,10 +77,11 @@ export const useFinanceForm = ({
   onSubmit,
   onSubmitForApproval,
   accessToken,
-  users: _users,
   categories: _categories,
   workPrograms: _workPrograms,
 }: UseFinanceFormProps) => {
+  const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
+
   const {
     uploadFile,
     deleteFile,
@@ -89,7 +89,18 @@ export const useFinanceForm = ({
     setPublicAccess,
     isLoading: photoLoading,
     error: photoError,
-  } = useFile(accessToken);
+  } = useFile(accessToken || fetchedAccessToken);
+
+  // Fetch access token if not provided
+  useEffect(() => {
+    if (!accessToken) {
+      const fetchAccessToken = async () => {
+        const token = await getAccessTokenAction();
+        setFetchedAccessToken(token);
+      };
+      fetchAccessToken();
+    }
+  }, [accessToken]);
 
   const [formData, setFormData] = useState({
     name: finance?.name || "",

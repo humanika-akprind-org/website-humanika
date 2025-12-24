@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { FiBriefcase, FiFolder, FiCalendar } from "react-icons/fi";
+import { FiBriefcase, FiFolder } from "react-icons/fi";
 import type {
   Document,
   CreateDocumentInput,
@@ -37,7 +37,6 @@ export default function DocumentForm({
   onSubmit,
   onSubmitForApproval,
   accessToken,
-  events,
   fixedDocumentType,
 }: DocumentFormProps) {
   const router = useRouter();
@@ -151,20 +150,6 @@ export default function DocumentForm({
             }))}
             placeholder="Select status"
             icon={<FiBriefcase className="text-gray-400" />}
-            disabled={isLoadingState}
-          />
-
-          <SelectInput
-            label="Related Event"
-            name="eventId"
-            value={formData.eventId}
-            onChange={(value) => handleSelectChange("eventId", value)}
-            options={events.map((event) => ({
-              value: event.id,
-              label: event.name,
-            }))}
-            placeholder="Pilih Event (Opsional)"
-            icon={<FiCalendar className="text-gray-400" />}
             disabled={isLoadingState}
           />
         </div>

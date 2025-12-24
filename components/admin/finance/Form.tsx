@@ -8,7 +8,6 @@ import type {
   UpdateFinanceInput,
 } from "@/types/finance";
 import { FinanceType, Status } from "@/types/enums";
-import type { User } from "@/types/user";
 import type { FinanceCategory } from "@/types/finance-category";
 import type { WorkProgram } from "@/types/work";
 import { FiBriefcase } from "react-icons/fi";
@@ -29,10 +28,10 @@ interface FinanceFormProps {
     data: CreateFinanceInput | UpdateFinanceInput
   ) => Promise<void>;
   isLoading?: boolean;
-  accessToken: string;
-  users: User[];
+  accessToken?: string;
   categories: FinanceCategory[];
   workPrograms: WorkProgram[];
+  isEditing?: boolean;
 }
 
 export default function FinanceForm({
@@ -40,9 +39,9 @@ export default function FinanceForm({
   onSubmit,
   onSubmitForApproval,
   accessToken,
-  users: _users,
   categories,
   workPrograms,
+  isEditing = false,
 }: FinanceFormProps) {
   const router = useRouter();
   const {
@@ -62,7 +61,6 @@ export default function FinanceForm({
     onSubmit,
     onSubmitForApproval,
     accessToken,
-    users: _users,
     categories,
     workPrograms,
   });
@@ -214,7 +212,7 @@ export default function FinanceForm({
             <SubmitButton
               isSubmitting={isSubmitting || photoLoading}
               text={
-                finance
+                isEditing
                   ? "Update Transaction"
                   : onSubmitForApproval
                   ? "Submit for Approval"

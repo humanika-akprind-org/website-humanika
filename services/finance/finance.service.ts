@@ -15,9 +15,9 @@ type UserWithId = Pick<User, "id">;
 export const getFinances = async (filter: {
   type?: FinanceType;
   status?: Status;
-  periodId?: string;
+  workProgramId?: string;
   categoryId?: string;
-  eventId?: string;
+  userId?: string;
   search?: string;
   startDate?: string;
   endDate?: string;
@@ -30,9 +30,9 @@ export const getFinances = async (filter: {
   if (filter.status) {
     where.status = { equals: filter.status as unknown as PrismaStatus };
   }
-  if (filter.periodId) where.periodId = filter.periodId;
+  if (filter.workProgramId) where.workProgramId = filter.workProgramId;
   if (filter.categoryId) where.categoryId = filter.categoryId;
-  if (filter.eventId) where.eventId = filter.eventId;
+  if (filter.userId) where.userId = filter.userId;
   if (filter.search) {
     where.OR = [
       { name: { contains: filter.search, mode: "insensitive" } },
@@ -48,14 +48,13 @@ export const getFinances = async (filter: {
   const finances = await prisma.finance.findMany({
     where,
     include: {
-      period: true,
-      category: true,
-      event: {
+      workProgram: {
         select: {
           id: true,
           name: true,
         },
       },
+      category: true,
       user: {
         select: {
           id: true,
@@ -88,14 +87,13 @@ export const getFinance = async (id: string) => {
   const finance = await prisma.finance.findUnique({
     where: { id },
     include: {
-      period: true,
-      category: true,
-      event: {
+      workProgram: {
         select: {
           id: true,
           name: true,
         },
       },
+      category: true,
       user: {
         select: {
           id: true,
@@ -132,29 +130,29 @@ export const createFinance = async (
     amount: data.amount,
     description: data.description || "",
     date: new Date(data.date),
-    category: { connect: { id: data.categoryId } },
     type: data.type,
-    period: { connect: { id: data.periodId } },
     user: { connect: { id: user.id } },
     proof: data.proof,
   };
 
-  // Only include eventId if it's provided and not empty
-  if (data.eventId && data.eventId.trim() !== "") {
-    financeData.event = { connect: { id: data.eventId } };
+  if (data.categoryId) {
+    financeData.category = { connect: { id: data.categoryId } };
+  }
+
+  if (data.workProgramId) {
+    financeData.workProgram = { connect: { id: data.workProgramId } };
   }
 
   const finance = await prisma.finance.create({
     data: financeData,
     include: {
-      period: true,
-      category: true,
-      event: {
+      workProgram: {
         select: {
           id: true,
           name: true,
         },
       },
+      category: true,
       user: {
         select: {
           id: true,
@@ -193,8 +191,7 @@ export const createFinance = async (
         date: finance.date,
         categoryId: finance.categoryId,
         type: finance.type,
-        periodId: finance.periodId,
-        eventId: finance.eventId,
+        workProgramId: finance.workProgramId,
         userId: finance.userId,
         proof: finance.proof,
         status: finance.status,
@@ -240,12 +237,8 @@ export const updateFinance = async (
   if (data.date !== undefined) updateData.date = new Date(data.date);
   if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
   if (data.type !== undefined) updateData.type = data.type;
-  if (data.periodId !== undefined) updateData.periodId = data.periodId;
-  if (data.eventId !== undefined && data.eventId.trim() !== "") {
-    updateData.eventId = data.eventId;
-  } else if (data.eventId === "") {
-    // If empty string is provided, set to null to clear the relation
-    updateData.eventId = null;
+  if (data.workProgramId !== undefined) {
+    updateData.workProgramId = data.workProgramId;
   }
   if (data.proof !== undefined) updateData.proof = data.proof;
   if (data.status !== undefined) updateData.status = data.status;
@@ -254,14 +247,13 @@ export const updateFinance = async (
     where: { id },
     data: updateData,
     include: {
-      period: true,
-      category: true,
-      event: {
+      workProgram: {
         select: {
           id: true,
           name: true,
         },
       },
+      category: true,
       user: {
         select: {
           id: true,
@@ -301,8 +293,7 @@ export const updateFinance = async (
         date: existingFinance.date,
         categoryId: existingFinance.categoryId,
         type: existingFinance.type,
-        periodId: existingFinance.periodId,
-        eventId: existingFinance.eventId,
+        workProgramId: existingFinance.workProgramId,
         userId: existingFinance.userId,
         proof: existingFinance.proof,
         status: existingFinance.status,
@@ -314,8 +305,7 @@ export const updateFinance = async (
         date: finance.date,
         categoryId: finance.categoryId,
         type: finance.type,
-        periodId: finance.periodId,
-        eventId: finance.eventId,
+        workProgramId: finance.workProgramId,
         userId: finance.userId,
         proof: finance.proof,
         status: finance.status,
@@ -368,8 +358,7 @@ export const deleteFinance = async (id: string, user: UserWithId) => {
         date: existingFinance.date,
         categoryId: existingFinance.categoryId,
         type: existingFinance.type,
-        periodId: existingFinance.periodId,
-        eventId: existingFinance.eventId,
+        workProgramId: existingFinance.workProgramId,
         userId: existingFinance.userId,
         proof: existingFinance.proof,
         status: existingFinance.status,

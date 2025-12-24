@@ -228,16 +228,6 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                   />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    {finance.description}
-                  </div>
-                  {finance.event && (
-                    <div className="text-xs text-gray-500 mt-1">
-                      Event: {finance.event.name}
-                    </div>
-                  )}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
                   <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
                     {finance.category?.name || "No category"}
                   </span>

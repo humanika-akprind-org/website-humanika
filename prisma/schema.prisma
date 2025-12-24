@@ -416,7 +416,7 @@ model Finance {
   description   String // Deskripsi transaksi
   date          DateTime // Tanggal transaksi
   type          FinanceType // Tipe transaksi (pemasukan/pengeluaran)
-  userId        String      @db.ObjectId
+  userId        String      @db.ObjectId // ID pengguna yang mengunggah
   status        Status      @default(PENDING) // Status transaksi
   proof         String? // URL file bukti transaksi
   categoryId    String?     @db.ObjectId // ID kategori keuangan

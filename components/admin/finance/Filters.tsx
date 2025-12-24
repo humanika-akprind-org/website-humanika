@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Status, FinanceType } from "@/types/enums";
-import { PeriodApi } from "@/use-cases/api/period";
+import { WorkApi } from "@/use-cases/api/work";
 import { getFinanceCategories } from "@/use-cases/api/finance-category";
 import SearchInput from "../ui/input/SearchInput";
 import FilterButton from "../ui/button/FilterButton";
@@ -18,8 +18,8 @@ interface FinanceFiltersProps {
   onTypeFilterChange: (type: string) => void;
   categoryFilter: string;
   onCategoryFilterChange: (category: string) => void;
-  periodFilter: string;
-  onPeriodFilterChange: (period: string) => void;
+  workProgramFilter: string;
+  onWorkProgramFilterChange: (workProgram: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
 }
@@ -33,48 +33,52 @@ export default function FinanceFilters({
   onTypeFilterChange,
   categoryFilter,
   onCategoryFilterChange,
-  periodFilter,
-  onPeriodFilterChange,
+  workProgramFilter,
+  onWorkProgramFilterChange,
   selectedCount,
   onDeleteSelected,
 }: FinanceFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
+  const [workPrograms, setWorkPrograms] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [loadingWorkPrograms, setLoadingWorkPrograms] = useState(true);
+  const [errorWorkPrograms, setErrorWorkPrograms] = useState<string | null>(
+    null
+  );
   const [categories, setCategories] = useState<{ id: string; name: string }[]>(
     []
   );
-  const [loadingPeriods, setLoadingPeriods] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
-  const [errorPeriods, setErrorPeriods] = useState<string | null>(null);
   const [errorCategories, setErrorCategories] = useState<string | null>(null);
 
-  // Fetch periods on component mount
+  // Fetch work programs on component mount
   useEffect(() => {
-    const fetchPeriods = async () => {
+    const fetchWorkPrograms = async () => {
       try {
-        setLoadingPeriods(true);
-        const periodData = await PeriodApi.getPeriods();
-        const periodOptions = periodData.map((period) => ({
-          id: period.id,
-          name: period.name,
+        setLoadingWorkPrograms(true);
+        const workProgramData = await WorkApi.getWorkPrograms();
+        const workProgramOptions = workProgramData.map((workProgram) => ({
+          id: workProgram.id,
+          name: workProgram.name,
         }));
-        setPeriods(periodOptions);
-        setErrorPeriods(null);
+        setWorkPrograms(workProgramOptions);
+        setErrorWorkPrograms(null);
       } catch (err) {
-        console.error("Error fetching periods:", err);
-        setErrorPeriods("Failed to load periods");
-        // Fallback to static periods
-        setPeriods([
+        console.error("Error fetching work programs:", err);
+        setErrorWorkPrograms("Failed to load work programs");
+        // Fallback to static work programs
+        setWorkPrograms([
           { id: "fallback-2024", name: "2024" },
           { id: "fallback-2023", name: "2023" },
           { id: "fallback-2022", name: "2022" },
         ]);
       } finally {
-        setLoadingPeriods(false);
+        setLoadingWorkPrograms(false);
       }
     };
 
-    fetchPeriods();
+    fetchWorkPrograms();
   }, []);
 
   // Fetch categories on component mount
@@ -128,11 +132,11 @@ export default function FinanceFilters({
     })),
   ];
 
-  const periodOptions = [
-    { value: "all", label: "Semua Periode" },
-    ...periods.map((period) => ({
-      value: period.id,
-      label: period.name,
+  const workProgramOptions = [
+    { value: "all", label: "Semua Program Kerja" },
+    ...workPrograms.map((workProgram) => ({
+      value: workProgram.id,
+      label: workProgram.name,
     })),
   ];
 
@@ -184,16 +188,16 @@ export default function FinanceFilters({
           </div>
           <div>
             <SelectFilter
-              label="Periode"
-              value={periodFilter}
-              onChange={onPeriodFilterChange}
-              options={periodOptions}
+              label="Program Kerja"
+              value={workProgramFilter}
+              onChange={onWorkProgramFilterChange}
+              options={workProgramOptions}
             />
-            {loadingPeriods && (
-              <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
+            {loadingWorkPrograms && (
+              <p className="text-xs text-gray-500 mt-1">Loading programs...</p>
             )}
-            {errorPeriods && (
-              <p className="text-xs text-red-500 mt-1">{errorPeriods}</p>
+            {errorWorkPrograms && (
+              <p className="text-xs text-red-500 mt-1">{errorWorkPrograms}</p>
             )}
           </div>
         </div>
