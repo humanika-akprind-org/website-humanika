@@ -144,6 +144,26 @@ export default function LetterForm({
             icon={<FiBriefcase className="text-gray-400" />}
             disabled={isLoadingState}
           />
+
+          <SelectInput
+            label="Classification"
+            name="classification"
+            value={formData.classification || ""}
+            onChange={(value) => handleSelectChange("classification", value)}
+            options={[
+              { value: "", label: "Select classification" },
+              ...Object.values(LetterClassification).map((classification) => ({
+                value: classification,
+                label: classification
+                  .replace(/_/g, " ")
+                  .toLowerCase()
+                  .replace(/\b\w/g, (l) => l.toUpperCase()),
+              })),
+            ]}
+            placeholder="Select classification"
+            icon={<FiBriefcase className="text-gray-400" />}
+            disabled={isLoadingState}
+          />
         </div>
 
         {/* Origin and Destination */}

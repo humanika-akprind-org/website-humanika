@@ -30,6 +30,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
 
   const [typeFilter, setTypeFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
+  const [classificationFilter, setClassificationFilter] = useState("all");
 
   const fetchLetters = useCallback(async () => {
     try {
@@ -83,12 +84,23 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
       const matchesType = typeFilter === "all" || letter.type === typeFilter;
       const matchesPriority =
         priorityFilter === "all" || letter.priority === priorityFilter;
+      const matchesClassification =
+        classificationFilter === "all" ||
+        letter.classification === classificationFilter;
 
-      return matchesSearch && matchesType && matchesPriority;
+      return (
+        matchesSearch && matchesType && matchesPriority && matchesClassification
+      );
     });
     setFilteredLetters(filtered);
     setTotalPages(Math.ceil(filtered.length / 10));
-  }, [letters, debouncedSearchTerm, typeFilter, priorityFilter]);
+  }, [
+    letters,
+    debouncedSearchTerm,
+    typeFilter,
+    priorityFilter,
+    classificationFilter,
+  ]);
 
   // Debounce search term
   useEffect(() => {
@@ -229,6 +241,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
     currentLetter,
     typeFilter,
     priorityFilter,
+    classificationFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -236,6 +249,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
     setCurrentLetter,
     setTypeFilter,
     setPriorityFilter,
+    setClassificationFilter,
     toggleLetterSelection,
     toggleSelectAll,
     handleAddLetter,

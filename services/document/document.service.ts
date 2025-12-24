@@ -32,7 +32,6 @@ export const getDocuments = async (filter: {
     where.status = { equals: filter.status as unknown as PrismaStatus };
   }
   if (filter.userId) where.userId = filter.userId;
-  if (filter.eventId) where.eventId = filter.eventId;
   if (filter.letterId) where.letterId = filter.letterId;
   if (filter.search) {
     where.OR = [{ name: { contains: filter.search, mode: "insensitive" } }];
@@ -247,7 +246,6 @@ export const createDocument = async (
         name: documentWithType.name,
         documentTypeId: documentWithType.documentTypeId,
         status: documentWithType.status,
-        eventId: documentWithType.eventId,
         letterId: documentWithType.letterId,
       },
     },
@@ -394,14 +392,12 @@ export const updateDocument = async (
         name: existingDocument.name,
         documentTypeId: existingDocument.documentTypeId,
         status: existingDocument.status,
-        eventId: existingDocument.eventId,
         letterId: existingDocument.letterId,
       },
       newData: {
         name: documentWithType.name,
         documentTypeId: documentWithType.documentTypeId,
         status: documentWithType.status,
-        eventId: documentWithType.eventId,
         letterId: documentWithType.letterId,
       },
     },
@@ -436,7 +432,6 @@ export const deleteDocument = async (id: string, user: UserWithId) => {
         name: existingDocument.name,
         documentTypeId: existingDocument.documentTypeId,
         status: existingDocument.status,
-        eventId: existingDocument.eventId,
         letterId: existingDocument.letterId,
       },
       newData: null,

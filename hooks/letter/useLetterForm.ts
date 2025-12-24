@@ -62,6 +62,7 @@ export function useLetterForm({
     date: letter?.date ? new Date(letter.date).toISOString().split("T")[0] : "",
     type: letter?.type || LetterType.INCOMING,
     priority: letter?.priority || LetterPriority.NORMAL,
+    classification: letter?.classification || undefined,
     origin: letter?.origin || "",
     destination: letter?.destination || "",
     body: letter?.body || "",

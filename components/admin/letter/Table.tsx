@@ -220,6 +220,21 @@ export default function LetterTable({
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("classification")}
+              >
+                <div className="flex items-center">
+                  Classification
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="classification"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort("status")}
               >
                 <div className="flex items-center">
@@ -307,6 +322,16 @@ export default function LetterTable({
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <PriorityChip priority={letter.priority} />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    {letter.classification
+                      ? letter.classification
+                          .replace(/_/g, " ")
+                          .toLowerCase()
+                          .replace(/\b\w/g, (l: string) => l.toUpperCase())
+                      : "-"}
+                  </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <StatusChip status={letter.status} />

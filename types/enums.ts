@@ -82,6 +82,13 @@ export enum LetterPriority {
   URGENT = "URGENT",
 }
 
+// Enum Letter Classification
+export enum LetterClassification {
+  GENERAL = "GENERAL",
+  CONFIDENTIAL = "CONFIDENTIAL",
+  HIGHLY_CONFIDENTIAL = "HIGHLY_CONFIDENTIAL",
+}
+
 export enum ApprovalType {
   WORK_PROGRAM = "WORK_PROGRAM",
   EVENT = "EVENT",

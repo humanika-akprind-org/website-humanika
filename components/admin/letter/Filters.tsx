@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LetterType, LetterPriority } from "types/enums";
+import { LetterType, LetterPriority, LetterClassification } from "types/enums";
 import type { LetterFilter } from "types/letter";
 import SearchInput from "../ui/input/SearchInput";
 import SelectFilter from "../ui/input/SelectFilter";
@@ -99,6 +99,27 @@ export default function LetterFilters({
                 label:
                   priority.charAt(0).toUpperCase() +
                   priority.slice(1).toLowerCase(),
+              })),
+            ]}
+          />
+
+          <SelectFilter
+            label="Classification"
+            value={filters.classification || ""}
+            onChange={(value) =>
+              handleFilterChange(
+                "classification",
+                value as LetterClassification
+              )
+            }
+            options={[
+              { value: "", label: "All Classifications" },
+              ...Object.values(LetterClassification).map((classification) => ({
+                value: classification,
+                label: classification
+                  .replace(/_/g, " ")
+                  .toLowerCase()
+                  .replace(/\b\w/g, (l: string) => l.toUpperCase()),
               })),
             ]}
           />
