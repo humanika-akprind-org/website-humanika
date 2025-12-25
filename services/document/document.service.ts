@@ -19,7 +19,6 @@ export const getDocuments = async (filter: {
   documentTypeId?: string;
   status?: Status;
   userId?: string;
-  eventId?: string;
   letterId?: string;
   search?: string;
 }) => {
@@ -45,12 +44,6 @@ export const getDocuments = async (filter: {
           id: true,
           name: true,
           email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          name: true,
         },
       },
       letter: {
@@ -100,12 +93,6 @@ export const getDocument = async (id: string) => {
           id: true,
           name: true,
           email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          name: true,
         },
       },
       letter: {
@@ -171,12 +158,6 @@ export const createDocument = async (
           id: true,
           name: true,
           email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          name: true,
         },
       },
       letter: {
@@ -338,12 +319,6 @@ export const updateDocument = async (
           id: true,
           name: true,
           email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          name: true,
         },
       },
       letter: {

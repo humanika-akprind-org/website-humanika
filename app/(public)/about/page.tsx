@@ -250,8 +250,10 @@ export default function AboutPage() {
               </div>
             ) : (
               <StructureAvatar
-                structure={latestStructure}
+                imageUrl={latestStructure.structure}
+                alt={latestStructure.name}
                 size={{ width: 1600, height: 900 }}
+                modalTitle={latestStructure.name}
               />
             )}
           </div>

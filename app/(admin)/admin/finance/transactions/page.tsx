@@ -19,9 +19,9 @@ import { useFinanceManagement } from "@/hooks/finance/useFinanceManagement";
 
 export default function FinanceTransactionsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
-  const [periodFilter, setPeriodFilter] = useState("all");
-  const [departmentFilter, setDepartmentFilter] = useState("all");
   const [workProgramFilter, setWorkProgramFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const {
     finances,
@@ -76,6 +76,12 @@ export default function FinanceTransactionsPage() {
       <Filters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        typeFilter={typeFilter}
+        onTypeFilterChange={setTypeFilter}
+        categoryFilter={categoryFilter}
+        onCategoryFilterChange={setCategoryFilter}
         workProgramFilter={workProgramFilter}
         onWorkProgramFilterChange={setWorkProgramFilter}
         selectedCount={selectedFinances.length}

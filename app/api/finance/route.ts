@@ -30,7 +30,6 @@ function validateCreateFinanceInput(body: CreateFinanceInput) {
     !body.amount ||
     !body.categoryId ||
     !body.type ||
-    !body.periodId ||
     !body.date
   ) {
     return { isValid: false, error: "Missing required fields" };

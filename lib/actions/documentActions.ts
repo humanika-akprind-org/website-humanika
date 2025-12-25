@@ -34,7 +34,6 @@ export async function handleDocumentSubmit(
     status: Status.DRAFT,
     document: documentData.document,
     userId: user.id,
-    eventId: documentData.eventId,
     letterId: documentData.letterId,
   };
 
@@ -93,7 +92,6 @@ export async function handleDocumentSubmitForApproval(
     status: Status.PENDING,
     document: documentData.document,
     userId: user.id,
-    eventId: documentData.eventId,
     letterId: documentData.letterId,
   };
 

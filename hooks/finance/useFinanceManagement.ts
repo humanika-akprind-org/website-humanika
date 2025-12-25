@@ -11,10 +11,10 @@ export function useFinanceManagement() {
   const [selectedFinances, setSelectedFinances] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [periodFilter, setPeriodFilter] = useState("all");
+  const [statusFilter] = useState("all");
+  const [typeFilter] = useState("all");
+  const [categoryFilter] = useState("all");
+  const [periodFilter] = useState("all");
   const [workProgramFilter, setWorkProgramFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

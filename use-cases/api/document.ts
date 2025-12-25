@@ -13,10 +13,8 @@ export const getDocuments = async (
 ): Promise<Document[]> => {
   const params = new URLSearchParams();
 
-  if (filter?.type) params.append("type", filter.type.toString());
   if (filter?.status) params.append("status", filter.status.toString());
   if (filter?.userId) params.append("userId", filter.userId);
-  if (filter?.eventId) params.append("eventId", filter.eventId);
   if (filter?.letterId) params.append("letterId", filter.letterId);
   if (filter?.search) params.append("search", filter.search);
 

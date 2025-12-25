@@ -60,8 +60,8 @@ export default async function ArticleDetail({
                 : article.category?.name || ""}
             </span>
             <span>
-              {article.publishedAt
-                ? new Date(article.publishedAt).toLocaleDateString("id-ID", {
+              {article.createdAt
+                ? new Date(article.createdAt).toLocaleDateString("id-ID", {
                     day: "numeric",
                     month: "long",
                     year: "numeric",

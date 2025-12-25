@@ -104,9 +104,7 @@ export const getEvents = async (filter: {
         },
       },
       galleries: true,
-      finances: true,
       letters: true,
-      documents: true,
     },
     orderBy: { startDate: "desc" },
   });
@@ -146,9 +144,7 @@ export const getEvent = async (id: string) => {
         },
       },
       galleries: true,
-      finances: true,
       letters: true,
-      documents: true,
     },
   });
 
@@ -216,9 +212,7 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
         },
       },
       galleries: true,
-      finances: true,
       letters: true,
-      documents: true,
     },
   });
 
@@ -370,9 +364,7 @@ export const updateEvent = async (
         },
       },
       galleries: true,
-      finances: true,
       letters: true,
-      documents: true,
     },
   });
 
