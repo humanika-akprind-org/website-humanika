@@ -7,6 +7,7 @@ import { getEvent, getEvents } from "use-cases/api/event";
 import type { Event } from "types/event";
 import { FiSend } from "react-icons/fi";
 import PastEventCard from "@/components/public/event/PastEventCard";
+import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 
 export default function EventDetail() {
   const params = useParams();
@@ -158,8 +159,8 @@ export default function EventDetail() {
         </section>
 
         <section className="max-w-2xl mx-auto prose prose-blue prose-lg mb-16">
-          <div
-            dangerouslySetInnerHTML={{ __html: safeEvent?.description ?? "" }}
+          <HtmlRenderer
+            html={safeEvent?.description || "<p>No description.</p>"}
           />
         </section>
 

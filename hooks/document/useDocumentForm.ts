@@ -8,14 +8,25 @@ import type {
 import { Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { documentFolderId } from "@/lib/config/config";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+
+// Helper functions
+const isGoogleDriveDocument = (doc: string | null | undefined): boolean => {
+  if (!doc) return false;
+  return (
+    doc.includes("drive.google.com") || doc.match(/^[a-zA-Z0-9_-]+$/) !== null
+  );
+};
 
 interface UseDocumentFormProps {
   document?: Document;
-  accessToken: string;
+  accessToken?: string;
   onSubmit: (data: CreateDocumentInput | UpdateDocumentInput) => Promise<void>;
   onSubmitForApproval?: (
     data: CreateDocumentInput | UpdateDocumentInput
   ) => Promise<void>;
+  fixedDocumentType?: string;
+  documentTypes?: { id: string; name: string }[];
 }
 
 export function useDocumentForm({
@@ -23,8 +34,12 @@ export function useDocumentForm({
   accessToken,
   onSubmit,
   onSubmitForApproval,
+  fixedDocumentType,
+  documentTypes,
 }: UseDocumentFormProps) {
   const router = useRouter();
+  const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
+
   const {
     uploadFile,
     deleteFile,
@@ -32,13 +47,38 @@ export function useDocumentForm({
     setPublicAccess,
     isLoading: fileLoading,
     error: fileError,
-  } = useFile(accessToken);
+  } = useFile(accessToken || fetchedAccessToken);
+
+  // Fetch access token if not provided
+  useEffect(() => {
+    if (!accessToken) {
+      const fetchAccessToken = async () => {
+        const token = await getAccessTokenAction();
+        setFetchedAccessToken(token);
+      };
+      fetchAccessToken();
+    }
+  }, [accessToken]);
+
+  // Compute initial documentTypeId
+  const initialDocumentTypeId = (() => {
+    if (document?.documentTypeId) return document.documentTypeId;
+    if (fixedDocumentType && documentTypes) {
+      return (
+        documentTypes.find(
+          (type) =>
+            type.name.toLowerCase().replace(/[\s\-]/g, "") ===
+            fixedDocumentType.toLowerCase().replace(/[\s\-]/g, "")
+        )?.id || ""
+      );
+    }
+    return "";
+  })();
 
   const [formData, setFormData] = useState({
     name: document?.name || "",
-    documentTypeId: document?.documentTypeId || "",
+    documentTypeId: initialDocumentTypeId,
     status: document?.status || Status.DRAFT,
-    eventId: document?.eventId || "",
     letterId: document?.letterId || "",
     documentFile: undefined as File | undefined,
   });
@@ -79,18 +119,17 @@ export function useDocumentForm({
       }
 
       setFormData((prev) => ({ ...prev, documentFile: file }));
+      setExistingDocument(null); // Hide existing file display when new file is selected
       setError(null);
       setRemovedDocument(false); // Reset removed state when new file is selected
     }
   };
 
   const removeDocument = () => {
-    if (existingDocument) {
-      // Mark document as removed for deletion during form submission
+    if (isGoogleDriveDocument(existingDocument)) {
       setRemovedDocument(true);
     }
 
-    // Clear form state
     setFormData((prev) => ({ ...prev, documentFile: undefined }));
     setExistingDocument(null);
   };
@@ -107,7 +146,7 @@ export function useDocumentForm({
       }
 
       // Check if access token is available
-      if (!accessToken) {
+      if (!(accessToken || fetchedAccessToken)) {
         throw new Error(
           "Authentication required. Please log in to Google Drive."
         );
@@ -117,15 +156,13 @@ export function useDocumentForm({
       let documentUrl: string | null | undefined = existingDocument;
 
       if (removedDocument) {
-        // Delete from Google Drive and set documentUrl to null
-        if (document?.document) {
+        if (document?.document && isGoogleDriveDocument(document.document)) {
           const fileId = getFileIdFromDocument(document.document);
           if (fileId) {
             try {
               await deleteFile(fileId);
             } catch (deleteError) {
               console.warn("Failed to delete document:", deleteError);
-              // Continue with submission even if delete fails
             }
           }
         }
@@ -133,19 +170,6 @@ export function useDocumentForm({
       }
 
       if (formData.documentFile) {
-        // Delete old document from Google Drive if it exists and wasn't already removed
-        if (!removedDocument && document?.document) {
-          const fileId = getFileIdFromDocument(document.document);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old document:", deleteError);
-              // Continue with upload even if delete fails
-            }
-          }
-        }
-
         // Upload with temporary filename first
         const tempFileName = `temp_${Date.now()}`;
         const uploadedFileId = await uploadFile(
@@ -155,22 +179,40 @@ export function useDocumentForm({
         );
 
         if (uploadedFileId) {
-          // Rename the file using the renameFile hook
           const finalFileName = `document-${formData.name
             .replace(/\s+/g, "-")
             .toLowerCase()}-${Date.now()}`;
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
           if (renameSuccess) {
-            // Set the file to public access
             const publicAccessSuccess = await setPublicAccess(uploadedFileId);
             if (publicAccessSuccess) {
               documentUrl = uploadedFileId;
             } else {
-              throw new Error("Failed to set public access for document");
+              console.warn("Failed to set public access for document");
+              // Continue with submission even if setting public access fails
+              documentUrl = uploadedFileId;
             }
           } else {
-            throw new Error("Failed to rename document");
+            console.warn("Failed to rename document");
+            // Continue with submission even if rename fails
+            documentUrl = uploadedFileId;
+          }
+
+          // Delete old document after successful upload
+          if (
+            !removedDocument &&
+            document?.document &&
+            isGoogleDriveDocument(document.document)
+          ) {
+            const fileId = getFileIdFromDocument(document.document);
+            if (fileId) {
+              try {
+                await deleteFile(fileId);
+              } catch (deleteError) {
+                console.warn("Failed to delete old document:", deleteError);
+              }
+            }
           }
         } else {
           throw new Error("Failed to upload document");
@@ -180,12 +222,31 @@ export function useDocumentForm({
       // Submit form data with document URL (exclude documentFile for server action)
       const { documentFile: _, ...dataToSend } = formData;
 
+      // For onSubmitForApproval on proposal/accountability report pages, ensure documentTypeId is set
+      let finalDocumentTypeId = dataToSend.documentTypeId;
+      if (onSubmitForApproval && fixedDocumentType) {
+        const normalizedFixed = fixedDocumentType
+          .toLowerCase()
+          .replace(/[\s\-]/g, "");
+        if (
+          normalizedFixed === "proposal" ||
+          normalizedFixed === "accountabilityreport"
+        ) {
+          finalDocumentTypeId =
+            documentTypes?.find(
+              (type) =>
+                type.name.toLowerCase().replace(/[\s\-]/g, "") ===
+                normalizedFixed
+            )?.id || "";
+        }
+      }
+
       // Prepare data to send
       const submitData = {
         ...dataToSend,
+        documentTypeId: finalDocumentTypeId,
         document: documentUrl,
-        eventId: formData.eventId || undefined,
-        letterId: formData.letterId || undefined,
+        letterId: formData.letterId ? formData.letterId : null,
       };
 
       if (onSubmitForApproval) {
@@ -197,7 +258,18 @@ export function useDocumentForm({
       // Reset form state after successful submission
       setRemovedDocument(false);
 
-      router.push("/admin/administration/documents");
+      let redirectPath = "/admin/administration/documents";
+      if (fixedDocumentType) {
+        const normalized = fixedDocumentType
+          .toLowerCase()
+          .replace(/[\s\-]/g, "");
+        if (normalized === "proposal") {
+          redirectPath = "/admin/administration/proposals";
+        } else if (normalized === "accountabilityreport") {
+          redirectPath = "/admin/administration/accountability-reports";
+        }
+      }
+      router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save document");
     } finally {
@@ -227,6 +299,7 @@ export function useDocumentForm({
     existingDocument,
     fileLoading,
     errors,
+    accessToken: accessToken || fetchedAccessToken,
     handleInputChange,
     handleFileChange,
     removeDocument,

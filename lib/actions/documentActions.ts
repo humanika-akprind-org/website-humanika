@@ -6,7 +6,7 @@ import type {
 import { Status, ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/enums";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 
 export async function handleDocumentSubmit(
@@ -34,7 +34,6 @@ export async function handleDocumentSubmit(
     status: Status.DRAFT,
     document: documentData.document,
     userId: user.id,
-    eventId: documentData.eventId,
     letterId: documentData.letterId,
   };
 
@@ -93,7 +92,6 @@ export async function handleDocumentSubmitForApproval(
     status: Status.PENDING,
     document: documentData.document,
     userId: user.id,
-    eventId: documentData.eventId,
     letterId: documentData.letterId,
   };
 

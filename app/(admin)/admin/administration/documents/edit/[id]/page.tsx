@@ -1,205 +1,75 @@
-import { UserApi } from "@/use-cases/api/user";
+"use client";
+
+import { useParams } from "next/navigation";
 import DocumentForm from "@/components/admin/document/Form";
-import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import type { Event } from "@/types/event";
-import type { Letter } from "@/types/letter";
-import type {
-  CreateDocumentInput,
-  UpdateDocumentInput,
-  Document,
-} from "@/types/document";
-import { Status, ApprovalType } from "@/types/enums";
-import { StatusApproval } from "@/types/enums";
-import { FiArrowLeft } from "react-icons/fi";
-import Link from "next/link";
-import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { notFound } from "next/navigation";
-import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
+import { useEditDocument } from "@/hooks/document/useEditDocument";
+import { useDocumentFormData } from "@/hooks/document/useDocumentFormData";
+import { useState, useEffect } from "react";
 
-async function EditDocumentPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const accessToken = await getGoogleAccessToken();
-  const { id } = await params;
+export default function EditDocumentPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-  try {
-    // Fetch document data
-    const document = await prisma.document.findUnique({
-      where: { id: id },
-      include: {
-        user: true,
-        event: true,
-        letter: true,
-      },
-    });
+  const {
+    document,
+    loading,
+    error,
+    isSubmitting,
+    updateDocument,
+    updateDocumentForApproval,
+    handleBack,
+  } = useEditDocument(id);
 
-    if (!document) {
-      notFound();
-    }
+  const {
+    events,
+    letters,
+    loading: formDataLoading,
+    error: formDataError,
+  } = useDocumentFormData();
 
-    // Transform document data to match Document type
-    const transformedDocument = document as unknown as Document;
+  const [accessToken, setAccessToken] = useState<string>("");
 
-    // Fetch users first (this is used to assign ownership / show user list).
-    const usersResponse = await UserApi.getUsers({ limit: 50 });
-    const users = usersResponse.data?.users || [];
-
-    // Fetch events and letters from DB (resiliently)
-    const [eventsSettled, lettersSettled] = await Promise.allSettled([
-      prisma.event.findMany({ orderBy: { name: "asc" } }),
-      prisma.letter.findMany({ orderBy: { date: "desc" } }),
-    ]);
-
-    const events =
-      eventsSettled.status === "fulfilled" ? eventsSettled.value : [];
-    if (eventsSettled.status === "rejected") {
-      console.error("Failed to load events from DB:", eventsSettled.reason);
-    }
-
-    const letters =
-      lettersSettled.status === "fulfilled" ? lettersSettled.value : [];
-    if (lettersSettled.status === "rejected") {
-      console.error("Failed to load letters from DB:", lettersSettled.reason);
-    }
-
-    const handleSubmit = async (
-      data: CreateDocumentInput | UpdateDocumentInput
-    ) => {
-      "use server";
-
-      const user = await getCurrentUser();
-      if (!user) {
-        throw new Error("Unauthorized");
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        // Assuming there's an API endpoint to get the access token client-side
+        const response = await fetch("/api/auth/google-access-token");
+        if (response.ok) {
+          const data = await response.json();
+          setAccessToken(data.accessToken || "");
+        }
+      } catch (e) {
+        console.error("Failed to fetch access token:", e);
       }
-
-      // Cast data to UpdateDocumentInput since this is the edit page
-      const documentData = data as UpdateDocumentInput;
-
-      if (!documentData.name || !documentData.documentTypeId) {
-        throw new Error("Missing required fields");
-      }
-
-      // Prepare data to send
-      const submitData = {
-        name: documentData.name,
-        documentTypeId: documentData.documentTypeId,
-        status: documentData.status || Status.DRAFT,
-        document: documentData.document,
-        userId: user.id,
-        eventId: documentData.eventId,
-        letterId: documentData.letterId,
-      };
-
-      await prisma.document.update({
-        where: { id: (await params).id },
-        data: submitData,
-      });
-
-      redirect("/admin/administration/documents");
     };
+    fetchToken();
+  }, []);
 
-    const handleSubmitForApproval = async (
-      data: CreateDocumentInput | UpdateDocumentInput
-    ) => {
-      "use server";
+  const combinedLoading = loading || formDataLoading || isSubmitting;
+  const loadError = error || formDataError;
 
-      const user = await getCurrentUser();
-      if (!user) {
-        throw new Error("Unauthorized");
-      }
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Edit Document" onBack={handleBack} />
 
-      // Cast data to UpdateDocumentInput since this is the edit page
-      const documentData = data as UpdateDocumentInput;
+      {loadError && <Alert type="error" message={loadError} />}
 
-      if (!documentData.name || !documentData.documentTypeId) {
-        throw new Error("Missing required fields");
-      }
-
-      // Prepare data to send
-      const submitData = {
-        name: documentData.name,
-        documentTypeId: documentData.documentTypeId,
-        status: Status.PENDING,
-        document: documentData.document,
-        userId: user.id,
-        eventId: documentData.eventId,
-        letterId: documentData.letterId,
-      };
-
-      // Update the document with PENDING status
-      await prisma.document.update({
-        where: { id: id },
-        data: submitData,
-      });
-
-      // Create approval record for the document
-      await prisma.approval.create({
-        data: {
-          entityType: ApprovalType.DOCUMENT,
-          entityId: id,
-          userId: user.id,
-          status: StatusApproval.PENDING,
-        },
-      });
-
-      redirect("/admin/administration/documents");
-    };
-
-    return (
-      <AuthGuard accessToken={accessToken}>
-        <div className="p-6 max-w-4xl min-h-screen mx-auto">
-          <div className="flex items-center mb-6">
-            <Link
-              href="/admin/administration/documents"
-              className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-            >
-              <FiArrowLeft className="mr-1" />
-              Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-800">Edit Document</h1>
-          </div>
-          <DocumentForm
-            document={transformedDocument}
-            accessToken={accessToken}
-            users={users}
-            events={
-              events.map((ev) => ({
-                id: ev.id,
-                name: ev.name,
-              })) as unknown as Event[]
-            }
-            letters={
-              letters.map((l) => ({
-                id: l.id,
-                number: l.number,
-                regarding: l.regarding,
-              })) as unknown as Letter[]
-            }
-            onSubmit={handleSubmit}
-            onSubmitForApproval={handleSubmitForApproval}
-          />
-        </div>
-      </AuthGuard>
-    );
-  } catch (error) {
-    console.error("Error loading form data:", error);
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="text-center text-red-500">
-              <h2 className="text-xl font-semibold mb-4">Error Loading Form</h2>
-              <p>{error instanceof Error ? error.message : "Unknown error"}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      {combinedLoading ? (
+        <LoadingForm />
+      ) : document ? (
+        <DocumentForm
+          document={document}
+          onSubmit={updateDocument}
+          onSubmitForApproval={updateDocumentForApproval}
+          accessToken={accessToken}
+          events={events}
+          letters={letters}
+          loading={combinedLoading}
+        />
+      ) : null}
+    </div>
+  );
 }
-
-export default EditDocumentPage;

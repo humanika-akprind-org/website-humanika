@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiSearch, FiFilter, FiTrash2, FiChevronDown } from "react-icons/fi";
 import { Department, Status } from "@/types/enums";
 import { PeriodApi } from "@/use-cases/api/period";
 import { useWorkPrograms } from "@/hooks/work-program/useWorkPrograms";
+import SearchInput from "../ui/input/SearchInput";
+import FilterButton from "../ui/button/FilterButton";
+import SelectFilter from "../ui/input/SelectFilter";
+import DeleteSelectedButton from "../ui/button/DeleteSelectedButton";
 
 interface EventFiltersProps {
   searchTerm: string;
@@ -72,135 +75,99 @@ export default function EventFilters({
     fetchPeriods();
   }, []);
 
+  const statusOptions = [
+    { value: "all", label: "Semua Status" },
+    ...Object.values(Status).map((status) => ({
+      value: status,
+      label:
+        status.toString().charAt(0).toUpperCase() +
+        status.toString().slice(1).toLowerCase(),
+    })),
+  ];
+
+  const periodOptions = [
+    { value: "all", label: "Semua Period" },
+    ...periods.map((period) => ({
+      value: period.id,
+      label: period.name,
+    })),
+  ];
+
+  const departmentOptions = [
+    { value: "all", label: "All Departments" },
+    ...Object.values(Department).map((dept) => ({
+      value: dept,
+      label: dept,
+    })),
+  ];
+
+  const workProgramOptions = [
+    { value: "all", label: "Semua Work Program" },
+    ...workPrograms.map((workProgram) => ({
+      value: workProgram.id,
+      label: workProgram.name,
+    })),
+  ];
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-        <div className="relative flex-1">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FiSearch className="text-gray-400" />
-          </div>
-          <input
-            type="text"
-            placeholder="Cari event..."
-            className="pl-10 w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
-        </div>
+        <SearchInput
+          placeholder="Cari event..."
+          value={searchTerm}
+          onChange={onSearchChange}
+        />
 
-        <button
-          className="flex items-center px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50"
+        <FilterButton
+          isOpen={isFilterOpen}
           onClick={() => setIsFilterOpen(!isFilterOpen)}
-        >
-          <FiFilter className="mr-2 text-gray-500" />
-          Filter
-          <FiChevronDown
-            className={`ml-2 transition-transform ${
-              isFilterOpen ? "rotate-180" : ""
-            }`}
-          />
-        </button>
+        />
       </div>
 
       {/* Advanced Filters */}
       {isFilterOpen && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-gray-100">
+          <SelectFilter
+            label="Status"
+            value={statusFilter}
+            onChange={onStatusFilterChange}
+            options={statusOptions}
+          />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={statusFilter}
-              onChange={(e) => onStatusFilterChange(e.target.value)}
-            >
-              <option value="all">Semua Status</option>
-              {Object.values(Status).map((status) => (
-                <option key={status} value={status}>
-                  {status.toString().charAt(0).toUpperCase() +
-                    status.toString().slice(1).toLowerCase()}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Period
-            </label>
-            <select
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <SelectFilter
+              label="Period"
               value={periodFilter}
-              onChange={(e) => onPeriodFilterChange(e.target.value)}
-              disabled={loading}
-            >
-              <option value="all">Semua Period</option>
-              {periods.map((period) => (
-                <option key={period.id} value={period.id}>
-                  {period.name}
-                </option>
-              ))}
-            </select>
+              onChange={onPeriodFilterChange}
+              options={periodOptions}
+            />
             {loading && (
               <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
             )}
             {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
           </div>
+          <SelectFilter
+            label="Department"
+            value={departmentFilter}
+            onChange={onDepartmentFilterChange}
+            options={departmentOptions}
+          />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Department
-            </label>
-            <select
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={departmentFilter}
-              onChange={(e) =>
-                onDepartmentFilterChange(e.target.value as Department | "all")
-              }
-            >
-              <option value="all">All Departments</option>
-              {Object.values(Department).map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Work Program
-            </label>
-            <select
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <SelectFilter
+              label="Work Program"
               value={workProgramFilter}
-              onChange={(e) => onWorkProgramFilterChange(e.target.value)}
-              disabled={workProgramsLoading}
-            >
-              <option value="all">Semua Work Program</option>
-              {workPrograms.map((workProgram) => (
-                <option key={workProgram.id} value={workProgram.id}>
-                  {workProgram.name}
-                </option>
-              ))}
-            </select>
+              onChange={onWorkProgramFilterChange}
+              options={workProgramOptions}
+            />
             {workProgramsLoading && (
               <p className="text-xs text-gray-500 mt-1">
                 Loading work programs...
               </p>
             )}
           </div>
-          <div className="flex items-end">
-            <button
-              className={`px-4 py-2.5 rounded-lg transition-colors w-full flex items-center justify-center ${
-                selectedCount === 0
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-red-50 text-red-700 hover:bg-red-100"
-              }`}
-              onClick={onDeleteSelected}
-              disabled={selectedCount === 0}
-            >
-              <FiTrash2 className="mr-2" />
-              Hapus Terpilih ({selectedCount})
-            </button>
-          </div>
+          <DeleteSelectedButton
+            selectedCount={selectedCount}
+            onClick={onDeleteSelected}
+          />
         </div>
       )}
     </div>

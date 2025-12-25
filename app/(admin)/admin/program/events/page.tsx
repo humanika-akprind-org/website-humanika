@@ -1,136 +1,299 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { FiPlus } from "react-icons/fi";
-import EventTable from "@/components/admin/event/Table";
-import DeleteModal from "@/components/admin/event/modal/DeleteModal";
-import type { Event } from "@/types/event";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import EventStats from "components/admin/event/Stats";
+import EventFilters from "components/admin/event/Filters";
+import EventTable from "components/admin/event/Table";
+import DeleteModal from "components/admin/ui/modal/DeleteModal";
+import ViewModal from "components/admin/ui/modal/ViewModal";
+import Loading from "components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "components/admin/ui/alert/Alert";
+import ManagementHeader from "components/admin/ui/ManagementHeader";
+import AddButton from "components/admin/ui/button/AddButton";
+import HtmlRenderer from "components/admin/ui/HtmlRenderer";
+import DepartmentChip from "components/admin/ui/chip/Department";
+import StatusChip from "components/admin/ui/chip/Status";
+import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
+import DateDisplay from "components/admin/ui/date/DateDisplay";
+import ImageView from "components/admin/ui/avatar/ImageView";
+import { useEventManagement } from "hooks/event/useEventManagement";
 
 export default function EventsPage() {
-  const [_events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    eventId: "",
-    eventName: "",
-  });
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [workProgramFilter, setWorkProgramFilter] = useState("all");
 
-  const { toast } = useToast();
+  const {
+    events,
+    loading,
+    error,
+    success,
+    selectedEvents,
+    searchTerm,
+    currentPage,
+    totalPages,
+    showDeleteModal,
+    showViewModal,
+    currentEvent,
+    setSearchTerm,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentEvent,
+    toggleEventSelection,
+    toggleSelectAll,
+    handleAddEvent,
+    handleEditEvent,
+    handleViewEvent,
+    handleDelete,
+    confirmDelete,
+  } = useEventManagement();
 
-  const fetchEvents = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/event");
-      if (response.ok) {
-        const data = await response.json();
-        setEvents(data || []);
-        setFilteredEvents(data || []);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to fetch events",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch events",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
 
-  // Fetch events
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
-
-  const handleDelete = async (eventId: string) => {
-    try {
-      const response = await fetch(`/api/event/${eventId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Event deleted successfully",
-        });
-        fetchEvents(); // Refresh the list
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to delete event",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting event:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete event",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleteModal({ isOpen: false, eventId: "", eventName: "" });
-    }
-  };
-
-  const closeDeleteModal = () => {
-    setDeleteModal({ isOpen: false, eventId: "", eventName: "" });
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Events Management
-          </h1>
-          <p className="text-gray-600">Manage and organize your events</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/admin/program/events/add"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <FiPlus className="h-4 w-4 mr-2" />
-            Add Event
-          </Link>
-        </div>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Events"
+          description="Manage events and their details"
+        />
+        <AddButton onClick={handleAddEvent} text="Add Event" />
       </div>
 
-      {/* Events Table */}
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <EventTable events={filteredEvents} onDelete={handleDelete} />
-      )}
+      <EventStats events={events} />
 
-      {/* Delete Modal */}
-      <DeleteModal
-        isOpen={deleteModal.isOpen}
-        onClose={closeDeleteModal}
-        onConfirm={() => handleDelete(deleteModal.eventId)}
-        eventName={deleteModal.eventName}
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <EventFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        periodFilter={periodFilter}
+        onPeriodFilterChange={setPeriodFilter}
+        departmentFilter={departmentFilter}
+        onDepartmentFilterChange={setDepartmentFilter}
+        workProgramFilter={workProgramFilter}
+        onWorkProgramFilterChange={setWorkProgramFilter}
+        selectedCount={selectedEvents.length}
+        onDeleteSelected={() => handleDelete()}
       />
+
+      <EventTable
+        events={events}
+        selectedEvents={selectedEvents}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onEventSelect={toggleEventSelection}
+        onSelectAll={toggleSelectAll}
+        onViewEvent={handleViewEvent}
+        onEditEvent={handleEditEvent}
+        onDeleteEvent={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddEvent={handleAddEvent}
+      />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentEvent?.name}
+        selectedCount={selectedEvents.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentEvent(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Event Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentEvent(null);
+        }}
+      >
+        {currentEvent && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900">
+                  {currentEvent.name}
+                </h4>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Department
+                </label>
+                <div className="mt-1">
+                  <DepartmentChip department={currentEvent.department} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <div className="mt-1">
+                  <StatusChip status={currentEvent.status} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentEvent.category?.name || "No category"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Period
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentEvent.period?.name || "No period"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Responsible
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentEvent.responsible?.name || "No responsible person"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Work Program
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentEvent.workProgram?.name || "No work program"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Start Date
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {new Intl.DateTimeFormat("id-ID", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  }).format(new Date(currentEvent.startDate))}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  End Date
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {new Intl.DateTimeFormat("id-ID", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  }).format(new Date(currentEvent.endDate))}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Approval
+                </label>
+                <div className="mt-1">
+                  {currentEvent.approvals &&
+                  currentEvent.approvals.length > 0 ? (
+                    (() => {
+                      const latestApproval = currentEvent.approvals.sort(
+                        (a, b) =>
+                          new Date(b.updatedAt).getTime() -
+                          new Date(a.updatedAt).getTime()
+                      )[0];
+                      return (
+                        <StatusApprovalChip status={latestApproval.status} />
+                      );
+                    })()
+                  ) : (
+                    <span className="text-xs text-gray-400">No approvals</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <div className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-blue-500">
+                  <HtmlRenderer
+                    html={currentEvent.description || "No description"}
+                  />
+                </div>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Goals
+                </label>
+                <p className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md border border-gray-200">
+                  {currentEvent.goal}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentEvent.createdAt} />
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Updated At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentEvent.updatedAt} />
+                </p>
+              </div>
+            </div>
+
+            {currentEvent.thumbnail && (
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700">
+                  Thumbnail
+                </label>
+                <div className="mt-2">
+                  <ImageView
+                    imageUrl={currentEvent.thumbnail}
+                    alt={`Event thumbnail for ${currentEvent.name}`}
+                    size={{ width: 300, height: 200 }}
+                    modalTitle={`Event Thumbnail - ${currentEvent.name}`}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </ViewModal>
     </div>
   );
 }

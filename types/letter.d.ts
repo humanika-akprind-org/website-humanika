@@ -11,6 +11,7 @@ export interface Letter {
   regarding: string;
   origin: string;
   destination: string;
+  classification?: LetterClassification | null;
   date: Date;
   type: LetterType;
   priority: LetterPriority;
@@ -53,6 +54,7 @@ export interface UpdateLetterInput {
   regarding?: string;
   origin?: string;
   destination?: string;
+  classification?: LetterClassification;
   date?: string | Date;
   type?: LetterType;
   priority?: LetterPriority;
@@ -69,6 +71,7 @@ export interface UpdateLetterInput {
 export interface LetterFilter {
   type?: LetterType;
   priority?: LetterPriority;
+  classification?: LetterClassification;
   periodId?: string;
   eventId?: string;
   search?: string;

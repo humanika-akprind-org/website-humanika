@@ -4,6 +4,7 @@ import type {
   UpdateDepartmentTaskInput,
   DepartmentTaskFilter,
 } from "@/types/task";
+import { Department, Status } from "@/types/enums";
 import { apiUrl } from "@/lib/config/config";
 
 const API_URL = apiUrl;
@@ -115,3 +116,13 @@ export const deleteDepartmentTask = async (id: string): Promise<void> => {
     throw new Error("Failed to delete department task");
   }
 };
+
+export const taskStatusOptions = Object.values(Status).map((status) => ({
+  value: status,
+  label: status.charAt(0) + status.slice(1).toLowerCase(),
+}));
+
+export const taskDepartmentOptions = Object.values(Department).map((dept) => ({
+  value: dept,
+  label: dept.charAt(0) + dept.slice(1).toLowerCase(),
+}));

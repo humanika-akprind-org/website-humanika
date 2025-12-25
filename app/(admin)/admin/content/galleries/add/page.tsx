@@ -1,65 +1,40 @@
+"use client";
+
 import GalleryForm from "@/components/admin/gallery/Form";
-import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
-import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
-import type { CreateGalleryInput, UpdateGalleryInput } from "@/types/gallery";
-import { FiArrowLeft } from "react-icons/fi";
-import Link from "next/link";
-import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
+import { useCreateGallery } from "@/hooks/gallery/useCreateGallery";
+import { useGalleryFormData } from "@/hooks/gallery/useGalleryFormData";
 
-async function AddGalleryPage() {
-  const accessToken = await getGoogleAccessToken();
+export default function AddGalleryPage() {
+  const { createGallery, handleBack, isSubmitting, error, isLoading } =
+    useCreateGallery();
 
-  const handleSubmit = async (
-    data: CreateGalleryInput | UpdateGalleryInput
-  ) => {
-    "use server";
+  const {
+    events,
+    loading: formDataLoading,
+    error: formDataError,
+  } = useGalleryFormData();
 
-    const user = await getCurrentUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-
-    // Cast data to CreateGalleryInput since this is the add page
-    const galleryData = data as CreateGalleryInput;
-
-    if (!galleryData.title || !galleryData.eventId) {
-      throw new Error("Missing required fields");
-    }
-
-    await prisma.gallery.create({
-      data: {
-        title: galleryData.title,
-        eventId: galleryData.eventId,
-        image: galleryData.image || "",
-      },
-    });
-
-    redirect("/admin/content/galleries");
-  };
+  const combinedLoading = isSubmitting || isLoading || formDataLoading;
+  const loadError = error || formDataError;
 
   return (
-    <AuthGuard accessToken={accessToken}>
-      <div className="p-6 max-w-4xl min-h-screen mx-auto">
-        <div className="flex items-center mb-6">
-          <Link
-            href="/admin/content/galleries"
-            className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-          >
-            <FiArrowLeft className="mr-1" />
-            Back
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-800">Add New Gallery</h1>
-        </div>
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Add New Gallery" onBack={handleBack} />
+
+      {loadError && <Alert type="error" message={loadError} />}
+
+      {combinedLoading ? (
+        <LoadingForm />
+      ) : (
         <GalleryForm
-          accessToken={accessToken}
-          onSubmit={handleSubmit}
-          isLoading={false}
+          onSubmit={createGallery}
+          events={events}
+          loading={combinedLoading}
         />
-      </div>
-    </AuthGuard>
+      )}
+    </div>
   );
 }
-
-export default AddGalleryPage;

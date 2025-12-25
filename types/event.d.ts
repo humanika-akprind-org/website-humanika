@@ -38,9 +38,6 @@ export interface Event {
   period: Period;
   startDate: Date;
   endDate: Date;
-  funds: number;
-  usedFunds: number;
-  remainingFunds: number;
   status: Status;
   workProgramId?: string | null;
   workProgram?: WorkProgram | null;
@@ -72,7 +69,6 @@ export interface CreateEventInput {
 
 export interface UpdateEventInput extends Partial<CreateEventInput> {
   status?: Status;
-  usedFunds?: number;
 }
 
 export interface EventFilter {

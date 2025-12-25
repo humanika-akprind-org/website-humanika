@@ -27,7 +27,6 @@ export default function UserTable({
   loading,
   currentPage,
   totalPages,
-  currentUserId,
   onUserSelect,
   onSelectAll,
   onViewUser,
@@ -41,13 +40,8 @@ export default function UserTable({
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  // Filter users to exclude unverified users and current user
-  const filteredUsers = users.filter(
-    (user) => user.verifiedAccount && user.id !== currentUserId
-  );
-
   // Sort users
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
+  const sortedUsers = [...users].sort((a, b) => {
     let aValue, bValue;
 
     switch (sortField) {
@@ -276,7 +270,7 @@ export default function UserTable({
         </table>
       </div>
 
-      {filteredUsers.length === 0 && !loading && (
+      {sortedUsers.length === 0 && !loading && (
         <EmptyState
           icon={<FiUser size={48} className="mx-auto" />}
           title="No users found"
@@ -285,9 +279,9 @@ export default function UserTable({
         />
       )}
 
-      {filteredUsers.length > 0 && (
+      {sortedUsers.length > 0 && (
         <Pagination
-          usersLength={filteredUsers.length}
+          usersLength={sortedUsers.length}
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={onPageChange}

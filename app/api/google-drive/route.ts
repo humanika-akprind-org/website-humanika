@@ -1,3 +1,4 @@
+import { refreshGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import { google } from "googleapis";
 import { type NextRequest, NextResponse } from "next/server";
 import { Readable } from "stream";
@@ -41,18 +42,55 @@ export async function POST(request: NextRequest) {
       const stream = Readable.from(buffer);
 
       // Upload to Google Drive
-      const { data } = await drive.files.create({
-        requestBody: {
-          name: fileName || file.name,
-          mimeType: file.type,
-          parents: folderId && folderId !== "root" ? [folderId] : undefined,
-        },
-        media: {
-          mimeType: file.type,
-          body: stream,
-        },
-        fields: "id,name,webViewLink,webContentLink,mimeType",
-      });
+      const { data } = await drive.files
+        .create({
+          requestBody: {
+            name: fileName || file.name,
+            mimeType: file.type,
+            parents: folderId && folderId !== "root" ? [folderId] : undefined,
+          },
+          media: {
+            mimeType: file.type,
+            body: stream,
+          },
+          fields: "id,name,webViewLink,webContentLink,mimeType",
+        })
+        .catch(async (error: unknown) => {
+          const err = error as { response?: { status?: number } };
+          if (err.response?.status === 401) {
+            try {
+              const newAccessToken = await refreshGoogleAccessToken();
+              const refreshedDrive = google.drive({
+                version: "v3",
+                headers: { Authorization: `Bearer ${newAccessToken}` },
+              });
+              return await refreshedDrive.files.create({
+                requestBody: {
+                  name: fileName || file.name,
+                  mimeType: file.type,
+                  parents:
+                    folderId && folderId !== "root" ? [folderId] : undefined,
+                },
+                media: {
+                  mimeType: file.type,
+                  body: stream,
+                },
+                fields: "id,name,webViewLink,webContentLink,mimeType",
+              });
+            } catch (refreshError) {
+              if (
+                refreshError instanceof Error &&
+                refreshError.message === "No refresh token available"
+              ) {
+                throw new Error(
+                  "Authentication expired. Please re-authenticate with Google."
+                );
+              }
+              throw refreshError;
+            }
+          }
+          throw error;
+        });
 
       // Use direct image URL for Next.js Image component if it's an image
       let imageUrl = data.webViewLink;

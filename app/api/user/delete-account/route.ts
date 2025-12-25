@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser, clearAuthCookies } from "@/lib/auth";
+import { getCurrentUser, clearAuthCookies } from "@/lib/auth-server";
 import { deleteAccount } from "@/services/user/user.service";
 
 export async function DELETE(_request: NextRequest) {

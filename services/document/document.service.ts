@@ -3,7 +3,11 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/types/document";
-import type { Status, DocumentType as DocumentTypeEnum } from "@/types/enums";
+import {
+  type Status,
+  type DocumentType as DocumentTypeEnum,
+  ApprovalType,
+} from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
@@ -15,7 +19,6 @@ export const getDocuments = async (filter: {
   documentTypeId?: string;
   status?: Status;
   userId?: string;
-  eventId?: string;
   letterId?: string;
   search?: string;
 }) => {
@@ -28,7 +31,6 @@ export const getDocuments = async (filter: {
     where.status = { equals: filter.status as unknown as PrismaStatus };
   }
   if (filter.userId) where.userId = filter.userId;
-  if (filter.eventId) where.eventId = filter.eventId;
   if (filter.letterId) where.letterId = filter.letterId;
   if (filter.search) {
     where.OR = [{ name: { contains: filter.search, mode: "insensitive" } }];
@@ -42,12 +44,6 @@ export const getDocuments = async (filter: {
           id: true,
           name: true,
           email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          name: true,
         },
       },
       letter: {
@@ -97,12 +93,6 @@ export const getDocument = async (id: string) => {
           id: true,
           name: true,
           email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          name: true,
         },
       },
       letter: {
@@ -156,10 +146,6 @@ export const createDocument = async (
     user: { connect: { id: user.id } },
   };
 
-  if (data.eventId) {
-    documentData.event = { connect: { id: data.eventId } };
-  }
-
   if (data.letterId) {
     documentData.letter = { connect: { id: data.letterId } };
   }
@@ -172,12 +158,6 @@ export const createDocument = async (
           id: true,
           name: true,
           email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          name: true,
         },
       },
       letter: {
@@ -214,10 +194,20 @@ export const createDocument = async (
       : undefined,
   };
 
+  // Determine entityType based on documentType
+  const entityType =
+    document.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
+    "proposal"
+      ? ApprovalType.DOCUMENT_PROPOSAL
+      : document.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
+        "accountabilityreport"
+      ? ApprovalType.DOCUMENT_ACCOUNTABILITY_REPORT
+      : ApprovalType.DOCUMENT;
+
   // Always create approval record with PENDING status
   await prisma.approval.create({
     data: {
-      entityType: "DOCUMENT",
+      entityType,
       entityId: document.id,
       userId: user.id,
       status: "PENDING",
@@ -237,7 +227,6 @@ export const createDocument = async (
         name: documentWithType.name,
         documentTypeId: documentWithType.documentTypeId,
         status: documentWithType.status,
-        eventId: documentWithType.eventId,
         letterId: documentWithType.letterId,
       },
     },
@@ -254,7 +243,7 @@ export const updateDocument = async (
   // Check if document exists with approval
   const existingDocument = await prisma.document.findUnique({
     where: { id },
-    include: { approvals: true },
+    include: { approvals: true, documentType: true },
   });
 
   if (!existingDocument) {
@@ -264,7 +253,6 @@ export const updateDocument = async (
   // Check if there are changes to the document (excluding status)
   const hasChanges =
     (data.name !== undefined && data.name !== existingDocument.name) ||
-    (data.eventId !== undefined && data.eventId !== existingDocument.eventId) ||
     (data.letterId !== undefined &&
       data.letterId !== existingDocument.letterId) ||
     (data.documentTypeId !== undefined &&
@@ -295,7 +283,6 @@ export const updateDocument = async (
   }
 
   if (data.name !== undefined) updateData.name = data.name;
-  if (data.eventId !== undefined) updateData.eventId = data.eventId;
   if (data.letterId !== undefined) updateData.letterId = data.letterId;
   if (data.documentTypeId) updateData.documentTypeId = data.documentTypeId;
   if (data.document !== undefined) updateData.document = data.document;
@@ -303,10 +290,18 @@ export const updateDocument = async (
 
   // Handle status change to PENDING - create approval record
   if (data.status === "PENDING") {
+    // Determine entityType based on documentType
+    const entityType =
+      existingDocument.documentType?.name
+        ?.toLowerCase()
+        .replace(/[\s\-]/g, "") === "proposal"
+        ? ApprovalType.DOCUMENT_PROPOSAL
+        : ApprovalType.DOCUMENT;
+
     // Create approval record for the document
     await prisma.approval.create({
       data: {
-        entityType: "DOCUMENT",
+        entityType,
         entityId: id,
         userId: user.id, // Current user submitting for approval
         status: "PENDING",
@@ -324,12 +319,6 @@ export const updateDocument = async (
           id: true,
           name: true,
           email: true,
-        },
-      },
-      event: {
-        select: {
-          id: true,
-          name: true,
         },
       },
       letter: {
@@ -378,14 +367,12 @@ export const updateDocument = async (
         name: existingDocument.name,
         documentTypeId: existingDocument.documentTypeId,
         status: existingDocument.status,
-        eventId: existingDocument.eventId,
         letterId: existingDocument.letterId,
       },
       newData: {
         name: documentWithType.name,
         documentTypeId: documentWithType.documentTypeId,
         status: documentWithType.status,
-        eventId: documentWithType.eventId,
         letterId: documentWithType.letterId,
       },
     },
@@ -420,7 +407,6 @@ export const deleteDocument = async (id: string, user: UserWithId) => {
         name: existingDocument.name,
         documentTypeId: existingDocument.documentTypeId,
         status: existingDocument.status,
-        eventId: existingDocument.eventId,
         letterId: existingDocument.letterId,
       },
       newData: null,

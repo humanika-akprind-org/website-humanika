@@ -2,16 +2,20 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { FiFile, FiSend } from "react-icons/fi";
+import { FiBriefcase, FiFolder } from "react-icons/fi";
 import type {
   Document,
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/types/document";
 import { Status } from "@/types/enums";
-import type { User } from "@/types/user";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
+import TextInput from "@/components/admin/ui/input/TextInput";
+import SelectInput from "@/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/components/ui/CancelButton";
+import FileUpload from "@/components/admin/ui/input/FileUpload";
 import { useDocumentForm } from "@/hooks/document/useDocumentForm";
 import { useDocumentTypes } from "@/hooks/document-type/useDocumentTypes";
 
@@ -21,11 +25,11 @@ interface DocumentFormProps {
   onSubmitForApproval?: (
     data: CreateDocumentInput | UpdateDocumentInput
   ) => Promise<void>;
-  isLoading?: boolean;
+  loading?: boolean;
   accessToken: string;
-  users?: User[];
   events: Event[];
   letters: Letter[];
+  fixedDocumentType?: string;
 }
 
 export default function DocumentForm({
@@ -33,9 +37,7 @@ export default function DocumentForm({
   onSubmit,
   onSubmitForApproval,
   accessToken,
-  users: _users,
-  events,
-  letters,
+  fixedDocumentType,
 }: DocumentFormProps) {
   const router = useRouter();
 
@@ -57,7 +59,45 @@ export default function DocumentForm({
     accessToken,
     onSubmit,
     onSubmitForApproval,
+    fixedDocumentType,
+    documentTypes,
   });
+
+  const handleSelectChange = (name: string, value: string) => {
+    handleInputChange({
+      target: { name, value },
+    } as React.ChangeEvent<HTMLSelectElement>);
+  };
+
+  // Determine if the Type select should be hidden
+  const normalizedFixed = fixedDocumentType
+    ?.toLowerCase()
+    .replace(/[\s\-]/g, "");
+  const hideTypeSelect =
+    normalizedFixed === "proposal" ||
+    normalizedFixed === "accountabilityreport";
+
+  // Dynamic label and placeholder based on fixedDocumentType
+  const getDynamicLabel = (type?: string) => {
+    if (!type) return "Document Name";
+    if (type.toLowerCase() === "proposal") return "Proposal Name";
+    if (type.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport") {
+      return "Accountability Report Name";
+    }
+    return "Document Name";
+  };
+
+  const getDynamicPlaceholder = (type?: string) => {
+    if (!type) return "Enter document name";
+    if (type.toLowerCase() === "proposal") return "Enter proposal name";
+    if (type.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport") {
+      return "Enter accountability report name";
+    }
+    return "Enter document name";
+  };
+
+  const documentLabel = getDynamicLabel(fixedDocumentType);
+  const documentPlaceholder = getDynamicPlaceholder(fixedDocumentType);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -70,178 +110,84 @@ export default function DocumentForm({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Document Name *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter document name"
-              required
-              disabled={isLoadingState}
-            />
-          </div>
+          <TextInput
+            label={documentLabel}
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder={documentPlaceholder}
+            required
+            icon={<FiBriefcase className="text-gray-400" />}
+            disabled={isLoadingState}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Type *
-            </label>
-            <select
+          {!hideTypeSelect && (
+            <SelectInput
+              label="Type"
               name="documentTypeId"
               value={formData.documentTypeId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={(value) => handleSelectChange("documentTypeId", value)}
+              options={documentTypes.map((type) => ({
+                value: type.id,
+                label: type.name,
+              }))}
+              placeholder="Select type"
               required
+              icon={<FiFolder className="text-gray-400" />}
               disabled={isLoadingState || documentTypesLoading}
-            >
-              <option value="">Pilih Type</option>
-              {documentTypes.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
-            {documentTypesLoading && (
-              <p className="text-sm text-gray-500 mt-1">
-                Memuat document types...
-              </p>
-            )}
-          </div>
+            />
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState}
-            >
-              {Object.values(Status).map((status) => (
-                <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() +
-                    status.slice(1).toLowerCase()}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Related Event
-            </label>
-            <select
-              name="eventId"
-              value={formData.eventId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState}
-            >
-              <option value="">Pilih Event (Opsional)</option>
-              {events.map((event) => (
-                <option key={event.id} value={event.id}>
-                  {event.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Related Letter
-            </label>
-            <select
-              name="letterId"
-              value={formData.letterId}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={isLoadingState}
-            >
-              <option value="">Pilih Letter (Opsional)</option>
-              {letters.map((letter) => (
-                <option key={letter.id} value={letter.id}>
-                  {letter.number} - {letter.regarding}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SelectInput
+            label="Status"
+            name="status"
+            value={formData.status}
+            onChange={(value) => handleSelectChange("status", value)}
+            options={Object.values(Status).map((status) => ({
+              value: status,
+              label:
+                status.charAt(0).toUpperCase() + status.slice(1).toLowerCase(),
+            }))}
+            placeholder="Select status"
+            icon={<FiBriefcase className="text-gray-400" />}
+            disabled={isLoadingState}
+          />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Document File
-          </label>
-          <div className="flex items-start space-x-4">
-            {existingDocument && (
-              <div className="flex flex-col items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200">
-                    <FiFile className="w-8 h-8 text-gray-500" />
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <button
-                    type="button"
-                    onClick={removeDocument}
-                    className="text-sm text-red-600 hover:text-red-800"
-                    disabled={isLoadingState}
-                  >
-                    Hapus File
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div className="flex-1">
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                disabled={isLoadingState || fileLoading}
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                Upload document (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX,
-                PPT, PPTX, TXT, JPG, PNG, GIF)
-              </p>
-              {fileLoading && (
-                <p className="text-sm text-blue-600 mt-1">Mengupload file...</p>
-              )}
-            </div>
-          </div>
-        </div>
+        <FileUpload
+          label="Document File"
+          existingFile={existingDocument}
+          onRemove={removeDocument}
+          onFileChange={(file) => {
+            const syntheticEvent = {
+              target: { files: [file] as unknown as FileList },
+            } as unknown as React.ChangeEvent<HTMLInputElement>;
+            handleFileChange(syntheticEvent);
+          }}
+          isLoading={isLoadingState}
+          fileLoading={fileLoading}
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
+          helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
+          loadingText="Mengupload file..."
+        />
 
         <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
+          <CancelButton
             onClick={() => router.back()}
             disabled={isLoadingState}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            Batal
-          </button>
-          <button
-            type="submit"
-            disabled={isLoadingState || fileLoading}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          >
-            <FiSend className="mr-2" />
-            {isLoadingState
-              ? onSubmitForApproval
-                ? "Mengajukan..."
-                : "Menyimpan..."
-              : onSubmitForApproval
-              ? "Simpan"
-              : document
-              ? "Update Document"
-              : "Create Document"}
-          </button>
+          />
+
+          <SubmitButton
+            isSubmitting={isLoadingState || fileLoading}
+            text={
+              onSubmitForApproval
+                ? "Simpan"
+                : document
+                ? "Update Document"
+                : "Create Document"
+            }
+            loadingText={onSubmitForApproval ? "Mengajukan..." : "Menyimpan..."}
+          />
         </div>
       </form>
     </div>

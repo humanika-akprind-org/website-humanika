@@ -49,10 +49,16 @@ export interface CreateWorkProgramInput {
   status?: Status;
 }
 
-export interface UpdateWorkProgramInput
-  extends Partial<CreateWorkProgramInput> {
-  status?: Status;
+export interface UpdateWorkProgramInput {
+  name?: string;
+  department?: Department;
+  schedule?: string;
+  funds?: number;
   usedFunds?: number;
+  goal?: string;
+  periodId?: string;
+  responsibleId?: string;
+  status?: Status;
   approvalId?: string;
 }
 

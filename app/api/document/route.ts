@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { CreateDocumentInput } from "@/types/document";
 import type { Status } from "@/types/enums";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import {
   getDocuments,
   createDocument,
@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
     const documentTypeId = searchParams.get("documentTypeId");
     const status = searchParams.get("status") as unknown as Status;
     const userId = searchParams.get("userId");
-    const eventId = searchParams.get("eventId");
     const letterId = searchParams.get("letterId");
     const search = searchParams.get("search");
 
@@ -26,7 +25,6 @@ export async function GET(request: NextRequest) {
       documentTypeId: documentTypeId || undefined,
       status,
       userId: userId || undefined,
-      eventId: eventId || undefined,
       letterId: letterId || undefined,
       search: search || undefined,
     });

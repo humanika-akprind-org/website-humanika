@@ -46,7 +46,7 @@ export default function UserFilters({
 
       {/* Advanced Filters */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-gray-100">
           <SelectFilter
             label="Role"
             value={filters.role}
@@ -69,6 +69,16 @@ export default function UserFilters({
             options={[
               { value: "all", label: "All Positions" },
               ...positionOptions,
+            ]}
+          />
+          <SelectFilter
+            label="Status"
+            value={filters.isActive}
+            onChange={(value) => onFilterChange("isActive", value)}
+            options={[
+              { value: "all", label: "All Status" },
+              { value: "true", label: "Active" },
+              { value: "false", label: "Inactive" },
             ]}
           />
           <DeleteSelectedButton

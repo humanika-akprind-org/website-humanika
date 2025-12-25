@@ -24,3 +24,21 @@ export const formatDate = (dateString: string) => {
     })
   );
 };
+
+// Format currency
+export const formatCurrency = (amount: number) =>
+  "Rp " +
+  new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+
+// Parse currency string back to number
+export const parseCurrency = (currencyString: string): number => {
+  // Remove "Rp " and dots, replace comma with dot for decimal
+  const cleaned = currencyString
+    .replace(/Rp\s?/, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
+  return parseFloat(cleaned) || 0;
+};

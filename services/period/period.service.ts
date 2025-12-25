@@ -167,7 +167,6 @@ export const deletePeriod = async (id: string): Promise<void> => {
     where: { id },
     include: {
       managements: true,
-      finances: true,
       letters: true,
       workPrograms: true,
       events: true,
@@ -182,7 +181,6 @@ export const deletePeriod = async (id: string): Promise<void> => {
   // Check if period has related data
   const hasRelatedData =
     existingPeriod.managements.length > 0 ||
-    existingPeriod.finances.length > 0 ||
     existingPeriod.letters.length > 0 ||
     existingPeriod.workPrograms.length > 0 ||
     existingPeriod.events.length > 0 ||

@@ -1,96 +1,158 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { FiPlus } from "react-icons/fi";
+import DocumentTypeStats from "@/components/admin/document/type/Stats";
+import DocumentTypeFilters from "@/components/admin/document/type/Filters";
 import DocumentTypeTable from "@/components/admin/document/type/Table";
-import type { DocumentType } from "@/types/document-type";
-import {
-  getDocumentTypes,
-  deleteDocumentType,
-} from "@/use-cases/api/document-type";
-import { useToast } from "@/hooks/use-toast";
+import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/components/admin/ui/modal/ViewModal";
+import Loading from "@/components/admin/layout/loading/Loading";
+import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/components/admin/ui/ManagementHeader";
+import AddButton from "@/components/admin/ui/button/AddButton";
+import { useDocumentTypeManagement } from "@/hooks/document-type/useDocumentTypeManagement";
 
 export default function DocumentTypesPage() {
-  const [types, setTypes] = useState<DocumentType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
+  const {
+    types,
+    loading,
+    error,
+    success,
+    selectedTypes,
+    searchTerm,
+    currentPage,
+    totalPages,
+    showDeleteModal,
+    showViewModal,
+    currentType,
+    setSearchTerm,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentType,
+    toggleTypeSelection,
+    toggleSelectAll,
+    handleAddType,
+    handleEditType,
+    handleViewType,
+    handleDelete,
+    confirmDelete,
+  } = useDocumentTypeManagement();
 
-  const fetchTypes = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const data = await getDocumentTypes();
-      setTypes(data || []);
-    } catch (error) {
-      console.error("Error fetching types:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch document types",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+    ? { type: "success", message: success }
+    : null;
 
-  // Fetch types
-  useEffect(() => {
-    fetchTypes();
-  }, [fetchTypes]);
-
-  const handleDelete = async (typeId: string) => {
-    try {
-      await deleteDocumentType(typeId);
-      toast({
-        title: "Success",
-        description: "Document type deleted successfully",
-      });
-      fetchTypes(); // Refresh the list
-    } catch (error) {
-      console.error("Error deleting type:", error);
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to delete type",
-        variant: "destructive",
-      });
-    }
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Document Types</h1>
-          <p className="text-gray-600">Manage document types</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/admin/administration/documents/types/add"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <FiPlus className="h-4 w-4 mr-2" />
-            Add Type
-          </Link>
-        </div>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Document Types"
+          description="Manage document types and their details"
+        />
+        <AddButton onClick={handleAddType} text="Add Type" />
       </div>
 
-      {/* Types Table */}
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4" />
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
+      <DocumentTypeStats types={types} />
+
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <DocumentTypeFilters
+        searchTerm={searchTerm}
+        selectedCategories={selectedTypes}
+        onSearchChange={setSearchTerm}
+        onDeleteSelected={() => handleDelete()}
+      />
+
+      <DocumentTypeTable
+        types={types}
+        selectedTypes={selectedTypes}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onTypeSelect={toggleTypeSelection}
+        onSelectAll={toggleSelectAll}
+        onViewType={handleViewType}
+        onEditType={handleEditType}
+        onDeleteType={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddType={handleAddType}
+      />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentType?.name}
+        selectedCount={selectedTypes.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentType(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Document Type Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentType(null);
+        }}
+      >
+        {currentType && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Name
+              </label>
+              <p className="mt-1 text-sm text-gray-900">{currentType.name}</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {currentType.description || "No description"}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Created At
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {new Intl.DateTimeFormat("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(currentType.createdAt))}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Updated At
+              </label>
+              <p className="mt-1 text-sm text-gray-900">
+                {new Intl.DateTimeFormat("id-ID", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(currentType.updatedAt))}
+              </p>
             </div>
           </div>
-        </div>
-      ) : (
-        <DocumentTypeTable types={types} onDelete={handleDelete} />
-      )}
+        )}
+      </ViewModal>
     </div>
   );
 }

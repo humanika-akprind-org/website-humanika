@@ -1,485 +1,307 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  FiEdit,
-  FiTrash2,
-  FiEye,
-  FiCalendar,
-  FiUser,
-  FiTrendingUp,
-  FiPlus,
-} from "react-icons/fi";
+import { FiEdit, FiTrash2, FiEye, FiTarget } from "react-icons/fi";
 import type { WorkProgram } from "@/types/work";
-import type { Department } from "@/types/enums";
-import { type Status } from "@/types/enums";
-import DeleteModal from "./modal/DeleteModal";
-import Stats from "./Stats";
-import Filters from "./Filters";
+import SortIcon from "../ui/SortIcon";
 import StatusChip from "../ui/chip/Status";
-import StatusApproval from "@/components/admin/ui/chip/StatusApproval";
+import Checkbox from "../ui/checkbox/Checkbox";
+import Pagination from "../ui/pagination/Pagination";
+import EmptyState from "../ui/EmptyState";
+import AddButton from "../ui/button/AddButton";
+import DropdownMenuItem from "../ui/dropdown/DropdownMenuItem";
+import DropdownMenu from "../ui/dropdown/DropdownMenu";
+import DepartmentChip from "../ui/chip/Department";
+import StatusApprovalChip from "../ui/chip/StatusApproval";
 
 interface WorkProgramTableProps {
   workPrograms: WorkProgram[];
-  onDelete: (id: string) => void;
-  onDeleteMultiple: (ids: string[]) => void;
+  selectedPrograms: string[];
+  currentPage: number;
+  totalPages: number;
+  onProgramSelect: (id: string) => void;
+  onSelectAll: () => void;
+  onViewProgram: (id: string) => void;
+  onEditProgram: (id: string) => void;
+  onDeleteProgram: (ids?: string[] | undefined) => void;
+  onPageChange: (page: number) => void;
+  onAddProgram: () => void;
 }
 
 export default function WorkProgramTable({
   workPrograms,
-  onDelete,
-  onDeleteMultiple,
+  selectedPrograms,
+  currentPage,
+  totalPages,
+  onProgramSelect,
+  onSelectAll,
+  onViewProgram,
+  onEditProgram,
+  onDeleteProgram,
+  onPageChange,
+  onAddProgram,
 }: WorkProgramTableProps) {
-  const router = useRouter();
-  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
-  const [departmentFilter, setDepartmentFilter] = useState<Department | "all">(
-    "all"
-  );
-  const [periodFilter, setPeriodFilter] = useState<string>("all");
-  const [isActiveFilter, setIsActiveFilter] = useState<
-    "all" | "active" | "inactive"
-  >("all");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [currentProgram, setCurrentProgram] = useState<WorkProgram | null>(
-    null
-  );
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sortField, setSortField] = useState("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  // Filter work programs based on search term and filters
-  const filteredPrograms = workPrograms.filter((program) => {
-    const matchesSearch =
-      program.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.goal.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || program.status === statusFilter;
-    const matchesDepartment =
-      departmentFilter === "all" || program.department === departmentFilter;
-    const matchesPeriod =
-      periodFilter === "all" || program.period.name === periodFilter;
-    const matchesIsActive =
-      isActiveFilter === "all" ||
-      (isActiveFilter === "active" && program.period.isActive) ||
-      (isActiveFilter === "inactive" && !program.period.isActive);
+  // Sort programs
+  const sortedPrograms = [...workPrograms].sort((a, b) => {
+    let aValue, bValue;
 
-    return (
-      matchesSearch &&
-      matchesStatus &&
-      matchesDepartment &&
-      matchesPeriod &&
-      matchesIsActive
-    );
+    switch (sortField) {
+      case "name":
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+        break;
+      case "department":
+        aValue = a.department.toLowerCase();
+        bValue = b.department.toLowerCase();
+        break;
+      case "status":
+        aValue = a.status.toLowerCase();
+        bValue = b.status.toLowerCase();
+        break;
+      case "responsible":
+        aValue = a.responsible?.name?.toLowerCase() || "";
+        bValue = b.responsible?.name?.toLowerCase() || "";
+        break;
+      case "schedule":
+        aValue = a.schedule?.toLowerCase() || "";
+        bValue = b.schedule?.toLowerCase() || "";
+        break;
+
+      default:
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+    }
+
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
   });
 
-  // Filter out programs with invalid IDs
-  const validPrograms = filteredPrograms.filter(
-    (program) =>
-      program.id &&
-      typeof program.id === "string" &&
-      program.id.trim() !== "" &&
-      program.id !== "undefined"
-  );
-
-  // Toggle program selection
-  const toggleProgramSelection = (id: string) => {
-    if (
-      !id ||
-      typeof id !== "string" ||
-      id.trim() === "" ||
-      id === "undefined"
-    ) {
-      console.warn("Attempted to select invalid program ID:", id);
-      return;
-    }
-    if (selectedPrograms.includes(id)) {
-      setSelectedPrograms(
-        selectedPrograms.filter((programId) => programId !== id)
-      );
+  // Handle sort
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      setSelectedPrograms([...selectedPrograms, id]);
+      setSortField(field);
+      setSortDirection("asc");
     }
   };
-
-  // Select all programs on current page
-  const toggleSelectAll = () => {
-    if (selectedPrograms.length === validPrograms.length) {
-      setSelectedPrograms([]);
-    } else {
-      setSelectedPrograms(validPrograms.map((program) => program.id));
-    }
-  };
-
-  // Navigate to add work program page
-  const handleAddProgram = () => {
-    router.push("/admin/program/works/add");
-  };
-
-  // Navigate to edit work program page
-  const handleEditProgram = (id: string) => {
-    router.push(`/admin/program/works/edit/${id}`);
-  };
-
-  // Navigate to view work program page
-  const handleViewProgram = (id: string) => {
-    router.push(`/admin/program/works/${id}`);
-  };
-
-  // Delete program(s)
-  const handleDelete = (program?: WorkProgram) => {
-    setCurrentProgram(program || null);
-    setShowDeleteModal(true);
-  };
-
-  // Execute deletion
-  const confirmDelete = () => {
-    if (currentProgram) {
-      // Validate single program ID
-      if (
-        currentProgram.id &&
-        typeof currentProgram.id === "string" &&
-        currentProgram.id.trim() !== "" &&
-        currentProgram.id !== "undefined"
-      ) {
-        onDelete(currentProgram.id);
-      } else {
-        console.warn(
-          "Attempted to delete program with invalid ID:",
-          currentProgram.id
-        );
-      }
-    } else if (selectedPrograms.length > 0) {
-      // Filter out invalid IDs and log if any invalid found
-      const validIds = selectedPrograms.filter(
-        (id) =>
-          id && typeof id === "string" && id.trim() !== "" && id !== "undefined"
-      );
-      if (validIds.length !== selectedPrograms.length) {
-        console.warn(
-          "Some selected program IDs are invalid and will be ignored:",
-          selectedPrograms.filter((id) => !validIds.includes(id))
-        );
-      }
-      if (validIds.length > 0) {
-        onDeleteMultiple(validIds);
-      }
-      setSelectedPrograms([]); // Clear selection after bulk delete
-    }
-    setShowDeleteModal(false);
-    setCurrentProgram(null);
-  };
-
-  // Format currency
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-
-  // Calculate usage percentage
-  const calculateUsagePercentage = (used: number, total: number) => {
-    if (total === 0) return 0;
-    return (used / total) * 100;
-  };
-
-  // Get departments from work programs
-  // const departments = Array.from(
-  //   new Set(workPrograms.map((program) => program.department))
-  // );
-
-  // Get periods from work programs
-  const periods = Array.from(
-    new Set(workPrograms.map((program) => program.period.name))
-  );
 
   return (
-    <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Work Programs</h1>
-          <p className="text-gray-600 mt-1">
-            Manage and track all organizational work programs
-          </p>
-        </div>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center mt-4 md:mt-0"
-          onClick={handleAddProgram}
-        >
-          <FiPlus className="mr-2" />
-          New Work Program
-        </button>
-      </div>
-
-      {/* Stats Overview */}
-      <Stats workPrograms={workPrograms} />
-
-      {/* Filters and Search */}
-      <Filters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        departmentFilter={departmentFilter}
-        setDepartmentFilter={setDepartmentFilter}
-        periodFilter={periodFilter}
-        setPeriodFilter={setPeriodFilter}
-        isActiveFilter={isActiveFilter}
-        setIsActiveFilter={setIsActiveFilter}
-        isFilterOpen={isFilterOpen}
-        setIsFilterOpen={setIsFilterOpen}
-        periods={periods}
-        selectedPrograms={selectedPrograms}
-        handleDelete={handleDelete}
-      />
-
-      {/* Work Programs Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="pl-6 pr-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"
-                >
-                  <input
-                    type="checkbox"
-                    checked={
-                      validPrograms.length > 0 &&
-                      selectedPrograms.length === validPrograms.length
-                    }
-                    onChange={toggleSelectAll}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                  />
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+    <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                className="pl-6 pr-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"
+              >
+                <Checkbox
+                  checked={
+                    sortedPrograms.length > 0 &&
+                    selectedPrograms.length === sortedPrograms.length
+                  }
+                  onChange={onSelectAll}
+                />
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("name")}
+              >
+                <div className="flex items-center">
                   Program
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  style={{ width: "300px", minWidth: "300px" }}
-                >
-                  Goal
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="name"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("department")}
+              >
+                <div className="flex items-center">
                   Department
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Budget & Usage
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Status
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Approval
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="department"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("schedule")}
+              >
+                <div className="flex items-center">
+                  Schedule
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="schedule"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("responsible")}
+              >
+                <div className="flex items-center">
                   Responsible
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Period
-                </th>
-                <th
-                  scope="col"
-                  className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {validPrograms.map((program) => {
-                const usagePercentage = calculateUsagePercentage(
-                  program.usedFunds,
-                  program.funds
-                );
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="responsible"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("status")}
+              >
+                <div className="flex items-center">
+                  Status
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="status"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
 
-                return (
-                  <tr
-                    key={program.id}
-                    className="hover:bg-gray-50 transition-colors"
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("approval")}
+              >
+                <div className="flex items-center">
+                  Approval
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="approval"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+
+              <th
+                scope="col"
+                className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              />
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {sortedPrograms.map((program) => (
+              <tr
+                key={program.id}
+                className="hover:bg-gray-50 transition-colors"
+              >
+                <td className="pl-6 pr-2 py-4 whitespace-nowrap">
+                  <Checkbox
+                    checked={selectedPrograms.includes(program.id)}
+                    onChange={() => onProgramSelect(program.id)}
+                  />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900 font-medium">
+                    {program.name}
+                  </div>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <DepartmentChip department={program.department} />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {program.schedule}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {program.responsible?.name || "Unassigned"}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <StatusChip status={program.status} />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {program.approvals && program.approvals.length > 0 ? (
+                    (() => {
+                      const latestApproval = program.approvals.sort(
+                        (a, b) =>
+                          new Date(b.updatedAt).getTime() -
+                          new Date(a.updatedAt).getTime()
+                      )[0];
+                      return (
+                        <StatusApprovalChip status={latestApproval.status} />
+                      );
+                    })()
+                  ) : (
+                    <span className="text-xs text-gray-400">No approvals</span>
+                  )}
+                </td>
+                <td className="pl-4 pr-6 py-4 whitespace-nowrap">
+                  <DropdownMenu
+                    isLastItem={false}
+                    hasMultipleItems={sortedPrograms.length > 1}
                   >
-                    <td className="pl-6 pr-2 py-4 whitespace-nowrap">
-                      <input
-                        type="checkbox"
-                        checked={selectedPrograms.includes(program.id)}
-                        onChange={() => toggleProgramSelection(program.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                      />
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {program.name}
-                      </div>
-                    </td>
-                    <td
-                      className="px-4 py-4"
-                      style={{ width: "300px", minWidth: "300px" }}
+                    <DropdownMenuItem
+                      onClick={() => onViewProgram(program.id)}
+                      color="default"
                     >
-                      <div className="text-sm text-gray-600 break-words">
-                        {program.goal}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {program.department}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex flex-col">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatCurrency(program.funds)}
-                        </div>
-                        <div className="mt-1">
-                          <div className="flex items-center justify-between text-xs text-gray-500">
-                            <span>
-                              {formatCurrency(program.usedFunds)} used
-                            </span>
-                            <span>{Math.round(usagePercentage)}%</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5 mt-0.5">
-                            <div
-                              className="h-1.5 rounded-full bg-blue-500"
-                              style={{ width: `${usagePercentage}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <StatusChip status={program.status} />
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      {program.approvals && program.approvals.length > 0 ? (
-                        <StatusApproval status={program.approvals[0].status} />
-                      ) : (
-                        <span className="text-xs text-gray-400">
-                          No approvals
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                          <FiUser className="text-blue-600" />
-                        </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {program.responsible.name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {program.responsible.department}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <FiCalendar className="mr-1 text-gray-400" />
-                        {program.period.name}
-                      </div>
-                    </td>
-                    <td className="pl-4 pr-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                          onClick={() => handleViewProgram(program.id)}
-                          title="View details"
-                        >
-                          <FiEye size={16} />
-                        </button>
-                        <button
-                          className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors"
-                          onClick={() => handleEditProgram(program.id)}
-                          title="Edit program"
-                        >
-                          <FiEdit size={16} />
-                        </button>
-                        <button
-                          className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
-                          onClick={() => handleDelete(program)}
-                          title="Delete program"
-                        >
-                          <FiTrash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {validPrograms.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-2">
-              <FiTrendingUp size={48} className="mx-auto" />
-            </div>
-            <p className="text-gray-500 text-lg font-medium">
-              No work programs found
-            </p>
-            <p className="text-gray-400 mt-1">
-              Try adjusting your search or filter criteria
-            </p>
-          </div>
-        )}
-
-        {/* Table Footer */}
-        {validPrograms.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row items-center justify-between">
-            <p className="text-sm text-gray-700 mb-4 sm:mb-0">
-              Showing{" "}
-              <span className="font-medium">{validPrograms.length}</span> of{" "}
-              <span className="font-medium">{workPrograms.length}</span>{" "}
-              programs
-            </p>
-            <div className="flex space-x-2">
-              <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
-                Previous
-              </button>
-              <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+                      <FiEye className="mr-2" size={14} />
+                      View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onEditProgram(program.id)}
+                      color="blue"
+                    >
+                      <FiEdit className="mr-2" size={14} />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onDeleteProgram([program.id])}
+                      color="red"
+                    >
+                      <FiTrash2 className="mr-2" size={14} />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenu>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <DeleteModal
-        isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setCurrentProgram(null);
-        }}
-        onConfirm={confirmDelete}
-        program={currentProgram}
-        selectedCount={selectedPrograms.length}
-      />
+      {sortedPrograms.length === 0 && (
+        <EmptyState
+          icon={<FiTarget size={48} className="mx-auto" />}
+          title="No work programs found"
+          description="Try adjusting your search or filter criteria"
+          actionButton={<AddButton onClick={onAddProgram} text="Add Program" />}
+        />
+      )}
+
+      {sortedPrograms.length > 0 && (
+        <Pagination
+          usersLength={sortedPrograms.length}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 }

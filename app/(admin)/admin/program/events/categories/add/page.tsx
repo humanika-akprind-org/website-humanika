@@ -1,57 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { FiArrowLeft } from "react-icons/fi";
 import EventCategoryForm from "@/components/admin/event/category/Form";
-import type {
-  CreateEventCategoryInput,
-  UpdateEventCategoryInput,
-} from "@/types/event-category";
-import { createEventCategory } from "@/use-cases/api/event-category";
-import { useToast } from "@/hooks/use-toast";
+import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/components/admin/ui/PageHeader";
+import Alert from "@/components/admin/ui/alert/Alert";
+import { useCreateEventCategory } from "@/hooks/event-category/useCreateEventCategory";
 
 export default function AddEventCategoryPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async (
-    data: CreateEventCategoryInput | UpdateEventCategoryInput
-  ) => {
-    setIsLoading(true);
-    try {
-      await createEventCategory(data as CreateEventCategoryInput);
-      toast({
-        title: "Success",
-        description: "Event category created successfully",
-      });
-      // Redirect is handled in the form
-    } catch (error) {
-      console.error("Error creating category:", error);
-      throw error; // Re-throw to let the form handle it
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { createEventCategory, handleBack, isSubmitting, error, isLoading } =
+    useCreateEventCategory();
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center mb-6">
-        <Link
-          href="/admin/program/events/categories"
-          className="flex items-center text-gray-600 hover:text-gray-800 mr-4"
-        >
-          <FiArrowLeft className="mr-1" />
-          Back
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Add New Event Category
-        </h1>
-      </div>
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Add New Event Category" onBack={handleBack} />
 
-      {/* Form */}
-      <EventCategoryForm onSubmit={handleSubmit} isLoading={isLoading} />
+      {error && <Alert type="error" message={error} />}
+
+      {isSubmitting || isLoading ? (
+        <LoadingForm />
+      ) : (
+        <EventCategoryForm onSubmit={createEventCategory} />
+      )}
     </div>
   );
 }

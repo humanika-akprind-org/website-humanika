@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { CreateEventInput } from "@/types/event";
 import type { Status, Department } from "@/types/enums";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { getEvents, createEvent } from "@/services/event/event.service";
 
 // Extract payload functions

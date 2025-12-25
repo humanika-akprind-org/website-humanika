@@ -68,6 +68,7 @@ export interface ApprovalFilters {
 }
 
 export interface ApprovalWithRelations {
+  nameApproval: any;
   id: string;
   status: StatusApproval;
   note?: string | null;
@@ -106,6 +107,10 @@ export interface ApprovalWithRelations {
     id: string;
     name: string;
     documentTypeId: string;
+    documentType?: {
+      id: string;
+      name: string;
+    } | null;
     status: string;
   } | null;
   letter?: {

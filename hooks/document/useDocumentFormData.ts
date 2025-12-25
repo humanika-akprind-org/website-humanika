@@ -1,49 +1,44 @@
-import { UserApi } from "@/use-cases/api/user";
-import prisma from "@/lib/prisma";
-import type { User } from "@/types/user";
-import type { Event } from "@/types/event";
-import type { Letter } from "@/types/letter";
+import { useState, useEffect } from "react";
 
-export interface FormDataResult {
-  users: User[];
-  events: Pick<Event, "id" | "name">[];
-  letters: Pick<Letter, "id" | "number" | "regarding">[];
-}
+export function useDocumentFormData() {
+  const [users, setUsers] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [letters, setLetters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export async function fetchDocumentFormData(): Promise<FormDataResult> {
-  // Fetch users first (this is used to assign ownership).
-  const usersResponse = await UserApi.getUsers({ limit: 50 });
-  const users = usersResponse.data?.users || [];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [usersRes, eventsRes, lettersRes] = await Promise.allSettled([
+          fetch("/api/user?limit=50"),
+          fetch("/api/event"),
+          fetch("/api/letter"),
+        ]);
 
-  // Fetch events and letters directly from the database; use allSettled
-  // so that a failure in one doesn't block rendering the form.
-  const [eventsSettled, lettersSettled] = await Promise.allSettled([
-    prisma.event.findMany({ orderBy: { name: "asc" } }),
-    prisma.letter.findMany({ orderBy: { date: "desc" } }),
-  ]);
+        const usersData =
+          usersRes.status === "fulfilled"
+            ? await usersRes.value.json()
+            : { users: [] };
+        const eventsData =
+          eventsRes.status === "fulfilled" ? await eventsRes.value.json() : [];
+        const lettersData =
+          lettersRes.status === "fulfilled"
+            ? await lettersRes.value.json()
+            : [];
 
-  const events =
-    eventsSettled.status === "fulfilled" ? eventsSettled.value : [];
-  if (eventsSettled.status === "rejected") {
-    console.error("Failed to load events from DB:", eventsSettled.reason);
-  }
+        setUsers(usersData.users || []);
+        setEvents(eventsData || []);
+        setLetters(lettersData || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const letters =
-    lettersSettled.status === "fulfilled" ? lettersSettled.value : [];
-  if (lettersSettled.status === "rejected") {
-    console.error("Failed to load letters from DB:", lettersSettled.reason);
-  }
+    fetchData();
+  }, []);
 
-  return {
-    users,
-    events: events.map((ev) => ({
-      id: ev.id,
-      name: ev.name,
-    })),
-    letters: letters.map((l) => ({
-      id: l.id,
-      number: l.number,
-      regarding: l.regarding,
-    })),
-  };
+  return { users, events, letters, loading, error };
 }

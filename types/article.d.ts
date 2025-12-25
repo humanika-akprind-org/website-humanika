@@ -15,8 +15,6 @@ export interface Article {
   category: ArticleCategory;
   periodId?: string | null;
   period?: Period | null;
-  isPublished: boolean;
-  publishedAt?: Date | null;
   status: Status;
   createdAt: Date;
   updatedAt: Date;
@@ -30,8 +28,6 @@ export interface CreateArticleInput {
   authorId: string;
   categoryId: string;
   periodId?: string;
-  isPublished?: boolean;
-  publishedAt?: Date;
 }
 
 export interface UpdateArticleInput extends Partial<CreateArticleInput> {
@@ -43,6 +39,5 @@ export interface ArticleFilter {
   periodId?: string;
   categoryId?: string;
   authorId?: string;
-  isPublished?: boolean;
   search?: string;
 }

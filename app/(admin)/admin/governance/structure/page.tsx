@@ -11,7 +11,7 @@ import ManagementHeader from "@/components/admin/ui/ManagementHeader";
 import AddButton from "@/components/admin/ui/button/AddButton";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import { useStructureManagement } from "@/hooks/structure/useStructureManagement";
-import StructureAvatar from "@/components/admin/ui/avatar/StructureAvatar";
+import ImageView from "@/components/admin/ui/avatar/ImageView";
 
 export default function StructuresPage() {
   const {
@@ -194,7 +194,12 @@ export default function StructuresPage() {
             </div>
 
             <div className="mt-6">
-              <StructureAvatar structure={currentStructure} />
+              <ImageView
+                imageUrl={currentStructure.structure}
+                alt={`Structure diagram for ${currentStructure.name}`}
+                size={{ width: 400, height: 300 }}
+                modalTitle={`Structure Diagram - ${currentStructure.name}`}
+              />
             </div>
           </div>
         )}

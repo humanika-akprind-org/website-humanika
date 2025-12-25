@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { CreateDepartmentTaskInput } from "@/types/task";
 import type { Department, Status } from "@/types/enums";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import {
   createDepartmentTask,
   getDepartmentTasks,
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     const body: CreateDepartmentTaskInput = await request.json();
 
-    if (!body.note || !body.department) {
+    if (!body.title || !body.note || !body.department) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
