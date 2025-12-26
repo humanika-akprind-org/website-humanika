@@ -25,25 +25,46 @@ import { WorkApi } from "@/use-cases/api/work";
 import { FinanceApi } from "@/use-cases/api/finance";
 import { ManagementApi } from "@/use-cases/api/management";
 import { ActivityApi } from "@/use-cases/api/activity";
+import { GalleryApi } from "@/use-cases/api/gallery";
+
 import type { Document } from "@/types/document";
 import type { WorkProgram } from "@/types/work";
 import type { Finance } from "@/types/finance";
 import { Status } from "@/types/enums";
 
 interface StatsData {
+  // User Stats
   totalUsers: number;
-  totalDocuments: number;
+  activeUsers: number;
+  userActivity: number;
+
+  // Administration Stats
+  totalProposals: number;
+  totalAccountabilityReports: number;
+  activePrograms: number;
+
+  // Letter Stats
+  totalLetters: number;
+  incomingLetters: number;
+  outgoingLetters: number;
+
+  // Public Content Stats
   totalArticles: number;
   totalEvents: number;
-  totalLetters: number;
-  totalWorkPrograms: number;
-  totalFinances: number;
-  totalManagements: number;
-  totalActivities: number;
-  activePrograms: number;
+  totalGalleries: number;
+
+  // Finance Stats
+  totalIncome: number;
+  totalExpense: number;
+  netIncome: number;
   budgetUtilization: number;
   totalBudget: number;
-  userActivity: number;
+
+  // System Stats
+  totalDocuments: number;
+  totalWorkPrograms: number;
+  totalManagements: number;
+  totalActivities: number;
   taskCompletion: number;
   documentProcessing: number;
   systemUptime: number;
@@ -70,6 +91,7 @@ export default function StatsPage() {
         finances,
         managements,
         activities,
+        galleries,
       ] = await Promise.all([
         UserApi.getUsers(),
         DocumentApi.getDocuments(),
@@ -80,6 +102,7 @@ export default function StatsPage() {
         FinanceApi.getFinances(),
         ManagementApi.getManagements(),
         ActivityApi.getActivities(),
+        GalleryApi.getGalleries(),
       ]);
 
       // Extract users from API response
@@ -92,21 +115,46 @@ export default function StatsPage() {
         documentTypes[type] = (documentTypes[type] || 0) + 1;
       });
 
+      // Calculate administration stats (proposals and accountability reports)
+      const totalProposals = documents.filter((doc: Document) =>
+        doc.type?.toLowerCase().includes("proposal")
+      ).length;
+      const totalAccountabilityReports = documents.filter((doc: Document) =>
+        doc.type?.toLowerCase().includes("accountability")
+      ).length;
+
+      // Calculate letter stats (incoming and outgoing)
+      const incomingLetters = letters.filter(
+        (letter: any) => letter.type === "INCOMING"
+      ).length;
+      const outgoingLetters = letters.filter(
+        (letter: any) => letter.type === "OUTGOING"
+      ).length;
+
+      // Calculate finance stats (income and expense)
+      const totalIncome = finances
+        .filter((f: Finance) => f.type === "INCOME")
+        .reduce((sum: number, f: Finance) => sum + (f.amount || 0), 0);
+      const totalExpense = finances
+        .filter((f: Finance) => f.type === "EXPENSE")
+        .reduce((sum: number, f: Finance) => sum + (f.amount || 0), 0);
+      const netIncome = totalIncome - totalExpense;
+
       // Calculate active programs (work programs that are active)
       const activePrograms = workPrograms.filter(
         (wp: WorkProgram) => wp.status === Status.PUBLISH
       ).length;
 
       // Calculate budget utilization (simplified - total finances amount)
-      const totalBudget = finances.reduce(
-        (sum: number, f: Finance) => sum + (f.amount || 0),
-        0
-      );
       const budgetUtilization =
-        totalBudget > 0 ? Math.min((totalBudget / 50000) * 100, 100) : 0; // Assuming 50k budget
+        totalIncome > 0 ? Math.min((totalExpense / totalIncome) * 100, 100) : 0;
+      const totalBudget = totalIncome + totalExpense;
+
+      // Calculate active users (mock calculation based on user activity)
+      const userActivity = 84.2; // Active users in last 7 days
+      const activeUsers = Math.round(users.length * (userActivity / 100));
 
       // Mock calculations for other metrics (can be enhanced with real data)
-      const userActivity = 84.2; // Active users in last 7 days
       const taskCompletion = 76.5; // On-time completion rate
       const documentProcessing = 2.4; // Avg processing time in days
       const systemUptime = 99.8; // System uptime
@@ -117,19 +165,38 @@ export default function StatsPage() {
       ];
 
       setStats({
+        // User Stats
         totalUsers: users.length,
-        totalDocuments: documents.length,
+        activeUsers,
+        userActivity,
+
+        // Administration Stats
+        totalProposals,
+        totalAccountabilityReports,
+        activePrograms,
+
+        // Letter Stats
+        totalLetters: letters.length,
+        incomingLetters,
+        outgoingLetters,
+
+        // Public Content Stats
         totalArticles: articles.length,
         totalEvents: events.length,
-        totalLetters: letters.length,
-        totalWorkPrograms: workPrograms.length,
-        totalFinances: finances.length,
-        totalManagements: managements.length,
-        totalActivities: activities.length,
-        activePrograms,
+        totalGalleries: galleries.length,
+
+        // Finance Stats
+        totalIncome,
+        totalExpense,
+        netIncome,
         budgetUtilization,
         totalBudget,
-        userActivity,
+
+        // System Stats
+        totalDocuments: documents.length,
+        totalWorkPrograms: workPrograms.length,
+        totalManagements: managements.length,
+        totalActivities: activities.length,
         taskCompletion,
         documentProcessing,
         systemUptime,
@@ -206,7 +273,6 @@ export default function StatsPage() {
 
   const totalDocumentsProcessed = stats.totalDocuments;
   const pendingDocuments = Math.floor(stats.totalDocuments * 0.05); // Assume 5% pending
-  const activeUsers = Math.round(stats.totalUsers * (stats.userActivity / 100));
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -278,7 +344,7 @@ export default function StatsPage() {
             <div className="text-right">
               <p className="text-sm text-gray-500">Active / Total</p>
               <p className="text-xs text-blue-600 font-medium">
-                {activeUsers} / {stats.totalUsers}
+                {stats.activeUsers} / {stats.totalUsers}
               </p>
             </div>
           </div>
