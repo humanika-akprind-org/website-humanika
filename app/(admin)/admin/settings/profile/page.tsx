@@ -2,49 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { FiUser, FiMail, FiSave, FiEdit3 } from "react-icons/fi";
-import { apiUrl } from "@/lib/config/config";
 import { useToast } from "@/hooks/use-toast";
-
-// Enum values from Prisma
-enum UserRole {
-  DPO = "DPO",
-  BPH = "BPH",
-  PENGURUS = "PENGURUS",
-  ANGGOTA = "ANGGOTA",
-}
-
-enum Department {
-  INFOKOM = "INFOKOM",
-  PSDM = "PSDM",
-  LITBANG = "LITBANG",
-  KWU = "KWU",
-}
-
-enum Position {
-  KETUA_UMUM = "KETUA_UMUM",
-  WAKIL_KETUA_UMUM = "WAKIL_KETUA_UMUM",
-  SEKRETARIS = "SEKRETARIS",
-  BENDAHARA = "BENDAHARA",
-  KEPALA_DEPARTEMEN = "KEPALA_DEPARTEMEN",
-  STAFF_DEPARTEMEN = "STAFF_DEPARTEMEN",
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  username: string;
-  role: UserRole;
-  department?: Department;
-  position?: Position;
-  isActive: boolean;
-  verifiedAccount: boolean;
-  attemptLogin: number;
-  blockExpires?: string;
-  createdAt: string;
-  updatedAt: string;
-  avatarColor: string;
-}
+import type { Department, Position } from "@/types/enums";
+import LoadingProfile from "@/components/admin/layout/loading/LoadingProfile";
+import { UserApi, formatEnumValue } from "@/use-cases/api/user";
+import type { User } from "@/types/user";
 
 interface UpdateUserData {
   name?: string;
@@ -52,52 +14,6 @@ interface UpdateUserData {
   username?: string;
   department?: Department;
   position?: Position;
-}
-
-// Helper function to format enum values for display
-const formatEnumValue = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
-
-class UserApi {
-  private static API_BASE_URL = apiUrl;
-
-  private static async fetchApi<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<{ data?: T; error?: string }> {
-    try {
-      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
-        ...options,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: data.error || "An error occurred" };
-      }
-
-      return { data };
-    } catch (_error) {
-      return { error: "Network error occurred" };
-    }
-  }
-
-  static async updateUser(
-    id: string,
-    userData: UpdateUserData
-  ): Promise<{ data?: User; error?: string }> {
-    return this.fetchApi<User>(`/user/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(userData),
-    });
-  }
 }
 
 export default function ProfilePage() {
@@ -216,8 +132,6 @@ export default function ProfilePage() {
         name: user.name,
         email: user.email,
         username: user.username,
-        department: user.department,
-        position: user.position,
       });
     }
     setFormErrors({});
@@ -225,11 +139,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    );
+    return <LoadingProfile />;
   }
 
   if (!user) {
