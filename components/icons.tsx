@@ -21,6 +21,7 @@ import {
   AlertCircle,
   CheckCircle,
   User,
+  BarChart3,
   // Tambahkan icon lain yang dibutuhkan
 } from "lucide-react";
 
@@ -47,5 +48,6 @@ export const Icons = {
   alertCircle: AlertCircle,
   checkCircle: CheckCircle,
   user: User,
+  barChart: BarChart3,
   // Tambahkan mapping icon lainnya di sini
 };
