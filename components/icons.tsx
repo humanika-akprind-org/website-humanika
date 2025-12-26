@@ -7,6 +7,7 @@ import {
   X,
   ArrowRight,
   Search,
+  Activity,
   // Tambahkan icon lain yang dibutuhkan
 } from "lucide-react";
 
@@ -19,5 +20,6 @@ export const Icons = {
   close: X,
   arrowRight: ArrowRight,
   search: Search,
+  activity: Activity,
   // Tambahkan mapping icon lainnya di sini
 };

@@ -1,62 +1,31 @@
 "use client";
 
-import { useState } from "react";
 import { FileText, FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { Finance } from "@/types/finance";
-import SelectInput from "@/components/admin/ui/input/SelectInput";
-import { X } from "lucide-react";
 
 interface ExportButtonsProps {
   finances: Finance[];
   categories: string[];
 }
 
-export default function ExportButtons({
-  finances,
-  categories,
-}: ExportButtonsProps) {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [exportType, setExportType] = useState<"pdf" | "excel" | null>(null);
-
-  // Filter finances based on selected category
-  const getFilteredFinances = () => {
-    if (selectedCategory === "All") {
-      return finances;
-    }
-    return finances.filter(
-      (finance) => finance.category?.name === selectedCategory
-    );
-  };
-
+export default function ExportButtons({ finances }: ExportButtonsProps) {
   // Export to PDF
   const exportToPDF = () => {
-    const filteredFinances = getFilteredFinances();
     const doc = new jsPDF("landscape");
 
     // Title
     doc.setFontSize(18);
     doc.text("Finance Transactions Report", 14, 20);
 
-    // Category info
-    if (selectedCategory !== "All") {
-      doc.setFontSize(12);
-      doc.text(`Category: ${selectedCategory}`, 14, 30);
-    }
-
     // Date
     doc.setFontSize(10);
-    doc.text(
-      `Generated on: ${new Date().toLocaleDateString()}`,
-      14,
-      selectedCategory !== "All" ? 35 : 30
-    );
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
 
     // Table data
-    const tableData = filteredFinances.map((finance) => [
+    const tableData = finances.map((finance) => [
       finance.name,
       finance.type,
       finance.status,
@@ -87,7 +56,7 @@ export default function ExportButtons({
         ],
       ],
       body: tableData,
-      startY: selectedCategory !== "All" ? 45 : 40,
+      startY: 40,
       styles: {
         fontSize: 8,
         cellPadding: 3,
@@ -103,20 +72,16 @@ export default function ExportButtons({
     });
 
     // Save the PDF
-    const filename =
-      selectedCategory === "All"
-        ? "finance-transactions-all.pdf"
-        : `finance-transactions-${selectedCategory}.pdf`;
+    const filename = "finance-transactions-all.pdf";
     doc.save(filename);
   };
 
   // Export to Excel
   const exportToExcel = () => {
-    const filteredFinances = getFilteredFinances();
     // Create worksheet data with title
     const wsData = [
       ["Finance Transactions Report"],
-      selectedCategory !== "All" ? [`Category: ${selectedCategory}`] : [""],
+      [""],
       [`Generated on: ${new Date().toLocaleDateString()}`],
       [
         "Transaction Name",
@@ -127,7 +92,7 @@ export default function ExportButtons({
         "Work Program",
         "Date",
       ],
-      ...filteredFinances.map((finance) => [
+      ...finances.map((finance) => [
         finance.name,
         finance.type,
         finance.status,
@@ -242,42 +207,16 @@ export default function ExportButtons({
     XLSX.utils.book_append_sheet(wb, ws, "Finance Transactions");
 
     // Generate filename
-    const filename = `finance-transactions-${selectedCategory || "all"}.xlsx`;
+    const filename = "finance-transactions-all.xlsx";
 
     // Save file
     XLSX.writeFile(wb, filename);
   };
 
-  const handleExportPDF = () => {
-    setExportType("pdf");
-    setShowModal(true);
-  };
-
-  const handleExportExcel = () => {
-    setExportType("excel");
-    setShowModal(true);
-  };
-
-  const handleConfirmExport = () => {
-    if (exportType === "pdf") {
-      exportToPDF();
-    } else if (exportType === "excel") {
-      exportToExcel();
-    }
-    setShowModal(false);
-    setSelectedCategory("All");
-    setExportType(null);
-  };
-
-  const categoryOptions = [
-    { value: "All", label: "All Categories" },
-    ...categories.map((category) => ({ value: category, label: category })),
-  ];
-
   return (
     <div className="flex gap-2">
       <button
-        onClick={handleExportPDF}
+        onClick={exportToPDF}
         disabled={finances.length === 0}
         className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
@@ -285,56 +224,13 @@ export default function ExportButtons({
         Export PDF
       </button>
       <button
-        onClick={handleExportExcel}
+        onClick={exportToExcel}
         disabled={finances.length === 0}
         className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <FileSpreadsheet className="h-4 w-4 mr-2" />
         Export Excel
       </button>
-
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Select Category for Export
-              </h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <SelectInput
-                name="category"
-                label="Category"
-                value={selectedCategory}
-                onChange={setSelectedCategory}
-                options={categoryOptions}
-              />
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmExport}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Export {exportType === "pdf" ? "PDF" : "Excel"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
