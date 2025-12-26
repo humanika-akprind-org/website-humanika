@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { FiKey, FiSave } from "react-icons/fi";
 import { useToast } from "@/hooks/use-toast";
+import { UserApi } from "@/use-cases/api/user";
 
 interface AccountStatus {
   isActive: boolean;
@@ -36,18 +37,17 @@ export default function AccountPage() {
   useEffect(() => {
     const fetchAccountStatus = async () => {
       try {
-        const res = await fetch("/api/auth/me");
-        if (res.ok) {
-          const data = await res.json();
+        const response = await UserApi.getCurrentUser();
+        if (response.data) {
           setAccountStatus({
-            isActive: data.isActive,
-            verifiedAccount: data.verifiedAccount,
-            email: data.email,
+            isActive: response.data.isActive,
+            verifiedAccount: response.data.verifiedAccount,
+            email: response.data.email,
           });
         } else {
           toast({
             title: "Error",
-            description: "Failed to load account status",
+            description: response.error || "Failed to load account status",
             variant: "destructive",
           });
         }
@@ -104,39 +104,29 @@ export default function AccountPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/user/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword,
-        }),
+      const response = await UserApi.changePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
+      if (response.error) {
         let errorMessage = "Failed to change password";
-        if (data.error) {
-          switch (data.error) {
-            case "Current password and new password are required":
-              errorMessage = "Please fill in all password fields";
-              break;
-            case "Current password is incorrect":
-              errorMessage = "Current password is incorrect";
-              break;
-            case "User not found or password not set":
-              errorMessage =
-                "Account password not found. Please contact support.";
-              break;
-            case "Unauthorized":
-              errorMessage = "You are not authorized to perform this action";
-              break;
-            default:
-              errorMessage = data.error;
-          }
+        switch (response.error) {
+          case "Current password and new password are required":
+            errorMessage = "Please fill in all password fields";
+            break;
+          case "Current password is incorrect":
+            errorMessage = "Current password is incorrect";
+            break;
+          case "User not found or password not set":
+            errorMessage =
+              "Account password not found. Please contact support.";
+            break;
+          case "Unauthorized":
+            errorMessage = "You are not authorized to perform this action";
+            break;
+          default:
+            errorMessage = response.error;
         }
         setError(errorMessage);
       } else {

@@ -116,6 +116,31 @@ export async function toggleUserStatus(
   return updateUser(id, { isActive });
 }
 
+// Get current authenticated user
+export async function getCurrentUser(): Promise<ApiResponse<User>> {
+  return fetchApi<User>("/auth/me");
+}
+
+// Change current user's password
+export async function changePassword(data: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<ApiResponse<{ message: string }>> {
+  return fetchApi<{ message: string }>("/user/change-password", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+// Delete current user's account
+export async function deleteCurrentAccount(): Promise<
+  ApiResponse<{ message: string }>
+> {
+  return fetchApi<{ message: string }>("/user/delete-account", {
+    method: "DELETE",
+  });
+}
+
 // Get unverified users
 export async function getUnverifiedUsers(params?: {
   search?: string;
@@ -204,9 +229,12 @@ export type {
 export const UserApi = {
   getUsers,
   getUserById,
+  getCurrentUser,
   createUser,
   updateUser,
   deleteUser,
+  changePassword,
+  deleteCurrentAccount,
   toggleUserStatus,
   getUnverifiedUsers,
   verifyUser,
