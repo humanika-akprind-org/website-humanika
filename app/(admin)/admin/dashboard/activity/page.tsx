@@ -19,6 +19,9 @@ import {
 } from "lucide-react";
 
 import type { ActivityLog } from "@/types/activity-log";
+import SelectInput from "@/components/admin/ui/input/SelectInput";
+import ExportButtons from "@/components/admin/activity/export-button/ExportButtons";
+import LoadingActivityDashboard from "@/components/admin/activity/LoadingActivityDashboard";
 
 export default function ActivityPage() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
@@ -223,18 +226,7 @@ export default function ActivityPage() {
   };
 
   if (loading) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-300 rounded mb-6" />
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-300 rounded" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingActivityDashboard />;
   }
 
   if (error) {
@@ -261,23 +253,25 @@ export default function ActivityPage() {
   ];
 
   return (
-    <div className="p-6">
+    <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Activity Log</h1>
         <div className="flex items-center space-x-4">
-          <select
+          <SelectInput
+            label=""
+            name="selectedTimeFilter"
             value={selectedTimeFilter}
-            onChange={(e) => setSelectedTimeFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option>All Activities</option>
-            <option>Today</option>
-            <option>This Week</option>
-            <option>This Month</option>
-          </select>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-            Export Log
-          </button>
+            onChange={setSelectedTimeFilter}
+            options={[
+              { value: "All Activities", label: "All Activities" },
+              { value: "Today", label: "Today" },
+              { value: "This Week", label: "This Week" },
+              { value: "This Month", label: "This Month" },
+            ]}
+            placeholder="Select time filter"
+            className="w-auto"
+          />
+          <ExportButtons activities={filteredActivities} />
         </div>
       </div>
 

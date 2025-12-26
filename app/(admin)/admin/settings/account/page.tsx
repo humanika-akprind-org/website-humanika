@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { FiKey, FiSave } from "react-icons/fi";
 import { useToast } from "@/hooks/use-toast";
 import { UserApi } from "@/use-cases/api/user";
+import SkeletonAccountPage from "@/components/admin/layout/loading/LoadingAccount";
 
 interface AccountStatus {
   isActive: boolean;
@@ -195,11 +196,7 @@ export default function AccountPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    );
+    return <SkeletonAccountPage />;
   }
 
   if (!accountStatus) {
