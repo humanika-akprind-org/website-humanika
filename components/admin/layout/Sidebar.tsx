@@ -64,13 +64,13 @@ export default function Sidebar() {
             Dashboard
           </h3>
         </div>
-        <NavLink href="/admin/dashboard/overview" icon={BarChart3}>
+        <NavLink href="/admin/dashboard/overview" icon={Home}>
           Overview
         </NavLink>
         <NavLink href="/admin/dashboard/activity" icon={Activity}>
           Recent Activity
         </NavLink>
-        <NavLink href="/admin/dashboard/stats" icon={Home}>
+        <NavLink href="/admin/dashboard/stats" icon={BarChart3}>
           Quick Stats
         </NavLink>
 
