@@ -17,7 +17,9 @@ interface ChangePasswordData {
 }
 
 export default function AccountPage() {
-  const [accountStatus, setAccountStatus] = useState<AccountStatus | null>(null);
+  const [accountStatus, setAccountStatus] = useState<AccountStatus | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -126,7 +128,8 @@ export default function AccountPage() {
               errorMessage = "Current password is incorrect";
               break;
             case "User not found or password not set":
-              errorMessage = "Account password not found. Please contact support.";
+              errorMessage =
+                "Account password not found. Please contact support.";
               break;
             case "Unauthorized":
               errorMessage = "You are not authorized to perform this action";
@@ -137,7 +140,9 @@ export default function AccountPage() {
         }
         setError(errorMessage);
       } else {
-        setSuccess("Password changed successfully! You can now use your new password to log in.");
+        setSuccess(
+          "Password changed successfully! You can now use your new password to log in."
+        );
         setError(""); // Clear any previous error messages
         setPasswordData({
           currentPassword: "",
@@ -182,7 +187,9 @@ export default function AccountPage() {
         }
         setError(errorMessage);
       } else {
-        setSuccess("Account deleted successfully! You will be redirected shortly.");
+        setSuccess(
+          "Account deleted successfully! You will be redirected shortly."
+        );
         // Optionally redirect user after account deletion
         setTimeout(() => {
           window.location.href = "/";
@@ -209,8 +216,12 @@ export default function AccountPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Account Not Found</h1>
-          <p className="text-gray-600">Unable to load your account information.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Account Not Found
+          </h1>
+          <p className="text-gray-600">
+            Unable to load your account information.
+          </p>
         </div>
       </div>
     );
@@ -342,7 +353,7 @@ export default function AccountPage() {
 
       {/* Delete Account */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6 text-red-600">
+        <h3 className="text-xl font-semibold text-gray-900 mb-6">
           Delete Account
         </h3>
         <p className="text-gray-600 mb-4">

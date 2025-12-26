@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiUser, FiMail, FiUsers, FiSave, FiEdit3 } from "react-icons/fi";
+import { FiUser, FiMail, FiSave, FiEdit3 } from "react-icons/fi";
 import { apiUrl } from "@/lib/config/config";
 import { useToast } from "@/hooks/use-toast";
 
@@ -164,8 +164,11 @@ export default function ProfilePage() {
     const errors: Partial<UpdateUserData> = {};
 
     if (!formData.name?.trim()) errors.name = "Name is required";
-    if (!formData.email?.trim()) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
+    if (!formData.email?.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid";
+    }
     if (!formData.username?.trim()) errors.username = "Username is required";
 
     setFormErrors(errors);
@@ -388,80 +391,6 @@ export default function ProfilePage() {
                     {formErrors.username}
                   </p>
                 )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Department
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiUsers className="text-gray-400" />
-                  </div>
-                  <select
-                    name="department"
-                    value={formData.department || ""}
-                    onChange={handleChange}
-                    className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                  >
-                    <option value="">Select a department</option>
-                    {Object.values(Department).map((dept) => (
-                      <option key={dept} value={dept}>
-                        {formatEnumValue(dept)}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Position
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiUsers className="text-gray-400" />
-                  </div>
-                  <select
-                    name="position"
-                    value={formData.position || ""}
-                    onChange={handleChange}
-                    className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                  >
-                    <option value="">Select a position</option>
-                    {Object.values(Position).map((pos) => (
-                      <option key={pos} value={pos}>
-                        {formatEnumValue(pos)}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                </div>
               </div>
             </div>
 

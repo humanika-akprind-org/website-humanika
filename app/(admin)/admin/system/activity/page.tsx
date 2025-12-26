@@ -1,6 +1,6 @@
 "use client";
 
-import Loading from "@/components/admin/layout/loading/Loading";
+import LoadingActivity from "@/components/admin/layout/loading/LoadingActivity";
 import ManagementHeader from "@/components/admin/ui/ManagementHeader";
 import ActivityFilters from "@/components/admin/activity/Filters";
 import ActivityTable from "@/components/admin/activity/Table";
@@ -17,9 +17,8 @@ export default function ActivityLogPage() {
     handlePageChange,
   } = useActivityPage();
 
-
   if (isLoading) {
-    return <Loading />;
+    return <LoadingActivity />;
   }
 
   return (
