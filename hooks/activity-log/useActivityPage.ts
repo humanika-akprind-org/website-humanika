@@ -4,10 +4,10 @@ import { useActivityLog } from "@/hooks/activity-log/useActivityLog";
 
 interface ActivityLogData {
   id: string;
-  userId: string;
+  userId: string | null;
   user: {
     name: string;
-  };
+  } | null;
   activityType: ActivityType;
   entityType: string;
   description: string;

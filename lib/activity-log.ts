@@ -4,7 +4,7 @@ import type { ActivityMetadata } from "@/types/activity-log";
 import type { InputJsonValue } from "@prisma/client/runtime/library";
 
 interface LogActivityParams {
-  userId: string;
+  userId?: string | null;
   activityType: ActivityType;
   entityType: string;
   entityId?: string;
@@ -27,7 +27,7 @@ export async function logActivity({
   try {
     await prisma.activityLog.create({
       data: {
-        userId,
+        userId: userId === "system" ? null : userId,
         activityType,
         entityType,
         entityId,

@@ -7,14 +7,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ActivityType } from "@/types/enums";
+import type { ActivityType as PrismaActivityType } from "@prisma/client";
 
 interface ActivityLogData {
   id: string;
-  userId: string;
+  userId: string | null;
   user: {
     name: string;
-  };
-  activityType: ActivityType;
+  } | null;
+  activityType: PrismaActivityType;
   entityType: string;
   description: string;
   ipAddress: string;
@@ -41,7 +42,7 @@ export default function ActivityTable({
   page,
   onPageChange,
 }: TableProps) {
-  const getActivityTypeColor = (type: ActivityType) => {
+  const getActivityTypeColor = (type: PrismaActivityType) => {
     const colors = {
       [ActivityType.CREATE]: "text-green-600",
       [ActivityType.UPDATE]: "text-blue-600",
@@ -54,7 +55,7 @@ export default function ActivityTable({
       [ActivityType.DOWNLOAD]: "text-cyan-600",
       [ActivityType.OTHER]: "text-slate-600",
     };
-    return colors[type] || "text-gray-600";
+    return colors[type as ActivityType] || "text-gray-600";
   };
 
   const generatePageNumbers = (
@@ -120,7 +121,7 @@ export default function ActivityTable({
               <TableCell className="whitespace-nowrap">
                 {new Date(activity.createdAt).toLocaleString()}
               </TableCell>
-              <TableCell>{activity.user.name}</TableCell>
+              <TableCell>{activity.user?.name || "System"}</TableCell>
               <TableCell
                 className={getActivityTypeColor(activity.activityType)}
               >

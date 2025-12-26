@@ -598,7 +598,7 @@ enum ActivityType {
 // Model untuk mencatat aktivitas pengguna dalam sistem
 model ActivityLog {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String       @db.ObjectId // ID pengguna yang melakukan aktivitas
+  userId       String?      @db.ObjectId // ID pengguna yang melakukan aktivitas (opsional untuk aktivitas sistem)
   activityType ActivityType // Tipe aktivitas
   entityType   String // Tipe entitas yang dipengaruhi (contoh: "User", "Article", dll)
   entityId     String?      @db.ObjectId // ID entitas yang dipengaruhi
@@ -609,7 +609,7 @@ model ActivityLog {
   createdAt    DateTime     @default(now()) // Waktu aktivitas tercatat
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, activityType, entityType, createdAt])
   @@map("activityLogs")
