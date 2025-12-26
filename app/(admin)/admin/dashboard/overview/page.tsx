@@ -13,6 +13,9 @@ import { ApprovalApi } from "@/use-cases/api/approval";
 import { PeriodApi } from "@/use-cases/api/period";
 
 import { ActivityApi } from "@/use-cases/api/activity";
+import { ManagementApi } from "@/use-cases/api/management";
+import { getDepartmentTasks } from "@/use-cases/api/task";
+import { StructureApi } from "@/use-cases/api/structure";
 import type { Document } from "@/types/document";
 import type { WorkProgram } from "@/types/work";
 import type { Finance } from "@/types/finance";
@@ -24,6 +27,7 @@ import type { Period } from "@/types/period";
 import { Status } from "@/types/enums";
 import { Icons } from "@/components/icons";
 import { MetricCard } from "@/components/admin/dashboard/MetricCard";
+import LoadingOverview from "@/components/admin/dashboard/LoadingOverview";
 
 interface OverviewData {
   totalUsers: number;
@@ -40,6 +44,12 @@ interface OverviewData {
   activePeriod: string;
   recentActivities: ActivityLog[];
   nextEvent?: Event;
+  totalPeriods: number;
+  totalManagements: number;
+  totalStructures: number;
+  totalTasks: number;
+  totalProposals: number;
+  totalAccountabilityReports: number;
 }
 
 export default function OverviewPage() {
@@ -62,6 +72,9 @@ export default function OverviewPage() {
           approvalsResponse,
           periods,
           activities,
+          managements,
+          tasks,
+          structures,
         ] = await Promise.all([
           UserApi.getUsers(),
           DocumentApi.getDocuments(),
@@ -74,6 +87,9 @@ export default function OverviewPage() {
           ApprovalApi.getApprovals({ status: "PENDING" }),
           PeriodApi.getPeriods(),
           ActivityApi.getActivities(),
+          ManagementApi.getManagements(),
+          getDepartmentTasks(),
+          StructureApi.getStructures(),
         ]);
 
         // Extract users from API response
@@ -147,6 +163,20 @@ export default function OverviewPage() {
           )
           .slice(0, 3);
 
+        // Calculate new metrics
+        const totalPeriods = periods.length;
+        const totalManagements = managements.length;
+        const totalStructures = structures.data?.length || 0;
+        const totalTasks = tasks.length;
+
+        // Calculate proposals and accountability reports from documents
+        const totalProposals = documents.filter(
+          (doc: Document) => doc.documentType?.name === "PROPOSAL"
+        ).length;
+        const totalAccountabilityReports = documents.filter(
+          (doc: Document) => doc.documentType?.name === "LPJ"
+        ).length;
+
         setOverview({
           totalUsers,
           totalWorkPrograms,
@@ -162,6 +192,12 @@ export default function OverviewPage() {
           activePeriod,
           recentActivities,
           nextEvent,
+          totalPeriods,
+          totalManagements,
+          totalStructures,
+          totalTasks,
+          totalProposals,
+          totalAccountabilityReports,
         });
       } catch (err) {
         setError("Failed to load overview data");
@@ -175,22 +211,7 @@ export default function OverviewPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-300 rounded mb-6" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-300 rounded" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="h-64 bg-gray-300 rounded" />
-            <div className="h-64 bg-gray-300 rounded" />
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingOverview />;
   }
 
   if (error) {
@@ -221,7 +242,65 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+      {/* Governance Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Governance
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+        <MetricCard
+          icon="calendar"
+          color="orange"
+          value={overview.totalPeriods}
+          title="Periods"
+          statusIcon="check"
+          statusColor="green-500"
+          statusText="Total periods"
+          href="/admin/governance/periods"
+        />
+
+        <MetricCard
+          icon="user"
+          color="purple"
+          value={overview.totalManagements}
+          title="Managements"
+          statusIcon="users"
+          statusColor="blue-500"
+          statusText="Total managements"
+          href="/admin/governance/managements"
+        />
+
+        <MetricCard
+          icon="users"
+          color="cyan"
+          value={overview.totalStructures}
+          title="Organizational Structures"
+          statusIcon="users"
+          statusColor="gray-500"
+          statusText="Total structures"
+          href="/admin/governance/structure"
+        />
+
+        <MetricCard
+          icon="fileText"
+          color="lime"
+          value={overview.totalTasks}
+          title="Department Tasks"
+          statusIcon="fileText"
+          statusColor="orange-500"
+          statusText="Total tasks"
+          href="/admin/governance/tasks"
+        />
+      </div>
+
+      {/* People & Access Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          People & Access
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
         <MetricCard
           icon="users"
           color="blue"
@@ -230,8 +309,17 @@ export default function OverviewPage() {
           statusIcon="checkCircle"
           statusColor="green-500"
           statusText="Active members"
+          href="/admin/people/users"
         />
+      </div>
 
+      {/* Programs & Events Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Programs & Events
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
         <MetricCard
           icon="briefcase"
           color="green"
@@ -240,6 +328,7 @@ export default function OverviewPage() {
           statusIcon="trendingUp"
           statusColor="blue-500"
           statusText={`${overview.activePrograms} ongoing`}
+          href="/admin/program/works"
         />
 
         <MetricCard
@@ -254,27 +343,37 @@ export default function OverviewPage() {
               ? `Next: ${overview.nextEvent.name}`
               : "No upcoming events"
           }
+          href="/admin/program/events"
         />
+      </div>
 
+      {/* Administration Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Administration
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
         <MetricCard
           icon="fileText"
-          color="yellow"
-          value={overview.totalDocuments}
-          title="Documents"
-          statusIcon="alertCircle"
-          statusColor="red-500"
-          statusText={`${overview.pendingDocuments} pending review`}
+          color="emerald"
+          value={overview.totalProposals}
+          title="Proposals"
+          statusIcon="fileText"
+          statusColor="blue-500"
+          statusText="Total proposals"
+          href="/admin/administration/proposals"
         />
 
         <MetricCard
-          icon="dollarSign"
-          color="red"
-          value={`Rp ${overview.totalBudget.toLocaleString()}`}
-          title="Current Budget"
-          statusIcon="trendingUp"
+          icon="fileCheck"
+          color="violet"
+          value={overview.totalAccountabilityReports}
+          title="Accountability Reports"
+          statusIcon="check"
           statusColor="green-500"
-          statusText="Net balance"
-          valueSize="lg"
+          statusText="Total reports"
+          href="/admin/administration/accountability-reports"
         />
 
         <MetricCard
@@ -285,8 +384,28 @@ export default function OverviewPage() {
           statusIcon="checkCircle"
           statusColor="green-500"
           statusText="Total processed"
+          href="/admin/administration/letters"
         />
 
+        <MetricCard
+          icon="fileText"
+          color="yellow"
+          value={overview.totalDocuments}
+          title="Documents"
+          statusIcon="alertCircle"
+          statusColor="red-500"
+          statusText={`${overview.pendingDocuments} pending review`}
+          href="/admin/administration/documents"
+        />
+      </div>
+
+      {/* Content & Media Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Content & Media
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
         <MetricCard
           icon="newspaper"
           color="pink"
@@ -296,6 +415,7 @@ export default function OverviewPage() {
           statusColor="green-500"
           statusText="Published"
           fontMedium
+          href="/admin/content/articles"
         />
 
         <MetricCard
@@ -306,6 +426,27 @@ export default function OverviewPage() {
           statusIcon="image"
           statusColor="gray-500"
           statusText="Total items"
+          href="/admin/content/galleries"
+        />
+      </div>
+
+      {/* Finance Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Finance
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <MetricCard
+          icon="dollarSign"
+          color="red"
+          value={`Rp ${overview.totalBudget.toLocaleString()}`}
+          title="Current Budget"
+          statusIcon="trendingUp"
+          statusColor="green-500"
+          statusText="Net balance"
+          valueSize="lg"
+          href="/admin/finance/transactions"
         />
       </div>
 

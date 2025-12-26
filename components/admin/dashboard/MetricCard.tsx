@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Icons } from "@/components/icons";
 
 interface MetricCardProps {
@@ -10,6 +11,7 @@ interface MetricCardProps {
   statusText: string;
   fontMedium?: boolean;
   valueSize?: "lg" | "2xl";
+  href?: string;
 }
 
 export function MetricCard({
@@ -22,12 +24,17 @@ export function MetricCard({
   statusText,
   fontMedium = false,
   valueSize = "2xl",
+  href,
 }: MetricCardProps) {
   const IconComponent = Icons[icon];
   const StatusIconComponent = Icons[statusIcon];
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+  const cardContent = (
+    <div
+      className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${
+        href ? "hover:shadow-md transition-shadow cursor-pointer" : ""
+      }`}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 bg-${color}-50 rounded-lg`}>
           <IconComponent className={`h-6 w-6 text-${color}-600`} />
@@ -49,4 +56,10 @@ export function MetricCard({
       </div>
     </div>
   );
+
+  if (href) {
+    return <Link href={href}>{cardContent}</Link>;
+  }
+
+  return cardContent;
 }
