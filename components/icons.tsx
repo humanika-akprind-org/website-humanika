@@ -8,6 +8,19 @@ import {
   ArrowRight,
   Search,
   Activity,
+  Users,
+  FileText,
+  CalendarDays,
+  DollarSign,
+  FileCheck,
+  Newspaper,
+  Image,
+  Briefcase,
+  TrendingUp,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  User,
   // Tambahkan icon lain yang dibutuhkan
 } from "lucide-react";
 
@@ -21,5 +34,18 @@ export const Icons = {
   arrowRight: ArrowRight,
   search: Search,
   activity: Activity,
+  users: Users,
+  fileText: FileText,
+  calendarDays: CalendarDays,
+  dollarSign: DollarSign,
+  fileCheck: FileCheck,
+  newspaper: Newspaper,
+  image: Image,
+  briefcase: Briefcase,
+  trendingUp: TrendingUp,
+  clock: Clock,
+  alertCircle: AlertCircle,
+  checkCircle: CheckCircle,
+  user: User,
   // Tambahkan mapping icon lainnya di sini
 };
