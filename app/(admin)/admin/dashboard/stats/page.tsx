@@ -2,6 +2,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Line,
+  LineChart,
+} from "recharts";
 import { UserApi } from "@/use-cases/api/user";
 import { DocumentApi } from "@/use-cases/api/document";
 import { ArticleApi } from "@/use-cases/api/article";
@@ -28,6 +42,7 @@ interface StatsData {
   totalActivities: number;
   activePrograms: number;
   budgetUtilization: number;
+  totalBudget: number;
   userActivity: number;
   taskCompletion: number;
   documentProcessing: number;
@@ -40,93 +55,121 @@ export default function StatsPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const [
+        usersResponse,
+        documents,
+        articles,
+        events,
+        letters,
+        workPrograms,
+        finances,
+        managements,
+        activities,
+      ] = await Promise.all([
+        UserApi.getUsers(),
+        DocumentApi.getDocuments(),
+        ArticleApi.getArticles(),
+        EventApi.getEvents(),
+        LetterApi.getLetters(),
+        WorkApi.getWorkPrograms(),
+        FinanceApi.getFinances(),
+        ManagementApi.getManagements(),
+        ActivityApi.getActivities(),
+      ]);
+
+      // Extract users from API response
+      const users = usersResponse.data?.users || [];
+
+      // Calculate document types distribution
+      const documentTypes: { [key: string]: number } = {};
+      documents.forEach((doc: Document) => {
+        const type = doc.type || "Others";
+        documentTypes[type] = (documentTypes[type] || 0) + 1;
+      });
+
+      // Calculate active programs (work programs that are active)
+      const activePrograms = workPrograms.filter(
+        (wp: WorkProgram) => wp.status === Status.PUBLISH
+      ).length;
+
+      // Calculate budget utilization (simplified - total finances amount)
+      const totalBudget = finances.reduce(
+        (sum: number, f: Finance) => sum + (f.amount || 0),
+        0
+      );
+      const budgetUtilization =
+        totalBudget > 0 ? Math.min((totalBudget / 50000) * 100, 100) : 0; // Assuming 50k budget
+
+      // Mock calculations for other metrics (can be enhanced with real data)
+      const userActivity = 84.2; // Active users in last 7 days
+      const taskCompletion = 76.5; // On-time completion rate
+      const documentProcessing = 2.4; // Avg processing time in days
+      const systemUptime = 99.8; // System uptime
+
+      // Monthly activities (mock data - can be calculated from activities)
+      const monthlyActivities = [
+        40, 55, 65, 50, 70, 85, 75, 80, 90, 95, 85, 100,
+      ];
+
+      setStats({
+        totalUsers: users.length,
+        totalDocuments: documents.length,
+        totalArticles: articles.length,
+        totalEvents: events.length,
+        totalLetters: letters.length,
+        totalWorkPrograms: workPrograms.length,
+        totalFinances: finances.length,
+        totalManagements: managements.length,
+        totalActivities: activities.length,
+        activePrograms,
+        budgetUtilization,
+        totalBudget,
+        userActivity,
+        taskCompletion,
+        documentProcessing,
+        systemUptime,
+        documentTypes,
+        monthlyActivities,
+      });
+      setLastUpdated(new Date());
+    } catch (err) {
+      setError("Failed to load statistics");
+      console.error("Error fetching stats:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchStats();
+  };
+
+  const handleExport = () => {
+    // Simple export functionality - in a real app, you'd use a library like jsPDF
+    const data = {
+      stats,
+      exportedAt: new Date().toISOString(),
+      lastUpdated: lastUpdated.toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `system-stats-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [
-          usersResponse,
-          documents,
-          articles,
-          events,
-          letters,
-          workPrograms,
-          finances,
-          managements,
-          activities,
-        ] = await Promise.all([
-          UserApi.getUsers(),
-          DocumentApi.getDocuments(),
-          ArticleApi.getArticles(),
-          EventApi.getEvents(),
-          LetterApi.getLetters(),
-          WorkApi.getWorkPrograms(),
-          FinanceApi.getFinances(),
-          ManagementApi.getManagements(),
-          ActivityApi.getActivities(),
-        ]);
-
-        // Extract users from API response
-        const users = usersResponse.data?.users || [];
-
-        // Calculate document types distribution
-        const documentTypes: { [key: string]: number } = {};
-        documents.forEach((doc: Document) => {
-          const type = doc.type || "Others";
-          documentTypes[type] = (documentTypes[type] || 0) + 1;
-        });
-
-        // Calculate active programs (work programs that are active)
-        const activePrograms = workPrograms.filter(
-          (wp: WorkProgram) => wp.status === Status.PUBLISH
-        ).length;
-
-        // Calculate budget utilization (simplified - total finances amount)
-        const totalBudget = finances.reduce(
-          (sum: number, f: Finance) => sum + (f.amount || 0),
-          0
-        );
-        const budgetUtilization =
-          totalBudget > 0 ? Math.min((totalBudget / 50000) * 100, 100) : 0; // Assuming 50k budget
-
-        // Mock calculations for other metrics (can be enhanced with real data)
-        const userActivity = 84.2; // Active users in last 7 days
-        const taskCompletion = 76.5; // On-time completion rate
-        const documentProcessing = 2.4; // Avg processing time in days
-        const systemUptime = 99.8; // System uptime
-
-        // Monthly activities (mock data - can be calculated from activities)
-        const monthlyActivities = [
-          40, 55, 65, 50, 70, 85, 75, 80, 90, 95, 85, 100,
-        ];
-
-        setStats({
-          totalUsers: users.length,
-          totalDocuments: documents.length,
-          totalArticles: articles.length,
-          totalEvents: events.length,
-          totalLetters: letters.length,
-          totalWorkPrograms: workPrograms.length,
-          totalFinances: finances.length,
-          totalManagements: managements.length,
-          totalActivities: activities.length,
-          activePrograms,
-          budgetUtilization,
-          userActivity,
-          taskCompletion,
-          documentProcessing,
-          systemUptime,
-          documentTypes,
-          monthlyActivities,
-        });
-      } catch (err) {
-        setError("Failed to load statistics");
-        console.error("Error fetching stats:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
   }, []);
 
@@ -163,52 +206,109 @@ export default function StatsPage() {
 
   const totalDocumentsProcessed = stats.totalDocuments;
   const pendingDocuments = Math.floor(stats.totalDocuments * 0.05); // Assume 5% pending
+  const activeUsers = Math.round(stats.totalUsers * (stats.userActivity / 100));
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">
           System Statistics Dashboard
         </h1>
-        <div className="text-sm text-gray-500">
-          Last updated: {new Date().toLocaleString()}
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full shadow-sm">
+            Last updated: {lastUpdated.toLocaleString()}
+          </div>
+          <div className="flex space-x-2">
+            <button
+              onClick={handleRefresh}
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center space-x-2 shadow-sm"
+            >
+              <svg
+                className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              <span>{loading ? "Refreshing..." : "Refresh"}</span>
+            </button>
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center space-x-2 shadow-sm"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <span>Export Data</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-xl transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
-                Total Users
-              </h2>
-              <p className="text-3xl font-bold text-blue-600">
-                {stats.totalUsers}
-              </p>
-              <p className="text-sm text-green-500 mt-2">Active members</p>
-            </div>
-            <div className="text-blue-500">
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:-translate-y-1">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Active / Total</p>
+              <p className="text-xs text-blue-600 font-medium">
+                {activeUsers} / {stats.totalUsers}
+              </p>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Total Users
+            </h3>
+            <p className="text-3xl font-bold text-blue-600 mb-2">
+              {stats.totalUsers}
+            </p>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${stats.userActivity}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {stats.userActivity}% active
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-green-500 hover:shadow-xl transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
-                Active Programs
-              </h2>
-              <p className="text-3xl font-bold text-green-600">
-                {stats.activePrograms}
-              </p>
-              <p className="text-sm text-gray-500 mt-2">Currently running</p>
-            </div>
-            <div className="text-green-500">
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:-translate-y-1">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-green-100 rounded-lg">
+              <svg
+                className="w-6 h-6 text-green-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -216,24 +316,46 @@ export default function StatsPage() {
                 />
               </svg>
             </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Active / Total</p>
+              <p className="text-xs text-green-600 font-medium">
+                {stats.activePrograms} / {stats.totalWorkPrograms}
+              </p>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Active Programs
+            </h3>
+            <p className="text-3xl font-bold text-green-600 mb-2">
+              {stats.activePrograms}
+            </p>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                style={{
+                  width: `${
+                    stats.totalWorkPrograms > 0
+                      ? (stats.activePrograms / stats.totalWorkPrograms) * 100
+                      : 0
+                  }%`,
+                }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              of {stats.totalWorkPrograms} total programs
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-purple-500 hover:shadow-xl transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
-                Documents Processed
-              </h2>
-              <p className="text-3xl font-bold text-purple-600">
-                {totalDocumentsProcessed}
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                {pendingDocuments} pending review
-              </p>
-            </div>
-            <div className="text-purple-500">
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:-translate-y-1">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-purple-100 rounded-lg">
+              <svg
+                className="w-6 h-6 text-purple-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
@@ -241,25 +363,78 @@ export default function StatsPage() {
                 />
               </svg>
             </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Processed / Pending</p>
+              <p className="text-xs text-purple-600 font-medium">
+                {totalDocumentsProcessed - pendingDocuments} /{" "}
+                {pendingDocuments}
+              </p>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Document Management
+            </h3>
+            <p className="text-3xl font-bold text-purple-600 mb-2">
+              {totalDocumentsProcessed}
+            </p>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                style={{
+                  width: `${
+                    totalDocumentsProcessed > 0
+                      ? ((totalDocumentsProcessed - pendingDocuments) /
+                          totalDocumentsProcessed) *
+                        100
+                      : 0
+                  }%`,
+                }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {(
+                ((totalDocumentsProcessed - pendingDocuments) /
+                  totalDocumentsProcessed) *
+                100
+              ).toFixed(1)}
+              % processed
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-red-500 hover:shadow-xl transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
-                Budget Utilization
-              </h2>
-              <p className="text-3xl font-bold text-red-600">
-                {stats.budgetUtilization.toFixed(1)}%
-              </p>
-              <p className="text-sm text-gray-500 mt-2">Current utilization</p>
-            </div>
-            <div className="text-red-500">
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:-translate-y-1">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-red-100 rounded-lg">
+              <svg
+                className="w-6 h-6 text-red-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
               </svg>
             </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Total Budget</p>
+              <p className="text-xs text-red-600 font-medium">
+                Rp {stats.totalBudget.toLocaleString()}
+              </p>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Budget Utilization
+            </h3>
+            <p className="text-3xl font-bold text-red-600 mb-2">
+              {stats.budgetUtilization.toFixed(1)}%
+            </p>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-red-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${stats.budgetUtilization}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">of allocated budget</p>
           </div>
         </div>
       </div>
@@ -281,30 +456,77 @@ export default function StatsPage() {
             </svg>
             Document Types Distribution
           </h2>
-          <div className="space-y-4">
-            {Object.entries(stats.documentTypes).map(([type, count]) => {
-              const percentage = ((count / stats.totalDocuments) * 100).toFixed(
-                1
-              );
-              return (
-                <div key={type}>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700 capitalize">
-                      {type.replace("_", " ")}
-                    </span>
-                    <span className="text-sm font-medium text-gray-700">
-                      {percentage}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={Object.entries(stats.documentTypes).map(
+                  ([type, count]) => ({
+                    name: type.replace("_", " "),
+                    value: count,
+                    percentage: ((count / stats.totalDocuments) * 100).toFixed(
+                      1
+                    ),
+                  })
+                )}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) =>
+                  `${name}: ${((percent || 0) * 100).toFixed(1)}%`
+                }
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {Object.entries(stats.documentTypes).map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={
+                      [
+                        "#3b82f6",
+                        "#10b981",
+                        "#8b5cf6",
+                        "#f59e0b",
+                        "#ef4444",
+                        "#06b6d4",
+                        "#84cc16",
+                      ][index % 7]
+                    }
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => [`${value} documents`, name]}
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {Object.entries(stats.documentTypes).map(([type, count], index) => (
+              <div key={type} className="flex items-center text-sm">
+                <div
+                  className="w-3 h-3 rounded-full mr-2"
+                  style={{
+                    backgroundColor: [
+                      "#3b82f6",
+                      "#10b981",
+                      "#8b5cf6",
+                      "#f59e0b",
+                      "#ef4444",
+                      "#06b6d4",
+                      "#84cc16",
+                    ][index % 7],
+                  }}
+                />
+                <span className="capitalize">{type.replace("_", " ")}</span>
+                <span className="ml-auto font-medium">{count}</span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -384,46 +606,124 @@ export default function StatsPage() {
             <option>Year to date</option>
           </select>
         </div>
-        <div className="flex items-end h-64 space-x-2">
-          {stats.monthlyActivities.map((height, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center flex-1 group"
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={stats.monthlyActivities.map((value, index) => ({
+              month: [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+              ][index],
+              activities: value,
+            }))}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip
+              formatter={(value) => [`${value} activities`, "Activities"]}
+              labelStyle={{ color: "#374151" }}
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+              }}
+            />
+            <Bar dataKey="activities" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* System Performance Trends */}
+      <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-700 flex items-center">
+            <svg
+              className="w-5 h-5 mr-2 text-gray-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
             >
-              <div
-                className="w-full bg-gradient-to-t from-blue-500 to-blue-300 rounded-t transition-all duration-300 hover:from-blue-600 hover:to-blue-400 group-hover:scale-105"
-                style={{ height: `${height}%` }}
-                title={`${height} activities`}
+              <path
+                fillRule="evenodd"
+                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                clipRule="evenodd"
               />
-              <span className="text-xs text-gray-500 mt-2 font-medium">
-                {
-                  [
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                  ][index]
-                }
-              </span>
-            </div>
-          ))}
+            </svg>
+            System Performance Trends
+          </h2>
+          <select className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option>Last 30 days</option>
+            <option>Last 90 days</option>
+            <option>Last 6 months</option>
+          </select>
         </div>
-        <div className="flex justify-center mt-6 space-x-8">
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-gradient-to-t from-blue-500 to-blue-300 rounded mr-3 shadow-sm" />
-            <span className="text-sm text-gray-600 font-medium">
-              Activities
-            </span>
-          </div>
-        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart
+            data={[
+              { month: "Jan", uptime: 99.8, activity: 84.2, completion: 76.5 },
+              { month: "Feb", uptime: 99.9, activity: 85.1, completion: 78.2 },
+              { month: "Mar", uptime: 99.7, activity: 83.8, completion: 75.9 },
+              { month: "Apr", uptime: 99.8, activity: 86.3, completion: 79.1 },
+              { month: "May", uptime: 99.9, activity: 87.2, completion: 80.5 },
+              { month: "Jun", uptime: 99.8, activity: 85.9, completion: 77.8 },
+            ]}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+              }}
+            />
+            <Line
+              type="monotone"
+              dataKey="uptime"
+              stroke="#10b981"
+              strokeWidth={3}
+              name="System Uptime (%)"
+            />
+            <Line
+              type="monotone"
+              dataKey="activity"
+              stroke="#3b82f6"
+              strokeWidth={3}
+              name="User Activity (%)"
+            />
+            <Line
+              type="monotone"
+              dataKey="completion"
+              stroke="#f59e0b"
+              strokeWidth={3}
+              name="Task Completion (%)"
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Service Usage Statistics */}
