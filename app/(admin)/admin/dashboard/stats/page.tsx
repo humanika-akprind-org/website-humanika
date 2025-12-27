@@ -25,27 +25,24 @@ import { useFinances } from "@/hooks/finance/useFinances";
 import { useLetters } from "@/hooks/letter/useLetters";
 import { useArticles } from "@/hooks/article/useArticles";
 import { useGalleries } from "@/hooks/gallery/useGalleries";
-import { useUsers } from "@/hooks/user/useUsers";
-import { useStructures } from "@/hooks/structure/useStructures";
 import { useEvents } from "@/hooks/event/useEvents";
 import { useManagements } from "@/hooks/management/useManagements";
+import { useActivityStats } from "@/hooks/activity/useActivityStats";
 
-// Dashboard Component
-export default function DashboardPage() {
+// Custom hook for dashboard data processing
+const useDashboardData = () => {
   const { finances, isLoading: financesLoading } = useFinances();
   const { letters, isLoading: lettersLoading } = useLetters();
   const { articles, isLoading: articlesLoading } = useArticles();
   const { galleries, isLoading: galleriesLoading } = useGalleries();
-  const { users, isLoading: usersLoading } = useUsers();
-  const { structures, isLoading: structuresLoading } = useStructures();
   const { events, isLoading: eventsLoading } = useEvents();
   const { managements, isLoading: managementsLoading } = useManagements();
+  const { activityStats, isLoading: activityStatsLoading } = useActivityStats();
 
   // Process finance data for area chart
   const financeData = React.useMemo(() => {
     if (financesLoading || !finances.length) return [];
 
-    // Group by month and calculate income/expense
     const monthlyData: { [key: string]: { income: number; expense: number } } =
       {};
 
@@ -99,23 +96,9 @@ export default function DashboardPage() {
 
   // Process department data for radar chart
   const departmentData = React.useMemo(() => {
-    if (structuresLoading || !structures.length) return [];
-
-    // Count members per department
-    const departmentCounts: { [key: string]: number } = {};
-    users.forEach((user) => {
-      if (user.department) {
-        departmentCounts[user.department] =
-          (departmentCounts[user.department] || 0) + 1;
-      }
-    });
-
-    return structures.map((structure) => ({
-      subject: structure.name,
-      A: departmentCounts[structure.name] || 0,
-      fullMark: 100,
-    }));
-  }, [structures, users, structuresLoading, usersLoading]);
+    if (activityStatsLoading || !activityStats.length) return [];
+    return activityStats;
+  }, [activityStats, activityStatsLoading]);
 
   // Calculate totals
   const totalIncome = React.useMemo(
@@ -155,19 +138,55 @@ export default function DashboardPage() {
   const totalArticles = articles.length;
   const totalEvents = events.length;
   const totalGallery = galleries.length;
-  const totalActiveManagement = managements.filter(
-    (management) => management.period?.isActive
-  ).length;
+  const totalActiveManagement = activeManagements.length;
 
   const isLoading =
     financesLoading ||
     lettersLoading ||
     articlesLoading ||
     galleriesLoading ||
-    usersLoading ||
-    structuresLoading ||
     eventsLoading ||
-    managementsLoading;
+    managementsLoading ||
+    activityStatsLoading;
+
+  return {
+    financeData,
+    letterData,
+    departmentData,
+    totalIncome,
+    totalExpense,
+    totalBalance,
+    infokomMembers,
+    psdmMembers,
+    wirausahaMembers,
+    litbangMembers,
+    totalArticles,
+    totalEvents,
+    totalGallery,
+    totalActiveManagement,
+    isLoading,
+  };
+};
+
+// Dashboard Component
+export default function DashboardPage() {
+  const {
+    financeData,
+    letterData,
+    departmentData,
+    totalIncome,
+    totalExpense,
+    totalBalance,
+    infokomMembers,
+    psdmMembers,
+    wirausahaMembers,
+    litbangMembers,
+    totalArticles,
+    totalEvents,
+    totalGallery,
+    totalActiveManagement,
+    isLoading,
+  } = useDashboardData();
 
   if (isLoading) {
     return (
@@ -178,6 +197,167 @@ export default function DashboardPage() {
       </div>
     );
   }
+
+  // Finance Chart Component
+  const FinanceChart = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+      <div className="flex items-center mb-6">
+        <div className="p-2 bg-green-50 rounded-lg mr-3">
+          <Icons.trendingUp className="h-5 w-5 text-green-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">
+          Keuangan: Pendapatan vs Pengeluaran
+        </h2>
+      </div>
+      <div className="h-72 md:h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={financeData}
+            margin={{ top: 10, right: 30, left: 40, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#4CAF50" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#4CAF50" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#F44336" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#F44336" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#6b7280" }}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              tickFormatter={(value) => `RP ${value.toLocaleString("id-ID")}`}
+            />
+            <Tooltip
+              formatter={(value) => [
+                `RP ${(value ?? 0).toLocaleString("id-ID")}`,
+                "Nilai",
+              ]}
+              labelFormatter={(label) => `Bulan: ${label}`}
+              contentStyle={{
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="income"
+              stackId="1"
+              stroke="#4CAF50"
+              fill="url(#colorIncome)"
+              name="Pendapatan"
+            />
+            <Area
+              type="monotone"
+              dataKey="expense"
+              stackId="1"
+              stroke="#F44336"
+              fill="url(#colorExpense)"
+              name="Pengeluaran"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+
+  // Letters Chart Component
+  const LettersChart = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="flex items-center mb-6">
+        <div className="p-2 bg-blue-50 rounded-lg mr-3">
+          <Icons.mail className="h-5 w-5 text-blue-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">
+          Surat: Masuk vs Keluar
+        </h2>
+      </div>
+      <div className="h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={letterData}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, percent }) =>
+                `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`
+              }
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              {letterData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value) => [`${value ?? 0} surat`, "Jumlah"]}
+              contentStyle={{
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+              }}
+            />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+
+  // Department Chart Component
+  const DepartmentChart = () => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="flex items-center mb-6">
+        <div className="p-2 bg-purple-50 rounded-lg mr-3">
+          <Icons.users className="h-5 w-5 text-purple-600" />
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900">
+          Kontribusi Organisasi
+        </h2>
+      </div>
+      <div className="h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadarChart outerRadius={90} data={departmentData}>
+            <PolarGrid stroke="#e5e7eb" />
+            <PolarAngleAxis dataKey="subject" tick={{ fill: "#6b7280" }} />
+            <PolarRadiusAxis
+              angle={30}
+              domain={[0, 100]}
+              tick={{ fill: "#6b7280" }}
+            />
+            <Radar
+              name="Kontribusi"
+              dataKey="A"
+              stroke="#8884d8"
+              fill="#8884d8"
+              fillOpacity={0.6}
+            />
+            <Tooltip
+              formatter={(value) => [`${value}%`, "Kontribusi"]}
+              contentStyle={{
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+              }}
+            />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -203,7 +383,6 @@ export default function DashboardPage() {
           statusText="Net balance"
           valueSize="lg"
         />
-
         <MetricCard
           icon="trendingUp"
           color="green"
@@ -214,7 +393,6 @@ export default function DashboardPage() {
           statusText="Total income"
           valueSize="lg"
         />
-
         <MetricCard
           icon="dollarSign"
           color="red"
@@ -228,80 +406,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Finance Chart */}
-      {financeData.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex items-center mb-6">
-            <div className="p-2 bg-green-50 rounded-lg mr-3">
-              <Icons.trendingUp className="h-5 w-5 text-green-600" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              Keuangan: Pendapatan vs Pengeluaran
-            </h2>
-          </div>
-          <div className="h-72 md:h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={financeData}
-                margin={{ top: 10, right: 30, left: 40, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4CAF50" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#4CAF50" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F44336" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#F44336" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis
-                  dataKey="month"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#6b7280" }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
-                  tickFormatter={(value) =>
-                    `RP ${value.toLocaleString("id-ID")}`
-                  }
-                />
-                <Tooltip
-                  formatter={(value) => [
-                    `RP ${(value ?? 0).toLocaleString("id-ID")}`,
-                    "Nilai",
-                  ]}
-                  labelFormatter={(label) => `Bulan: ${label}`}
-                  contentStyle={{
-                    borderRadius: "8px",
-                    border: "1px solid #e5e7eb",
-                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="income"
-                  stackId="1"
-                  stroke="#4CAF50"
-                  fill="url(#colorIncome)"
-                  name="Pendapatan"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="expense"
-                  stackId="1"
-                  stroke="#F44336"
-                  fill="url(#colorExpense)"
-                  name="Pengeluaran"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
+      {financeData.length > 0 && <FinanceChart />}
 
       {/* Organization Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
@@ -314,7 +419,6 @@ export default function DashboardPage() {
           statusColor="green-500"
           statusText="Active period"
         />
-
         <MetricCard
           icon="users"
           color="blue"
@@ -324,7 +428,6 @@ export default function DashboardPage() {
           statusColor="blue-500"
           statusText="Total members"
         />
-
         <MetricCard
           icon="users"
           color="purple"
@@ -334,7 +437,6 @@ export default function DashboardPage() {
           statusColor="purple-500"
           statusText="Total members"
         />
-
         <MetricCard
           icon="newspaper"
           color="orange"
@@ -357,7 +459,6 @@ export default function DashboardPage() {
           statusColor="red-500"
           statusText="Total members"
         />
-
         <MetricCard
           icon="users"
           color="teal"
@@ -367,7 +468,6 @@ export default function DashboardPage() {
           statusColor="teal-500"
           statusText="Total members"
         />
-
         <MetricCard
           icon="calendar"
           color="pink"
@@ -377,7 +477,6 @@ export default function DashboardPage() {
           statusColor="green-500"
           statusText="Published"
         />
-
         <MetricCard
           icon="image"
           color="indigo"
@@ -391,95 +490,8 @@ export default function DashboardPage() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Letters Chart */}
-        {letterData.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center mb-6">
-              <div className="p-2 bg-blue-50 rounded-lg mr-3">
-                <Icons.mail className="h-5 w-5 text-blue-600" />
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                Surat: Masuk vs Keluar
-              </h2>
-            </div>
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={letterData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`
-                    }
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {letterData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value) => [`${value ?? 0} surat`, "Jumlah"]}
-                    contentStyle={{
-                      borderRadius: "8px",
-                      border: "1px solid #e5e7eb",
-                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                    }}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
-
-        {/* Department Contribution Chart */}
-        {departmentData.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center mb-6">
-              <div className="p-2 bg-purple-50 rounded-lg mr-3">
-                <Icons.users className="h-5 w-5 text-purple-600" />
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                Kontribusi Departemen
-              </h2>
-            </div>
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart outerRadius={90} data={departmentData}>
-                  <PolarGrid stroke="#e5e7eb" />
-                  <PolarAngleAxis
-                    dataKey="subject"
-                    tick={{ fill: "#6b7280" }}
-                  />
-                  <PolarRadiusAxis
-                    angle={30}
-                    domain={[0, 100]}
-                    tick={{ fill: "#6b7280" }}
-                  />
-                  <Radar
-                    name="Kontribusi"
-                    dataKey="A"
-                    stroke="#8884d8"
-                    fill="#8884d8"
-                    fillOpacity={0.6}
-                  />
-                  <Tooltip
-                    formatter={(value) => [`${value}%`, "Kontribusi"]}
-                    contentStyle={{
-                      borderRadius: "8px",
-                      border: "1px solid #e5e7eb",
-                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                    }}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
+        {letterData.length > 0 && <LettersChart />}
+        {departmentData.length > 0 && <DepartmentChart />}
       </div>
     </div>
   );
