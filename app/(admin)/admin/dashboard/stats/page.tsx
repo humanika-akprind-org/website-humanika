@@ -195,7 +195,7 @@ export default function DashboardPage() {
 
   // Finance Chart Component
   const FinanceChart = () => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
       <div className="flex items-center mb-6">
         <div className="p-2 bg-green-50 rounded-lg mr-3">
           <Icons.trendingUp className="h-5 w-5 text-green-600" />

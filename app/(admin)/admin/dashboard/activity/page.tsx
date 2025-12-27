@@ -232,7 +232,7 @@ export default function ActivityPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-700">{error}</p>
         </div>
@@ -255,9 +255,9 @@ export default function ActivityPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Activity Log</h1>
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 py-1">Activity Log</h1>
+        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 py-1">
           <SelectInput
             label=""
             name="selectedTimeFilter"

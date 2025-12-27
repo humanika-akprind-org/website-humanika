@@ -128,7 +128,10 @@ export default function SidebarMobile() {
           <div className="flex flex-col">
             <h1 className="text-lg font-bold text-gray-800">HUMANIKA</h1>
             <p className="text-blue-600 font-medium text-xs">
-              Himpunan Mahasiswa
+              Himpunan Mahasiswa Informatika
+            </p>
+            <p className="text-gray-500 text-xs">
+              Universitas AKPRIND Indonesia
             </p>
           </div>
         </div>

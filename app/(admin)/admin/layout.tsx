@@ -41,11 +41,11 @@ export default async function RootLayout({
               <header className="bg-white shadow-sm">
                 <SidebarMobile />
 
-                <div className="px-6 py-4 flex justify-between items-center">
+                <div className="px-6 py-4 flex flex-col sm:flex-row items-center">
                   <h1 className="text-2xl font-bold text-gray-800">
                     Organizational Admin
                   </h1>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-4 ml-auto">
                     <UserInfo />
                   </div>
                 </div>

@@ -216,7 +216,7 @@ export default function OverviewPage() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-700">{error}</p>
         </div>
@@ -227,7 +227,7 @@ export default function OverviewPage() {
   if (!overview) return null;
 
   return (
-    <div className="p-6">
+    <div>
       <div className="flex items-center mb-8">
         <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mr-4">
           <Icons.trendingUp className="h-8 w-8 text-white" />

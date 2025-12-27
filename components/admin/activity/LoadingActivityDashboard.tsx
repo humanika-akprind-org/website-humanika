@@ -2,11 +2,11 @@ export default function LoadingActivityDashboard() {
   return (
     <div>
       {/* Header Skeleton */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="animate-pulse">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+        <div className="animate-pulse py-1">
           <div className="h-8 bg-gray-300 rounded w-48" />
         </div>
-        <div className="animate-pulse flex items-center space-x-4">
+        <div className="animate-pulse flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 py-1">
           <div className="h-10 bg-gray-300 rounded w-40" />
           <div className="h-10 bg-gray-300 rounded w-32" />
         </div>
