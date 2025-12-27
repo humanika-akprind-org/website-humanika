@@ -159,16 +159,16 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6">
+      <div>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
+    <div>
       <div className="flex items-center mb-8">
         <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mr-4">
           <Icons.barChart className="h-8 w-8 text-white" />
@@ -230,7 +230,7 @@ export default function DashboardPage() {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={financeData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                margin={{ top: 10, right: 30, left: 40, bottom: 0 }}
               >
                 <defs>
                   <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
@@ -254,7 +254,7 @@ export default function DashboardPage() {
                   tickLine={false}
                   tick={{ fill: "#6b7280", fontSize: 12 }}
                   tickFormatter={(value) =>
-                    `Rp ${value.toLocaleString("id-ID")}`
+                    `RP ${value.toLocaleString("id-ID")}`
                   }
                 />
                 <Tooltip
