@@ -26,7 +26,6 @@ interface DocumentFormProps {
     data: CreateDocumentInput | UpdateDocumentInput
   ) => Promise<void>;
   loading?: boolean;
-  accessToken: string;
   events: Event[];
   letters: Letter[];
   fixedDocumentType?: string;
@@ -36,7 +35,6 @@ export default function DocumentForm({
   document,
   onSubmit,
   onSubmitForApproval,
-  accessToken,
   fixedDocumentType,
 }: DocumentFormProps) {
   const router = useRouter();
@@ -56,7 +54,6 @@ export default function DocumentForm({
     handleSubmit,
   } = useDocumentForm({
     document,
-    accessToken,
     onSubmit,
     onSubmitForApproval,
     fixedDocumentType,

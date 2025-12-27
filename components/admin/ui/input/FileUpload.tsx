@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import AccessTokenGuard from "./AccessTokenGuard";
 import { FiFile } from "react-icons/fi";
 
 interface FileUploadProps {
@@ -29,10 +30,7 @@ export default function FileUpload({
   required = false,
 }: FileUploadProps) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label} {required && "*"}
-      </label>
+    <AccessTokenGuard label={label} required={required}>
       <div className="flex items-start space-x-4">
         {existingFile && existingFile.trim() !== "" && (
           <div className="flex flex-col items-center">
@@ -71,6 +69,6 @@ export default function FileUpload({
           )}
         </div>
       </div>
-    </div>
+    </AccessTokenGuard>
   );
 }

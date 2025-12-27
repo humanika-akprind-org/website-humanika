@@ -31,7 +31,6 @@ interface LetterFormProps {
     data: CreateLetterInput | UpdateLetterInput
   ) => Promise<void>;
   isLoading?: boolean;
-  accessToken?: string;
   periods?: Period[];
   events?: Event[];
   isEditing?: boolean;
@@ -41,7 +40,6 @@ export default function LetterForm({
   letter,
   onSubmit,
   onSubmitForApproval,
-  accessToken,
   periods = [],
   events = [],
   isEditing,
@@ -61,7 +59,6 @@ export default function LetterForm({
     handleSubmit,
   } = useLetterForm({
     letter,
-    accessToken,
     onSubmit,
     onSubmitForApproval,
   });
