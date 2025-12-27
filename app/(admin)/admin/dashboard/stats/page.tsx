@@ -28,6 +28,7 @@ import { useGalleries } from "@/hooks/gallery/useGalleries";
 import { useEvents } from "@/hooks/event/useEvents";
 import { useManagements } from "@/hooks/management/useManagements";
 import { useActivityStats } from "@/hooks/activity/useActivityStats";
+import LoadingStats from "@/components/admin/dashboard/LoadingStats";
 
 // Custom hook for dashboard data processing
 const useDashboardData = () => {
@@ -189,13 +190,7 @@ export default function DashboardPage() {
   } = useDashboardData();
 
   if (isLoading) {
-    return (
-      <div>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-        </div>
-      </div>
-    );
+    return <LoadingStats />;
   }
 
   // Finance Chart Component
