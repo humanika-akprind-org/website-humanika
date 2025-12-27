@@ -293,13 +293,13 @@ export async function middleware(request: NextRequest) {
   // Get token from cookies
   const token = request.cookies.get("token")?.value;
   if (!token) {
-    return NextResponse.redirect(new URL("/auth/admin", request.url));
+    return NextResponse.redirect(new URL("/auth/admin/login", request.url));
   }
 
   // Verify token
   const decoded = verifyToken(token);
   if (!decoded) {
-    return NextResponse.redirect(new URL("/auth/admin", request.url));
+    return NextResponse.redirect(new URL("/auth/admin/login", request.url));
   }
 
   const userId = decoded.userId;
@@ -311,7 +311,7 @@ export async function middleware(request: NextRequest) {
   });
 
   if (!user) {
-    return NextResponse.redirect(new URL("/auth/admin", request.url));
+    return NextResponse.redirect(new URL("/auth/admin/login", request.url));
   }
 
   const userRole = user.role;
