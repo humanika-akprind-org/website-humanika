@@ -7,7 +7,7 @@ import { FiFile } from "react-icons/fi";
 interface FileUploadProps {
   label: string;
   existingFile?: string | null;
-  onRemove?: () => void;
+  onRemoveFile?: () => void;
   onFileChange: (file: File) => void;
   isLoading?: boolean;
   fileLoading?: boolean;
@@ -15,12 +15,13 @@ interface FileUploadProps {
   helpText?: string;
   loadingText?: string;
   required?: boolean;
+  removeButtonText?: string;
 }
 
 export default function FileUpload({
   label,
   existingFile,
-  onRemove,
+  onRemoveFile,
   onFileChange,
   isLoading = false,
   fileLoading = false,
@@ -28,6 +29,7 @@ export default function FileUpload({
   helpText,
   loadingText = "Uploading file...",
   required = false,
+  removeButtonText = "Remove File",
 }: FileUploadProps) {
   return (
     <AccessTokenGuard label={label} required={required}>
@@ -42,11 +44,11 @@ export default function FileUpload({
             <div className="flex gap-2 mt-2">
               <button
                 type="button"
-                onClick={onRemove}
+                onClick={onRemoveFile}
                 className="text-sm text-red-600 hover:text-red-800"
                 disabled={isLoading}
               >
-                Remove File
+                {removeButtonText}
               </button>
             </div>
           </div>
