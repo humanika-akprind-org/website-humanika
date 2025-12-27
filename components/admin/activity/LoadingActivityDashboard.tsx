@@ -27,12 +27,17 @@ export default function LoadingActivityDashboard() {
       {/* Stats Overview Skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="animate-pulse bg-white rounded-lg shadow p-4">
-            <div className="flex justify-between items-center mb-2">
+          <div
+            key={i}
+            className="animate-pulse bg-white rounded-xl shadow-sm p-4 border border-gray-100"
+          >
+            <div className="flex justify-between items-center">
               <div className="h-4 bg-gray-300 rounded w-24" />
-              <div className="h-6 w-6 bg-gray-300 rounded" />
+              <div className="p-2 bg-gray-300 rounded-lg">
+                <div className="h-4 w-4 bg-gray-300 rounded" />
+              </div>
             </div>
-            <div className="h-8 bg-gray-300 rounded w-16" />
+            <div className="h-8 bg-gray-300 rounded w-16 mt-2" />
           </div>
         ))}
       </div>

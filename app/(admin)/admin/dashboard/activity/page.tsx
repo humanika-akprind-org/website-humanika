@@ -22,6 +22,7 @@ import type { ActivityLog } from "@/types/activity-log";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import ExportButtons from "@/components/admin/activity/export-button/ExportButtons";
 import LoadingActivityDashboard from "@/components/admin/activity/LoadingActivityDashboard";
+import StatCard from "@/components/admin/ui/card/StatCard";
 
 export default function ActivityPage() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
@@ -299,74 +300,69 @@ export default function ActivityPage() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">
-              Total Activities
-            </h3>
-            <BarChart3 className="h-6 w-6 text-blue-500" />
-          </div>
-          <p className="text-2xl font-bold text-gray-800">
-            {filteredActivities.length}
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">This Week</h3>
-            <RefreshCw className="h-6 w-6 text-green-500" />
-          </div>
-          <p className="text-2xl font-bold text-gray-800">
+        {(() => {
+          const thisWeekCount = activities.filter((activity) => {
+            const activityDate = new Date(activity.createdAt);
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return activityDate >= weekAgo;
+          }).length;
+
+          const userCounts = filteredActivities.reduce((acc, activity) => {
+            const userName = activity.user?.name || "Unknown";
+            acc[userName] = (acc[userName] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          const mostActive = Object.entries(userCounts).sort(
+            ([, a], [, b]) => b - a
+          )[0];
+
+          const serviceCounts = filteredActivities.reduce((acc, activity) => {
+            const serviceName = getServiceName(activity.entityType);
+            acc[serviceName] = (acc[serviceName] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          const topService = Object.entries(serviceCounts).sort(
+            ([, a], [, b]) => b - a
+          )[0];
+
+          const stats = [
             {
-              activities.filter((activity) => {
-                const activityDate = new Date(activity.createdAt);
-                const weekAgo = new Date();
-                weekAgo.setDate(weekAgo.getDate() - 7);
-                return activityDate >= weekAgo;
-              }).length
-            }
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Most Active</h3>
-            <User className="h-6 w-6 text-purple-500" />
-          </div>
-          <p className="text-xl font-bold text-gray-800">
-            {(() => {
-              const userCounts = filteredActivities.reduce((acc, activity) => {
-                const userName = activity.user?.name || "Unknown";
-                acc[userName] = (acc[userName] || 0) + 1;
-                return acc;
-              }, {} as Record<string, number>);
-              const mostActive = Object.entries(userCounts).sort(
-                ([, a], [, b]) => b - a
-              )[0];
-              return mostActive ? mostActive[0] : "No data";
-            })()}
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Top Service</h3>
-            <FileText className="h-6 w-6 text-orange-500" />
-          </div>
-          <p className="text-xl font-bold text-gray-800">
-            {(() => {
-              const serviceCounts = filteredActivities.reduce(
-                (acc, activity) => {
-                  const serviceName = getServiceName(activity.entityType);
-                  acc[serviceName] = (acc[serviceName] || 0) + 1;
-                  return acc;
-                },
-                {} as Record<string, number>
-              );
-              const topService = Object.entries(serviceCounts).sort(
-                ([, a], [, b]) => b - a
-              )[0];
-              return topService ? topService[0] : "No data";
-            })()}
-          </p>
-        </div>
+              title: "Total Activities",
+              value: filteredActivities.length,
+              icon: BarChart3,
+              color: "blue",
+            },
+            {
+              title: "This Week",
+              value: thisWeekCount,
+              icon: RefreshCw,
+              color: "green",
+            },
+            {
+              title: "Most Active",
+              value: mostActive ? mostActive[0] : "No data",
+              icon: User,
+              color: "purple",
+            },
+            {
+              title: "Top Service",
+              value: topService ? topService[0] : "No data",
+              icon: FileText,
+              color: "orange",
+            },
+          ];
+
+          return stats.map((stat, index) => (
+            <StatCard
+              key={index}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              color={stat.color}
+            />
+          ));
+        })()}
       </div>
 
       {/* Activity Log */}
