@@ -28,6 +28,7 @@ import { useGalleries } from "@/hooks/gallery/useGalleries";
 import { useUsers } from "@/hooks/user/useUsers";
 import { useStructures } from "@/hooks/structure/useStructures";
 import { useEvents } from "@/hooks/event/useEvents";
+import { useManagements } from "@/hooks/management/useManagements";
 
 // Dashboard Component
 export default function DashboardPage() {
@@ -38,6 +39,7 @@ export default function DashboardPage() {
   const { users, isLoading: usersLoading } = useUsers();
   const { structures, isLoading: structuresLoading } = useStructures();
   const { events, isLoading: eventsLoading } = useEvents();
+  const { managements, isLoading: managementsLoading } = useManagements();
 
   // Process finance data for area chart
   const financeData = React.useMemo(() => {
@@ -135,18 +137,27 @@ export default function DashboardPage() {
   const totalBalance = totalIncome - totalExpense;
 
   // Count metrics
-  const totalPengurus = users.filter(
-    (u) => u.role === "ADMIN" || u.role === "SUPER_ADMIN"
+  const activeManagements = managements.filter(
+    (management) => management.period?.isActive
+  );
+  const infokomMembers = activeManagements.filter(
+    (m) => m.department === "INFOKOM"
   ).length;
-  const infokomMembers = users.filter((u) => u.department === "INFOKOM").length;
-  const psdmMembers = users.filter((u) => u.department === "PSDM").length;
-  const wirausahaMembers = users.filter(
-    (u) => u.department === "WIRAUSAHA"
+  const psdmMembers = activeManagements.filter(
+    (m) => m.department === "PSDM"
   ).length;
-  const litbangMembers = users.filter((u) => u.department === "LITBANG").length;
+  const wirausahaMembers = activeManagements.filter(
+    (m) => m.department === "KWU"
+  ).length;
+  const litbangMembers = activeManagements.filter(
+    (m) => m.department === "LITBANG"
+  ).length;
   const totalArticles = articles.length;
   const totalEvents = events.length;
   const totalGallery = galleries.length;
+  const totalActiveManagement = managements.filter(
+    (management) => management.period?.isActive
+  ).length;
 
   const isLoading =
     financesLoading ||
@@ -155,7 +166,8 @@ export default function DashboardPage() {
     galleriesLoading ||
     usersLoading ||
     structuresLoading ||
-    eventsLoading;
+    eventsLoading ||
+    managementsLoading;
 
   if (isLoading) {
     return (
@@ -296,7 +308,7 @@ export default function DashboardPage() {
         <MetricCard
           icon="users"
           color="green"
-          value={totalPengurus}
+          value={totalActiveManagement}
           title="Total Pengurus"
           statusIcon="checkCircle"
           statusColor="green-500"
