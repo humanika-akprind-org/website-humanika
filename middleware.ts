@@ -1,8 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
-import { PrismaClient, UserRole } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { getCurrentUser } from "lib/auth-server";
+import { UserRole } from "@prisma/client";
 
 // Define RBAC rules with regex patterns for dynamic routes
 const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
@@ -285,36 +283,44 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Handle /auth/admin/login path
+  if (pathname === "/auth/admin/login") {
+    const user = await getCurrentUser();
+    if (
+      user &&
+      (user.role === UserRole.DPO ||
+        user.role === UserRole.BPH ||
+        user.role === UserRole.PENGURUS)
+    ) {
+      return NextResponse.redirect(
+        new URL("/admin/dashboard/overview", request.url)
+      );
+    }
+    // Allow access to login page if not logged in or not admin roles
+    return NextResponse.next();
+  }
+
   // Only apply middleware to /admin routes
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
 
-  // Get token from cookies
-  const token = request.cookies.get("token")?.value;
-  if (!token) {
-    return NextResponse.redirect(new URL("/auth/admin/login", request.url));
-  }
-
-  // Verify token
-  const decoded = verifyToken(token);
-  if (!decoded) {
-    return NextResponse.redirect(new URL("/auth/admin/login", request.url));
-  }
-
-  const userId = decoded.userId;
-
-  // Fetch user role from database
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { role: true },
-  });
-
+  const user = await getCurrentUser();
   if (!user) {
     return NextResponse.redirect(new URL("/auth/admin/login", request.url));
   }
 
+  // Check if user is active
+  if (!user.isActive) {
+    return NextResponse.redirect(new URL("/auth/admin/login", request.url));
+  }
+
   const userRole = user.role;
+
+  // If user is ANGGOTA, redirect to home
+  if (userRole === UserRole.ANGGOTA) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   // Find matching rule
   const rule = rbacRules.find((rule) => rule.pattern.test(pathname));
@@ -339,5 +345,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/admin/:path*",
+  matcher: ["/admin/:path*", "/auth/admin/login"],
+  runtime: "nodejs",
 };
