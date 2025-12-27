@@ -196,13 +196,25 @@ export default function SidebarMobile() {
                   Dashboard
                 </h3>
               </div>
-              <NavLink href="/admin/dashboard/overview" icon={Home}>
+              <NavLink
+                href="/admin/dashboard/overview"
+                icon={Home}
+                onClick={toggleSidebar}
+              >
                 Overview
               </NavLink>
-              <NavLink href="/admin/dashboard/activity" icon={Activity}>
+              <NavLink
+                href="/admin/dashboard/activity"
+                icon={Activity}
+                onClick={toggleSidebar}
+              >
                 Recent Activity
               </NavLink>
-              <NavLink href="/admin/dashboard/stats" icon={BarChart3}>
+              <NavLink
+                href="/admin/dashboard/stats"
+                icon={BarChart3}
+                onClick={toggleSidebar}
+              >
                 Quick Stats
               </NavLink>
             </>
@@ -260,12 +272,18 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/governance/periods">
+                    <NavDropdownItem
+                      href="/admin/governance/periods"
+                      onClick={toggleSidebar}
+                    >
                       All Period
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.DPO, UserRole.BPH]) && (
-                    <NavDropdownItem href="/admin/governance/periods/add">
+                    <NavDropdownItem
+                      href="/admin/governance/periods/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
@@ -288,12 +306,18 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/governance/managements">
+                    <NavDropdownItem
+                      href="/admin/governance/managements"
+                      onClick={toggleSidebar}
+                    >
                       All Management
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/governance/managements/add">
+                    <NavDropdownItem
+                      href="/admin/governance/managements/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
@@ -316,12 +340,18 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/governance/structure">
+                    <NavDropdownItem
+                      href="/admin/governance/structure"
+                      onClick={toggleSidebar}
+                    >
                       All Structure
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.BPH]) && (
-                    <NavDropdownItem href="/admin/governance/structure/add">
+                    <NavDropdownItem
+                      href="/admin/governance/structure/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
@@ -344,12 +374,18 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/governance/tasks">
+                    <NavDropdownItem
+                      href="/admin/governance/tasks"
+                      onClick={toggleSidebar}
+                    >
                       All Tasks
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/governance/tasks/add">
+                    <NavDropdownItem
+                      href="/admin/governance/tasks/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
@@ -373,17 +409,26 @@ export default function SidebarMobile() {
 
               <NavDropdown icon={Users} title="Users">
                 {hasAccess([UserRole.BPH]) && (
-                  <NavDropdownItem href="/admin/people/users">
+                  <NavDropdownItem
+                    href="/admin/people/users"
+                    onClick={toggleSidebar}
+                  >
                     All Users
                   </NavDropdownItem>
                 )}
                 {hasAccess([UserRole.BPH]) && (
-                  <NavDropdownItem href="/admin/people/users/add">
+                  <NavDropdownItem
+                    href="/admin/people/users/add"
+                    onClick={toggleSidebar}
+                  >
                     Add New
                   </NavDropdownItem>
                 )}
                 {hasAccess([UserRole.BPH]) && (
-                  <NavDropdownItem href="/admin/people/users/roles">
+                  <NavDropdownItem
+                    href="/admin/people/users/roles"
+                    onClick={toggleSidebar}
+                  >
                     Roles & Permissions
                   </NavDropdownItem>
                 )}
@@ -483,12 +528,18 @@ export default function SidebarMobile() {
               ]) && (
                 <NavDropdown icon={CalendarRange} title="Events">
                   {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/program/events">
+                    <NavDropdownItem
+                      href="/admin/program/events"
+                      onClick={toggleSidebar}
+                    >
                       All Events
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/program/events/add">
+                    <NavDropdownItem
+                      href="/admin/program/events/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
@@ -497,12 +548,18 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/program/events/categories">
+                    <NavDropdownItem
+                      href="/admin/program/events/categories"
+                      onClick={toggleSidebar}
+                    >
                       Categories
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.DPO, UserRole.BPH]) && (
-                    <NavDropdownItem href="/admin/program/events/approval">
+                    <NavDropdownItem
+                      href="/admin/program/events/approval"
+                      onClick={toggleSidebar}
+                    >
                       Approval
                     </NavDropdownItem>
                   )}
@@ -589,17 +646,26 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/administration/proposals">
+                    <NavDropdownItem
+                      href="/admin/administration/proposals"
+                      onClick={toggleSidebar}
+                    >
                       All Proposals
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/administration/proposals/add">
+                    <NavDropdownItem
+                      href="/admin/administration/proposals/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.DPO, UserRole.BPH]) && (
-                    <NavDropdownItem href="/admin/administration/proposals/approval">
+                    <NavDropdownItem
+                      href="/admin/administration/proposals/approval"
+                      onClick={toggleSidebar}
+                    >
                       Approval
                     </NavDropdownItem>
                   )}
@@ -626,17 +692,26 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/administration/accountability-reports">
+                    <NavDropdownItem
+                      href="/admin/administration/accountability-reports"
+                      onClick={toggleSidebar}
+                    >
                       All Accountability Reports
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/administration/accountability-reports/add">
+                    <NavDropdownItem
+                      href="/admin/administration/accountability-reports/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.DPO, UserRole.BPH]) && (
-                    <NavDropdownItem href="/admin/administration/accountability-reports/approval">
+                    <NavDropdownItem
+                      href="/admin/administration/accountability-reports/approval"
+                      onClick={toggleSidebar}
+                    >
                       Approval
                     </NavDropdownItem>
                   )}
@@ -700,12 +775,18 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/administration/documents">
+                    <NavDropdownItem
+                      href="/admin/administration/documents"
+                      onClick={toggleSidebar}
+                    >
                       All Documents
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/administration/documents/add">
+                    <NavDropdownItem
+                      href="/admin/administration/documents/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
@@ -714,7 +795,10 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/administration/documents/types">
+                    <NavDropdownItem
+                      href="/admin/administration/documents/types"
+                      onClick={toggleSidebar}
+                    >
                       Document Type
                     </NavDropdownItem>
                   )}
@@ -774,12 +858,18 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/content/articles">
+                    <NavDropdownItem
+                      href="/admin/content/articles"
+                      onClick={toggleSidebar}
+                    >
                       All Article
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/content/articles/add">
+                    <NavDropdownItem
+                      href="/admin/content/articles/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
@@ -788,7 +878,10 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/content/articles/categories">
+                    <NavDropdownItem
+                      href="/admin/content/articles/categories"
+                      onClick={toggleSidebar}
+                    >
                       Categories
                     </NavDropdownItem>
                   )}
@@ -815,12 +908,18 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/content/galleries">
+                    <NavDropdownItem
+                      href="/admin/content/galleries"
+                      onClick={toggleSidebar}
+                    >
                       All Gallery
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.PENGURUS]) && (
-                    <NavDropdownItem href="/admin/content/galleries/add">
+                    <NavDropdownItem
+                      href="/admin/content/galleries/add"
+                      onClick={toggleSidebar}
+                    >
                       Add New
                     </NavDropdownItem>
                   )}
@@ -829,7 +928,10 @@ export default function SidebarMobile() {
                     UserRole.BPH,
                     UserRole.PENGURUS,
                   ]) && (
-                    <NavDropdownItem href="/admin/content/galleries/categories">
+                    <NavDropdownItem
+                      href="/admin/content/galleries/categories"
+                      onClick={toggleSidebar}
+                    >
                       Categories
                     </NavDropdownItem>
                   )}
@@ -907,7 +1009,11 @@ export default function SidebarMobile() {
                 </h3>
               </div>
 
-              <NavLink href="/admin/system/activity" icon={Activity}>
+              <NavLink
+                href="/admin/system/activity"
+                icon={Activity}
+                onClick={toggleSidebar}
+              >
                 Activity Log
               </NavLink>
             </>
@@ -922,10 +1028,18 @@ export default function SidebarMobile() {
                 </h3>
               </div>
 
-              <NavLink href="/admin/settings/profile" icon={User}>
+              <NavLink
+                href="/admin/settings/profile"
+                icon={User}
+                onClick={toggleSidebar}
+              >
                 Profile
               </NavLink>
-              <NavLink href="/admin/settings/account" icon={Settings}>
+              <NavLink
+                href="/admin/settings/account"
+                icon={Settings}
+                onClick={toggleSidebar}
+              >
                 Account
               </NavLink>
             </>
