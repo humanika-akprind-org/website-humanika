@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Home,
   Users,
@@ -26,12 +27,29 @@ import Image from "next/image";
 import NavLink from "@/components/admin/layout/NavLink";
 import NavDropdown from "@/components/admin/layout/NavDropdown";
 import NavDropdownItem from "@/components/admin/layout/NavDropdownItem";
-import { useSession } from "next-auth/react";
 import { UserRole } from "@/types/enums";
 
 export default function Sidebar() {
-  const { data: session } = useSession();
-  const userRole = session?.user?.role;
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+        if (response.ok) {
+          const user = await response.json();
+          setUserRole(user.role);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   // Access control function
   const hasAccess = (allowedRoles: UserRole[]) =>
@@ -40,6 +58,198 @@ export default function Sidebar() {
   // Check if dropdown has any accessible items
   const hasDropdownAccess = (items: { href: string; roles: UserRole[] }[]) =>
     items.some((item) => hasAccess(item.roles));
+
+  if (loading) {
+    return (
+      <div className="hidden md:flex md:w-64 lg:w-72 flex-col border-r border-gray-200 bg-white h-full overflow-hidden">
+        {/* Header dengan Logo */}
+        <div className="p-5 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <div className="bg-white rounded-full shadow-sm p-1 border border-gray-100">
+              <Image
+                src="/logo.png"
+                alt="HUMANIKA"
+                width={60}
+                height={60}
+                className="rounded-full"
+              />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold text-gray-800">HUMANIKA</h1>
+              <p className="text-blue-600 font-medium text-sm">
+                Himpunan Mahasiswa Informatika
+              </p>
+              <p className="text-gray-500 text-xs">
+                Universitas AKPRIND Indonesia
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Menu Skeleton */}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {/* Dashboard Section Skeleton */}
+          <div className="mt-2 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-20" />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-3 p-3 rounded-lg">
+              <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
+            </div>
+            <div className="flex items-center space-x-3 p-3 rounded-lg">
+              <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-28" />
+            </div>
+            <div className="flex items-center space-x-3 p-3 rounded-lg">
+              <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+            </div>
+          </div>
+
+          {/* Governance Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-24" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-16" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="ml-6 space-y-1">
+              <div className="flex items-center space-x-3 p-2 rounded-lg">
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-20" />
+              </div>
+              <div className="flex items-center space-x-3 p-2 rounded-lg">
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-16" />
+              </div>
+            </div>
+          </div>
+
+          {/* People & Access Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-32" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-12" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+
+          {/* Programs & Events Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-36" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-12" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+
+          {/* Administration Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-28" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-32" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+
+          {/* Content & Media Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-32" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+
+          {/* Finance Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-16" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+
+          {/* System Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-14" />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-3 p-3 rounded-lg">
+              <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+            </div>
+          </div>
+
+          {/* Settings Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-16" />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-3 p-3 rounded-lg">
+              <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-14" />
+            </div>
+            <div className="flex items-center space-x-3 p-3 rounded-lg">
+              <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-16" />
+            </div>
+          </div>
+        </nav>
+
+        {/* Footer dengan Logout Skeleton */}
+        <div className="mt-auto p-4 border-t border-gray-200 space-y-4 bg-gray-50">
+          <div className="flex items-center space-x-3 p-3 rounded-lg">
+            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-16" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="hidden md:flex md:w-64 lg:w-72 flex-col border-r border-gray-200 bg-white h-full overflow-hidden">

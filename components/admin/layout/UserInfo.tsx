@@ -33,22 +33,10 @@ export default function UserInfo() {
     return (
       <div className="flex items-center space-x-2 text-gray-600">
         <div className="text-right min-w-[120px] max-w-[200px]">
-          <p className="font-medium truncate">Loading...</p>
+          <div className="h-4 bg-gray-200 rounded animate-pulse mb-1" />
+          <div className="h-3 bg-gray-200 rounded animate-pulse w-16" />
         </div>
-        <span className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-gray-400"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </span>
+        <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse" />
       </div>
     );
   }

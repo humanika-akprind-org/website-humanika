@@ -1,4 +1,4 @@
-// components/admin/layout/SidebarMobile.jsx
+// components/admin/layout/SidebarMobile.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,17 +25,34 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { LogoutButton } from "components/admin/auth/LogoutButton";
+import { LogoutButton } from "@/components/admin/auth/LogoutButton";
 import Image from "next/image";
-import NavLink from "components/admin/layout/NavLink";
-import NavDropdown from "components/admin/layout/NavDropdown";
-import NavDropdownItem from "components/admin/layout/NavDropdownItem";
-import { UserRole } from "types/enums";
+import NavLink from "@/components/admin/layout/NavLink";
+import NavDropdown from "@/components/admin/layout/NavDropdown";
+import NavDropdownItem from "@/components/admin/layout/NavDropdownItem";
+import { UserRole } from "@/types/enums";
 
 export default function SidebarMobile() {
-  const { data: session } = useSession();
-  const userRole = session?.user?.role;
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+        if (response.ok) {
+          const user = await response.json();
+          setUserRole(user.role);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   // Access control function
   const hasAccess = (allowedRoles: UserRole[]) =>
@@ -63,6 +80,36 @@ export default function SidebarMobile() {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  if (loading) {
+    return (
+      <>
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <div className="bg-white rounded-full shadow-sm p-1 border border-gray-100">
+              <Image
+                src="/logo.png"
+                alt="HUMANIKA"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-lg font-bold text-gray-800">HUMANIKA</h1>
+              <p className="text-blue-600 font-medium text-xs">
+                Himpunan Mahasiswa
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col space-y-1">
+            <div className="h-6 w-6 bg-gray-300 rounded animate-pulse" />
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
