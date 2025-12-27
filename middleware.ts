@@ -300,6 +300,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Handle /auth/:path* paths for logged-in users
+  if (pathname.startsWith("/auth/")) {
+    const user = await getCurrentUser();
+    if (user) {
+      if (user.role === UserRole.ANGGOTA) {
+        return NextResponse.redirect(new URL("/", request.url));
+      } else if (
+        user.role === UserRole.DPO ||
+        user.role === UserRole.BPH ||
+        user.role === UserRole.PENGURUS
+      ) {
+        return NextResponse.redirect(
+          new URL("/admin/dashboard/overview", request.url)
+        );
+      }
+    }
+    // Allow access if not logged in
+    return NextResponse.next();
+  }
+
   // Only apply middleware to /admin routes
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
@@ -345,6 +365,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/auth/admin/login"],
+  matcher: ["/admin/:path*", "/auth/:path*"],
   runtime: "nodejs",
 };

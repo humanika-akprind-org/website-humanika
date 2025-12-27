@@ -1,4 +1,3 @@
-// components/admin/layout/SidebarMobile.tsx
 "use client";
 
 import { useState, useEffect } from "react";
