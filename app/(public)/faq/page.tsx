@@ -1,5 +1,17 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { useState } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  MessageSquare,
+  ChevronRight,
+  HelpCircle,
+  Search,
+  X,
+  Mail,
+  UserPlus,
+} from "lucide-react";
 
 interface FAQItem {
   question: string;
@@ -85,105 +97,278 @@ const faqs: FAQItem[] = [
 ];
 
 export default function FAQPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const filteredFaqs = faqs.filter(
+    (faq) =>
+      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-grey-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 text-white py-24 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white overflow-hidden">
+        {/* Background Effects */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-72 h-72 bg-primary-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-          <div className="absolute top-0 right-0 w-72 h-72 bg-primary-700 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-          <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-primary-800 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+          <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse animation-delay-2000" />
+          <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-primary-800 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse animation-delay-4000" />
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-display-2 md:text-[64px] mb-6">
-              Pertanyaan Umum
+        <div className="container mx-auto px-4 py-20 md:py-24 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-5xl mx-auto text-center"
+          >
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-white/20">
+              <HelpCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">FAQ</span>
+            </div>
+
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">
+                Pertanyaan Umum
+              </span>
+              <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-300 to-primary-100">
+                Tentang HUMANIKA
+              </span>
             </h1>
-            <p className="text-body-1 text-primary-100 max-w-2xl mx-auto mb-10">
+
+            <p className="text-xl text-primary-100/90 max-w-3xl mx-auto mb-10 leading-relaxed">
               Temukan jawaban atas pertanyaan-pertanyaan yang sering ditanyakan
-              tentang HUMANIKA dan kegiatan kami
+              tentang HUMANIKA, keanggotaan, kegiatan, dan segala hal yang
+              perlu Anda ketahui.
             </p>
-          </div>
+
+            {/* Quick Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-wrap justify-center gap-8 text-sm"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-primary-200">
+                  {faqs.length} Pertanyaan
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+                <span className="text-primary-200">Update Terkini</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                <span className="text-primary-200">Informasi Valid</span>
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-16 bg-grey-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-heading-2 text-grey-900 mb-4">
-                FAQ HUMANIKA
-              </h2>
-              <p className="text-body-1 text-grey-600">
-                Jawaban atas pertanyaan yang paling sering ditanyakan
-              </p>
-            </div>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-12">
+        {/* Search Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="max-w-4xl mx-auto mb-12"
+        >
+          <div className="relative">
+            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-grey-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Cari pertanyaan..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-14 pr-12 py-4 bg-white rounded-2xl border border-grey-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-lg"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-6 top-1/2 transform -translate-y-1/2 text-grey-400 hover:text-grey-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+          {searchTerm && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center mt-4 text-grey-600"
+            >
+              Ditemukan {filteredFaqs.length} pertanyaan untuk &quot;
+              {searchTerm}&quot;
+            </motion.p>
+          )}
+        </motion.div>
 
-            <div className="space-y-6">
-              {faqs.map((faq, index) => (
-                <Card
-                  key={index}
-                  className="shadow-sm hover:shadow-md transition-shadow"
+        {/* FAQ Grid */}
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
+          >
+            {filteredFaqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * (index % 6) }}
+                whileHover={{ y: -5 }}
+                className="group"
+              >
+                <div
+                  className={`bg-white rounded-2xl shadow-lg hover:shadow-xl p-6 border border-grey-200 cursor-pointer transition-all duration-300 ${
+                    expandedIndex === index ? "ring-2 ring-primary-500" : ""
+                  }`}
+                  onClick={() =>
+                    setExpandedIndex(expandedIndex === index ? null : index)
+                  }
                 >
-                  <CardHeader>
-                    <CardTitle className="text-lg text-grey-900 flex items-start">
-                      <span className="bg-primary-100 text-primary-600 p-1 rounded mr-3 mt-0.5 flex-shrink-0">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </span>
-                      {faq.question}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-body-2 text-grey-700 leading-relaxed pl-9">
-                      {faq.answer}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <HelpCircle className="w-6 h-6 text-primary-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-grey-900 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2">
+                        {faq.question}
+                      </h3>
+                      <div
+                        className={`transition-all duration-300 overflow-hidden ${
+                          expandedIndex === index
+                            ? "max-h-96 opacity-100"
+                            : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <p className="text-grey-700 leading-relaxed pt-2">
+                          {faq.answer}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <span className="text-sm text-primary-600 font-medium">
+                          {expandedIndex === index ? "Sembunyikan" : "Baca jawaban"}
+                        </span>
+                        <ChevronRight
+                          className={`w-5 h-5 text-grey-400 transition-transform ${
+                            expandedIndex === index ? "rotate-90" : ""
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
 
-            {/* Contact CTA */}
-            <div className="mt-16 text-center">
-              <div className="bg-white rounded-xl shadow-lg p-8 border border-grey-200">
-                <h3 className="text-heading-3 text-grey-900 mb-4">
-                  Masih ada pertanyaan?
-                </h3>
-                <p className="text-body-2 text-grey-600 mb-6 max-w-2xl mx-auto">
+          {/* Contact CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="mb-16"
+          >
+            <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+              <div className="absolute inset-0">
+                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
+                <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />
+              </div>
+
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+                  <MessageSquare className="w-4 h-4" />
+                  <span className="text-sm font-medium">BUTUH BANTUAN?</span>
+                </div>
+
+                <h2 className="text-3xl font-bold mb-6">
+                  Masih Ada Pertanyaan?
+                </h2>
+
+                <p className="text-xl text-primary-100/90 max-w-2xl mx-auto mb-10 leading-relaxed">
                   Jika pertanyaan Anda tidak terjawab di atas, jangan ragu untuk
-                  menghubungi kami. Tim HUMANIKA siap membantu Anda.
+                  menghubungi kami. Tim HUMANIKA siap membantu Anda dengan
+                  senang hati.
                 </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/contact"
-                    className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-md hover:shadow-lg"
+                    className="group inline-flex items-center gap-3 px-8 py-4 bg-white text-primary-700 rounded-xl hover:bg-grey-50 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
                   >
-                    Hubungi Kami
+                    <Mail className="w-5 h-5" />
+                    <span>Hubungi Kami</span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
                     href="/auth/register"
-                    className="px-6 py-3 bg-transparent border-2 border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-medium"
+                    className="group inline-flex items-center gap-3 px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl hover:bg-white/10 transition-all duration-300 font-semibold"
                   >
-                    Daftar Sekarang
+                    <UserPlus className="w-5 h-5" />
+                    <span>Daftar Sekarang</span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Quick Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1 }}
+            className="bg-white rounded-2xl shadow-lg p-8 border border-grey-200"
+          >
+            <h3 className="text-2xl font-bold text-grey-900 mb-8 text-center">
+              Informasi Lainnya
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <Link
+                href="/about"
+                className="group p-6 bg-grey-50 rounded-xl hover:bg-primary-50 transition-colors"
+              >
+                <h4 className="text-lg font-semibold text-grey-900 mb-2 group-hover:text-primary-700">
+                  Tentang Kami
+                </h4>
+                <p className="text-grey-600 text-sm">
+                  Pelajari lebih lanjut tentang visi, misi, dan struktur organisasi HUMANIKA
+                </p>
+              </Link>
+              <Link
+                href="/activities"
+                className="group p-6 bg-grey-50 rounded-xl hover:bg-primary-50 transition-colors"
+              >
+                <h4 className="text-lg font-semibold text-grey-900 mb-2 group-hover:text-primary-700">
+                  Kegiatan
+                </h4>
+                <p className="text-grey-600 text-sm">
+                  Jelajahi berbagai kegiatan dan program yang kami selenggarakan
+                </p>
+              </Link>
+              <Link
+                href="/membership"
+                className="group p-6 bg-grey-50 rounded-xl hover:bg-primary-50 transition-colors"
+              >
+                <h4 className="text-lg font-semibold text-grey-900 mb-2 group-hover:text-primary-700">
+                  Keanggotaan
+                </h4>
+                <p className="text-grey-600 text-sm">
+                  Informasi lengkap tentang manfaat dan proses keanggotaan
+                </p>
+              </Link>
+            </div>
+          </motion.div>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

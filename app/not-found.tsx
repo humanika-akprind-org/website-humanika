@@ -1,135 +1,119 @@
 "use client";
 
-import "@/app/not-found.css";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Home, ArrowLeft, AlertCircle, Mail } from "lucide-react";
+import "./not-found.css";
 
 export default function NotFound() {
-  const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const floatingElements = Array.from({ length: 4 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 40 + 20,
-    left: Math.random() * 100,
-    delay: Math.random() * 3,
-    duration: Math.random() * 8 + 12,
-  }));
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden relative">
-      {/* Background floating elements */}
+    <div className="min-h-[100dvh] bg-gradient-to-b from-primary-50 via-white to-grey-50 overflow-hidden">
+      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {floatingElements.map((item) => (
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-primary-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-[0.03]">
           <div
-            key={item.id}
-            className="absolute rounded-full bg-gradient-to-r from-blue-100/20 to-purple-100/20 animate-float"
+            className="absolute inset-0"
             style={{
-              width: `${item.size}px`,
-              height: `${item.size}px`,
-              left: `${item.left}%`,
-              top: "-50px",
-              animationDelay: `${item.delay}s`,
-              animationDuration: `${item.duration}s`,
+              backgroundImage: `linear-gradient(to right, #3b82f6 1px, transparent 1px),
+                              linear-gradient(to bottom, #3b82f6 1px, transparent 1px)`,
+              backgroundSize: "40px 40px",
             }}
           />
-        ))}
+        </div>
       </div>
 
-      {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        <div
-          className={`bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl max-w-md w-full text-center transform transition-all duration-700 ${
-            isMounted ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-        >
-          {/* Logo Container */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur-lg opacity-20" />
-            <div className="relative mx-auto w-24 h-24">
-              <Image
-                src="/logo.png"
-                alt="HUMANIKA"
-                width={94}
-                height={94}
-                className="rounded-full border-4 border-white shadow-lg"
-              />
+      <div className="container mx-auto px-4 py-8 md:py-12 relative z-10">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium mb-8 group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Kembali ke Beranda
+            </Link>
+
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full mb-6">
+              <AlertCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">Error 404</span>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Error Number with Animation */}
-          <div className="mb-4">
-            <h1 className="text-8xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
-              404
-            </h1>
-          </div>
-
-          <h2 className="text-2xl font-bold mb-3 text-gray-800 animate-slide-up">
-            Oops! Page Not Found
-          </h2>
-
-          <p
-            className="text-gray-600 mb-8 animate-slide-up"
-            style={{ animationDelay: "0.1s" }}
+          {/* Large 404 Number */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-center mb-12"
           >
-            The page you&apos;re looking for seems to have vanished into the
-            digital void.
-          </p>
+            <h1 className="text-9xl font-bold text-primary-600 mb-4">404</h1>
+            <p className="text-2xl text-grey-600">Halaman Tidak Ditemukan</p>
+          </motion.div>
 
-          {/* Animated Button */}
-          <div
-            className="space-y-4 animate-slide-up"
-            style={{ animationDelay: "0.2s" }}
+          {/* CTA Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="mt-16 text-center"
           >
-            <button
-              onClick={() => router.back()}
-              className="group relative px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 w-full"
-            >
-              <span className="relative z-10">Go Back</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </button>
+            <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl p-8 md:p-10 border border-primary-200">
+              <div className="max-w-2xl mx-auto">
+                <h3 className="text-2xl font-bold text-grey-900 mb-4">
+                  Masih Bingung?
+                </h3>
+                <p className="text-grey-600 mb-8">
+                  Jika Anda masih mengalami masalah atau memiliki pertanyaan,
+                  jangan ragu untuk menghubungi tim support kami.
+                </p>
 
-            <button
-              onClick={() => router.push("/")}
-              className="group px-8 py-3 border-2 border-blue-500 text-blue-600 rounded-full font-semibold transition-all duration-300 hover:bg-blue-50 hover:border-blue-600 hover:scale-105 w-full"
-            >
-              Go Home
-            </button>
-          </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/"
+                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
+                  >
+                    <Home className="w-5 h-5" />
+                    Kembali ke Beranda
+                  </Link>
 
-          {/* Search suggestion */}
-          <div
-            className="mt-8 pt-6 border-t border-gray-100 animate-fade-in"
-            style={{ animationDelay: "0.4s" }}
+                  <Link
+                    href="/contact"
+                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white border-2 border-primary-600 text-primary-600 rounded-xl hover:bg-primary-50 transition-all duration-300 font-semibold"
+                  >
+                    <Mail className="w-5 h-5" />
+                    Hubungi Support
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Technical Info */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="mt-12 text-center"
           >
-            <p className="text-sm text-gray-500 mb-2">
-              Can&apos;t find what you need?
-            </p>
-            <button
-              onClick={() => router.push("/search")}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              Try our search →
-            </button>
-          </div>
-        </div>
-
-        {/* Decorative elements */}
-        <div className="mt-8 text-center">
-          <div className="inline-flex items-center space-x-2 text-gray-400 animate-pulse">
-            <span className="text-sm">Need help?</span>
-            <button
-              onClick={() => router.push("/contact")}
-              className="text-sm text-blue-500 hover:text-blue-600 transition-colors"
-            >
-              Contact Support
-            </button>
-          </div>
+            <div className="inline-flex flex-wrap items-center justify-center gap-6 text-sm text-grey-500">
+              <span>HTTP 404 • Page Not Found</span>
+              <span className="w-1 h-1 bg-grey-300 rounded-full" />
+              <span>HUMANIKA Platform</span>
+              <span className="w-1 h-1 bg-grey-300 rounded-full" />
+              <span>Timestamp: {new Date().toLocaleString("id-ID")}</span>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

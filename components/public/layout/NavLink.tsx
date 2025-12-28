@@ -25,49 +25,27 @@ export function NavLink({
 }: NavLinkProps) {
   const pathname = usePathname();
 
-  // Fungsi untuk menentukan status aktif yang lebih robust
-  const getIsActive = (): boolean => {
-    if (!pathname) return false;
+  const isActive = !pathname
+    ? false
+    : exact
+    ? pathname === href
+    : pathname === href || pathname.startsWith(`${href}/`);
 
-    if (exact) {
-      return pathname === href;
-    }
-
-    // Handle kasus khusus untuk homepage
-    if (href === "/") {
-      return pathname === "/";
-    }
-
-    // Cek apakah pathname dimulai dengan href dan diikuti oleh slash atau akhir string
-    return (
-      pathname === href ||
-      pathname.startsWith(`${href}/`) ||
-      (pathname.startsWith(href) && pathname.length === href.length)
-    );
-  };
-
-  const isActive = getIsActive();
-
-  // Class dasar yang selalu diterapkan
-  const baseClasses = clsx(
+  const combinedClasses = clsx(
     "px-4 py-2 font-medium transition-colors duration-200",
     "flex items-center border-b-2 border-transparent",
-    "hover:bg-blue-700 hover:border-yellow-400",
-    "focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50",
-    "disabled:opacity-50 disabled:cursor-not-allowed"
-  );
-
-  // Class kondisional berdasarkan status aktif
-  const stateClasses = clsx(
+    "hover:bg-blue-700 rounded-md",
+    "focus:outline-none focus:ring-2 focus:ring-opacity-50",
+    className,
     isActive
-      ? clsx("bg-blue-700 border-yellow-400", activeClassName)
-      : clsx(inactiveClassName, className)
+      ? clsx("bg-blue-700 rounded-md", activeClassName)
+      : inactiveClassName
   );
 
   return (
     <Link
       href={href}
-      className={clsx(baseClasses, stateClasses)}
+      className={combinedClasses}
       aria-current={isActive ? "page" : undefined}
       {...props}
     >

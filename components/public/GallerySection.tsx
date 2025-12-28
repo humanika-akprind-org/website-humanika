@@ -73,13 +73,23 @@ export default function GallerySection() {
     return acc;
   }, {} as Record<string, number>);
 
-  const albums = events.map((event) => ({
-    id: event.id,
-    title: event.name,
-    count: galleryCounts[event.id] || 0,
-    cover: getPreviewUrl(event.thumbnail),
-    lastUpdated: event.updatedAt,
-  }));
+  // Prepare albums data with additional info
+  const albums = events
+    .map((event) => {
+      const eventDate = new Date(event.startDate);
+      return {
+        id: event.id,
+        title: event.name,
+        count: galleryCounts[event.id] || 0,
+        cover: getPreviewUrl(event.thumbnail),
+        lastUpdated: event.updatedAt,
+        eventName: event.name,
+        category: event.department?.toString() || "General",
+        date: eventDate,
+        year: eventDate.getFullYear().toString(),
+      };
+    })
+    .filter((album) => album.count > 0); // Only show albums with photos
 
   if (loading) {
     return (

@@ -10,6 +10,7 @@ import { Letter } from "./letter";
 import { Document } from "./document";
 
 export interface Event {
+  type: string;
   price: boolean;
   isFree: any;
   capacity: any;
