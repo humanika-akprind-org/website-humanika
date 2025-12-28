@@ -13,6 +13,9 @@ import { ApprovalApi } from "@/use-cases/api/approval";
 import { PeriodApi } from "@/use-cases/api/period";
 
 import { ActivityApi } from "@/use-cases/api/activity";
+import { ManagementApi } from "@/use-cases/api/management";
+import { getDepartmentTasks } from "@/use-cases/api/task";
+import { StructureApi } from "@/use-cases/api/structure";
 import type { Document } from "@/types/document";
 import type { WorkProgram } from "@/types/work";
 import type { Finance } from "@/types/finance";
@@ -22,6 +25,9 @@ import type { Article } from "@/types/article";
 import type { ActivityLog } from "@/types/activity-log";
 import type { Period } from "@/types/period";
 import { Status } from "@/types/enums";
+import { Icons } from "@/components/icons";
+import { MetricCard } from "@/components/admin/dashboard/MetricCard";
+import LoadingOverview from "@/components/admin/dashboard/LoadingOverview";
 
 interface OverviewData {
   totalUsers: number;
@@ -38,6 +44,12 @@ interface OverviewData {
   activePeriod: string;
   recentActivities: ActivityLog[];
   nextEvent?: Event;
+  totalPeriods: number;
+  totalManagements: number;
+  totalStructures: number;
+  totalTasks: number;
+  totalProposals: number;
+  totalAccountabilityReports: number;
 }
 
 export default function OverviewPage() {
@@ -60,6 +72,9 @@ export default function OverviewPage() {
           approvalsResponse,
           periods,
           activities,
+          managements,
+          tasks,
+          structures,
         ] = await Promise.all([
           UserApi.getUsers(),
           DocumentApi.getDocuments(),
@@ -72,6 +87,9 @@ export default function OverviewPage() {
           ApprovalApi.getApprovals({ status: "PENDING" }),
           PeriodApi.getPeriods(),
           ActivityApi.getActivities(),
+          ManagementApi.getManagements(),
+          getDepartmentTasks(),
+          StructureApi.getStructures(),
         ]);
 
         // Extract users from API response
@@ -145,6 +163,20 @@ export default function OverviewPage() {
           )
           .slice(0, 3);
 
+        // Calculate new metrics
+        const totalPeriods = periods.length;
+        const totalManagements = managements.length;
+        const totalStructures = structures.data?.length || 0;
+        const totalTasks = tasks.length;
+
+        // Calculate proposals and accountability reports from documents
+        const totalProposals = documents.filter(
+          (doc: Document) => doc.documentType?.name === "PROPOSAL"
+        ).length;
+        const totalAccountabilityReports = documents.filter(
+          (doc: Document) => doc.documentType?.name === "LPJ"
+        ).length;
+
         setOverview({
           totalUsers,
           totalWorkPrograms,
@@ -160,6 +192,12 @@ export default function OverviewPage() {
           activePeriod,
           recentActivities,
           nextEvent,
+          totalPeriods,
+          totalManagements,
+          totalStructures,
+          totalTasks,
+          totalProposals,
+          totalAccountabilityReports,
         });
       } catch (err) {
         setError("Failed to load overview data");
@@ -173,27 +211,12 @@ export default function OverviewPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-300 rounded mb-6" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-300 rounded" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="h-64 bg-gray-300 rounded" />
-            <div className="h-64 bg-gray-300 rounded" />
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingOverview />;
   }
 
   if (error) {
     return (
-      <div className="p-6">
+      <div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-700">{error}</p>
         </div>
@@ -204,170 +227,335 @@ export default function OverviewPage() {
   if (!overview) return null;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Overview</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {/* Users Card */}
-        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
-            Total Users
-          </h2>
-          <p className="text-3xl font-bold text-blue-600">
-            {overview.totalUsers}
-          </p>
-          <p className="text-sm text-green-500 mt-2">Active members</p>
+    <div>
+      <div className="flex items-center mb-8">
+        <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mr-4">
+          <Icons.trendingUp className="h-8 w-8 text-white" />
         </div>
-
-        {/* Work Programs Card */}
-        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
-            Work Programs
-          </h2>
-          <p className="text-3xl font-bold text-green-600">
-            {overview.totalWorkPrograms}
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Dashboard Overview
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Monitor your organization&apos;s key metrics and activities
           </p>
-          <p className="text-sm text-gray-500 mt-2">
-            {overview.activePrograms} ongoing
-          </p>
-        </div>
-
-        {/* Events Card */}
-        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
-            Upcoming Events
-          </h2>
-          <p className="text-3xl font-bold text-purple-600">
-            {overview.upcomingEvents}
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            {overview.nextEvent
-              ? `Next: ${overview.nextEvent.name}`
-              : "No upcoming events"}
-          </p>
-        </div>
-
-        {/* Documents Card */}
-        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
-            Documents
-          </h2>
-          <p className="text-3xl font-bold text-yellow-600">
-            {overview.totalDocuments}
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            {overview.pendingDocuments} pending review
-          </p>
-        </div>
-
-        {/* Finance Card */}
-        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">Budget</h2>
-          <p className="text-3xl font-bold text-red-600">
-            Rp {overview.totalBudget.toLocaleString()}
-          </p>
-          <p className="text-sm text-green-500 mt-2">Current total</p>
-        </div>
-
-        {/* Letters Card */}
-        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-indigo-500">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
-            Processed Letters
-          </h2>
-          <p className="text-3xl font-bold text-indigo-600">
-            {overview.processedLetters}
-          </p>
-          <p className="text-sm text-gray-500 mt-2">Total processed</p>
-        </div>
-
-        {/* Articles Card */}
-        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-pink-500">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
-            Published Articles
-          </h2>
-          <p className="text-3xl font-bold text-pink-600">
-            {overview.publishedArticles}
-          </p>
-          <p className="text-sm text-green-500 mt-2">Published</p>
-        </div>
-
-        {/* Gallery Card */}
-        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-teal-500">
-          <h2 className="text-lg font-semibold text-gray-700 mb-2">
-            Gallery Items
-          </h2>
-          <p className="text-3xl font-bold text-teal-600">
-            {overview.galleryItems}
-          </p>
-          <p className="text-sm text-gray-500 mt-2">Total items</p>
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Governance Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Governance
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+        <MetricCard
+          icon="calendar"
+          color="orange"
+          value={overview.totalPeriods}
+          title="Periods"
+          statusIcon="check"
+          statusColor="green-500"
+          statusText="Total periods"
+          href="/admin/governance/periods"
+        />
+
+        <MetricCard
+          icon="user"
+          color="purple"
+          value={overview.totalManagements}
+          title="Managements"
+          statusIcon="users"
+          statusColor="blue-500"
+          statusText="Total managements"
+          href="/admin/governance/managements"
+        />
+
+        <MetricCard
+          icon="users"
+          color="cyan"
+          value={overview.totalStructures}
+          title="Organizational Structures"
+          statusIcon="users"
+          statusColor="gray-500"
+          statusText="Total structures"
+          href="/admin/governance/structure"
+        />
+
+        <MetricCard
+          icon="fileText"
+          color="lime"
+          value={overview.totalTasks}
+          title="Department Tasks"
+          statusIcon="fileText"
+          statusColor="orange-500"
+          statusText="Total tasks"
+          href="/admin/governance/tasks"
+        />
+      </div>
+
+      {/* People & Access Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          People & Access
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+        <MetricCard
+          icon="users"
+          color="blue"
+          value={overview.totalUsers}
+          title="Total Users"
+          statusIcon="checkCircle"
+          statusColor="green-500"
+          statusText="Active members"
+          href="/admin/people/users"
+        />
+      </div>
+
+      {/* Programs & Events Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Programs & Events
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+        <MetricCard
+          icon="briefcase"
+          color="green"
+          value={overview.totalWorkPrograms}
+          title="Work Programs"
+          statusIcon="trendingUp"
+          statusColor="blue-500"
+          statusText={`${overview.activePrograms} ongoing`}
+          href="/admin/program/works"
+        />
+
+        <MetricCard
+          icon="calendarDays"
+          color="purple"
+          value={overview.upcomingEvents}
+          title="Upcoming Events"
+          statusIcon="clock"
+          statusColor="orange-500"
+          statusText={
+            overview.nextEvent
+              ? `Next: ${overview.nextEvent.name}`
+              : "No upcoming events"
+          }
+          href="/admin/program/events"
+        />
+      </div>
+
+      {/* Administration Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Administration
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+        <MetricCard
+          icon="fileText"
+          color="emerald"
+          value={overview.totalProposals}
+          title="Proposals"
+          statusIcon="fileText"
+          statusColor="blue-500"
+          statusText="Total proposals"
+          href="/admin/administration/proposals"
+        />
+
+        <MetricCard
+          icon="fileCheck"
+          color="violet"
+          value={overview.totalAccountabilityReports}
+          title="Accountability Reports"
+          statusIcon="check"
+          statusColor="green-500"
+          statusText="Total reports"
+          href="/admin/administration/accountability-reports"
+        />
+
+        <MetricCard
+          icon="mail"
+          color="indigo"
+          value={overview.processedLetters}
+          title="Processed Letters"
+          statusIcon="checkCircle"
+          statusColor="green-500"
+          statusText="Total processed"
+          href="/admin/administration/letters"
+        />
+
+        <MetricCard
+          icon="fileText"
+          color="yellow"
+          value={overview.totalDocuments}
+          title="Documents"
+          statusIcon="alertCircle"
+          statusColor="red-500"
+          statusText={`${overview.pendingDocuments} pending review`}
+          href="/admin/administration/documents"
+        />
+      </div>
+
+      {/* Content & Media Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Content & Media
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+        <MetricCard
+          icon="newspaper"
+          color="pink"
+          value={overview.publishedArticles}
+          title="Published Articles"
+          statusIcon="checkCircle"
+          statusColor="green-500"
+          statusText="Published"
+          fontMedium
+          href="/admin/content/articles"
+        />
+
+        <MetricCard
+          icon="image"
+          color="teal"
+          value={overview.galleryItems}
+          title="Gallery Items"
+          statusIcon="image"
+          statusColor="gray-500"
+          statusText="Total items"
+          href="/admin/content/galleries"
+        />
+      </div>
+
+      {/* Finance Section */}
+      <div className="mt-6 mb-2">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+          Finance
+        </h3>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <MetricCard
+          icon="dollarSign"
+          color="red"
+          value={`Rp ${overview.totalBudget.toLocaleString()}`}
+          title="Current Budget"
+          statusIcon="trendingUp"
+          statusColor="green-500"
+          statusText="Net balance"
+          valueSize="lg"
+          href="/admin/finance/transactions"
+        />
+      </div>
+
+      {/* Activity and System Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">
-            Recent Activity
-          </h2>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center mb-6">
+            <div className="p-2 bg-blue-50 rounded-lg mr-3">
+              <Icons.activity className="h-5 w-5 text-blue-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Recent Activity
+            </h2>
+          </div>
           <div className="space-y-4">
             {overview.recentActivities.length > 0 ? (
               overview.recentActivities.map((activity: ActivityLog) => (
-                <div key={activity.id} className="flex items-center">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 font-semibold">
-                      {activity.user?.name?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
+                <div
+                  key={activity.id}
+                  className="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex-shrink-0">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                      <span className="text-white font-semibold text-sm">
+                        {activity.user?.name?.charAt(0)?.toUpperCase() || "U"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-900">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 leading-5">
                       {activity.description}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(activity.createdAt).toLocaleString()}
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(activity.createdAt).toLocaleString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500">No recent activity</p>
+              <div className="text-center py-8">
+                <Icons.activity className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-sm text-gray-500">No recent activity</p>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">
-            System Overview
-          </h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-700">
-                Active Period
-              </span>
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+        {/* System Overview */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center mb-6">
+            <div className="p-2 bg-green-50 rounded-lg mr-3">
+              <Icons.trendingUp className="h-5 w-5 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              System Overview
+            </h2>
+          </div>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center">
+                <Icons.calendar className="h-5 w-5 text-blue-600 mr-3" />
+                <span className="text-sm font-medium text-gray-700">
+                  Active Period
+                </span>
+              </div>
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
                 {overview.activePeriod}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-700">
-                External Links
-              </span>
-              <span className="text-sm text-gray-900">12</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-700">
-                Pending Approvals
-              </span>
-              <span className="text-sm text-gray-900">
+
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center">
+                <Icons.alertCircle className="h-5 w-5 text-orange-600 mr-3" />
+                <span className="text-sm font-medium text-gray-700">
+                  Pending Approvals
+                </span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900">
                 {overview.pendingApprovals}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-700">
-                System Health
-              </span>
-              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center">
+                <Icons.checkCircle className="h-5 w-5 text-green-600 mr-3" />
+                <span className="text-sm font-medium text-gray-700">
+                  System Health
+                </span>
+              </div>
+              <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
                 Optimal
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center">
+                <Icons.users className="h-5 w-5 text-purple-600 mr-3" />
+                <span className="text-sm font-medium text-gray-700">
+                  User Engagement
+                </span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900">
+                {Math.round((overview.totalUsers / 100) * 85)}%
               </span>
             </div>
           </div>

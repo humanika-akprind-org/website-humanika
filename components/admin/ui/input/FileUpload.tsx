@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
+import AccessTokenGuard from "./AccessTokenGuard";
 import { FiFile } from "react-icons/fi";
 
 interface FileUploadProps {
   label: string;
   existingFile?: string | null;
-  onRemove?: () => void;
+  onRemoveFile?: () => void;
   onFileChange: (file: File) => void;
   isLoading?: boolean;
   fileLoading?: boolean;
@@ -14,12 +15,13 @@ interface FileUploadProps {
   helpText?: string;
   loadingText?: string;
   required?: boolean;
+  removeButtonText?: string;
 }
 
 export default function FileUpload({
   label,
   existingFile,
-  onRemove,
+  onRemoveFile,
   onFileChange,
   isLoading = false,
   fileLoading = false,
@@ -27,12 +29,10 @@ export default function FileUpload({
   helpText,
   loadingText = "Uploading file...",
   required = false,
+  removeButtonText = "Remove File",
 }: FileUploadProps) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label} {required && "*"}
-      </label>
+    <AccessTokenGuard label={label} required={required}>
       <div className="flex items-start space-x-4">
         {existingFile && existingFile.trim() !== "" && (
           <div className="flex flex-col items-center">
@@ -44,11 +44,11 @@ export default function FileUpload({
             <div className="flex gap-2 mt-2">
               <button
                 type="button"
-                onClick={onRemove}
+                onClick={onRemoveFile}
                 className="text-sm text-red-600 hover:text-red-800"
                 disabled={isLoading}
               >
-                Remove File
+                {removeButtonText}
               </button>
             </div>
           </div>
@@ -71,6 +71,6 @@ export default function FileUpload({
           )}
         </div>
       </div>
-    </div>
+    </AccessTokenGuard>
   );
 }

@@ -1,50 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiUser, FiMail, FiUsers, FiSave, FiEdit3 } from "react-icons/fi";
-import { apiUrl } from "@/lib/config/config";
+import { FiUser, FiMail, FiSave, FiEdit3 } from "react-icons/fi";
 import { useToast } from "@/hooks/use-toast";
-
-// Enum values from Prisma
-enum UserRole {
-  DPO = "DPO",
-  BPH = "BPH",
-  PENGURUS = "PENGURUS",
-  ANGGOTA = "ANGGOTA",
-}
-
-enum Department {
-  INFOKOM = "INFOKOM",
-  PSDM = "PSDM",
-  LITBANG = "LITBANG",
-  KWU = "KWU",
-}
-
-enum Position {
-  KETUA_UMUM = "KETUA_UMUM",
-  WAKIL_KETUA_UMUM = "WAKIL_KETUA_UMUM",
-  SEKRETARIS = "SEKRETARIS",
-  BENDAHARA = "BENDAHARA",
-  KEPALA_DEPARTEMEN = "KEPALA_DEPARTEMEN",
-  STAFF_DEPARTEMEN = "STAFF_DEPARTEMEN",
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  username: string;
-  role: UserRole;
-  department?: Department;
-  position?: Position;
-  isActive: boolean;
-  verifiedAccount: boolean;
-  attemptLogin: number;
-  blockExpires?: string;
-  createdAt: string;
-  updatedAt: string;
-  avatarColor: string;
-}
+import type { Department, Position } from "@/types/enums";
+import LoadingProfile from "@/components/admin/layout/loading/LoadingProfile";
+import { UserApi, formatEnumValue } from "@/use-cases/api/user";
+import type { User } from "@/types/user";
 
 interface UpdateUserData {
   name?: string;
@@ -52,52 +14,6 @@ interface UpdateUserData {
   username?: string;
   department?: Department;
   position?: Position;
-}
-
-// Helper function to format enum values for display
-const formatEnumValue = (value: string) =>
-  value
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
-
-class UserApi {
-  private static API_BASE_URL = apiUrl;
-
-  private static async fetchApi<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<{ data?: T; error?: string }> {
-    try {
-      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
-        ...options,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { error: data.error || "An error occurred" };
-      }
-
-      return { data };
-    } catch (_error) {
-      return { error: "Network error occurred" };
-    }
-  }
-
-  static async updateUser(
-    id: string,
-    userData: UpdateUserData
-  ): Promise<{ data?: User; error?: string }> {
-    return this.fetchApi<User>(`/user/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(userData),
-    });
-  }
 }
 
 export default function ProfilePage() {
@@ -164,8 +80,11 @@ export default function ProfilePage() {
     const errors: Partial<UpdateUserData> = {};
 
     if (!formData.name?.trim()) errors.name = "Name is required";
-    if (!formData.email?.trim()) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
+    if (!formData.email?.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid";
+    }
     if (!formData.username?.trim()) errors.username = "Username is required";
 
     setFormErrors(errors);
@@ -213,8 +132,6 @@ export default function ProfilePage() {
         name: user.name,
         email: user.email,
         username: user.username,
-        department: user.department,
-        position: user.position,
       });
     }
     setFormErrors({});
@@ -222,11 +139,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    );
+    return <LoadingProfile />;
   }
 
   if (!user) {
@@ -388,80 +301,6 @@ export default function ProfilePage() {
                     {formErrors.username}
                   </p>
                 )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Department
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiUsers className="text-gray-400" />
-                  </div>
-                  <select
-                    name="department"
-                    value={formData.department || ""}
-                    onChange={handleChange}
-                    className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                  >
-                    <option value="">Select a department</option>
-                    {Object.values(Department).map((dept) => (
-                      <option key={dept} value={dept}>
-                        {formatEnumValue(dept)}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Position
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiUsers className="text-gray-400" />
-                  </div>
-                  <select
-                    name="position"
-                    value={formData.position || ""}
-                    onChange={handleChange}
-                    className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                  >
-                    <option value="">Select a position</option>
-                    {Object.values(Position).map((pos) => (
-                      <option key={pos} value={pos}>
-                        {formatEnumValue(pos)}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                </div>
               </div>
             </div>
 

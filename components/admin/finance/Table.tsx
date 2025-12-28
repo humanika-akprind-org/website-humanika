@@ -137,7 +137,7 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                 onClick={() => handleSort("description")}
               >
                 <div className="flex items-center">
-                  Description
+                  Name
                   <SortIcon
                     sortField={sortField}
                     sortDirection={sortDirection}
@@ -226,6 +226,9 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                     checked={selectedFinances.includes(finance.id)}
                     onChange={() => handleFinanceSelect(finance.id)}
                   />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {finance.description}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">

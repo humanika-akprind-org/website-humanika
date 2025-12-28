@@ -100,13 +100,14 @@ export default function StructureForm({
         <FileUpload
           label="Decree File (SK)"
           existingFile={existingDecree}
-          onRemove={removeDecree}
+          onRemoveFile={removeDecree}
           onFileChange={handleFileChange}
           isLoading={isLoading}
           fileLoading={fileLoading}
           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
           helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, JPG, PNG)"
           loadingText="Uploading file..."
+          removeButtonText="Hapus File"
           required
         />
 

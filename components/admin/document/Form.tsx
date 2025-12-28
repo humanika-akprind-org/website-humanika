@@ -26,7 +26,6 @@ interface DocumentFormProps {
     data: CreateDocumentInput | UpdateDocumentInput
   ) => Promise<void>;
   loading?: boolean;
-  accessToken: string;
   events: Event[];
   letters: Letter[];
   fixedDocumentType?: string;
@@ -36,7 +35,6 @@ export default function DocumentForm({
   document,
   onSubmit,
   onSubmitForApproval,
-  accessToken,
   fixedDocumentType,
 }: DocumentFormProps) {
   const router = useRouter();
@@ -56,7 +54,6 @@ export default function DocumentForm({
     handleSubmit,
   } = useDocumentForm({
     document,
-    accessToken,
     onSubmit,
     onSubmitForApproval,
     fixedDocumentType,
@@ -157,7 +154,7 @@ export default function DocumentForm({
         <FileUpload
           label="Document File"
           existingFile={existingDocument}
-          onRemove={removeDocument}
+          onRemoveFile={removeDocument}
           onFileChange={(file) => {
             const syntheticEvent = {
               target: { files: [file] as unknown as FileList },
@@ -169,6 +166,7 @@ export default function DocumentForm({
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
           helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
           loadingText="Mengupload file..."
+          removeButtonText="Hapus File"
         />
 
         <div className="flex justify-end space-x-3 pt-4">

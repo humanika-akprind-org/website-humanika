@@ -112,3 +112,11 @@ export const deleteGallery = async (id: string): Promise<void> => {
     throw new Error("Failed to delete gallery");
   }
 };
+
+export const GalleryApi = {
+  getGallery,
+  getGalleries,
+  createGallery,
+  updateGallery,
+  deleteGallery,
+};

@@ -19,6 +19,10 @@ import {
 } from "lucide-react";
 
 import type { ActivityLog } from "@/types/activity-log";
+import SelectInput from "@/components/admin/ui/input/SelectInput";
+import ExportButtons from "@/components/admin/activity/export-button/ExportButtons";
+import LoadingActivityDashboard from "@/components/admin/activity/LoadingActivityDashboard";
+import StatCard from "@/components/admin/ui/card/StatCard";
 
 export default function ActivityPage() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
@@ -223,23 +227,12 @@ export default function ActivityPage() {
   };
 
   if (loading) {
-    return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-300 rounded mb-6" />
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-300 rounded" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingActivityDashboard />;
   }
 
   if (error) {
     return (
-      <div className="p-6">
+      <div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-700">{error}</p>
         </div>
@@ -261,23 +254,25 @@ export default function ActivityPage() {
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Activity Log</h1>
-        <div className="flex items-center space-x-4">
-          <select
+    <div>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 py-1">Activity Log</h1>
+        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 py-1">
+          <SelectInput
+            label=""
+            name="selectedTimeFilter"
             value={selectedTimeFilter}
-            onChange={(e) => setSelectedTimeFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option>All Activities</option>
-            <option>Today</option>
-            <option>This Week</option>
-            <option>This Month</option>
-          </select>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-            Export Log
-          </button>
+            onChange={setSelectedTimeFilter}
+            options={[
+              { value: "All Activities", label: "All Activities" },
+              { value: "Today", label: "Today" },
+              { value: "This Week", label: "This Week" },
+              { value: "This Month", label: "This Month" },
+            ]}
+            placeholder="Select time filter"
+            className="w-auto"
+          />
+          <ExportButtons activities={filteredActivities} />
         </div>
       </div>
 
@@ -305,74 +300,69 @@ export default function ActivityPage() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">
-              Total Activities
-            </h3>
-            <BarChart3 className="h-6 w-6 text-blue-500" />
-          </div>
-          <p className="text-2xl font-bold text-gray-800">
-            {filteredActivities.length}
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">This Week</h3>
-            <RefreshCw className="h-6 w-6 text-green-500" />
-          </div>
-          <p className="text-2xl font-bold text-gray-800">
+        {(() => {
+          const thisWeekCount = activities.filter((activity) => {
+            const activityDate = new Date(activity.createdAt);
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return activityDate >= weekAgo;
+          }).length;
+
+          const userCounts = filteredActivities.reduce((acc, activity) => {
+            const userName = activity.user?.name || "Unknown";
+            acc[userName] = (acc[userName] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          const mostActive = Object.entries(userCounts).sort(
+            ([, a], [, b]) => b - a
+          )[0];
+
+          const serviceCounts = filteredActivities.reduce((acc, activity) => {
+            const serviceName = getServiceName(activity.entityType);
+            acc[serviceName] = (acc[serviceName] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          const topService = Object.entries(serviceCounts).sort(
+            ([, a], [, b]) => b - a
+          )[0];
+
+          const stats = [
             {
-              activities.filter((activity) => {
-                const activityDate = new Date(activity.createdAt);
-                const weekAgo = new Date();
-                weekAgo.setDate(weekAgo.getDate() - 7);
-                return activityDate >= weekAgo;
-              }).length
-            }
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Most Active</h3>
-            <User className="h-6 w-6 text-purple-500" />
-          </div>
-          <p className="text-xl font-bold text-gray-800">
-            {(() => {
-              const userCounts = filteredActivities.reduce((acc, activity) => {
-                const userName = activity.user?.name || "Unknown";
-                acc[userName] = (acc[userName] || 0) + 1;
-                return acc;
-              }, {} as Record<string, number>);
-              const mostActive = Object.entries(userCounts).sort(
-                ([, a], [, b]) => b - a
-              )[0];
-              return mostActive ? mostActive[0] : "No data";
-            })()}
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-600">Top Service</h3>
-            <FileText className="h-6 w-6 text-orange-500" />
-          </div>
-          <p className="text-xl font-bold text-gray-800">
-            {(() => {
-              const serviceCounts = filteredActivities.reduce(
-                (acc, activity) => {
-                  const serviceName = getServiceName(activity.entityType);
-                  acc[serviceName] = (acc[serviceName] || 0) + 1;
-                  return acc;
-                },
-                {} as Record<string, number>
-              );
-              const topService = Object.entries(serviceCounts).sort(
-                ([, a], [, b]) => b - a
-              )[0];
-              return topService ? topService[0] : "No data";
-            })()}
-          </p>
-        </div>
+              title: "Total Activities",
+              value: filteredActivities.length,
+              icon: BarChart3,
+              color: "blue",
+            },
+            {
+              title: "This Week",
+              value: thisWeekCount,
+              icon: RefreshCw,
+              color: "green",
+            },
+            {
+              title: "Most Active",
+              value: mostActive ? mostActive[0] : "No data",
+              icon: User,
+              color: "purple",
+            },
+            {
+              title: "Top Service",
+              value: topService ? topService[0] : "No data",
+              icon: FileText,
+              color: "orange",
+            },
+          ];
+
+          return stats.map((stat, index) => (
+            <StatCard
+              key={index}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              color={stat.color}
+            />
+          ));
+        })()}
       </div>
 
       {/* Activity Log */}

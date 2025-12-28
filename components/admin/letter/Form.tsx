@@ -31,7 +31,6 @@ interface LetterFormProps {
     data: CreateLetterInput | UpdateLetterInput
   ) => Promise<void>;
   isLoading?: boolean;
-  accessToken?: string;
   periods?: Period[];
   events?: Event[];
   isEditing?: boolean;
@@ -41,7 +40,6 @@ export default function LetterForm({
   letter,
   onSubmit,
   onSubmitForApproval,
-  accessToken,
   periods = [],
   events = [],
   isEditing,
@@ -61,7 +59,6 @@ export default function LetterForm({
     handleSubmit,
   } = useLetterForm({
     letter,
-    accessToken,
     onSubmit,
     onSubmitForApproval,
   });
@@ -269,7 +266,7 @@ export default function LetterForm({
         <FileUpload
           label="Letter File"
           existingFile={existingLetter}
-          onRemove={removeLetter}
+          onRemoveFile={removeLetter}
           onFileChange={(file) => {
             const syntheticEvent = {
               target: { files: [file] as unknown as FileList },
@@ -281,6 +278,7 @@ export default function LetterForm({
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
           helpText="Upload letter file (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
           loadingText="Mengupload file..."
+          removeButtonText="Hapus File"
         />
 
         {/* Form Actions */}

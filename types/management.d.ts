@@ -1,6 +1,7 @@
 import { Department, Position } from "./enums";
 
 export interface Management {
+  isActive: unknown;
   id: string;
   userId: string;
   periodId: string;

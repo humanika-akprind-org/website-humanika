@@ -1,5 +1,5 @@
 // components/admin/NavLink.tsx
-'use client';
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,6 +11,7 @@ interface NavLinkProps {
   icon: LucideIcon;
   children: ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 export default function NavLink({
@@ -18,6 +19,7 @@ export default function NavLink({
   icon: Icon,
   children,
   className = "",
+  onClick,
 }: NavLinkProps) {
   const pathname = usePathname();
   const isActive = pathname === href;
@@ -25,6 +27,7 @@ export default function NavLink({
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors text-sm ml-3 group ${
         isActive ? "bg-blue-50 text-blue-600 font-medium" : ""
       } ${className}`}

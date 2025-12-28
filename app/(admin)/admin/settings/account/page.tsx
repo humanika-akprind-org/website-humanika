@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { FiKey, FiSave } from "react-icons/fi";
 import { useToast } from "@/hooks/use-toast";
+import { UserApi } from "@/use-cases/api/user";
+import SkeletonAccountPage from "@/components/admin/layout/loading/LoadingAccount";
 
 interface AccountStatus {
   isActive: boolean;
@@ -17,7 +19,9 @@ interface ChangePasswordData {
 }
 
 export default function AccountPage() {
-  const [accountStatus, setAccountStatus] = useState<AccountStatus | null>(null);
+  const [accountStatus, setAccountStatus] = useState<AccountStatus | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -34,18 +38,17 @@ export default function AccountPage() {
   useEffect(() => {
     const fetchAccountStatus = async () => {
       try {
-        const res = await fetch("/api/auth/me");
-        if (res.ok) {
-          const data = await res.json();
+        const response = await UserApi.getCurrentUser();
+        if (response.data) {
           setAccountStatus({
-            isActive: data.isActive,
-            verifiedAccount: data.verifiedAccount,
-            email: data.email,
+            isActive: response.data.isActive,
+            verifiedAccount: response.data.verifiedAccount,
+            email: response.data.email,
           });
         } else {
           toast({
             title: "Error",
-            description: "Failed to load account status",
+            description: response.error || "Failed to load account status",
             variant: "destructive",
           });
         }
@@ -102,42 +105,35 @@ export default function AccountPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/user/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword,
-        }),
+      const response = await UserApi.changePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
+      if (response.error) {
         let errorMessage = "Failed to change password";
-        if (data.error) {
-          switch (data.error) {
-            case "Current password and new password are required":
-              errorMessage = "Please fill in all password fields";
-              break;
-            case "Current password is incorrect":
-              errorMessage = "Current password is incorrect";
-              break;
-            case "User not found or password not set":
-              errorMessage = "Account password not found. Please contact support.";
-              break;
-            case "Unauthorized":
-              errorMessage = "You are not authorized to perform this action";
-              break;
-            default:
-              errorMessage = data.error;
-          }
+        switch (response.error) {
+          case "Current password and new password are required":
+            errorMessage = "Please fill in all password fields";
+            break;
+          case "Current password is incorrect":
+            errorMessage = "Current password is incorrect";
+            break;
+          case "User not found or password not set":
+            errorMessage =
+              "Account password not found. Please contact support.";
+            break;
+          case "Unauthorized":
+            errorMessage = "You are not authorized to perform this action";
+            break;
+          default:
+            errorMessage = response.error;
         }
         setError(errorMessage);
       } else {
-        setSuccess("Password changed successfully! You can now use your new password to log in.");
+        setSuccess(
+          "Password changed successfully! You can now use your new password to log in."
+        );
         setError(""); // Clear any previous error messages
         setPasswordData({
           currentPassword: "",
@@ -182,7 +178,9 @@ export default function AccountPage() {
         }
         setError(errorMessage);
       } else {
-        setSuccess("Account deleted successfully! You will be redirected shortly.");
+        setSuccess(
+          "Account deleted successfully! You will be redirected shortly."
+        );
         // Optionally redirect user after account deletion
         setTimeout(() => {
           window.location.href = "/";
@@ -198,19 +196,19 @@ export default function AccountPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    );
+    return <SkeletonAccountPage />;
   }
 
   if (!accountStatus) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Account Not Found</h1>
-          <p className="text-gray-600">Unable to load your account information.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Account Not Found
+          </h1>
+          <p className="text-gray-600">
+            Unable to load your account information.
+          </p>
         </div>
       </div>
     );
@@ -342,7 +340,7 @@ export default function AccountPage() {
 
       {/* Delete Account */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6 text-red-600">
+        <h3 className="text-xl font-semibold text-gray-900 mb-6">
           Delete Account
         </h3>
         <p className="text-gray-600 mb-4">
