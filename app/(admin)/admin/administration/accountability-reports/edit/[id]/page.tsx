@@ -7,7 +7,6 @@ import PageHeader from "@/components/admin/ui/PageHeader";
 import Alert from "@/components/admin/ui/alert/Alert";
 import { useEditDocument } from "@/hooks/document/useEditDocument";
 import { useDocumentFormData } from "@/hooks/document/useDocumentFormData";
-import { useState, useEffect } from "react";
 
 export default function EditDocumentPage() {
   const params = useParams();
@@ -30,24 +29,6 @@ export default function EditDocumentPage() {
     error: formDataError,
   } = useDocumentFormData();
 
-  const [accessToken, setAccessToken] = useState<string>("");
-
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        // Assuming there's an API endpoint to get the access token client-side
-        const response = await fetch("/api/auth/google-access-token");
-        if (response.ok) {
-          const data = await response.json();
-          setAccessToken(data.accessToken || "");
-        }
-      } catch (e) {
-        console.error("Failed to fetch access token:", e);
-      }
-    };
-    fetchToken();
-  }, []);
-
   const combinedLoading = loading || formDataLoading || isSubmitting;
   const loadError = error || formDataError;
 
@@ -64,7 +45,6 @@ export default function EditDocumentPage() {
           document={document}
           onSubmit={updateDocument}
           onSubmitForApproval={updateDocumentForApproval}
-          accessToken={accessToken}
           events={events}
           letters={letters}
           loading={combinedLoading}
