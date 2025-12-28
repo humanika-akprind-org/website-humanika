@@ -63,6 +63,7 @@
     "cookies-next": "^4.2.0",
     "crypto": "^1.0.1",
     "docx": "^9.5.1",
+    "framer-motion": "^12.23.26",
     "googleapis": "^144.0.0",
     "html-react-parser": "^5.2.10",
     "jsonwebtoken": "^9.0.2",

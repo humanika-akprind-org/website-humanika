@@ -4,10 +4,23 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import EventCard from "@/components/public/event/EventCard";
 import type { Event } from "@/types/event";
+import {
+  Calendar,
+  Filter,
+  CalendarDays,
+  Sparkles,
+  ChevronRight,
+  Loader2,
+  TrendingUp,
+  Clock,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function UpcomingEventsSection() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -32,101 +45,481 @@ export default function UpcomingEventsSection() {
     fetchEvents();
   }, []);
 
+  const now = new Date();
+
+  // Filter upcoming events
+  const upcomingEvents = allEvents.filter(
+    (event) => new Date(event.startDate) > now
+  );
+
+  // Get unique categories
+  const categories = [
+    "all",
+    ...Array.from(
+      new Set(
+        allEvents.map((e) => e.department?.toString().toLowerCase() || "other")
+      )
+    ),
+  ];
+
+  // Filter events by selected category
+  const filteredEvents =
+    selectedCategory === "all"
+      ? upcomingEvents
+      : upcomingEvents.filter(
+          (event) =>
+            event.department?.toString().toLowerCase() === selectedCategory
+        );
+
+  // Sort by date (nearest first)
+  const sortedEvents = [...filteredEvents].sort(
+    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  );
+
   if (loading) {
     return (
-      <section className="py-16 bg-grey-50">
+      <section className="py-20 bg-gradient-to-b from-white to-primary-50/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-heading-2 text-grey-900 mb-4">
-              Event Terdekat
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 text-primary-600 font-semibold uppercase tracking-wider text-sm mb-4">
+              <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
+              KEGIATAN TERDEKAT
+            </div>
+
+            <h2 className="text-4xl md:text-5xl font-bold text-grey-900 mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+                Event Mendatang
+              </span>
+              <br />
+              yang Wajib Diikuti
             </h2>
-            <p className="text-body-1 text-grey-600 max-w-2xl mx-auto">
-              Ikuti kegiatan dan acara terbaru kami untuk mengembangkan skill
-              dan jaringan profesional Anda
+
+            <p className="text-lg text-grey-600 max-w-2xl mx-auto leading-relaxed">
+              Temukan acara terbaru yang akan membantu Anda mengembangkan skill
+              dan memperluas jaringan profesional
             </p>
-          </div>
-          <div className="text-center py-12">
-            <p className="text-gray-500">Memuat event...</p>
+          </motion.div>
+
+          <div className="text-center py-20">
+            <div className="inline-flex flex-col items-center gap-4">
+              <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
+              <p className="text-grey-600 font-medium">
+                Memuat event terdekat...
+              </p>
+            </div>
           </div>
         </div>
       </section>
     );
   }
 
-  const now = new Date();
-
-  // Pass full event objects without mapping to EventCard for correct props
-  const upcomingEvents = allEvents.filter(
-    (event) => new Date(event.startDate) > now
-  );
-
   return (
-    <section className="py-16 bg-grey-50">
+    <section className="py-20 bg-gradient-to-b from-white to-primary-50/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-heading-2 text-grey-900 mb-4">Event Terdekat</h2>
-          <p className="text-body-1 text-grey-600 max-w-2xl mx-auto">
-            Ikuti kegiatan dan acara terbaru kami untuk mengembangkan skill dan
-            jaringan profesional Anda
-          </p>
-        </div>
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 text-primary-600 font-semibold uppercase tracking-wider text-sm mb-4">
+            <div className="w-2 h-2 bg-primary-500 rounded-full" />
+            KEGIATAN TERDEKAT
+          </div>
 
-        {/* Upcoming Events */}
-        <div className="mb-12">
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 border-b-4 border-blue-600 pb-2 inline-block">
-              Upcoming Events
-            </h3>
-            <div className="flex items-center space-x-4">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
-                Filter
-              </button>
-              <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium">
-                Calendar View
-              </button>
+          <h2 className="text-4xl md:text-5xl font-bold text-grey-900 mb-6">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+              Event Mendatang
+            </span>
+            <br />
+            yang Wajib Diikuti
+          </h2>
+
+          <p className="text-lg text-grey-600 max-w-2xl mx-auto leading-relaxed">
+            Temukan acara terbaru yang akan membantu Anda mengembangkan skill
+            dan memperluas jaringan profesional
+          </p>
+        </motion.div>
+
+        {/* Stats Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-12"
+        >
+          <div className="bg-white rounded-2xl shadow-lg border border-grey-200 p-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary-700 mb-2">
+                  {upcomingEvents.length}
+                </div>
+                <div className="text-sm text-grey-600 font-medium">
+                  Total Event
+                </div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-2">
+                  {new Set(upcomingEvents.map((e) => e.department)).size}
+                </div>
+                <div className="text-sm text-grey-600 font-medium">
+                  Kategori
+                </div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-600 mb-2">
+                  {upcomingEvents.filter((e) => e.isFree).length}
+                </div>
+                <div className="text-sm text-grey-600 font-medium">
+                  Event Gratis
+                </div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-3xl font-bold text-purple-600 mb-2">
+                  {Math.max(...upcomingEvents.map((e) => e.capacity || 0))}
+                </div>
+                <div className="text-sm text-grey-600 font-medium">
+                  Kapasitas Tertinggi
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Control Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-10"
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div>
+              <h3 className="text-2xl font-bold text-grey-900 mb-2 flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-primary-600" />
+                Event yang Akan Datang
+                <span className="ml-2 px-3 py-1 bg-primary-100 text-primary-700 text-sm font-medium rounded-full">
+                  {sortedEvents.length} Event
+                </span>
+              </h3>
+              <p className="text-grey-600">
+                Pilih kategori untuk menemukan event yang sesuai minat Anda
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Category Filter */}
+              <div className="flex flex-wrap gap-2">
+                {categories.slice(0, 4).map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                      selectedCategory === category
+                        ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md"
+                        : "bg-white border border-grey-200 text-grey-700 hover:border-primary-300 hover:text-primary-600"
+                    }`}
+                  >
+                    {category === "all"
+                      ? "Semua"
+                      : category.charAt(0).toUpperCase() + category.slice(1)}
+                  </button>
+                ))}
+
+                {categories.length > 4 && (
+                  <button className="px-4 py-2 bg-white border border-grey-200 text-grey-700 rounded-lg text-sm font-medium hover:border-primary-300 hover:text-primary-600 transition-colors">
+                    +{categories.length - 4} lainnya
+                  </button>
+                )}
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center bg-white border border-grey-200 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === "grid"
+                      ? "bg-primary-50 text-primary-600"
+                      : "text-grey-600 hover:text-primary-600"
+                  }`}
+                  aria-label="Grid view"
+                >
+                  <Filter className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === "list"
+                      ? "bg-primary-50 text-primary-600"
+                      : "text-grey-600 hover:text-primary-600"
+                  }`}
+                  aria-label="List view"
+                >
+                  <CalendarDays className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Events Grid/List */}
+        {sortedEvents.length > 0 ? (
+          <>
+            {/* Grid View */}
+            {viewMode === "grid" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+              >
+                {sortedEvents.slice(0, 6).map((event, index) => {
+                  const truncatedDescription = event.description
+                    ? event.description.length > 150
+                      ? `${event.description.substring(0, 150)}...`
+                      : event.description
+                    : "";
+
+                  return (
+                    <EventCard
+                      key={event.id}
+                      event={event}
+                      truncatedDescription={truncatedDescription}
+                      index={index}
+                    />
+                  );
+                })}
+              </motion.div>
+            )}
+
+            {/* List View */}
+            {viewMode === "list" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="mb-16"
+              >
+                <div className="space-y-6">
+                  {sortedEvents.slice(0, 4).map((event, index) => (
+                    <motion.div
+                      key={event.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      whileHover={{ x: 5 }}
+                      className="group bg-white rounded-xl shadow-lg hover:shadow-xl border border-grey-200 overflow-hidden transition-all duration-300"
+                    >
+                      <div className="flex flex-col md:flex-row">
+                        {/* Date Badge */}
+                        <div className="md:w-32 bg-gradient-to-b from-primary-600 to-primary-700 text-white p-6 flex flex-col items-center justify-center">
+                          <div className="text-3xl font-bold">
+                            {new Date(event.startDate).getDate()}
+                          </div>
+                          <div className="text-sm uppercase font-semibold mt-1">
+                            {new Date(event.startDate).toLocaleString("id-ID", {
+                              month: "short",
+                            })}
+                          </div>
+                          <div className="text-xs opacity-80 mt-1">
+                            {new Date(event.startDate).toLocaleString("id-ID", {
+                              weekday: "short",
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Event Details */}
+                        <div className="flex-1 p-6">
+                          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="px-3 py-1 bg-primary-100 text-primary-700 text-xs font-semibold rounded-full">
+                                  {event.department || "General"}
+                                </span>
+                                <span className="text-sm text-grey-600 flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  {new Date(event.startDate).toLocaleTimeString(
+                                    "id-ID",
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    }
+                                  )}
+                                </span>
+                              </div>
+
+                              <h3 className="text-xl font-bold text-grey-900 mb-3 group-hover:text-primary-600 transition-colors">
+                                {event.name}
+                              </h3>
+
+                              {event.description && (
+                                <p className="text-grey-600 line-clamp-2 mb-4">
+                                  {event.description.length > 200
+                                    ? `${event.description.substring(
+                                        0,
+                                        200
+                                      )}...`
+                                    : event.description}
+                                </p>
+                              )}
+
+                              <div className="flex items-center gap-4 text-sm text-grey-600">
+                                {event.location && (
+                                  <span className="flex items-center gap-1">
+                                    📍 {event.location}
+                                  </span>
+                                )}
+                                {event.capacity && (
+                                  <span className="flex items-center gap-1">
+                                    👥 {event.capacity} peserta
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Action Button */}
+                            <div className="flex flex-col items-end gap-3">
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                  event.isFree
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-blue-100 text-blue-700"
+                                }`}
+                              >
+                                {event.isFree ? "Gratis" : "Berbayar"}
+                              </span>
+
+                              <Link
+                                href={`/event/${event.id}`}
+                                className="group/btn inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold"
+                              >
+                                <span>Detail</span>
+                                <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Load More / View More */}
+            {sortedEvents.length > 6 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-center mb-16"
+              >
+                <button className="group inline-flex items-center gap-2 px-8 py-3.5 bg-white border border-grey-200 text-grey-700 rounded-xl hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all duration-300 font-semibold shadow-sm hover:shadow-md">
+                  <span>Muat Lebih Banyak</span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+
+                <p className="text-grey-600 text-sm mt-4">
+                  Menampilkan 6 dari {sortedEvents.length} event mendatang
+                </p>
+              </motion.div>
+            )}
+          </>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-16 bg-white rounded-2xl border border-grey-200 mb-16"
+          >
+            <div className="inline-flex flex-col items-center gap-6 max-w-md mx-auto">
+              <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center">
+                <Calendar className="w-10 h-10 text-primary-600" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-grey-900 mb-2">
+                  Belum Ada Event Mendatang
+                </h3>
+                <p className="text-grey-600 mb-6">
+                  Saat ini belum ada event yang akan datang. Silakan kembali
+                  lagi nanti atau jelajahi event sebelumnya.
+                </p>
+              </div>
+              <Link
+                href="/event/archive"
+                className="group inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium"
+              >
+                <span>Lihat Event Sebelumnya</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </motion.div>
+        )}
+
+        {/* CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center"
+        >
+          <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-12 text-white shadow-2xl mb-8">
+            <div className="max-w-2xl mx-auto">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  Bergabung dengan Komunitas
+                </span>
+              </div>
+
+              <h3 className="text-3xl font-bold mb-6">
+                Tidak Ingin Ketinggalan Event?
+              </h3>
+
+              <p className="text-primary-100/90 text-lg mb-8 leading-relaxed">
+                Daftar sekarang untuk mendapatkan notifikasi event terbaru,
+                akses eksklusif, dan kesempatan untuk berpartisipasi dalam
+                kegiatan komunitas kami.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/auth/register"
+                  className="group inline-flex items-center gap-2 px-8 py-4 bg-white text-primary-700 rounded-xl hover:bg-grey-50 transition-all duration-300 font-semibold shadow-lg"
+                >
+                  <span>Daftar Sekarang</span>
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  href="/event/calendar"
+                  className="group inline-flex items-center gap-2 px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl hover:bg-white/10 transition-all duration-300 font-semibold"
+                >
+                  <span>Lihat Kalender</span>
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {upcomingEvents.map((event) => {
-              // Truncate description for EventCard
-              const truncatedDescription = event.description
-                ? event.description.length > 150
-                  ? event.description.substring(0, 150) + "..."
-                  : event.description
-                : "";
-
-              return (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  truncatedDescription={truncatedDescription}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="text-center mt-12">
           <Link
             href="/event"
-            className="inline-flex items-center px-6 py-3 bg-white border border-grey-200 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-medium shadow-sm hover:shadow-md"
+            className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
           >
-            Lihat Semua Event
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <Sparkles className="w-5 h-5" />
+            <span>Jelajahi Semua Event</span>
+            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
-        </div>
+
+          <p className="text-grey-600 text-sm mt-4">
+            {allEvents.length}+ event tersedia untuk Anda ikuti
+          </p>
+        </motion.div>
       </div>
     </section>
   );

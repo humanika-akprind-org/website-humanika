@@ -1,5 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Image as ImageIcon,
+  ChevronRight,
+  FolderOpen,
+  Clock,
+} from "lucide-react";
 
 interface AlbumCardProps {
   album: {
@@ -8,60 +17,111 @@ interface AlbumCardProps {
     count: number;
     cover?: string;
     lastUpdated?: Date;
+    eventName?: string;
+    category?: string;
   };
+  index?: number;
 }
 
-export default function AlbumCard({ album }: AlbumCardProps) {
+export default function AlbumCard({ album, index = 0 }: AlbumCardProps) {
   const lastUpdatedText = album.lastUpdated
-    ? `Terakhir diupdate ${new Date(album.lastUpdated).toLocaleDateString(
-        "id-ID",
-        {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }
-      )}`
-    : "Terakhir diupdate 2 minggu lalu";
+    ? new Date(album.lastUpdated).toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "Baru-baru ini";
+
+  // Format count text
+  const countText = `${album.count} ${album.count === 1 ? "foto" : "foto"}`;
 
   return (
-    <Link href={`/gallery/${album.id}`}>
-      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-        <div className="aspect-video bg-gray-200 relative group flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 z-10" />
-          {album.cover ? (
-            <Image
-              src={album.cover}
-              alt={album.title}
-              fill
-              style={{ objectFit: "cover" }}
-              className="group-hover:scale-105 transition-transform z-0"
-            />
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-20 w-20 text-gray-400 group-hover:scale-105 transition-transform"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
+      whileHover={{ y: -5 }}
+    >
+      <Link href={`/gallery/${album.id}`}>
+        <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-grey-200">
+          {/* Album Cover */}
+          <div className="relative aspect-video bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
+            {album.cover ? (
+              <>
+                <Image
+                  src={album.cover}
+                  alt={album.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                  className="group-hover:scale-110 transition-transform duration-500"
+                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </>
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-primary-200">
+                <FolderOpen className="w-16 h-16 mb-2" />
+                <span className="text-sm text-primary-600 font-medium">
+                  Album
+                </span>
+              </div>
+            )}
+
+            {/* Photo Count Badge */}
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md">
+              <div className="flex items-center gap-1.5 text-sm font-semibold text-grey-900">
+                <ImageIcon className="w-4 h-4 text-primary-600" />
+                {countText}
+              </div>
+            </div>
+
+            {/* Category Badge */}
+            {album.category && (
+              <div className="absolute top-4 right-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
+                {album.category}
+              </div>
+            )}
+
+            {/* View Album Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-2xl transform group-hover:scale-105 transition-transform duration-300">
+                <ChevronRight className="w-6 h-6 text-primary-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Album Info */}
+          <div className="p-5">
+            <h3 className="text-lg font-bold text-grey-900 mb-3 line-clamp-2 group-hover:text-primary-600 transition-colors leading-tight">
+              {album.title}
+            </h3>
+
+            {/* Event Info */}
+            {album.eventName && (
+              <p className="text-sm text-grey-600 mb-3 line-clamp-1">
+                📅 {album.eventName}
+              </p>
+            )}
+
+            {/* Metadata */}
+            <div className="flex items-center justify-between text-sm text-grey-500">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{lastUpdatedText}</span>
+              </div>
+
+              <div className="flex items-center gap-1 text-primary-600 font-medium group-hover:text-primary-700 transition-colors">
+                <span>Buka</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </div>
+
+          {/* Hover Effect Line */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
         </div>
-        <div className="p-4">
-          <h3 className="font-semibold text-lg text-gray-800 mb-1">
-            {album.title}
-          </h3>
-          <p className="text-gray-500 text-sm">
-            {album.count} foto • {lastUpdatedText}
-          </p>
-        </div>
-      </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }
