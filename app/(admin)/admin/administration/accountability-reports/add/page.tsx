@@ -37,24 +37,6 @@ export default function AddDocumentPage() {
     error: documentTypesError,
   } = useDocumentTypes();
 
-  const [accessToken, setAccessToken] = useState<string>("");
-
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        // Assuming there's an API endpoint to get the access token client-side
-        const response = await fetch("/api/auth/google-access-token");
-        if (response.ok) {
-          const data = await response.json();
-          setAccessToken(data.accessToken || "");
-        }
-      } catch (e) {
-        console.error("Failed to fetch access token:", e);
-      }
-    };
-    fetchToken();
-  }, []);
-
   // Check if ACCOUNTABILITY-REPORT document type exists
   useEffect(() => {
     if (!documentTypesLoading && documentTypes.length > 0) {
@@ -95,7 +77,6 @@ export default function AddDocumentPage() {
         <DocumentForm
           onSubmit={createDocument}
           onSubmitForApproval={createDocumentForApproval}
-          accessToken={accessToken}
           events={events}
           letters={letters}
           loading={combinedLoading}
