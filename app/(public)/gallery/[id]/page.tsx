@@ -18,12 +18,10 @@ import {
   ArrowLeft,
   Share2,
   Download,
-  Grid3x3,
   Image as ImageIcon,
   Film,
   Users,
   MapPin,
-  Clock,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -54,8 +52,6 @@ export default function GalleryDetail() {
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "masonry">("grid");
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -66,9 +62,20 @@ export default function GalleryDetail() {
           getGalleries({ eventId: id }),
           getEvents({ status: Status.PUBLISH }),
         ]);
+
+        // Group galleries by eventId and count them
+        const galleryCounts = galleriesData.reduce((acc, gallery) => {
+          acc[gallery.eventId] = (acc[gallery.eventId] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+
         setEvent(eventData);
         setGalleries(galleriesData);
-        setRelatedEvents(eventsData.filter((e) => e.id !== id).slice(0, 4));
+        setRelatedEvents(
+          eventsData
+            .filter((e) => e.id !== id && (galleryCounts[e.id] || 0) > 0)
+            .slice(0, 4)
+        );
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load gallery data"
@@ -381,31 +388,6 @@ export default function GalleryDetail() {
                   {album.photos.length} foto dalam album ini
                 </p>
               </div>
-
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 bg-grey-100 rounded-xl p-1">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`px-4 py-2 rounded-lg transition-colors ${
-                      viewMode === "grid"
-                        ? "bg-white text-grey-900 shadow-sm"
-                        : "text-grey-600 hover:text-grey-900"
-                    }`}
-                  >
-                    <Grid3x3 className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("masonry")}
-                    className={`px-4 py-2 rounded-lg transition-colors ${
-                      viewMode === "masonry"
-                        ? "bg-white text-grey-900 shadow-sm"
-                        : "text-grey-600 hover:text-grey-900"
-                    }`}
-                  >
-                    <ImageIcon className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
             </div>
           </motion.div>
 
@@ -417,11 +399,7 @@ export default function GalleryDetail() {
             className="mb-16"
           >
             {galleries.length > 0 ? (
-              <GalleryGrid
-                galleries={galleries}
-                viewMode={viewMode}
-                onImageClick={(imageUrl) => setSelectedImage(imageUrl)}
-              />
+              <GalleryGrid galleries={galleries} />
             ) : (
               <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-grey-200">
                 <div className="text-grey-400 mb-4">
@@ -532,9 +510,6 @@ export default function GalleryDetail() {
           </motion.section>
         </div>
       </div>
-
-      {/* Image Modal */}
-      {selectedImage && <ImageModal />}
     </div>
   );
 }
