@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { LatestGalleryGrid } from "../../gallery/LatestGalleryGrid";
-import AlbumGrid from "../../gallery/AlbumGrid";
+import AlbumGrid from "../../gallery/album/AlbumGrid";
 import { getGalleries } from "@/use-cases/api/gallery";
 import { getEvents } from "@/use-cases/api/event";
 import type { Gallery } from "@/types/gallery";

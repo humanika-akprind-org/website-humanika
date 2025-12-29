@@ -6,7 +6,7 @@ import { getGalleries } from "@/use-cases/api/gallery";
 import type { Event } from "@/types/event";
 import type { Gallery } from "@/types/gallery";
 import { Status } from "@/types/enums";
-import AlbumGrid from "@/components/public/gallery/AlbumGrid";
+import AlbumGrid from "@/components/public/gallery/album/AlbumGrid";
 import GalleryGrid from "@/components/public/gallery/GalleryGrid";
 import {
   Camera,
