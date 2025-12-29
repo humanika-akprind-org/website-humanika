@@ -21,7 +21,13 @@ export async function getArticleCategoriesWithCount(): Promise<
     orderBy: { name: "asc" },
     include: {
       _count: {
-        select: { articles: true },
+        select: {
+          articles: {
+            where: {
+              status: "PUBLISH",
+            },
+          },
+        },
       },
     },
   });

@@ -20,6 +20,7 @@ import {
   Download,
   Image as ImageIcon,
   Film,
+  FolderOpen,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -71,7 +72,12 @@ export default function GalleryDetail() {
         }, {} as Record<string, number>);
 
         const relatedEventsData = eventsData
-          .filter((e) => e.id !== id && (galleryCounts[e.id] || 0) > 0)
+          .filter(
+            (e) =>
+              e.id !== id &&
+              (galleryCounts[e.id] || 0) > 0 &&
+              e.category?.id === eventData.category?.id
+          )
           .slice(0, 4);
 
         // Filter galleries for current event only
@@ -191,6 +197,19 @@ export default function GalleryDetail() {
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
+        {/* Background Image */}
+        {event?.thumbnail && (
+          <div className="absolute inset-0">
+            <Image
+              src={getPreviewUrl(event.thumbnail)}
+              alt={event.name}
+              fill
+              style={{ objectFit: "cover" }}
+              className="opacity-20"
+              priority
+            />
+          </div>
+        )}
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -273,33 +292,48 @@ export default function GalleryDetail() {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Album Thumbnail */}
-          {album.thumbnail && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-12"
-            >
-              <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-xl group">
-                <Image
-                  src={getPreviewUrl(album.thumbnail)}
-                  alt={album.title}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  className="group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                <div className="absolute bottom-8 left-8 text-white">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Camera className="w-5 h-5" />
-                    <span className="text-sm font-medium">COVER ALBUM</span>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12"
+          >
+            <div className="relative max-w-4xl mx-auto w-full aspect-video rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-primary-50 to-primary-100 group">
+              {getPreviewUrl(album.thumbnail) ? (
+                <>
+                  <Image
+                    src={getPreviewUrl(album.thumbnail)}
+                    alt={album.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    className="group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                    priority
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+
+                  {/* Album Badge */}
+                  <div className="absolute top-6 right-6">
+                    <div className="px-4 py-2 bg-primary-600 text-white rounded-full font-medium shadow-lg">
+                      ALBUM FOTO
+                    </div>
                   </div>
-                  <h2 className="text-2xl font-bold">{album.title}</h2>
+
+                  <div className="absolute bottom-8 left-8 text-white">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Camera className="w-5 h-5" />
+                      <span className="text-sm font-medium">COVER ALBUM</span>
+                    </div>
+                    <h2 className="text-2xl font-bold">{album.title}</h2>
+                  </div>
+                </>
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-primary-200">
+                  <FolderOpen className="w-32 h-32 mb-4" />
                 </div>
-              </div>
-            </motion.div>
-          )}
+              )}
+            </div>
+          </motion.div>
 
           {/* Album Description */}
           {album.description && (
@@ -355,46 +389,44 @@ export default function GalleryDetail() {
           </motion.section>
 
           {/* Related Albums */}
-          {relatedEvents.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mb-16"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-2xl font-bold text-grey-900">
-                    Album Terkait
-                  </h2>
-                  <p className="text-grey-600">
-                    Jelajahi album dari acara HUMANIKA lainnya
-                  </p>
-                </div>
-                <button
-                  onClick={() => router.push("/gallery")}
-                  className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
-                >
-                  <span>Lihat Semua</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mb-16"
+          >
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-grey-900">
+                  Album Terkait
+                </h2>
+                <p className="text-grey-600">
+                  Jelajahi album dari acara HUMANIKA lainnya
+                </p>
               </div>
+              <button
+                onClick={() => router.push("/gallery")}
+                className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
+              >
+                <span>Lihat Semua</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
 
-              <AlbumGrid
-                albums={relatedEvents.map((event) => ({
-                  id: event.id,
-                  title: event.name,
-                  count: galleryCounts[event.id] || 0,
-                  cover: getPreviewUrl(event.thumbnail),
-                  lastUpdated: event.startDate,
-                  eventName: event.name,
-                  category: event.category?.name,
-                }))}
-                title="Album Terkait"
-                showFilters={false}
-              />
-            </motion.section>
-          )}
+            <AlbumGrid
+              albums={relatedEvents.map((event) => ({
+                id: event.id,
+                title: event.name,
+                count: galleryCounts[event.id] || 0,
+                cover: getPreviewUrl(event.thumbnail),
+                lastUpdated: event.startDate,
+                eventName: event.name,
+                category: event.category?.name,
+              }))}
+              title="Album Terkait"
+              showFilters={false}
+            />
+          </motion.section>
         </div>
       </div>
     </div>

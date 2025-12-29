@@ -355,8 +355,7 @@ export default function ContactPage() {
               </h2>
 
               <p className="text-xl text-primary-100/90 max-w-2xl mx-auto mb-10 leading-relaxed">
-                Jelajahi FAQ kami untuk jawaban cepat atau jadwalkan konsultasi
-                langsung dengan tim HUMANIKA.
+                Jelajahi FAQ kami untuk jawaban cepat.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -365,13 +364,6 @@ export default function ContactPage() {
                   className="group inline-flex items-center gap-3 px-8 py-4 bg-white text-primary-700 rounded-xl hover:bg-grey-50 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
                 >
                   <span>Lihat FAQ</span>
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </a>
-                <a
-                  href="/consultation"
-                  className="group inline-flex items-center gap-3 px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl hover:bg-white/10 transition-all duration-300 font-semibold"
-                >
-                  <span>Jadwalkan Konsultasi</span>
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </a>
               </div>

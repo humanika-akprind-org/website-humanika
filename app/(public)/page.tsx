@@ -326,6 +326,14 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Divider */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-grey-200 to-transparent h-px" />
+        <div className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-grey-200 flex items-center justify-center">
+          <Sparkles className="w-4 h-4 text-grey-400" />
+        </div>
+      </div>
+
       {/* 3. Artikel Terbaru */}
       <div className="bg-gradient-to-b from-white to-grey-50">
         <ArticleSection />
@@ -465,11 +473,21 @@ export default function Home() {
       {/* Divider */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-grey-200 to-transparent h-px" />
-        <div className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-grey-200" />
+        <div className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-grey-200 flex items-center justify-center">
+          <Sparkles className="w-4 h-4 text-grey-400" />
+        </div>
       </div>
 
       {/* 5. Event Terdekat */}
       <EventsSection />
+
+      {/* Divider */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-grey-200 to-transparent h-px" />
+        <div className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-grey-200 flex items-center justify-center">
+          <Sparkles className="w-4 h-4 text-grey-400" />
+        </div>
+      </div>
 
       {/* 6. Galeri */}
       <GallerySection />

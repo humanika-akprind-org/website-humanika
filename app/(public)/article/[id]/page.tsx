@@ -1,13 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getArticle, getArticles } from "use-cases/api/article";
+import { getArticle } from "use-cases/api/article";
 import type { Article } from "types/article";
-import { Status } from "@/types/enums";
 import Image from "next/image";
 import ArticleCard from "components/public/article/ArticleCard";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
-import { Calendar, User, ArrowLeft, Eye, Bookmark, Share2 } from "lucide-react";
+import {
+  FileText,
+  Calendar,
+  User,
+  ArrowLeft,
+  Eye,
+  Bookmark,
+  Share2,
+} from "lucide-react";
 import Link from "next/link";
 import ActionBar from "@/components/public/article/ActionBar";
 
@@ -60,23 +67,8 @@ export default function ArticleDetail({
         const articleData = await getArticle(id);
         setArticle(articleData);
 
-        // Fetch related articles
-        const categoryId = Array.isArray(articleData.category)
-          ? articleData.category[0]?.id
-          : articleData.category?.id;
-        const authorId = articleData.author.id;
-
-        const relatedArticlesData = await getArticles({
-          status: Status.PUBLISH,
-          categoryId: categoryId,
-          authorId: authorId,
-        });
-
-        const filteredRelated = relatedArticlesData
-          .filter((a) => a.id !== id)
-          .slice(0, 6);
-
-        setRelatedArticles(filteredRelated);
+        // Use related articles from the API response
+        setRelatedArticles(articleData.relatedArticles || []);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load article data"
@@ -251,25 +243,31 @@ export default function ArticleDetail({
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto">
           {/* Thumbnail Image */}
-          {article.thumbnail && (
-            <div className="mb-12">
-              <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src={getPreviewUrl(article.thumbnail)}
-                  alt={article.title}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  className="hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                  priority
-                />
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-              </div>
+          <div className="mb-12">
+            <div className="relative max-w-4xl mx-auto w-full aspect-video rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-primary-50 to-primary-100">
+              {getPreviewUrl(article.thumbnail) ? (
+                <>
+                  <Image
+                    src={getPreviewUrl(article.thumbnail)}
+                    alt={article.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    className="hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                    priority
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                </>
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-primary-200">
+                  <FileText className="w-32 h-32 mb-4" />
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Article Content */}
           <article className="prose prose-lg max-w-none mb-16">

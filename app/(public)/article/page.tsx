@@ -141,7 +141,7 @@ const ArticlePage: ArticlePageType = () => {
   const fetchArticles = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/article?isPublished=true");
+      const response = await fetch("/api/article?status=PUBLISH");
       if (!response.ok) {
         throw new Error("Failed to fetch articles");
       }

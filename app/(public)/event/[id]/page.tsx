@@ -320,7 +320,7 @@ export default function EventDetail() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-primary-50 to-primary-100">
+            <div className="relative max-w-4xl mx-auto w-full aspect-video rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-primary-50 to-primary-100">
               {getPreviewUrl(event.thumbnail) ? (
                 <>
                   <Image
@@ -336,22 +336,8 @@ export default function EventDetail() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                 </>
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-primary-200">
-                    <svg
-                      className="w-32 h-32"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-primary-200">
+                  <Calendar className="w-32 h-32 mb-4" />
                 </div>
               )}
 
