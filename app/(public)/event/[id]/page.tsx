@@ -7,9 +7,8 @@ import { getEvent, getEvents } from "use-cases/api/event";
 import type { Event } from "types/event";
 import {
   Calendar,
-  MapPin,
   Clock,
-  Users,
+  Tag,
   Share2,
   Bookmark,
   ChevronRight,
@@ -249,18 +248,12 @@ export default function EventDetail() {
 
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <MapPin className="w-6 h-6" />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6" />
+                  <Tag className="w-6 h-6" />
                 </div>
                 <div>
                   <p className="text-sm text-primary-200/80">Kategori</p>
                   <p className="font-medium">
-                    {event.department || "HUMANIKA"}
+                    {event.category?.name || event.department || "HUMANIKA"}
                   </p>
                 </div>
               </div>
@@ -309,46 +302,66 @@ export default function EventDetail() {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Thumbnail Image */}
-          {event.thumbnail && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-12"
-            >
-              <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src={getPreviewUrl(event.thumbnail)}
-                  alt={event.name}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  className="hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                  priority
-                />
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-
-                {/* Event Status Badge */}
-                <div className="absolute top-6 right-6">
-                  <div
-                    className={`px-4 py-2 rounded-full font-medium shadow-lg ${
-                      isPastEvent
-                        ? "bg-grey-700 text-white"
-                        : isUpcomingEvent
-                        ? "bg-green-500 text-white"
-                        : "bg-blue-500 text-white"
-                    }`}
-                  >
-                    {isPastEvent
-                      ? "Berakhir"
-                      : isUpcomingEvent
-                      ? "Mendatang"
-                      : "Berlangsung"}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12"
+          >
+            <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-primary-50 to-primary-100">
+              {getPreviewUrl(event.thumbnail) ? (
+                <>
+                  <Image
+                    src={getPreviewUrl(event.thumbnail)}
+                    alt={event.name}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    className="hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                    priority
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                </>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-primary-200">
+                    <svg
+                      className="w-32 h-32"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
                   </div>
                 </div>
+              )}
+
+              {/* Event Status Badge */}
+              <div className="absolute top-6 right-6">
+                <div
+                  className={`px-4 py-2 rounded-full font-medium shadow-lg ${
+                    isPastEvent
+                      ? "bg-grey-700 text-white"
+                      : isUpcomingEvent
+                      ? "bg-green-500 text-white"
+                      : "bg-blue-500 text-white"
+                  }`}
+                >
+                  {isPastEvent
+                    ? "Berakhir"
+                    : isUpcomingEvent
+                    ? "Mendatang"
+                    : "Berlangsung"}
+                </div>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Left Column - Event Details */}
@@ -391,7 +404,7 @@ export default function EventDetail() {
                     : "bg-gradient-to-br from-blue-500 to-blue-600"
                 }`}
               >
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                     {isPastEvent ? (
                       <Trophy className="w-6 h-6" />
@@ -426,7 +439,7 @@ export default function EventDetail() {
                 </h3>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
-                    <Users className="w-6 h-6 text-primary-600" />
+                    <Tag className="w-6 h-6 text-primary-600" />
                   </div>
                   <div>
                     <p className="font-semibold text-grey-900">HUMANIKA</p>

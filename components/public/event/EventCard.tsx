@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Event } from "@/types/event";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
-import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";
+import { Calendar, ArrowRight, Tag } from "lucide-react";
 import { motion } from "framer-motion";
 
 // Helper function to get preview URL from image
@@ -35,21 +35,6 @@ const categoryColors: Record<string, { bg: string; text: string }> = {
   default: { bg: "from-primary-500 to-primary-600", text: "text-primary-600" },
 };
 
-// Format date and time
-const formatDate = (date: Date) =>
-  date.toLocaleDateString("id-ID", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-
-const formatTime = (date: Date) =>
-  date.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
 interface EventCardProps {
   event: Event;
   truncatedDescription: string;
@@ -66,12 +51,37 @@ export default function EventCard({
     [event.thumbnail]
   );
 
-  const category = event.department?.toString().toLowerCase() || "default";
+  const category =
+    event.category?.name?.toString().toLowerCase() ||
+    event.department?.toString().toLowerCase() ||
+    "default";
   const categoryColor = categoryColors[category] || categoryColors.default;
 
   // Date calculations
   const startDate = event.startDate ? new Date(event.startDate) : null;
   const endDate = event.endDate ? new Date(event.endDate) : null;
+
+  // Format date range
+  const formatDateRange = () => {
+    if (!startDate || !endDate) return "Loading...";
+
+    if (startDate.toDateString() === endDate.toDateString()) {
+      return startDate.toLocaleDateString("id-ID", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    }
+    return `${startDate.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+    })} - ${endDate.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })}`;
+  };
 
   const month = startDate?.toLocaleString("id-ID", { month: "short" }) || "N/A";
   const day = startDate?.getDate() || null;
@@ -79,9 +89,6 @@ export default function EventCard({
     startDate &&
     endDate &&
     endDate.getTime() - startDate.getTime() > 24 * 60 * 60 * 1000;
-
-  const formattedDate = startDate ? formatDate(startDate) : "Loading...";
-  const formattedTime = startDate ? formatTime(startDate) : "Loading...";
 
   // Status badge
   const now = new Date();
@@ -196,17 +203,13 @@ export default function EventCard({
           <div className="flex items-center gap-3 text-sm">
             <div className="flex items-center gap-2 text-grey-600">
               <Calendar className="w-4 h-4" />
-              <span>{formattedDate}</span>
-            </div>
-            <div className="flex items-center gap-2 text-grey-600">
-              <Clock className="w-4 h-4" />
-              <span>{formattedTime}</span>
+              <span>{formatDateRange()}</span>
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-4 border-t border-grey-100">
+        <div className="flex items-center justify-end pt-4 border-t border-grey-100">
           <Link
             href={`/event/${event.id}`}
             className="group/link inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg"

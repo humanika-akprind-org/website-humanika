@@ -146,24 +146,7 @@ export default function ArticleCard({
         </div>
 
         {/* Author & Read Button */}
-        <div className="flex items-center justify-between pt-4 border-t border-grey-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary-100 to-primary-200 flex items-center justify-center">
-              <span className="font-bold text-primary-600 text-sm">
-                {article.author.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-
-            <div>
-              <div className="font-medium text-grey-900">
-                {article.author.name}
-              </div>
-              <div className="text-xs text-grey-500">
-                {article.author.role || "Penulis"}
-              </div>
-            </div>
-          </div>
-
+        <div className="flex items-center justify-end pt-4 border-t border-grey-100">
           <Link
             href={`/article/${article.id}`}
             className="group/link inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-all duration-300 font-semibold"
