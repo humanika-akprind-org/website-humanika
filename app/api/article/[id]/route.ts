@@ -8,12 +8,20 @@ import {
 } from "@/services/article/article.service";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Keep fetching user if needed for future enhancements, but do not require authentication
-    await getCurrentUser();
+    const { searchParams } = new URL(request.url);
+    const isPublished = searchParams.get("isPublished") === "true";
+
+    // Allow public access for published articles
+    if (!isPublished) {
+      const user = await getCurrentUser();
+      if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
 
     const { id } = await params;
     const article = await getArticleById(id);

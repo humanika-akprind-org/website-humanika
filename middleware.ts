@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "lib/auth-server";
 import { UserRole } from "@prisma/client";
+import NextRateLimit from "next-rate-limit";
 
 // Define RBAC rules with regex patterns for dynamic routes
 const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
@@ -280,8 +281,49 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
   },
 ];
 
+const rateLimit = NextRateLimit({
+  interval: 60 * 1000, // 1 menit
+  uniqueTokenPerInterval: 500,
+});
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Rate limit API requests
+  if (pathname.startsWith("/api/")) {
+    try {
+      const headers = await rateLimit.checkNext(request, 10); // 10 request/menit
+
+      // Check if rate limit exceeded by looking for X-RateLimit-Remaining header
+      const remaining = parseInt(headers.get("X-RateLimit-Remaining") || "0");
+
+      if (remaining <= 0) {
+        return new NextResponse(
+          JSON.stringify({
+            error: "Rate limit exceeded",
+            resetIn: parseInt(headers.get("X-RateLimit-Reset") || "0"),
+          }),
+          {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              ...Object.fromEntries(headers.entries()),
+            },
+          }
+        );
+      }
+
+      const response = NextResponse.next();
+      // Add rate limit headers to the response
+      headers.forEach((value, key) => {
+        response.headers.set(key, value);
+      });
+
+      return response;
+    } catch {
+      return NextResponse.next(); // Fallback jika error
+    }
+  }
 
   // Handle /auth/admin/login path
   if (pathname === "/auth/admin/login") {
@@ -365,6 +407,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/auth/:path*"],
+  matcher: ["/admin/:path*", "/auth/:path*", "/api/:path*"],
   runtime: "nodejs",
 };
