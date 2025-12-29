@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import ArticleSection from "@/components/public/ArticleSection";
-import GallerySection from "@/components/public/GallerySection";
-import UpcomingEventsSection from "@/components/public/UpcomingEventsSection";
+import ArticleSection from "@/components/public/sections/ArticleSection";
+import GallerySection from "@/components/public/sections/GallerySection";
+import UpcomingEventsSection from "@/components/public/sections/UpcomingEventsSection";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
