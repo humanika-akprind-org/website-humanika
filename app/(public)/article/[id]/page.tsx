@@ -99,7 +99,7 @@ export default async function ArticleDetail({
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       {/* Article Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -217,25 +217,6 @@ export default async function ArticleDetail({
           <article className="prose prose-lg max-w-none mb-16">
             <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-grey-200">
               <HtmlRenderer html={article.content} />
-
-              {/* Article Tags */}
-              {article.tags && article.tags.length > 0 && (
-                <div className="mt-12 pt-8 border-t border-grey-200">
-                  <h4 className="text-lg font-bold text-grey-900 mb-4">
-                    Tags:
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {article.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-grey-100 text-grey-700 rounded-lg text-sm font-medium hover:bg-primary-50 hover:text-primary-700 transition-colors cursor-pointer"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </article>
 
@@ -308,8 +289,6 @@ export default async function ArticleDetail({
                       key={item.id}
                       article={{
                         ...item,
-                        excerpt: truncatedContent,
-                        readTime: "5 min read",
                       }}
                       formattedDate={formattedDate}
                       truncatedContent={truncatedContent}
@@ -321,7 +300,7 @@ export default async function ArticleDetail({
           )}
 
           {/* Newsletter CTA */}
-          <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+          <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
             <div className="absolute inset-0">
               <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
               <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />

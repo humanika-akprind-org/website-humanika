@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import EventCard from "@/components/public/event/EventCard";
 import PastEventCard from "@/components/public/event/PastEventCard";
 import type { Event } from "@/types/event";
+import { useEventCategories } from "@/hooks/event-category/useEventCategories";
 import {
   Calendar,
   Filter,
@@ -17,6 +18,7 @@ import {
   Trophy,
   AlertCircle,
   BarChart3,
+  Tag,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -37,7 +39,8 @@ export default function EventPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const now = new Date();
+  // Fetch dynamic categories from API
+  const { categories: eventCategories } = useEventCategories();
 
   useEffect(() => {
     fetchEvents();
@@ -66,6 +69,7 @@ export default function EventPage() {
 
   // Filter and sort logic
   const filteredEvents = useMemo(() => {
+    const now = new Date();
     let filtered = [...allEvents];
 
     // Filter by active tab
@@ -80,8 +84,7 @@ export default function EventPage() {
       filtered = filtered.filter(
         (event) =>
           event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          event.location.toLowerCase().includes(searchQuery.toLowerCase())
+          event.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -89,80 +92,57 @@ export default function EventPage() {
     if (selectedCategory !== "all") {
       filtered = filtered.filter(
         (event) =>
-          event.department?.toString().toLowerCase() ===
+          event.category?.name?.toLowerCase().replace(/\s+/g, "-") ===
           selectedCategory.toLowerCase()
       );
     }
-
-    // Filter by type
-    if (selectedType !== "all") {
-      filtered = filtered.filter((event) => event.type === selectedType);
-    }
-
-    // Filter by status
-    if (selectedStatus !== "all") {
-      if (selectedStatus === "free") {
-        filtered = filtered.filter((event) => event.isFree);
-      } else if (selectedStatus === "paid") {
-        filtered = filtered.filter((event) => !event.isFree);
-      }
-    }
-
-    // Sort events
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "date":
-          return (
-            new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-          );
-        case "popular":
-          return (b.capacity || 0) - (a.capacity || 0);
-        case "name":
-          return a.name.localeCompare(b.name);
-        default:
-          return 0;
-      }
-    });
 
     // Pagination
     const paginated = filtered.slice(0, page * 9);
     setHasMore(filtered.length > page * 9);
 
     return paginated;
-  }, [
-    allEvents,
-    searchQuery,
-    selectedCategory,
-    selectedType,
-    selectedStatus,
-    sortBy,
-    activeTab,
-    page,
-  ]);
+  }, [allEvents, searchQuery, selectedCategory, activeTab, page]);
 
-  // Extract unique categories and types
+  // Dynamic categories from API
   const categories = [
-    "all",
-    ...Array.from(
-      new Set(
-        allEvents.map((e) => e.department?.toString().toLowerCase() || "other")
-      )
-    ),
-  ];
-
-  const eventTypes = [
-    "all",
-    ...Array.from(new Set(allEvents.map((e) => e.type || "general"))),
+    {
+      id: "all",
+      name: "Semua Kategori",
+      count: allEvents.length,
+      color: "from-grey-500 to-grey-600",
+    },
+    ...eventCategories.map((category, index) => {
+      const colors = [
+        "from-blue-500 to-blue-600",
+        "from-purple-500 to-purple-600",
+        "from-pink-500 to-pink-600",
+        "from-green-500 to-green-600",
+        "from-orange-500 to-orange-600",
+        "from-cyan-500 to-cyan-600",
+        "from-red-500 to-red-600",
+        "from-yellow-500 to-yellow-600",
+        "from-indigo-500 to-indigo-600",
+        "from-teal-500 to-teal-600",
+      ];
+      return {
+        id: category.name.toLowerCase().replace(/\s+/g, "-"),
+        name: category.name,
+        count: allEvents.filter((e) => e.category?.id === category.id).length,
+        color: colors[index % colors.length],
+      };
+    }),
   ];
 
   // Stats calculation
-  const stats = {
-    total: allEvents.length,
-    upcoming: allEvents.filter((e) => new Date(e.startDate) > now).length,
-    past: allEvents.filter((e) => new Date(e.endDate) < now).length,
-    free: allEvents.filter((e) => e.isFree).length,
-    paid: allEvents.filter((e) => !e.isFree).length,
-  };
+  const stats = useMemo(() => {
+    const now = new Date();
+    return {
+      total: allEvents.length,
+      upcoming: allEvents.filter((e) => new Date(e.startDate) > now).length,
+      past: allEvents.filter((e) => new Date(e.endDate) < now).length,
+    };
+  }, [allEvents]);
 
   const loadMore = () => {
     setPage((prev) => prev + 1);
@@ -225,7 +205,7 @@ export default function EventPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -303,9 +283,6 @@ export default function EventPage() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
-                <span className="text-primary-200">
-                  {stats.free} Event Gratis
-                </span>
               </div>
             </motion.div>
           </motion.div>
@@ -346,7 +323,7 @@ export default function EventPage() {
                 <button
                   key={tab.id}
                   onClick={() => {
-                    setActiveTab(tab.id as any);
+                    setActiveTab(tab.id as "all" | "upcoming" | "past");
                     setPage(1);
                   }}
                   className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
@@ -390,43 +367,33 @@ export default function EventPage() {
                   </div>
 
                   {/* Category Filter */}
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="px-4 py-2 bg-grey-100 text-grey-700 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                  >
-                    <option value="all">Semua Kategori</option>
+                  <div className="flex flex-wrap gap-2">
                     {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </option>
+                      <button
+                        key={category.id}
+                        onClick={() => setSelectedCategory(category.id)}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          selectedCategory === category.id
+                            ? `bg-gradient-to-r ${category.color} text-white shadow-md`
+                            : "bg-grey-100 text-grey-700 hover:bg-grey-200"
+                        }`}
+                      >
+                        <Tag className="w-3 h-3" />
+                        {category.name}
+                        {category.id !== "all" && (
+                          <span
+                            className={`text-xs px-1.5 py-0.5 rounded-full ${
+                              selectedCategory === category.id
+                                ? "bg-white/30"
+                                : "bg-grey-300"
+                            }`}
+                          >
+                            {category.count}
+                          </span>
+                        )}
+                      </button>
                     ))}
-                  </select>
-
-                  {/* Type Filter */}
-                  <select
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value)}
-                    className="px-4 py-2 bg-grey-100 text-grey-700 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                  >
-                    <option value="all">Semua Tipe</option>
-                    {eventTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* Status Filter */}
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    className="px-4 py-2 bg-grey-100 text-grey-700 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-                  >
-                    <option value="all">Semua Status</option>
-                    <option value="free">Gratis</option>
-                    <option value="paid">Berbayar</option>
-                  </select>
+                  </div>
                 </div>
               </div>
 
@@ -463,7 +430,9 @@ export default function EventPage() {
                     ].map((option) => (
                       <button
                         key={option.id}
-                        onClick={() => setSortBy(option.id as any)}
+                        onClick={() =>
+                          setSortBy(option.id as "date" | "popular" | "name")
+                        }
                         className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
                           sortBy === option.id
                             ? "bg-primary-50 text-primary-600"
@@ -743,7 +712,8 @@ export default function EventPage() {
 
           {/* Featured Past Events (Only for upcoming/all tabs) */}
           {activeTab !== "past" &&
-            allEvents.filter((e) => new Date(e.endDate) < now).length > 0 && (
+            allEvents.filter((e) => new Date(e.endDate) < new Date()).length >
+              0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -775,7 +745,7 @@ export default function EventPage() {
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {allEvents
-                    .filter((event) => new Date(event.endDate) < now)
+                    .filter((event) => new Date(event.endDate) < new Date())
                     .slice(0, 4)
                     .map((event) => (
                       <PastEventCard
@@ -784,106 +754,72 @@ export default function EventPage() {
                         title={event.name}
                         date={event.endDate}
                         image={event.thumbnail || undefined}
-                        participants={event.capacity}
-                        achievements={[event.department || "General"]}
                       />
                     ))}
                 </div>
               </motion.div>
             )}
+        </motion.div>
 
-          {/* Event Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="mt-20"
-          >
-            <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-8 md:p-12 text-white">
-              <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-12">
-                  <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
-                    <BarChart3 className="w-4 h-4" />
-                    <span className="text-sm font-medium">STATISTIK EVENT</span>
-                  </div>
-                  <h2 className="text-3xl font-bold mb-6">Dalam Angka</h2>
+        {/* Popular Categories */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-16"
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-grey-900 mb-6">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+                Jelajahi Kategori
+              </span>
+            </h2>
+            <p className="text-grey-600 max-w-2xl mx-auto">
+              Temukan event berdasarkan kategori yang paling diminati
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/event?category=${category.id}`}
+                className={`group flex flex-col items-center justify-center p-6 rounded-2xl transition-all duration-300 ${
+                  selectedCategory === category.id
+                    ? `bg-gradient-to-br ${category.color} text-white shadow-lg scale-105`
+                    : "bg-white text-grey-700 hover:bg-grey-50 shadow-md hover:shadow-lg"
+                }`}
+              >
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
+                    selectedCategory === category.id
+                      ? "bg-white/20"
+                      : "bg-grey-100 group-hover:bg-primary-50"
+                  }`}
+                >
+                  <Tag
+                    className={`w-6 h-6 ${
+                      selectedCategory === category.id
+                        ? "text-white"
+                        : "text-grey-600 group-hover:text-primary-600"
+                    }`}
+                  />
                 </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">{stats.total}</div>
-                    <div className="text-sm text-primary-200">Total Event</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">
-                      {stats.upcoming}
-                    </div>
-                    <div className="text-sm text-primary-200">
-                      Event Mendatang
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">{stats.free}</div>
-                    <div className="text-sm text-primary-200">Event Gratis</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">
-                      {Math.max(...allEvents.map((e) => e.capacity || 0))}
-                    </div>
-                    <div className="text-sm text-primary-200">
-                      Kapasitas Tertinggi
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Newsletter CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mt-20"
-          >
-            <div className="bg-white rounded-2xl shadow-xl p-12 text-center border border-grey-200">
-              <div className="max-w-2xl mx-auto">
-                <div className="inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full mb-6">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-sm font-medium">
-                    JANGAN KETINGGALAN
-                  </span>
-                </div>
-
-                <h2 className="text-3xl font-bold text-grey-900 mb-6">
-                  Dapatkan Notifikasi Event Terbaru
-                </h2>
-
-                <p className="text-grey-600 mb-10 leading-relaxed">
-                  Berlangganan untuk mendapatkan update event terbaru langsung
-                  ke email Anda. Dapatkan akses early bird, diskon khusus, dan
-                  informasi lengkap seputar kegiatan HUMANIKA.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link
-                    href="/auth/register"
-                    className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-lg"
-                  >
-                    <Calendar className="w-5 h-5" />
-                    <span>Daftar Event Mendatang</span>
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="group inline-flex items-center gap-3 px-8 py-4 bg-white border-2 border-primary-600 text-primary-600 rounded-xl hover:bg-primary-50 transition-all duration-300 font-semibold"
-                  >
-                    <span>Info Lebih Lanjut</span>
-                    <ChevronDown className="w-5 h-5 transform rotate-270" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+                <span className="font-semibold text-center text-sm">
+                  {category.name}
+                </span>
+                <span
+                  className={`text-xs mt-2 ${
+                    selectedCategory === category.id
+                      ? "text-white/80"
+                      : "text-grey-500"
+                  }`}
+                >
+                  {category.count} event
+                </span>
+              </Link>
+            ))}
+          </div>
         </motion.div>
       </div>
     </div>

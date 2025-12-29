@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function UpcomingEventsSection() {
+export default function EventsSection() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -143,54 +143,6 @@ export default function UpcomingEventsSection() {
             Temukan acara terbaru yang akan membantu Anda mengembangkan skill
             dan memperluas jaringan profesional
           </p>
-        </motion.div>
-
-        {/* Stats Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-12"
-        >
-          <div className="bg-white rounded-2xl shadow-lg border border-grey-200 p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary-700 mb-2">
-                  {upcomingEvents.length}
-                </div>
-                <div className="text-sm text-grey-600 font-medium">
-                  Total Event
-                </div>
-              </div>
-
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">
-                  {new Set(upcomingEvents.map((e) => e.department)).size}
-                </div>
-                <div className="text-sm text-grey-600 font-medium">
-                  Kategori
-                </div>
-              </div>
-
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">
-                  {upcomingEvents.filter((e) => e.isFree).length}
-                </div>
-                <div className="text-sm text-grey-600 font-medium">
-                  Event Gratis
-                </div>
-              </div>
-
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">
-                  {Math.max(...upcomingEvents.map((e) => e.capacity || 0))}
-                </div>
-                <div className="text-sm text-grey-600 font-medium">
-                  Kapasitas Tertinggi
-                </div>
-              </div>
-            </div>
-          </div>
         </motion.div>
 
         {/* Control Bar */}
@@ -369,40 +321,6 @@ export default function UpcomingEventsSection() {
                                     : event.description}
                                 </p>
                               )}
-
-                              <div className="flex items-center gap-4 text-sm text-grey-600">
-                                {event.location && (
-                                  <span className="flex items-center gap-1">
-                                    📍 {event.location}
-                                  </span>
-                                )}
-                                {event.capacity && (
-                                  <span className="flex items-center gap-1">
-                                    👥 {event.capacity} peserta
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Action Button */}
-                            <div className="flex flex-col items-end gap-3">
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                  event.isFree
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-blue-100 text-blue-700"
-                                }`}
-                              >
-                                {event.isFree ? "Gratis" : "Berbayar"}
-                              </span>
-
-                              <Link
-                                href={`/event/${event.id}`}
-                                className="group/btn inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold"
-                              >
-                                <span>Detail</span>
-                                <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                              </Link>
                             </div>
                           </div>
                         </div>
@@ -469,7 +387,7 @@ export default function UpcomingEventsSection() {
           transition={{ delay: 0.5 }}
           className="text-center"
         >
-          <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-12 text-white shadow-2xl mb-8">
+          <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-white shadow-2xl mb-8">
             <div className="max-w-2xl mx-auto">
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
                 <Sparkles className="w-4 h-4" />

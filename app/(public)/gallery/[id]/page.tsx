@@ -21,7 +21,6 @@ import {
   Image as ImageIcon,
   Film,
   Users,
-  MapPin,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -91,7 +90,7 @@ export default function GalleryDetail() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-grey-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto" />
           <p className="mt-4 text-grey-600">Memuat album galeri...</p>
         </div>
       </div>
@@ -147,7 +146,6 @@ export default function GalleryDetail() {
     title: event.name,
     date: event.startDate,
     description: event.description,
-    location: event.location,
     photos: galleries.map((gallery) => ({
       id: gallery.id,
       title: gallery.title,
@@ -181,43 +179,10 @@ export default function GalleryDetail() {
       });
   };
 
-  // Modal untuk tampilan gambar penuh
-  const ImageModal = () => {
-    if (!selectedImage) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
-        onClick={() => setSelectedImage(null)}
-      >
-        <div className="relative max-w-6xl max-h-[90vh] w-full h-full p-4">
-          <button
-            className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors"
-            onClick={() => setSelectedImage(null)}
-          >
-            ✕
-          </button>
-          <div className="relative w-full h-full flex items-center justify-center">
-            <Image
-              src={selectedImage}
-              alt="Fullscreen"
-              fill
-              style={{ objectFit: "contain" }}
-              className="rounded-lg"
-            />
-          </div>
-        </div>
-      </motion.div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -270,18 +235,6 @@ export default function GalleryDetail() {
                 <div>
                   <p className="text-sm text-primary-200/80">Tanggal</p>
                   <p className="font-medium">{formattedDate}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm text-primary-200/80">Lokasi</p>
-                  <p className="font-medium">
-                    {album.location || "Universitas AKPRIND"}
-                  </p>
                 </div>
               </div>
 
@@ -456,7 +409,6 @@ export default function GalleryDetail() {
                   cover: getPreviewUrl(event.thumbnail),
                   lastUpdated: event.updatedAt,
                   date: event.startDate,
-                  location: event.location,
                 }))}
               />
             </motion.section>
@@ -468,7 +420,7 @@ export default function GalleryDetail() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
-            <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+            <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
               <div className="absolute inset-0">
                 <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
                 <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />

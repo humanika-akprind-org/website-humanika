@@ -14,7 +14,6 @@ import {
   Bookmark,
   ChevronRight,
   ArrowLeft,
-  ExternalLink,
   CalendarDays,
   Target,
   Trophy,
@@ -85,7 +84,7 @@ export default function EventDetail() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-grey-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto" />
           <p className="mt-4 text-grey-600">Loading event details...</p>
         </div>
       </div>
@@ -141,7 +140,6 @@ export default function EventDetail() {
   const now = new Date();
   const isPastEvent = endDate < now;
   const isUpcomingEvent = eventDate > now;
-  const isOngoingEvent = eventDate <= now && endDate >= now;
 
   const pastEvents = allEvents
     .filter((e) => new Date(e.endDate) < now && e.id !== id)
@@ -166,17 +164,16 @@ export default function EventDetail() {
     })}`;
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("id-ID", {
+  const formatTime = (date: Date) =>
+    date.toLocaleTimeString("id-ID", {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -254,12 +251,6 @@ export default function EventDetail() {
                 <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
                   <MapPin className="w-6 h-6" />
                 </div>
-                <div>
-                  <p className="text-sm text-primary-200/80">Lokasi</p>
-                  <p className="font-medium">
-                    {event.location || "Universitas AKPRIND"}
-                  </p>
-                </div>
               </div>
 
               <div className="flex items-center gap-3">
@@ -309,19 +300,6 @@ export default function EventDetail() {
                 <Share2 className="w-4 h-4" />
                 <span>Bagikan</span>
               </button>
-
-              {event.registrationLink && !isPastEvent && (
-                <a
-                  href={event.registrationLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-6 py-3 bg-white text-primary-700 rounded-xl hover:bg-grey-50 transition-colors font-semibold shadow-lg hover:shadow-xl"
-                >
-                  <CalendarDays className="w-4 h-4" />
-                  <span>Daftar Sekarang</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              )}
             </div>
           </div>
         </div>
@@ -395,33 +373,6 @@ export default function EventDetail() {
                     }
                   />
                 </div>
-
-                {/* Additional Info */}
-                {event.goals && (
-                  <div className="mt-8 pt-8 border-t border-grey-200">
-                    <h3 className="text-xl font-bold text-grey-900 mb-4 flex items-center gap-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Target className="w-5 h-5 text-green-600" />
-                      </div>
-                      Tujuan Acara
-                    </h3>
-                    <ul className="space-y-3">
-                      {Array.isArray(event.goals) ? (
-                        event.goals.map((goal, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-grey-700">{goal}</span>
-                          </li>
-                        ))
-                      ) : (
-                        <li className="flex items-start gap-3">
-                          <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
-                          <span className="text-grey-700">{event.goals}</span>
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                )}
               </motion.div>
             </div>
 
@@ -461,18 +412,6 @@ export default function EventDetail() {
                     </p>
                   </div>
                 </div>
-                {!isPastEvent && event.registrationLink && (
-                  <a
-                    href={event.registrationLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full mt-4 inline-flex items-center justify-center gap-2 px-4 py-3 bg-white text-grey-900 rounded-xl hover:bg-grey-100 transition-colors font-semibold"
-                  >
-                    <CalendarDays className="w-4 h-4" />
-                    Daftar Sekarang
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                )}
               </motion.div>
 
               {/* Organizer Info */}
@@ -568,7 +507,7 @@ export default function EventDetail() {
             transition={{ delay: 0.8 }}
             className="mt-16"
           >
-            <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+            <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
               <div className="absolute inset-0">
                 <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
                 <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />

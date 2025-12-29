@@ -21,7 +21,6 @@ import {
   RefreshCw,
   X,
   Grid3x3,
-  Award,
   Heart,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -185,7 +184,7 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -310,7 +309,9 @@ export default function GalleryPage() {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() =>
+                    setActiveTab(tab.id as "albums" | "highlights" | "trending")
+                  }
                   className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
                     activeTab === tab.id
                       ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md"
@@ -382,7 +383,11 @@ export default function GalleryPage() {
                   {/* View Mode */}
                   <select
                     value={viewMode}
-                    onChange={(e) => setViewMode(e.target.value as any)}
+                    onChange={(e) =>
+                      setViewMode(
+                        e.target.value as "albums" | "photos" | "both"
+                      )
+                    }
                     className="px-4 py-2 bg-grey-100 text-grey-700 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
                   >
                     <option value="both">Album & Foto</option>
@@ -425,7 +430,9 @@ export default function GalleryPage() {
                     ].map((option) => (
                       <button
                         key={option.id}
-                        onClick={() => setSortBy(option.id as any)}
+                        onClick={() =>
+                          setSortBy(option.id as "recent" | "popular" | "event")
+                        }
                         className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
                           sortBy === option.id
                             ? "bg-primary-50 text-primary-600"
@@ -638,60 +645,6 @@ export default function GalleryPage() {
             </motion.section>
           )}
 
-          {/* Stats Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-8 md:p-12 text-white">
-              <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-12">
-                  <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
-                    <Award className="w-4 h-4" />
-                    <span className="text-sm font-medium">
-                      STATISTIK GALERI
-                    </span>
-                  </div>
-                  <h2 className="text-3xl font-bold mb-6">
-                    Galeri dalam Angka
-                  </h2>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">
-                      {stats.totalPhotos}
-                    </div>
-                    <div className="text-sm text-primary-200">Total Foto</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">
-                      {stats.totalAlbums}
-                    </div>
-                    <div className="text-sm text-primary-200">Album</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">
-                      {stats.totalEvents}
-                    </div>
-                    <div className="text-sm text-primary-200">
-                      Event Tercakup
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">
-                      {years.length - 1}
-                    </div>
-                    <div className="text-sm text-primary-200">
-                      Tahun Dokumentasi
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.section>
-
           {/* Top Events */}
           {albums.length > 0 && (
             <motion.section
@@ -715,7 +668,7 @@ export default function GalleryPage() {
                 {albums
                   .sort((a, b) => b.count - a.count)
                   .slice(0, 4)
-                  .map((album, index) => (
+                  .map((album) => (
                     <Link
                       key={album.id}
                       href={`/gallery/${album.id}`}

@@ -109,7 +109,7 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -140,8 +140,8 @@ export default function FAQPage() {
 
             <p className="text-xl text-primary-100/90 max-w-3xl mx-auto mb-10 leading-relaxed">
               Temukan jawaban atas pertanyaan-pertanyaan yang sering ditanyakan
-              tentang HUMANIKA, keanggotaan, kegiatan, dan segala hal yang
-              perlu Anda ketahui.
+              tentang HUMANIKA, keanggotaan, kegiatan, dan segala hal yang perlu
+              Anda ketahui.
             </p>
 
             {/* Quick Stats */}
@@ -255,7 +255,9 @@ export default function FAQPage() {
                       </div>
                       <div className="flex items-center justify-between mt-4">
                         <span className="text-sm text-primary-600 font-medium">
-                          {expandedIndex === index ? "Sembunyikan" : "Baca jawaban"}
+                          {expandedIndex === index
+                            ? "Sembunyikan"
+                            : "Baca jawaban"}
                         </span>
                         <ChevronRight
                           className={`w-5 h-5 text-grey-400 transition-transform ${
@@ -277,7 +279,7 @@ export default function FAQPage() {
             transition={{ delay: 0.8 }}
             className="mb-16"
           >
-            <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+            <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
               <div className="absolute inset-0">
                 <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
                 <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />
@@ -340,7 +342,8 @@ export default function FAQPage() {
                   Tentang Kami
                 </h4>
                 <p className="text-grey-600 text-sm">
-                  Pelajari lebih lanjut tentang visi, misi, dan struktur organisasi HUMANIKA
+                  Pelajari lebih lanjut tentang visi, misi, dan struktur
+                  organisasi HUMANIKA
                 </p>
               </Link>
               <Link

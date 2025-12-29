@@ -12,6 +12,7 @@ import {
   Loader2,
   ChevronRight,
 } from "lucide-react";
+import { type ArticleCategory } from "@/types/article-category";
 
 interface ArticleSectionType extends React.FC {
   fetchArticles?: () => void;
@@ -19,6 +20,7 @@ interface ArticleSectionType extends React.FC {
 
 const ArticleSection: ArticleSectionType = () => {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [categories, setCategories] = useState<ArticleCategory[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -49,11 +51,31 @@ const ArticleSection: ArticleSectionType = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("/api/article/category?withCount=true");
+      if (!response.ok) {
+        throw new Error("Failed to fetch categories");
+      }
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setCategories(data);
+      } else {
+        console.warn("Unexpected data format from categories API:", data);
+        setCategories([]);
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setCategories([]);
+    }
+  };
+
   // Expose fetchArticles for manual reload button usage
   ArticleSection.fetchArticles = fetchArticles;
 
   useEffect(() => {
     fetchArticles();
+    fetchCategories();
   }, []);
 
   return (
@@ -263,28 +285,46 @@ const ArticleSection: ArticleSectionType = () => {
             <h3 className="text-2xl font-bold text-grey-900 mb-8 text-center">
               Kategori Populer
             </h3>
-            <div className="flex flex-wrap justify-center gap-4">
-              {[
-                { name: "Teknologi", count: 12 },
-                { name: "Pemrograman", count: 8 },
-                { name: "AI/ML", count: 5 },
-                { name: "Web Development", count: 15 },
-                { name: "Tips & Trik", count: 7 },
-              ].map((category) => (
-                <Link
-                  key={category.name}
-                  href={`/article?category=${category.name}`}
-                  className="group flex items-center gap-3 px-6 py-3 bg-white border border-grey-200 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-all duration-300"
-                >
-                  <span className="font-medium text-grey-800 group-hover:text-primary-700">
-                    {category.name}
-                  </span>
-                  <span className="bg-grey-100 text-grey-600 text-xs px-2 py-1 rounded-full group-hover:bg-primary-100 group-hover:text-primary-700">
-                    {category.count}
-                  </span>
-                </Link>
-              ))}
-            </div>
+            {(() => {
+              const popularCategories = categories.filter(
+                (category) =>
+                  category._count?.articles && category._count.articles > 0
+              );
+              return popularCategories.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="inline-flex flex-col items-center gap-4 max-w-md mx-auto">
+                    <div className="w-16 h-16 bg-grey-100 rounded-full flex items-center justify-center">
+                      <Newspaper className="w-8 h-8 text-grey-500" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-grey-900 mb-2">
+                        Belum Ada Kategori Populer
+                      </h4>
+                      <p className="text-grey-600">
+                        Kategori artikel dengan artikel akan segera ditambahkan.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap justify-center gap-4">
+                  {popularCategories.map((category) => (
+                    <Link
+                      key={category.id}
+                      href={`/article?category=${category.name}`}
+                      className="group flex items-center gap-3 px-6 py-3 bg-white border border-grey-200 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-all duration-300"
+                    >
+                      <span className="font-medium text-grey-800 group-hover:text-primary-700">
+                        {category.name}
+                      </span>
+                      <span className="bg-grey-100 text-grey-600 text-xs px-2 py-1 rounded-full group-hover:bg-primary-100 group-hover:text-primary-700">
+                        {category._count?.articles || 0}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              );
+            })()}
           </motion.div>
         )}
       </div>

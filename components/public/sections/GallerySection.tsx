@@ -242,36 +242,6 @@ export default function GallerySection() {
           {activeTab === "photos" ? (
             <div className="space-y-8">
               <LatestGalleryGrid galleries={galleries} />
-
-              {/* Stats Card */}
-              <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-8 text-white">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold mb-2">
-                      {galleries.length}
-                    </div>
-                    <div className="text-sm text-primary-200">
-                      Foto Unggulan
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold mb-2">
-                      {new Set(galleries.map((g) => g.event?.name)).size}
-                    </div>
-                    <div className="text-sm text-primary-200">
-                      Event Terdokumentasi
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold mb-2">1.2K+</div>
-                    <div className="text-sm text-primary-200">Total Foto</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold mb-2">24</div>
-                    <div className="text-sm text-primary-200">Foto Terbaru</div>
-                  </div>
-                </div>
-              </div>
             </div>
           ) : (
             <AlbumGrid albums={albums} title="Album Galeri" />

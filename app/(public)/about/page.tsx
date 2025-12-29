@@ -128,7 +128,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-grey-50 to-white overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-0 left-0 w-72 h-72 bg-primary-700 rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-pulse" />
@@ -403,7 +403,7 @@ export default function AboutPage() {
             className="space-y-16"
           >
             {/* Vision Card */}
-            <div className="bg-gradient-to-br from-primary-900 to-primary-950 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-br from-primary-800 to-primary-900 rounded-2xl shadow-2xl overflow-hidden">
               <div className="p-8 md:p-12 text-white">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
@@ -616,7 +616,7 @@ export default function AboutPage() {
             </div>
 
             {/* Achievements */}
-            <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-8 md:p-12 text-white">
+            <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-8 md:p-12 text-white">
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
                   <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
@@ -768,7 +768,7 @@ export default function AboutPage() {
 
         {/* Join CTA */}
         <section className="mt-20">
-          <div className="bg-gradient-to-r from-primary-900 to-primary-950 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+          <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
             <div className="absolute inset-0">
               <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
               <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />
