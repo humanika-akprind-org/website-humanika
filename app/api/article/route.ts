@@ -4,36 +4,55 @@ import type { Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth-server";
 import { getArticles, createArticle } from "@/services/article/article.service";
 
+// Extract payload functions
+function extractArticleQueryParams(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  return {
+    status: searchParams.get("status") as Status,
+    periodId: searchParams.get("periodId") || undefined,
+    categoryId: searchParams.get("categoryId") || undefined,
+    authorId: searchParams.get("authorId") || undefined,
+    search: searchParams.get("search") || undefined,
+  };
+}
+
+async function extractCreateArticleBody(
+  request: NextRequest
+): Promise<CreateArticleInput> {
+  return await request.json();
+}
+
+// Validation functions
+function validateCreateArticleInput(body: CreateArticleInput) {
+  if (!body.title || !body.content || !body.authorId || !body.categoryId) {
+    return { isValid: false, error: "Missing required fields" };
+  }
+  return { isValid: true };
+}
+
 export async function GET(request: NextRequest) {
+  /**
+   * 1. Extract payload --> tempat sendiri
+   * 2. Validasi --> tempat sendiri
+   * 3. Error handling
+   * 4. Response
+   */
   try {
-    const { searchParams } = new URL(request.url);
-    const isPublished = searchParams.get("isPublished") === "true";
+    // Temporarily remove authentication check to allow public access for published articles
+    // const user = await getCurrentUser();
+    // if (!user) {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
 
-    // Allow public access for published articles
-    if (!isPublished) {
-      const user = await getCurrentUser();
-      if (!user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
-    }
+    // 1. Extract payload
+    const queryParams = extractArticleQueryParams(request);
 
-    const status = searchParams.get("status") as unknown as Status;
-    const periodId = searchParams.get("periodId");
-    const categoryId = searchParams.get("categoryId");
-    const authorId = searchParams.get("authorId");
-    const search = searchParams.get("search");
+    // 2. Validasi - no validation needed for GET request
 
-    const filter = {
-      status: status || undefined,
-      periodId: periodId || undefined,
-      categoryId: categoryId || undefined,
-      authorId: authorId || undefined,
-      isPublished: isPublished || undefined,
-      search: search || undefined,
-    };
+    // 3. Business logic
+    const articles = await getArticles(queryParams);
 
-    const articles = await getArticles(filter);
-
+    // 4. Response
     return NextResponse.json(articles);
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -51,17 +70,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body: CreateArticleInput = await request.json();
+    // 1. Extract payload
+    const body = await extractCreateArticleBody(request);
 
-    if (!body.title || !body.content || !body.authorId || !body.categoryId) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    // 2. Validasi
+    const validation = validateCreateArticleInput(body);
+    if (!validation.isValid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const article = await createArticle(body, user.id, request);
+    // 3. Business logic
+    const article = await createArticle(body, user);
 
+    // 4. Response
     return NextResponse.json(article, { status: 201 });
   } catch (error) {
     console.error("Error creating article:", error);

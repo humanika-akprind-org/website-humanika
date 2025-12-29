@@ -13,12 +13,11 @@ import {
   Bookmark,
   ChevronRight,
   ArrowLeft,
-  CalendarDays,
   Target,
   Trophy,
   Sparkles,
 } from "lucide-react";
-import PastEventCard from "@/components/public/event/PastEventCard";
+import EventCard from "@/components/public/event/EventCard";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 import { motion } from "framer-motion";
 
@@ -46,6 +45,7 @@ export default function EventDetail() {
 
   const [event, setEvent] = useState<Event | null>(null);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -72,12 +72,25 @@ export default function EventDetail() {
       try {
         const events = await getEvents();
         setAllEvents(events);
+
+        // Filter related events if event is loaded
+        if (event) {
+          const related = events
+            .filter(
+              (e) =>
+                e.id !== event.id &&
+                (e.categoryId === event.categoryId ||
+                  e.department === event.department)
+            )
+            .slice(0, 6);
+          setRelatedEvents(related);
+        }
       } catch (err) {
         console.error("Failed to load all events:", err);
       }
     }
     loadAllEvents();
-  }, []);
+  }, [event]);
 
   if (loading) {
     return (
@@ -501,68 +514,162 @@ export default function EventDetail() {
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {pastEvents.map((event) => (
-                  <PastEventCard
+                {pastEvents.map((event, index) => (
+                  <EventCard
                     key={event.id}
-                    id={event.id}
-                    title={event.name}
-                    date={event.endDate}
+                    event={event}
+                    truncatedDescription={
+                      event.description
+                        ? event.description.length > 150
+                          ? event.description.substring(0, 150) + "..."
+                          : event.description
+                        : ""
+                    }
+                    index={index}
                   />
                 ))}
               </div>
             </motion.section>
           )}
 
-          {/* CTA Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-16"
-          >
-            <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
-              <div className="absolute inset-0">
-                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
-                <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />
-              </div>
-
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-                  <CalendarDays className="w-4 h-4" />
-                  <span className="text-sm font-medium">IKUTI KAMI</span>
-                </div>
-
-                <h3 className="text-2xl font-bold mb-6">
-                  Ingin Tetap Update dengan Acara HUMANIKA?
-                </h3>
-
-                <p className="text-xl text-primary-100/90 max-w-2xl mx-auto mb-10 leading-relaxed">
-                  Bergabung dengan newsletter kami untuk mendapatkan notifikasi
-                  langsung tentang acara, workshop, dan kegiatan menarik
-                  lainnya.
-                </p>
-
-                <div className="max-w-md mx-auto">
-                  <div className="flex gap-2">
-                    <input
-                      type="email"
-                      placeholder="Email Anda"
-                      className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
-                    />
-                    <button
-                      type="submit"
-                      className="px-6 py-3 bg-white text-primary-700 rounded-xl hover:bg-grey-50 transition-colors font-semibold"
-                    >
-                      Berlangganan
-                    </button>
-                  </div>
-                  <p className="text-sm text-primary-200/80 mt-3">
-                    Kami tidak akan mengirim spam. Batalkan kapan saja.
+          {/* Related Events Section */}
+          {relatedEvents.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="mt-16"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-2xl font-bold text-grey-900">
+                    Acara Terkait
+                  </h2>
+                  <p className="text-grey-600">
+                    Jelajahi acara HUMANIKA lainnya dari kategori atau
+                    departemen yang sama
                   </p>
                 </div>
+                <button
+                  onClick={() => router.push("/events")}
+                  className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
+                >
+                  <span>Lihat Semua</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-            </div>
-          </motion.section>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {relatedEvents.map((relatedEvent) => {
+                  const eventDate = new Date(relatedEvent.startDate);
+                  const endDate = new Date(relatedEvent.endDate);
+                  const now = new Date();
+                  const isPastEvent = endDate < now;
+                  const isUpcomingEvent = eventDate > now;
+
+                  return (
+                    <motion.div
+                      key={relatedEvent.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileHover={{ y: -5 }}
+                      className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-grey-200"
+                    >
+                      <div className="relative aspect-video bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
+                        {getPreviewUrl(relatedEvent.thumbnail) ? (
+                          <>
+                            <Image
+                              src={getPreviewUrl(relatedEvent.thumbnail)}
+                              alt={relatedEvent.name}
+                              fill
+                              style={{ objectFit: "cover" }}
+                              className="hover:scale-105 transition-transform duration-700"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                          </>
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-primary-200">
+                              <svg
+                                className="w-16 h-16"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="absolute top-4 right-4">
+                          <div
+                            className={`px-3 py-1 rounded-full font-medium text-xs ${
+                              isPastEvent
+                                ? "bg-grey-700 text-white"
+                                : isUpcomingEvent
+                                ? "bg-green-500 text-white"
+                                : "bg-blue-500 text-white"
+                            }`}
+                          >
+                            {isPastEvent
+                              ? "Berakhir"
+                              : isUpcomingEvent
+                              ? "Mendatang"
+                              : "Berlangsung"}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-6">
+                        <h3 className="text-lg font-bold text-grey-900 mb-3 line-clamp-2">
+                          {relatedEvent.name}
+                        </h3>
+
+                        <div className="space-y-2 text-sm text-grey-600">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span>
+                              {eventDate.toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Tag className="w-4 h-4" />
+                            <span>
+                              {relatedEvent.category?.name ||
+                                relatedEvent.department ||
+                                "HUMANIKA"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() =>
+                            router.push(`/event/${relatedEvent.id}`)
+                          }
+                          className="w-full mt-4 inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-semibold"
+                        >
+                          <span>Lihat Detail</span>
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.section>
+          )}
         </div>
       </div>
     </div>

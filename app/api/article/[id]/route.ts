@@ -8,23 +8,11 @@ import {
 } from "@/services/article/article.service";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { searchParams } = new URL(request.url);
-    const isPublished = searchParams.get("isPublished") === "true";
-
-    // Allow public access for published articles
-    if (!isPublished) {
-      const user = await getCurrentUser();
-      if (!user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
-    }
-
-    const { id } = await params;
-    const article = await getArticleById(id);
+    const article = await getArticleById((await params).id);
 
     if (!article) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
@@ -50,17 +38,16 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
     const body: UpdateArticleInput = await request.json();
 
-    const article = await updateArticle(id, body, user.id, request);
+    const article = await updateArticle((await params).id, body, user);
 
     return NextResponse.json(article);
   } catch (error) {
-    if (error instanceof Error && error.message === "Article not found") {
-      return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    }
     console.error("Error updating article:", error);
+    if (error instanceof Error && error.message === "Article not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -69,7 +56,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -78,15 +65,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = await params;
-    await deleteArticle(id, user.id, request);
+    await deleteArticle((await params).id, user);
 
     return NextResponse.json({ message: "Article deleted successfully" });
   } catch (error) {
-    if (error instanceof Error && error.message === "Article not found") {
-      return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    }
     console.error("Error deleting article:", error);
+    if (error instanceof Error && error.message === "Article not found") {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

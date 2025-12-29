@@ -36,7 +36,7 @@ export const getArticles = async (
 };
 
 export const getArticle = async (id: string): Promise<Article> => {
-  const response = await fetch(`${API_URL}/article/${id}?isPublished=true`, {
+  const response = await fetch(`${API_URL}/article/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

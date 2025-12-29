@@ -20,7 +20,6 @@ import {
   Download,
   Image as ImageIcon,
   Film,
-  Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -49,6 +48,9 @@ export default function GalleryDetail() {
   const [event, setEvent] = useState<Event | null>(null);
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
+  const [galleryCounts, setGalleryCounts] = useState<Record<string, number>>(
+    {}
+  );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,25 +58,31 @@ export default function GalleryDetail() {
     async function loadData() {
       try {
         setLoading(true);
-        const [eventData, galleriesData, eventsData] = await Promise.all([
+        const [eventData, allGalleriesData, eventsData] = await Promise.all([
           getEvent(id),
-          getGalleries({ eventId: id }),
+          getGalleries(),
           getEvents({ status: Status.PUBLISH }),
         ]);
 
-        // Group galleries by eventId and count them
-        const galleryCounts = galleriesData.reduce((acc, gallery) => {
+        // Group all galleries by eventId and count them
+        const galleryCounts = allGalleriesData.reduce((acc, gallery) => {
           acc[gallery.eventId] = (acc[gallery.eventId] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
 
-        setEvent(eventData);
-        setGalleries(galleriesData);
-        setRelatedEvents(
-          eventsData
-            .filter((e) => e.id !== id && (galleryCounts[e.id] || 0) > 0)
-            .slice(0, 4)
+        const relatedEventsData = eventsData
+          .filter((e) => e.id !== id && (galleryCounts[e.id] || 0) > 0)
+          .slice(0, 4);
+
+        // Filter galleries for current event only
+        const currentEventGalleries = allGalleriesData.filter(
+          (gallery) => gallery.eventId === id
         );
+
+        setEvent(eventData);
+        setGalleries(currentEventGalleries);
+        setGalleryCounts(galleryCounts);
+        setRelatedEvents(relatedEventsData);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load gallery data"
@@ -237,16 +245,6 @@ export default function GalleryDetail() {
                   <p className="font-medium">{formattedDate}</p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm text-primary-200/80">Penyelenggara</p>
-                  <p className="font-medium">HUMANIKA</p>
-                </div>
-              </div>
             </div>
 
             {/* Action Buttons */}
@@ -325,25 +323,6 @@ export default function GalleryDetail() {
             </motion.div>
           )}
 
-          {/* Gallery Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-8"
-          >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div>
-                <h2 className="text-2xl font-bold text-grey-900 mb-2">
-                  Semua Foto
-                </h2>
-                <p className="text-grey-600">
-                  {album.photos.length} foto dalam album ini
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
           {/* Photo Grid */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
@@ -352,7 +331,7 @@ export default function GalleryDetail() {
             className="mb-16"
           >
             {galleries.length > 0 ? (
-              <GalleryGrid galleries={galleries} />
+              <GalleryGrid galleries={galleries} showFilters={false} />
             ) : (
               <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-grey-200">
                 <div className="text-grey-400 mb-4">
@@ -386,10 +365,10 @@ export default function GalleryDetail() {
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h2 className="text-2xl font-bold text-grey-900">
-                    Album Lainnya
+                    Album Terkait
                   </h2>
                   <p className="text-grey-600">
-                    Jelajahi album foto dari acara HUMANIKA lainnya
+                    Jelajahi album dari acara HUMANIKA lainnya
                   </p>
                 </div>
                 <button
@@ -405,61 +384,17 @@ export default function GalleryDetail() {
                 albums={relatedEvents.map((event) => ({
                   id: event.id,
                   title: event.name,
-                  count: galleries.length, // Placeholder count
+                  count: galleryCounts[event.id] || 0,
                   cover: getPreviewUrl(event.thumbnail),
-                  lastUpdated: event.updatedAt,
-                  date: event.startDate,
+                  lastUpdated: event.startDate,
+                  eventName: event.name,
+                  category: event.category?.name,
                 }))}
+                title="Album Terkait"
+                showFilters={false}
               />
             </motion.section>
           )}
-
-          {/* Download CTA */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
-              <div className="absolute inset-0">
-                <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
-                <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />
-              </div>
-
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-                  <Download className="w-4 h-4" />
-                  <span className="text-sm font-medium">DOWNLOAD</span>
-                </div>
-
-                <h3 className="text-2xl font-bold mb-6">
-                  Ingin Mendownload Semua Foto?
-                </h3>
-
-                <p className="text-xl text-primary-100/90 max-w-2xl mx-auto mb-10 leading-relaxed">
-                  Dapatkan semua foto dalam album ini dalam kualitas tinggi
-                  untuk keperluan pribadi atau publikasi.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={handleDownloadAll}
-                    className="inline-flex items-center gap-3 px-8 py-4 bg-white text-primary-700 rounded-xl hover:bg-grey-50 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
-                  >
-                    <Download className="w-5 h-5" />
-                    <span>Download Album Lengkap</span>
-                  </button>
-                  <button
-                    onClick={handleShare}
-                    className="inline-flex items-center gap-3 px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl hover:bg-white/10 transition-all duration-300 font-semibold"
-                  >
-                    <Share2 className="w-5 h-5" />
-                    <span>Bagikan ke Teman</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.section>
         </div>
       </div>
     </div>

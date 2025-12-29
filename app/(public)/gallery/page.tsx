@@ -712,49 +712,6 @@ export default function GalleryPage() {
               </div>
             </motion.section>
           )}
-
-          {/* CTA Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            <div className="bg-white rounded-2xl shadow-xl p-12 text-center border border-grey-200">
-              <div className="max-w-2xl mx-auto">
-                <div className="inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full mb-6">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-sm font-medium">UNGGAH FOTO</span>
-                </div>
-
-                <h2 className="text-3xl font-bold text-grey-900 mb-6">
-                  Punya Foto dari Event HUMANIKA?
-                </h2>
-
-                <p className="text-grey-600 mb-10 leading-relaxed">
-                  Bagikan momen berharga Anda dengan komunitas. Upload foto
-                  event HUMANIKA yang Anda ikuti dan jadilah bagian dari
-                  dokumentasi kami.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link
-                    href="/upload"
-                    className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-lg"
-                  >
-                    <Camera className="w-5 h-5" />
-                    <span>Upload Foto</span>
-                  </Link>
-                  <Link
-                    href="/event"
-                    className="group inline-flex items-center gap-3 px-8 py-4 bg-white border-2 border-primary-600 text-primary-600 rounded-xl hover:bg-primary-50 transition-all duration-300 font-semibold"
-                  >
-                    <span>Lihat Event</span>
-                    <ChevronDown className="w-5 h-5 transform rotate-270" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </motion.section>
         </motion.div>
       </div>
     </div>

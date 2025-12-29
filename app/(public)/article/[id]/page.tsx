@@ -1,6 +1,9 @@
-import React from "react";
-import { getArticle } from "use-cases/api/article";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { getArticle, getArticles } from "use-cases/api/article";
 import type { Article } from "types/article";
+import { Status } from "@/types/enums";
 import Image from "next/image";
 import ArticleCard from "components/public/article/ArticleCard";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
@@ -28,20 +31,72 @@ function getPreviewUrl(image: string | null | undefined): string {
   }
 }
 
-export default async function ArticleDetail({
+export default function ArticleDetail({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const [id, setId] = useState<string>("");
+  const [article, setArticle] = useState<Article | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
-  let article: Article | null = null;
-  let error: string | null = null;
+  useEffect(() => {
+    async function resolveParams() {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+    }
+    resolveParams();
+  }, [params]);
 
-  try {
-    article = await getArticle(id);
-  } catch (err) {
-    error = err instanceof Error ? err.message : "Failed to load article data";
+  useEffect(() => {
+    async function loadArticle() {
+      if (!id) return;
+
+      try {
+        setLoading(true);
+        const articleData = await getArticle(id);
+        setArticle(articleData);
+
+        // Fetch related articles
+        const categoryId = Array.isArray(articleData.category)
+          ? articleData.category[0]?.id
+          : articleData.category?.id;
+        const authorId = articleData.author.id;
+
+        const relatedArticlesData = await getArticles({
+          status: Status.PUBLISH,
+          categoryId: categoryId,
+          authorId: authorId,
+        });
+
+        const filteredRelated = relatedArticlesData
+          .filter((a) => a.id !== id)
+          .slice(0, 6);
+
+        setRelatedArticles(filteredRelated);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load article data"
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadArticle();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white to-grey-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto" />
+          <p className="mt-4 text-grey-600">Loading article details...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -157,13 +212,37 @@ export default async function ArticleDetail({
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-4">
-              <button className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-colors">
-                <Bookmark className="w-4 h-4" />
-                <span>Bookmark</span>
+              <button
+                onClick={() => setIsBookmarked(!isBookmarked)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 font-medium ${
+                  isBookmarked
+                    ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                    : "bg-white/10 backdrop-blur-sm text-white hover:bg-white/20"
+                }`}
+              >
+                <Bookmark
+                  className={`w-4 h-4 ${isBookmarked ? "fill-current" : ""}`}
+                />
+                <span>{isBookmarked ? "Disimpan" : "Simpan"}</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-colors">
+
+              <button
+                onClick={() => {
+                  navigator
+                    .share?.({
+                      title: article.title,
+                      text: article.content?.substring(0, 100) + "...",
+                      url: window.location.href,
+                    })
+                    .catch(() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      alert("Link copied to clipboard!");
+                    });
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors"
+              >
                 <Share2 className="w-4 h-4" />
-                <span>Share</span>
+                <span>Bagikan</span>
               </button>
             </div>
           </div>
@@ -203,7 +282,7 @@ export default async function ArticleDetail({
           <ActionBar article={article} />
 
           {/* Related Articles */}
-          {article.relatedArticles && article.relatedArticles.length > 0 && (
+          {relatedArticles.length > 0 && (
             <section className="mb-16">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-grey-900">
@@ -219,7 +298,7 @@ export default async function ArticleDetail({
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {article.relatedArticles.map((item) => {
+                {relatedArticles.map((item) => {
                   const formattedDate = item.createdAt
                     ? new Date(item.createdAt).toLocaleDateString("id-ID", {
                         day: "numeric",
@@ -246,42 +325,6 @@ export default async function ArticleDetail({
               </div>
             </section>
           )}
-
-          {/* Newsletter CTA */}
-          <div className="bg-gradient-to-r from-primary-800 to-primary-900 rounded-2xl p-12 text-center text-white relative overflow-hidden">
-            <div className="absolute inset-0">
-              <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full mix-blend-multiply filter blur-3xl" />
-              <div className="absolute bottom-0 right-0 w-64 h-64 bg-primary-700/10 rounded-full mix-blend-multiply filter blur-3xl" />
-            </div>
-
-            <div className="relative z-10">
-              <h3 className="text-2xl font-bold mb-4">
-                Tetap Terhubung dengan HUMANIKA
-              </h3>
-              <p className="text-primary-100/90 max-w-2xl mx-auto mb-8">
-                Dapatkan update terbaru tentang artikel, kegiatan, dan
-                kesempatan bergabung dengan HUMANIKA langsung di inbox Anda.
-              </p>
-              <form className="max-w-md mx-auto">
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    placeholder="Email Anda"
-                    className="flex-1 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
-                  />
-                  <button
-                    type="submit"
-                    className="px-6 py-3 bg-white text-primary-700 rounded-xl hover:bg-grey-50 transition-colors font-semibold"
-                  >
-                    Berlangganan
-                  </button>
-                </div>
-                <p className="text-sm text-primary-200/80 mt-3">
-                  Kami tidak akan mengirim spam. Batalkan kapan saja.
-                </p>
-              </form>
-            </div>
-          </div>
         </div>
       </div>
     </div>
