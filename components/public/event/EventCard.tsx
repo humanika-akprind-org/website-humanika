@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Event } from "@/types/event";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
-import { Calendar, Clock, MapPin, Users, ArrowRight, Tag } from "lucide-react";
+import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";
 import { motion } from "framer-motion";
 
 // Helper function to get preview URL from image
@@ -203,30 +203,10 @@ export default function EventCard({
               <span>{formattedTime}</span>
             </div>
           </div>
-
-          {event.location && (
-            <div className="flex items-center gap-2 text-sm text-grey-600">
-              <MapPin className="w-4 h-4" />
-              <span className="truncate">{event.location}</span>
-            </div>
-          )}
-
-          {event.capacity && (
-            <div className="flex items-center gap-2 text-sm text-grey-600">
-              <Users className="w-4 h-4" />
-              <span>{event.capacity} peserta</span>
-            </div>
-          )}
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center justify-between pt-4 border-t border-grey-100">
-          <div className="text-sm">
-            <span className={`font-semibold ${categoryColor.text}`}>
-              {event.isFree ? "Gratis" : "Berbayar"}
-            </span>
-          </div>
-
           <Link
             href={`/event/${event.id}`}
             className="group/link inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg"

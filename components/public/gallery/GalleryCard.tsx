@@ -2,14 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import {
-  Download,
-  Maximize2,
-  Heart,
-  Share2,
-  Calendar,
-  MapPin,
-} from "lucide-react";
+import { Download, Maximize2, Share2, Calendar } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +26,6 @@ interface GalleryCardProps {
 }
 
 export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -100,19 +92,6 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsLiked(!isLiked);
-                }}
-                className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
-              >
-                <Heart
-                  className={`w-4 h-4 ${
-                    isLiked ? "fill-red-500 text-red-500" : "text-grey-700"
-                  }`}
-                />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
                   handleShare();
                 }}
                 className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
@@ -142,11 +121,6 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Like Count Badge */}
-        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
-          ❤️ 24
         </div>
       </motion.div>
 
@@ -203,18 +177,6 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
                         </p>
                       </div>
                     )}
-
-                    {gallery.event?.location && (
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm text-grey-600">
-                          <MapPin className="w-4 h-4" />
-                          <span className="font-medium">Lokasi</span>
-                        </div>
-                        <p className="text-grey-900 font-medium">
-                          {gallery.event.location}
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -240,18 +202,6 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
                       >
                         <Share2 className="w-4 h-4 mr-2" />
                         Bagikan
-                      </Button>
-                      <Button
-                        onClick={() => setIsLiked(!isLiked)}
-                        className="flex-1 min-w-[120px]"
-                        variant={isLiked ? "default" : "outline"}
-                      >
-                        <Heart
-                          className={`w-4 h-4 mr-2 ${
-                            isLiked ? "fill-white" : ""
-                          }`}
-                        />
-                        {isLiked ? "Disukai" : "Suka"}
                       </Button>
                     </div>
                   </div>
