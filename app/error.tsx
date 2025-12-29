@@ -4,42 +4,8 @@ import "@/app/error.css";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, AlertCircle, Mail, RefreshCw } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
-  const router = useRouter();
-  const [isVisible, setIsVisible] = useState(false);
-  const [shake, setShake] = useState(false);
-  const [particles, setParticles] = useState<
-    Array<{ id: number; x: number; y: number; size: number }>
-  >([]);
-
-  useEffect(() => {
-    setIsVisible(true);
-
-    // Create particles for error effect
-    const newParticles = Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 20 + 5,
-    }));
-    setParticles(newParticles);
-
-    // Trigger shake animation
-    setTimeout(() => setShake(true), 300);
-    setTimeout(() => setShake(false), 800);
-  }, []);
-
-  const errorDetails = error?.digest ? `ID Error: ${error.digest}` : "";
-
+export default function Error({ reset }: { reset: () => void }) {
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-red-50 via-white to-grey-50 overflow-hidden">
       {/* Background Elements */}
