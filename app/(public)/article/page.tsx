@@ -11,14 +11,14 @@ import {
   sortArticles,
 } from "@/hooks/article/utils";
 import { CATEGORY_COLORS, ARTICLES_PER_PAGE } from "@/hooks/article/constants";
-import { HeroSection } from "@/components/public/sections/article/HeroSection";
-import { ControlBar } from "@/components/public/sections/article/ControlBar";
-import { ArticleGrid } from "@/components/public/sections/article/ArticleGrid";
-import { ArticleList } from "@/components/public/sections/article/ArticleList";
-import { LoadingState } from "@/components/public/sections/article/LoadingState";
-import { ErrorState } from "@/components/public/sections/article/ErrorState";
-import { EmptyState } from "@/components/public/sections/article/EmptyState";
-import { PopularCategories } from "@/components/public/sections/article/PopularCategories";
+import { HeroSection } from "@/components/public/pages/article/HeroSection";
+import { ControlBar } from "@/components/public/pages/article/ControlBar";
+import { ArticleGrid } from "@/components/public/pages/article/ArticleGrid";
+import { ArticleList } from "@/components/public/pages/article/ArticleList";
+import { LoadingState } from "@/components/public/pages/article/LoadingState";
+import { ErrorState } from "@/components/public/pages/article/ErrorState";
+import { EmptyState } from "@/components/public/pages/article/EmptyState";
+import { PopularCategories } from "@/components/public/pages/article/PopularCategories";
 
 interface ArticlePageType extends React.FC {
   fetchArticles?: () => void;
