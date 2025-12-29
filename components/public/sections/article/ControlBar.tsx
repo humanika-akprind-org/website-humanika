@@ -10,10 +10,7 @@ import {
   TrendingUp,
   BookOpen,
 } from "lucide-react";
-import type {
-  SortOption,
-  ViewMode,
-} from "../../../../hooks/article/hooks/constants";
+import type { SortOption, ViewMode } from "@/hooks/article/constants";
 
 interface Category {
   id: string;
