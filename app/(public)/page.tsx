@@ -1,12 +1,12 @@
 "use client";
 
-import HeroSection from "@/components/public/sections/HeroSection";
-import FeaturesSection from "@/components/public/sections/FeaturesSection";
-import ArticleSection from "@/components/public/sections/ArticleSection";
-import AboutSection from "@/components/public/sections/AboutSection";
-import EventsSection from "@/components/public/sections/EventsSection";
-import GallerySection from "@/components/public/sections/GallerySection";
-import CTASection from "@/components/public/sections/CTASection";
+import HeroSection from "@/components/public/sections/home/HeroSection";
+import FeaturesSection from "@/components/public/sections/home/FeaturesSection";
+import ArticleSection from "@/components/public/sections/home/ArticleSection";
+import AboutSection from "@/components/public/sections/home/AboutSection";
+import EventsSection from "@/components/public/sections/home/EventsSection";
+import GallerySection from "@/components/public/sections/home/GallerySection";
+import CTASection from "@/components/public/sections/home/CTASection";
 import Divider from "@/components/public/ui/Divider";
 
 /**

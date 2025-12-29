@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import ArticleCard from "../article/ArticleCard";
+import ArticleCard from "../../article/ArticleCard";
 import type { Article } from "@/types/article";
 import { motion } from "framer-motion";
 import {
