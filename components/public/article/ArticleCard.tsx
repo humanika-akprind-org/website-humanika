@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Article } from "@/types/article";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
-import { Calendar, User, ArrowRight, Clock, Tag } from "lucide-react";
+import { Calendar, ArrowRight, Clock, Tag } from "lucide-react";
 import { motion } from "framer-motion";
 
 // Helper function to get preview URL from image (file ID or URL)
@@ -129,13 +129,6 @@ export default function ArticleCard({
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
             <span>{formattedDate || "Loading date..."}</span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <User className="w-4 h-4" />
-            <span className="font-medium text-grey-700">
-              {article.author.name}
-            </span>
           </div>
         </div>
 

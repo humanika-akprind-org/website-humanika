@@ -509,7 +509,7 @@ export default function Home() {
                   className="group inline-flex items-center gap-3 px-10 py-5 bg-white text-primary-700 rounded-xl hover:bg-grey-50 transition-all duration-300 font-bold text-lg shadow-2xl"
                 >
                   <Sparkles className="w-5 h-5" />
-                  <span>Daftar Sekarang - Gratis!</span>
+                  <span>Gabung bersama kami</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </motion.div>
@@ -522,7 +522,7 @@ export default function Home() {
                   href="/contact"
                   className="group inline-flex items-center gap-3 px-10 py-5 bg-transparent border-2 border-white text-white rounded-xl hover:bg-white/10 transition-all duration-300 font-bold text-lg"
                 >
-                  <span>Jadwalkan Konsultasi</span>
+                  <span>Hubungi kami</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </motion.div>

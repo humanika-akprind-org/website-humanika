@@ -4,8 +4,9 @@ import type { Article } from "types/article";
 import Image from "next/image";
 import ArticleCard from "components/public/article/ArticleCard";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
-import { Calendar, User, ArrowLeft, Share2, Bookmark, Eye } from "lucide-react";
+import { Calendar, User, ArrowLeft, Eye, Bookmark, Share2 } from "lucide-react";
 import Link from "next/link";
+import ActionBar from "@/components/public/article/ActionBar";
 
 // Helper function to get preview URL from image (file ID or URL)
 function getPreviewUrl(image: string | null | undefined): string {
@@ -53,7 +54,7 @@ export default async function ArticleDetail({
           </h1>
           <p className="text-grey-600">{error}</p>
           <Link
-            href="/articles"
+            href="/article"
             className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -76,7 +77,7 @@ export default async function ArticleDetail({
             The requested article could not be found.
           </p>
           <Link
-            href="/articles"
+            href="/article"
             className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -112,7 +113,7 @@ export default async function ArticleDetail({
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 mb-8">
               <Link
-                href="/articles"
+                href="/article"
                 className="inline-flex items-center gap-2 text-primary-200 hover:text-white transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -191,28 +192,6 @@ export default async function ArticleDetail({
             </div>
           )}
 
-          {/* Author Info Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-12 border border-grey-200">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <div className="flex-shrink-0">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                  {article.author.name.charAt(0)}
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-grey-900 mb-2">
-                  {article.author.name}
-                </h3>
-                <p className="text-grey-600 mb-3">{article.author.role}</p>
-                <p className="text-grey-700">
-                  Penulis artikel dengan fokus pada perkembangan teknologi dan
-                  informatika. Bergabung dengan HUMANIKA untuk berbagi
-                  pengetahuan dan pengalaman.
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Article Content */}
           <article className="prose prose-lg max-w-none mb-16">
             <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border border-grey-200">
@@ -221,38 +200,7 @@ export default async function ArticleDetail({
           </article>
 
           {/* Action Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-12 border border-grey-200">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-              <div className="flex items-center gap-4">
-                <span className="text-grey-700 font-medium">
-                  Share artikel:
-                </span>
-                <div className="flex gap-3">
-                  {["Facebook", "Twitter", "LinkedIn", "WhatsApp"].map(
-                    (platform) => (
-                      <button
-                        key={platform}
-                        className="w-10 h-10 rounded-full bg-grey-100 flex items-center justify-center hover:bg-primary-100 hover:text-primary-600 transition-colors"
-                        title={`Share on ${platform}`}
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </button>
-                    )
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <button className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium">
-                  <Bookmark className="w-4 h-4" />
-                  <span>Simpan Artikel</span>
-                </button>
-                <button className="flex items-center gap-2 px-6 py-3 border-2 border-primary-600 text-primary-600 rounded-xl hover:bg-primary-50 transition-colors font-medium">
-                  <Share2 className="w-4 h-4" />
-                  <span>Bagikan</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <ActionBar article={article} />
 
           {/* Related Articles */}
           {article.relatedArticles && article.relatedArticles.length > 0 && (
@@ -262,7 +210,7 @@ export default async function ArticleDetail({
                   Artikel Terkait
                 </h2>
                 <Link
-                  href="/articles"
+                  href="/article"
                   className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
                 >
                   <span>Lihat Semua</span>
