@@ -546,113 +546,20 @@ export default function EventDetail() {
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {relatedEvents.map((relatedEvent) => {
-                  const eventDate = new Date(relatedEvent.startDate);
-                  const endDate = new Date(relatedEvent.endDate);
-                  const now = new Date();
-                  const isPastEvent = endDate < now;
-                  const isUpcomingEvent = eventDate > now;
-
-                  return (
-                    <motion.div
-                      key={relatedEvent.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ y: -5 }}
-                      className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-grey-200"
-                    >
-                      <div className="relative aspect-video bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
-                        {getPreviewUrl(relatedEvent.thumbnail) ? (
-                          <>
-                            <Image
-                              src={getPreviewUrl(relatedEvent.thumbnail)}
-                              alt={relatedEvent.name}
-                              fill
-                              style={{ objectFit: "cover" }}
-                              className="hover:scale-105 transition-transform duration-700"
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
-                          </>
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-primary-200">
-                              <svg
-                                className="w-16 h-16"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1}
-                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                              </svg>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="absolute top-4 right-4">
-                          <div
-                            className={`px-3 py-1 rounded-full font-medium text-xs ${
-                              isPastEvent
-                                ? "bg-grey-700 text-white"
-                                : isUpcomingEvent
-                                ? "bg-green-500 text-white"
-                                : "bg-blue-500 text-white"
-                            }`}
-                          >
-                            {isPastEvent
-                              ? "Berakhir"
-                              : isUpcomingEvent
-                              ? "Mendatang"
-                              : "Berlangsung"}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-6">
-                        <h3 className="text-lg font-bold text-grey-900 mb-3 line-clamp-2">
-                          {relatedEvent.name}
-                        </h3>
-
-                        <div className="space-y-2 text-sm text-grey-600">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            <span>
-                              {eventDate.toLocaleDateString("id-ID", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <Tag className="w-4 h-4" />
-                            <span>
-                              {relatedEvent.category?.name ||
-                                relatedEvent.department ||
-                                "HUMANIKA"}
-                            </span>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() =>
-                            router.push(`/event/${relatedEvent.id}`)
-                          }
-                          className="w-full mt-4 inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-semibold"
-                        >
-                          <span>Lihat Detail</span>
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                {relatedEvents.map((relatedEvent, index) => (
+                  <EventCard
+                    key={relatedEvent.id}
+                    event={relatedEvent}
+                    truncatedDescription={
+                      relatedEvent.description
+                        ? relatedEvent.description.length > 150
+                          ? relatedEvent.description.substring(0, 150) + "..."
+                          : relatedEvent.description
+                        : ""
+                    }
+                    index={index}
+                  />
+                ))}
               </div>
             </motion.section>
           )}
