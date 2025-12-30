@@ -43,7 +43,7 @@ const formSchema = z.object({
   }),
 });
 
-export default function ContactForm() {
+export default function ContactFormSection() {
   const [success, setSuccess] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [loading, setLoading] = useState(false);
