@@ -59,7 +59,7 @@ export function useEventData() {
   };
 }
 
-export function useEventFilters(allEvents: Event[]) {
+export function useEventFilters() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -128,8 +128,12 @@ export function useFilteredEvents(allEvents: Event[], filters: EventFilters) {
     if (filters.searchQuery.trim()) {
       filtered = filtered.filter(
         (event) =>
-          event.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-          event.description?.toLowerCase().includes(filters.searchQuery.toLowerCase())
+          event.name
+            .toLowerCase()
+            .includes(filters.searchQuery.toLowerCase()) ||
+          event.description
+            ?.toLowerCase()
+            .includes(filters.searchQuery.toLowerCase())
       );
     }
 
@@ -152,16 +156,24 @@ export function useFilteredEvents(allEvents: Event[], filters: EventFilters) {
     let totalFiltered = [...allEvents];
 
     if (filters.activeTab === "upcoming") {
-      totalFiltered = totalFiltered.filter((event) => new Date(event.startDate) > now);
+      totalFiltered = totalFiltered.filter(
+        (event) => new Date(event.startDate) > now
+      );
     } else if (filters.activeTab === "past") {
-      totalFiltered = totalFiltered.filter((event) => new Date(event.endDate) < now);
+      totalFiltered = totalFiltered.filter(
+        (event) => new Date(event.endDate) < now
+      );
     }
 
     if (filters.searchQuery.trim()) {
       totalFiltered = totalFiltered.filter(
         (event) =>
-          event.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-          event.description?.toLowerCase().includes(filters.searchQuery.toLowerCase())
+          event.name
+            .toLowerCase()
+            .includes(filters.searchQuery.toLowerCase()) ||
+          event.description
+            ?.toLowerCase()
+            .includes(filters.searchQuery.toLowerCase())
       );
     }
 

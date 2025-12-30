@@ -29,7 +29,7 @@ import ErrorState from "@/components/public/event/ErrorState";
 export default function EventPage() {
   // Custom hooks for data management
   const { allEvents, loading, error, refetch } = useEventData();
-  const { filters, setters, actions } = useEventFilters(allEvents);
+  const { filters, setters, actions } = useEventFilters();
   const { filteredEvents, hasMore } = useFilteredEvents(allEvents, filters);
   const stats = useEventStats(allEvents);
   const { viewMode, setViewMode } = useViewMode();
