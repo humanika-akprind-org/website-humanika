@@ -10,12 +10,14 @@ import {
 } from "@/lib/gallery-utils";
 
 export function useGalleryPageData() {
+  const eventFilter = useMemo(() => ({ status: Status.PUBLISH }), []);
+
   const {
     events,
     isLoading: eventsLoading,
     error: eventsError,
     refetch: refetchEvents,
-  } = useEvents({ status: Status.PUBLISH });
+  } = useEvents(eventFilter);
 
   const {
     galleries,
@@ -25,7 +27,10 @@ export function useGalleryPageData() {
   } = useGalleries();
 
   const isLoading = eventsLoading || galleriesLoading;
-  const error = eventsError || galleriesError;
+  const error =
+    eventsError && galleriesError
+      ? `${eventsError} ${galleriesError}`
+      : eventsError || galleriesError;
 
   const refetch = () => {
     refetchEvents();

@@ -79,7 +79,14 @@ export default function GalleryPage() {
       <GalleryHeroSection
         searchQuery={filters.searchQuery}
         onSearchChange={(query) => updateFilter("searchQuery", query)}
-        stats={stats!}
+        stats={
+          stats || {
+            totalPhotos: 0,
+            totalAlbums: 0,
+            totalEvents: 0,
+            latestUpload: "Belum ada",
+          }
+        }
       />
 
       {/* Main Content */}
@@ -88,7 +95,7 @@ export default function GalleryPage() {
         <GalleryTabs
           activeTab={filters.activeTab}
           onTabChange={(tab) => updateFilter("activeTab", tab)}
-          albums={albums!}
+          albums={albums || []}
           galleries={galleries}
         />
 
@@ -99,7 +106,7 @@ export default function GalleryPage() {
           viewMode={filters.viewMode}
           sortBy={filters.sortBy}
           searchQuery={filters.searchQuery}
-          years={years!}
+          years={years || []}
           events={events}
           onYearChange={(year) => updateFilter("selectedYear", year)}
           onEventChange={(event) => updateFilter("selectedEvent", event)}
@@ -119,7 +126,7 @@ export default function GalleryPage() {
         />
 
         {/* Top Events */}
-        <TopEventsSection albums={albums!} />
+        <TopEventsSection albums={albums || []} />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ImageOff } from "lucide-react";
 
 export default function GalleryDetailNotFoundState() {
   const router = useRouter();
@@ -8,7 +8,7 @@ export default function GalleryDetailNotFoundState() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50 flex items-center justify-center">
       <div className="text-center">
-        <div className="text-grey-400 text-6xl mb-4">📷</div>
+        <ImageOff className="text-grey-400 w-16 h-16 mb-4" />
         <h1 className="text-2xl font-bold text-grey-900 mb-2">
           Album Tidak Ditemukan
         </h1>

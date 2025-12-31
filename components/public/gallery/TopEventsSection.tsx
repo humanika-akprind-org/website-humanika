@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar } from "lucide-react";
+import { Calendar, ImageOff } from "lucide-react";
 import type { Album } from "@/lib/gallery-utils";
 import { ANIMATION_DELAYS } from "./constants";
 
@@ -50,7 +50,7 @@ export default function TopEventsSection({ albums }: TopEventsSectionProps) {
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-primary-200">
-                  <span className="text-4xl">📷</span>
+                  <ImageOff className="w-16 h-16" />
                 </div>
               )}
               <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-primary-600 shadow-md">
