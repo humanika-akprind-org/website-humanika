@@ -4,11 +4,11 @@ import React, { useMemo } from "react";
 import { Loader2, Image as ImageIcon, RefreshCw } from "lucide-react";
 import { useGalleryPageData } from "@/hooks/gallery/useGalleryPageData";
 import { useGalleryFilters } from "@/hooks/gallery/useGalleryFilters";
-import GalleryHeroSection from "@/components/public/gallery/GalleryHeroSection";
+import GalleryHeroSection from "@/components/public/sections/gallery/GalleryHeroSection";
 import GalleryTabs from "@/components/public/gallery/GalleryTabs";
 import GalleryControlBar from "@/components/public/gallery/GalleryControlBar";
 import GalleryContent from "@/components/public/gallery/GalleryContent";
-import TopEventsSection from "@/components/public/gallery/TopEventsSection";
+import TopEventsSection from "@/components/public/sections/gallery/TopEventsSection";
 
 export default function GalleryPage() {
   const { events, galleries, isLoading, error, refetch, albums, stats, years } =

@@ -43,7 +43,8 @@ export default function SearchSection({
           animate={{ opacity: 1 }}
           className="text-center mt-4 text-grey-600"
         >
-          Ditemukan {filteredFaqsCount} pertanyaan untuk "{searchTerm}"
+          Ditemukan {filteredFaqsCount} pertanyaan untuk &quot;{searchTerm}
+          &quot;
         </motion.p>
       )}
     </motion.div>

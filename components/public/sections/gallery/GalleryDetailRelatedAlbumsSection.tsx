@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
-import AlbumGrid from "@/components/public/gallery/album/AlbumGrid";
+import AlbumGrid from "@/components/public/card/gallery/album/AlbumGrid";
 import { getPreviewUrl } from "@/lib/gallery-utils";
 import type { Event } from "@/types/event";
 

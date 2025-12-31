@@ -1,7 +1,7 @@
 "use client";
 
-import HeroSection from "../../../components/public/faq/HeroSection";
-import SearchSection from "../../../components/public/faq/SearchSection";
+import HeroSection from "../../../components/public/sections/faq/HeroSection";
+import SearchSection from "../../../components/public/sections/faq/SearchSection";
 import FAQGrid from "../../../components/public/faq/FAQGrid";
 import ContactCTA from "../../../components/public/faq/ContactCTA";
 import QuickLinks from "../../../components/public/faq/QuickLinks";

@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Camera, ArrowLeft } from "lucide-react";
-import GalleryGrid from "@/components/public/gallery/GalleryGrid";
+import GalleryGrid from "@/components/public/card/gallery/GalleryGrid";
 import type { Gallery } from "@/types/gallery";
 
 interface GalleryDetailPhotoGridProps {

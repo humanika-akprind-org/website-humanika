@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
-import { STATS_DATA } from "./constants";
+import { STATS_DATA } from "../../about/constants";
 
 export default function HeroSection() {
   return (

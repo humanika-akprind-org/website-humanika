@@ -4,12 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useArticleDetail } from "hooks/article/useArticleDetail";
 import { useBookmark } from "hooks/article/useBookmark";
 import { useShare } from "hooks/article/useShare";
-import ArticleHeroSection from "components/public/article/ArticleHeroSection";
-import ArticleContentSection from "components/public/article/ArticleContentSection";
-import RelatedArticlesSection from "components/public/article/RelatedArticlesSection";
-import LoadingState from "components/public/article/LoadingState";
+import ArticleHeroSection from "@/components/public/sections/article/detail/ArticleHeroSection";
+import ArticleContentSection from "@/components/public/sections/article/detail/ArticleContentSection";
+import RelatedArticlesSection from "@/components/public/sections/article/RelatedArticlesSection";
+import { LoadingState } from "@/components/public/article/LoadingState";
 import NotFoundState from "components/public/article/NotFoundState";
-import ErrorState from "components/public/article/ErrorState";
+import { ErrorState } from "components/public/article/ErrorState";
 
 export default function ArticleDetail({
   params,
@@ -26,7 +26,8 @@ export default function ArticleDetail({
     resolveParams();
   }, [params]);
 
-  const { article, relatedArticles, loading, error } = useArticleDetail(id);
+  const { article, relatedArticles, loading, error, refetch } =
+    useArticleDetail(id);
   const { isBookmarked, toggleBookmark } = useBookmark();
   const { handleShare } = useShare();
 
@@ -45,7 +46,7 @@ export default function ArticleDetail({
   }
 
   if (error) {
-    return <ErrorState error={error} />;
+    return <ErrorState error={error} onRetry={refetch} />;
   }
 
   if (!article) {

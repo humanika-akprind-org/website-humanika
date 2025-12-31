@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
-import EventCard from "@/components/public/event/EventCard";
+import EventCard from "@/components/public/card/event/EventCard";
 import { useEventCategories } from "@/hooks/event-category/useEventCategories";
 import {
   useEventData,
@@ -15,7 +15,7 @@ import {
   generateCategories,
   truncateDescription,
 } from "@/components/public/event/utils";
-import EventHeroSection from "@/components/public/event/EventHeroSection";
+import EventHeroSection from "@/components/public/sections/event/EventHeroSection";
 import EventTabs from "@/components/public/event/EventTabs";
 import EventControlBar from "@/components/public/event/EventControlBar";
 import EventEmptyState from "@/components/public/event/EventEmptyState";

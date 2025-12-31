@@ -4,9 +4,9 @@ import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { useEventDetailPage } from "hooks/event/useEventDetailPage";
-import EventDetailHeroSection from "@/components/public/event/EventDetailHeroSection";
-import EventDetailContentSection from "@/components/public/event/EventDetailContentSection";
-import EventSections from "@/components/public/event/EventSections";
+import EventDetailHeroSection from "@/components/public/sections/event/detail/EventDetailHeroSection";
+import EventDetailContentSection from "@/components/public/sections/event/detail/EventDetailContentSection";
+import EventSections from "@/components/public/sections/event/EventSections";
 import { handleShare } from "lib/eventDetailUtils";
 
 /**

@@ -6,7 +6,7 @@ import type { Article } from "@/types/article";
 import {
   formatArticleDate,
   truncateContent,
-} from "../../../../hooks/article/utils";
+} from "../../../hooks/article/utils";
 
 interface ArticleListProps {
   articles: Article[];

@@ -1,10 +1,10 @@
 "use client";
 
 import ContactHero from "@/components/public/contact/ContactHero";
-import ContactInfoSection from "@/components/public/contact/ContactInfoSection";
-import ContactFormSection from "@/components/public/contact/ContactFormSection";
-import MapSection from "@/components/public/contact/MapSection";
-import FAQCTASection from "@/components/public/contact/FAQCTASection";
+import ContactInfoSection from "@/components/public/sections/contact/ContactInfoSection";
+import ContactFormSection from "@/components/public/sections/contact/ContactFormSection";
+import MapSection from "@/components/public/sections/contact/MapSection";
+import FAQCTASection from "@/components/public/sections/contact/FAQCTASection";
 
 export default function ContactPage() {
   return (

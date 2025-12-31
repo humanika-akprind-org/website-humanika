@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { HelpCircle } from "lucide-react";
-import { faqs } from "../../../hooks/faq/constants";
+import { faqs } from "../../../../hooks/faq/constants";
 
 export default function HeroSection() {
   return (

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import EventCard from "@/components/public/event/EventCard";
+import EventCard from "@/components/public/card/event/EventCard";
 import type { Event } from "@/types/event";
 import {
   Calendar,
