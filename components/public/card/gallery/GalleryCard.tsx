@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Download, Maximize2, Share2, Calendar } from "lucide-react";
 import {
@@ -28,6 +28,23 @@ interface GalleryCardProps {
 export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [relatedGalleries, setRelatedGalleries] = useState<Gallery[]>([]);
+
+  // Fetch related galleries from the same event only when dialog opens
+  useEffect(() => {
+    if (isDialogOpen && gallery.eventId) {
+      const fetchRelatedGalleries = async () => {
+        try {
+          const { getGalleries } = await import("@/use-cases/api/gallery");
+          const data = await getGalleries({ eventId: gallery.eventId });
+          setRelatedGalleries(data);
+        } catch (error) {
+          console.error("Failed to fetch related galleries:", error);
+        }
+      };
+      fetchRelatedGalleries();
+    }
+  }, [isDialogOpen, gallery.eventId]);
 
   const handleDownload = () => {
     const link = document.createElement("a");
@@ -231,22 +248,40 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
             </div>
 
             {/* Related Images (if any) */}
-            <div>
-              <h4 className="text-lg font-semibold text-grey-900 mb-4">
-                Foto Lainnya dari Event Ini
-              </h4>
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div
-                    key={i}
-                    className="aspect-square bg-grey-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
-                  >
-                    {/* Placeholder for related images */}
-                    <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200" />
+            {relatedGalleries &&
+              relatedGalleries.filter((g) => g.id !== gallery.id).length >
+                0 && (
+                <div>
+                  <h4 className="text-lg font-semibold text-grey-900 mb-4">
+                    Foto Lainnya dari Event Ini
+                  </h4>
+                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                    {relatedGalleries
+                      .filter((g) => g.id !== gallery.id)
+                      .slice(0, 6)
+                      .map((relatedGallery) => (
+                        <div
+                          key={relatedGallery.id}
+                          className="aspect-square bg-grey-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => {
+                            setIsDialogOpen(false);
+                            // Navigate to the related gallery (you might need to implement this)
+                            window.location.href = `/gallery/${relatedGallery.id}`;
+                          }}
+                        >
+                          <Image
+                            src={getThumbnailUrl(relatedGallery.image)}
+                            alt={relatedGallery.title}
+                            fill
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                            style={{ objectFit: "cover" }}
+                            className="hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              )}
           </div>
         </DialogContent>
       </Dialog>

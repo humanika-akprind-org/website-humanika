@@ -6,7 +6,6 @@ import HeroSection from "@/components/public/sections/about/HeroSection";
 import NavigationTabs from "@/components/public/about/NavigationTabs";
 import AboutTab from "@/components/public/about/AboutTab";
 import VisionTab from "@/components/public/about/VisionTab";
-import HistoryTab from "@/components/public/about/HistoryTab";
 import OrganizationalStructureSection from "@/components/public/sections/about/OrganizationalStructureSection";
 import JoinCTASection from "@/components/public/sections/about/JoinCTASection";
 
@@ -28,9 +27,6 @@ export default function AboutPage() {
 
         {/* Vision & Mission Tab */}
         {activeTab === "vision" && <VisionTab />}
-
-        {/* History Tab */}
-        {activeTab === "history" && <HistoryTab />}
 
         {/* Organizational Structure Section */}
         <OrganizationalStructureSection />

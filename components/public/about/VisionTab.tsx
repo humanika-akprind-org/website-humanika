@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Target } from "lucide-react";
-import { MISSIONS_DATA, GOALS_DATA } from "./constants";
+import { MISSIONS_DATA } from "./constants";
 
 export default function VisionTab() {
   return (
@@ -75,35 +75,6 @@ export default function VisionTab() {
               </p>
             </motion.div>
           ))}
-        </div>
-      </div>
-
-      {/* Goals */}
-      <div className="bg-grey-50 rounded-2xl p-8">
-        <div className="max-w-4xl mx-auto">
-          <h3 className="text-2xl font-bold text-grey-900 mb-8 text-center">
-            Target Kami hingga 2025
-          </h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            {GOALS_DATA.map((item, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="font-semibold text-grey-900">
-                    {item.goal}
-                  </span>
-                  <span className="font-bold text-primary-600">
-                    {item.progress}%
-                  </span>
-                </div>
-                <div className="w-full bg-grey-200 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${item.progress}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </motion.div>

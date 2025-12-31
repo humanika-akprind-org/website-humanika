@@ -11,7 +11,6 @@ import {
   Target,
   GraduationCap,
   Briefcase,
-  History,
 } from "lucide-react";
 
 export const STATS_DATA = [
@@ -136,13 +135,6 @@ export const MISSIONS_DATA = [
   },
 ];
 
-export const GOALS_DATA = [
-  { goal: "500+ Anggota Aktif", progress: 80 },
-  { goal: "100+ Proyek Inovasi", progress: 65 },
-  { goal: "50+ Partner Industri", progress: 70 },
-  { goal: "10+ Penghargaan Nasional", progress: 90 },
-];
-
 export const ACHIEVEMENTS_DATA = [
   {
     year: "2023",
@@ -209,11 +201,6 @@ export const NAVIGATION_TABS = [
     id: "vision",
     label: "Visi & Misi",
     icon: <Target className="w-4 h-4" />,
-  },
-  {
-    id: "history",
-    label: "Sejarah",
-    icon: <History className="w-4 h-4" />,
   },
 ] as const;
 

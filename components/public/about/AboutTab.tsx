@@ -27,7 +27,7 @@ export default function AboutTab() {
             <p>
               <span className="font-semibold text-primary-700">HUMANIKA</span>{" "}
               (Himpunan Mahasiswa Informatika) adalah organisasi mahasiswa yang
-              didirikan pada tahun 2005 sebagai wadah pengembangan talenta
+              didirikan pada tahun 1991 sebagai wadah pengembangan talenta
               digital di lingkungan akademik.
             </p>
             <p>
@@ -37,9 +37,9 @@ export default function AboutTab() {
               kolaborasi dengan industri.
             </p>
             <p>
-              Dengan lebih dari 15 tahun pengalaman, kami telah melahirkan
-              ratusan profesional IT yang berkontribusi di berbagai sektor, baik
-              nasional maupun internasional.
+              Dengan ini kami telah melahirkan ratusan profesional IT yang
+              berkontribusi di berbagai sektor, baik nasional maupun
+              internasional.
             </p>
           </div>
         </div>
