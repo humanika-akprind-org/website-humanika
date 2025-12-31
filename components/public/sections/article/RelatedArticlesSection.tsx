@@ -8,7 +8,7 @@ interface RelatedArticlesSectionProps {
   relatedArticles: Article[];
 }
 
-export default function ({
+export default function RelatedArticlesSection({
   relatedArticles,
 }: RelatedArticlesSectionProps) {
   if (relatedArticles.length === 0) return null;
