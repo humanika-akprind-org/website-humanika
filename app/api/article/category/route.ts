@@ -4,16 +4,17 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   getArticleCategories,
   createArticleCategory,
+  getArticleCategoriesWithCount,
 } from "@/services/article/article-category.service";
 
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { searchParams } = new URL(request.url);
+    const withCount = searchParams.get("withCount") === "true";
 
-    const categories = await getArticleCategories();
+    const categories = withCount
+      ? await getArticleCategoriesWithCount()
+      : await getArticleCategories();
 
     return NextResponse.json(categories);
   } catch (error) {

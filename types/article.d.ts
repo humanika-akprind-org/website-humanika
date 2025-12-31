@@ -4,6 +4,7 @@ import { Period } from "./period";
 import { ArticleCategory } from "./article-category";
 
 export interface Article {
+  viewCount: number;
   id: string;
   title: string;
   slug: string;

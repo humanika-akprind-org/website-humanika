@@ -1,118 +1,133 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { getEvents } from "@/use-cases/api/event";
-import { getGalleries } from "@/use-cases/api/gallery";
-import type { Event } from "@/types/event";
-import type { Gallery } from "@/types/gallery";
-import { Status } from "@/types/enums";
-import AlbumGrid from "@/components/public/gallery/AlbumGrid";
-import GalleryGrid from "@/components/public/gallery/GalleryGrid";
+import React, { useMemo } from "react";
+import { Loader2, Image as ImageIcon, RefreshCw } from "lucide-react";
+import { useGalleryPageData } from "@/hooks/gallery/useGalleryPageData";
+import { useGalleryFilters } from "@/hooks/gallery/useGalleryFilters";
+import GalleryHeroSection from "@/components/public/sections/gallery/GalleryHeroSection";
+import GalleryTabs from "@/components/public/gallery/GalleryTabs";
+import GalleryControlBar from "@/components/public/gallery/GalleryControlBar";
+import GalleryContent from "@/components/public/gallery/GalleryContent";
+import TopEventsSection from "@/components/public/sections/gallery/TopEventsSection";
 
 export default function GalleryPage() {
-  // Helper function to get preview URL from image (file ID or URL)
-  function getPreviewUrl(image: string | null | undefined): string {
-    if (!image) return "";
+  const { events, galleries, isLoading, error, refetch, albums, stats, years } =
+    useGalleryPageData();
 
-    if (image.includes("drive.google.com")) {
-      // It's a full Google Drive URL, convert to direct image URL
-      const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (fileIdMatch) {
-        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
-      }
-      return image;
-    } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
-      // It's a Google Drive file ID, construct direct URL
-      return `/api/drive-image?fileId=${image}`;
-    } else {
-      // It's a direct URL or other format
-      return image;
-    }
+  const { filters, updateFilter, resetFilters } = useGalleryFilters();
+
+  // Filter albums by selected year
+  const filteredAlbums = useMemo(() => {
+    if (!albums) return [];
+    return filters.selectedYear === "all"
+      ? albums
+      : albums.filter((album) => album.year === filters.selectedYear);
+  }, [albums, filters.selectedYear]);
+
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
+        <div className="container mx-auto px-4 py-16">
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="relative">
+              <Loader2 className="w-16 h-16 text-primary-600 animate-spin" />
+              <div className="w-8 h-8 bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full" />
+            </div>
+            <p className="mt-6 text-grey-600 font-medium">Memuat galeri...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  const [events, setEvents] = useState<Event[]>([]);
-  const [galleries, setGalleries] = useState<Gallery[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        const [eventsData, galleriesData] = await Promise.all([
-          getEvents({ status: Status.PUBLISH }),
-          getGalleries(),
-        ]);
-        setEvents(eventsData);
-        setGalleries(galleriesData);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load gallery data"
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, []);
-
-  if (loading) return <div>Loading galleries...</div>;
-  if (error) return <div>Error loading galleries: {error}</div>;
-
-  // Group galleries by eventId and count them
-  const galleryCounts = galleries.reduce((acc, gallery) => {
-    acc[gallery.eventId] = (acc[gallery.eventId] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const albums = events.map((event) => ({
-    id: event.id,
-    title: event.name,
-    count: galleryCounts[event.id] || 0,
-    cover: getPreviewUrl(event.thumbnail),
-    lastUpdated: event.updatedAt,
-  }));
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center py-16">
+            <div className="inline-flex flex-col items-center gap-4 max-w-md mx-auto">
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                <ImageIcon className="w-10 h-10 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-grey-900 mb-2">
+                  Gagal Memuat Galeri
+                </h3>
+                <p className="text-grey-600 mb-6">{error}</p>
+              </div>
+              <button
+                onClick={handleRefresh}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Coba Lagi
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-r from-blue-700 to-red-700 text-white rounded-xl p-8 mb-12 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-20 w-32 h-32 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob" />
-            <div className="absolute bottom-20 right-20 w-32 h-32 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000" />
-          </div>
-          <div className="relative z-10 text-center">
-            <h1 className="text-4xl font-bold mb-4">Galeri HUMANIKA</h1>
-            <p className="text-xl max-w-3xl mx-auto">
-              Dokumentasi kegiatan dan momen berharga bersama Himpunan Mahasiswa
-              Informatika.
-            </p>
-          </div>
-        </section>
+    <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
+      {/* Hero Section */}
+      <GalleryHeroSection
+        searchQuery={filters.searchQuery}
+        onSearchChange={(query) => updateFilter("searchQuery", query)}
+        stats={
+          stats || {
+            totalPhotos: 0,
+            totalAlbums: 0,
+            totalEvents: 0,
+            latestUpload: "Belum ada",
+          }
+        }
+      />
 
-        {/* Gallery Content */}
-        <section>
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 border-b-4 border-blue-600 pb-2 inline-block">
-              Album Foto
-            </h2>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
-              Filter Tahun
-            </button>
-          </div>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-12">
+        {/* Tabs Navigation */}
+        <GalleryTabs
+          activeTab={filters.activeTab}
+          onTabChange={(tab) => updateFilter("activeTab", tab)}
+          albums={albums || []}
+          galleries={galleries}
+        />
 
-          <AlbumGrid albums={albums} />
-        </section>
+        {/* Control Bar */}
+        <GalleryControlBar
+          selectedYear={filters.selectedYear}
+          selectedEvent={filters.selectedEvent}
+          viewMode={filters.viewMode}
+          sortBy={filters.sortBy}
+          searchQuery={filters.searchQuery}
+          years={years || []}
+          events={events}
+          onYearChange={(year) => updateFilter("selectedYear", year)}
+          onEventChange={(event) => updateFilter("selectedEvent", event)}
+          onViewModeChange={(mode) => updateFilter("viewMode", mode)}
+          onSortChange={(sort) => updateFilter("sortBy", sort)}
+          onSearchChange={(query) => updateFilter("searchQuery", query)}
+          onResetFilters={resetFilters}
+          onRefresh={handleRefresh}
+        />
 
-        {/* Photo Highlights */}
-        <section className="mt-16">
-          <h2 className="text-3xl font-bold mb-8 text-gray-800 border-b-4 border-red-600 pb-2 inline-block">
-            Foto Terbaru
-          </h2>
-          <GalleryGrid />
-        </section>
-      </main>
+        {/* Content Sections */}
+        <GalleryContent
+          viewMode={filters.viewMode}
+          activeTab={filters.activeTab}
+          filteredAlbums={filteredAlbums}
+          galleries={galleries}
+        />
+
+        {/* Top Events */}
+        <TopEventsSection albums={albums || []} />
+      </div>
     </div>
   );
 }

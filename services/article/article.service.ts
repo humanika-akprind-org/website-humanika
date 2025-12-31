@@ -1,10 +1,9 @@
 import prisma from "@/lib/prisma";
 import type { CreateArticleInput, UpdateArticleInput } from "@/types/article";
 import type { Status } from "@/types/enums";
-import { logActivityFromRequest } from "@/lib/activity-log";
+import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
-import type { NextRequest } from "next/server";
 
 type ArticleWithPartialAuthor = Prisma.ArticleGetPayload<{
   include: {
@@ -25,7 +24,6 @@ export async function getArticles(filter?: {
   periodId?: string;
   categoryId?: string;
   authorId?: string;
-  isPublished?: boolean;
   search?: string;
 }): Promise<ArticleWithPartialAuthor[]> {
   const where: Prisma.ArticleWhereInput = {};
@@ -62,8 +60,7 @@ export async function getArticles(filter?: {
 
 export async function createArticle(
   data: CreateArticleInput,
-  userId: string,
-  request: NextRequest
+  user: { id: string }
 ): Promise<ArticleWithPartialAuthor> {
   // Generate slug from title
   const slug = data.title
@@ -101,8 +98,8 @@ export async function createArticle(
   });
 
   // Log activity
-  await logActivityFromRequest(request, {
-    userId,
+  await logActivity({
+    userId: user.id,
     activityType: ActivityType.CREATE,
     entityType: "Article",
     entityId: article.id,
@@ -182,8 +179,7 @@ export async function getArticleById(id: string): Promise<
 export async function updateArticle(
   id: string,
   data: UpdateArticleInput,
-  userId: string,
-  request: NextRequest
+  user: { id: string }
 ): Promise<ArticleWithPartialAuthor> {
   const existingArticle = await prisma.article.findUnique({
     where: { id },
@@ -230,8 +226,8 @@ export async function updateArticle(
   });
 
   // Log activity
-  await logActivityFromRequest(request, {
-    userId,
+  await logActivity({
+    userId: user.id,
     activityType: ActivityType.UPDATE,
     entityType: "Article",
     entityId: article.id,
@@ -257,8 +253,7 @@ export async function updateArticle(
 
 export async function deleteArticle(
   id: string,
-  userId: string,
-  request: NextRequest
+  user: { id: string }
 ): Promise<void> {
   const existingArticle = await prisma.article.findUnique({
     where: { id },
@@ -273,8 +268,8 @@ export async function deleteArticle(
   });
 
   // Log activity
-  await logActivityFromRequest(request, {
-    userId,
+  await logActivity({
+    userId: user.id,
     activityType: ActivityType.DELETE,
     entityType: "Article",
     entityId: id,

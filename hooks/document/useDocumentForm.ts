@@ -7,7 +7,11 @@ import type {
 } from "@/types/document";
 import { Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
-import { documentFolderId } from "@/lib/config/config";
+import {
+  documentFolderId,
+  accountabilityReportFolderId,
+  proposalFolderId,
+} from "@/lib/config/config";
 import { getAccessTokenAction } from "@/lib/actions/accessToken";
 
 // Helper functions
@@ -16,6 +20,21 @@ const isGoogleDriveDocument = (doc: string | null | undefined): boolean => {
   return (
     doc.includes("drive.google.com") || doc.match(/^[a-zA-Z0-9_-]+$/) !== null
   );
+};
+
+const getFolderIdForDocumentType = (
+  documentTypeName: string | undefined,
+  documentTypes: { id: string; name: string }[] | undefined
+): string => {
+  if (!documentTypeName || !documentTypes) return documentFolderId;
+
+  const normalizedType = documentTypeName.toLowerCase().replace(/[\s\-]/g, "");
+  if (normalizedType === "accountabilityreport") {
+    return accountabilityReportFolderId;
+  } else if (normalizedType === "proposal") {
+    return proposalFolderId;
+  }
+  return documentFolderId;
 };
 
 interface UseDocumentFormProps {
@@ -172,10 +191,14 @@ export function useDocumentForm({
       if (formData.documentFile) {
         // Upload with temporary filename first
         const tempFileName = `temp_${Date.now()}`;
+        const folderId = getFolderIdForDocumentType(
+          fixedDocumentType,
+          documentTypes
+        );
         const uploadedFileId = await uploadFile(
           formData.documentFile,
           tempFileName,
-          documentFolderId
+          folderId
         );
 
         if (uploadedFileId) {

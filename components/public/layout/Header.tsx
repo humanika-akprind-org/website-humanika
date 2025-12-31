@@ -58,13 +58,13 @@ function DesktopHeader({ currentUser }: HeaderProps) {
               <>
                 <Link
                   href="/auth/register"
-                  className="px-5 py-2.5 bg-transparent border-2 border-yellow-500 text-white rounded-full hover:border-white hover:bg-white hover:text-blue-800 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+                  className="px-5 py-2.5 bg-transparent border-2 text-white rounded-full hover:border-white hover:bg-white hover:text-blue-800 transition-all duration-300 flex items-center gap-2 font-semibold shadow-md hover:shadow-lg"
                 >
                   Daftar
                 </Link>
                 <Link
                   href="/auth/login"
-                  className="px-5 py-2.5 bg-red-500 text-white rounded-full hover:bg-red-300 hover:scale-105 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+                  className="px-5 py-2.5 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-300 flex items-center gap-2 font-semibold shadow-md hover:shadow-lg"
                 >
                   Masuk
                 </Link>
@@ -76,7 +76,7 @@ function DesktopHeader({ currentUser }: HeaderProps) {
           </div>
         </div>
 
-        <nav className="flex justify-center border-t border-blue-700">
+        <nav className="flex justify-center border-t border-blue-700 py-2">
           <ul className="flex space-x-1">
             <li>
               <NavLink href="/" exact>

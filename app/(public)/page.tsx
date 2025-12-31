@@ -1,295 +1,50 @@
 "use client";
 
-import Link from "next/link";
-import ArticleSection from "@/components/public/ArticleSection";
-import GallerySection from "@/components/public/GallerySection";
-import UpcomingEventsSection from "@/components/public/UpcomingEventsSection";
-import { useEffect, useState } from "react";
-interface Stat {
-  number: string;
-  label: string;
-}
+import HeroSection from "@/components/public/sections/home/HeroSection";
+import FeaturesSection from "@/components/public/sections/home/FeaturesSection";
+import ArticleSection from "@/components/public/sections/home/ArticleSection";
+import AboutSection from "@/components/public/sections/home/AboutSection";
+import EventsSection from "@/components/public/sections/home/EventsSection";
+import GallerySection from "@/components/public/sections/home/GallerySection";
+import CTASection from "@/components/public/sections/home/CTASection";
+import Divider from "@/components/public/ui/Divider";
 
+/**
+ * Home page component for HUMANIKA website
+ * Displays the main landing page with all sections
+ */
 export default function Home() {
-  const [stats, setStats] = useState<Stat[]>([
-    { number: "0", label: "Anggota Aktif" },
-    { number: "0", label: "Kegiatan Tahunan" },
-    { number: "0", label: "Proyek Kolaborasi" },
-    { number: "0", label: "Penghargaan" },
-  ]);
-  const [_loading, setLoading] = useState(true);
-  const [_error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/stats`,
-          { cache: "no-store" }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setStats(data);
-        } else {
-          setError("Failed to fetch stats");
-        }
-      } catch (_err) {
-        setError("Failed to fetch stats");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
   return (
-    <div className="min-h-screen bg-grey-50">
-      {/* 1. Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 text-white py-24 overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-72 h-72 bg-primary-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-          <div className="absolute top-0 right-0 w-72 h-72 bg-primary-700 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-          <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-primary-800 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-grey-50 to-white">
+      {/* Hero Section */}
+      <HeroSection />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-display-2 md:text-[64px] mb-6">
-              Berinovasi, Berkarya,{" "}
-              <span className="text-primary-200">Berkolaborasi</span>
-            </h1>
-            <p className="text-body-1 text-primary-100 max-w-2xl mx-auto mb-10">
-              HUMANIKA menghimpun mahasiswa informatika untuk mengembangkan
-              potensi, menciptakan inovasi, dan membangun komunitas yang
-              berdampak.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                href="/about"
-                className="px-8 py-4 bg-white text-primary-700 rounded-lg hover:bg-grey-50 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
-              >
-                Jelajahi HUMANIKA
-              </Link>
-              <Link
-                href="/auth/register"
-                className="px-8 py-4 bg-transparent border-2 border-red-500 text-white rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300 font-semibold"
-              >
-                Bergabung Sekarang
-              </Link>
-            </div>
-          </div>
-        </div>
+      {/* Features Section */}
+      <FeaturesSection />
 
-        {/* Stats Section */}
-        <div className="container mx-auto px-4 mt-20 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat: Stat, index: number) => (
-              <div
-                key={index}
-                className="text-center p-6 bg-white/10 backdrop-blur-sm rounded-xl"
-              >
-                <div className="text-heading-1 text-primary-200">
-                  {stat.number}
-                </div>
-                <div className="text-caption-1 text-primary-100 mt-2">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Divider */}
+      <Divider />
 
-      {/* 2. Artikel Terbaru */}
+      {/* Artikel Terbaru */}
       <ArticleSection />
 
-      {/* 3. Tentang Kami */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="mb-2 text-primary-600 font-semibold uppercase tracking-wider text-overline-1">
-                TENTANG KAMI
-              </div>
-              <h2 className="text-heading-3 text-grey-900 mb-6">
-                Mengenal HUMANIKA
-              </h2>
-              <p className="text-body-2 text-grey-700 mb-6 leading-relaxed">
-                HUMANIKA (Himpunan Mahasiswa Informatika) adalah organisasi
-                mahasiswa yang mewadahi seluruh mahasiswa Program Studi
-                Informatika dalam berbagai kegiatan akademik dan non-akademik.
-                Kami berkomitmen untuk menciptakan lingkungan yang mendukung
-                pengembangan keterampilan teknis dan soft skills.
-              </p>
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="flex items-center">
-                  <div className="mr-3 bg-primary-100 p-2 rounded-lg">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 text-primary-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-grey-900">Komunitas</div>
-                    <div className="text-caption-1 text-grey-600">
-                      500+ anggota
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <div className="mr-3 bg-primary-100 p-2 rounded-lg">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 text-primary-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-grey-900">Inovasi</div>
-                    <div className="text-caption-1 text-grey-600">
-                      20+ proyek
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/about"
-                className="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-md hover:shadow-lg"
-              >
-                Pelajari Lebih Lanjut
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 ml-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </Link>
-            </div>
+      {/* About Section */}
+      <AboutSection />
 
-            <div className="bg-white p-8 rounded-xl shadow-lg border border-grey-200">
-              <h3 className="text-heading-5 text-primary-800 mb-6 border-b border-grey-200 pb-3">
-                Visi & Misi
-              </h3>
-              <div className="mb-6">
-                <h4 className="font-semibold text-grey-900 mb-2 flex items-center">
-                  <span className="bg-primary-100 text-primary-600 p-1 rounded mr-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                      <path
-                        fillRule="evenodd"
-                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </span>
-                  Visi
-                </h4>
-                <p className="text-body-2 text-grey-700 pl-7">
-                  Menjadi wadah utama pengembangan talenta digital yang inovatif
-                  dan kolaboratif untuk menciptakan dampak positif bagi
-                  masyarakat.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-grey-900 mb-2 flex items-center">
-                  <span className="bg-primary-100 text-primary-600 p-1 rounded mr-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </span>
-                  Misi
-                </h4>
-                <ul className="text-body-2 text-grey-700 pl-7 space-y-2">
-                  <li className="flex items-start">
-                    <span className="text-primary-500 mr-2">•</span>
-                    Meningkatkan kompetensi anggota di bidang teknologi
-                    informasi
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary-500 mr-2">•</span>
-                    Menjalin kolaborasi dengan industri dan komunitas
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary-500 mr-2">•</span>
-                    Mengembangkan solusi inovatif untuk masalah sosial
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Divider */}
+      <Divider />
 
-      {/* 4. Event Terdekat */}
-      <UpcomingEventsSection />
+      {/* Event Terdekat */}
+      <EventsSection />
 
-      {/* 5. Galeri */}
+      {/* Divider */}
+      <Divider />
+
+      {/* Galeri */}
       <GallerySection />
 
-      {/* 6. Kontak CTA */}
-      <section className="py-16 bg-gradient-to-r from-primary-800 to-primary-900 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-heading-2 mb-6">Tertarik untuk Bergabung?</h2>
-          <p className="text-body-1 text-primary-100 max-w-2xl mx-auto mb-10">
-            Mari berkolaborasi dan kembangkan potensi Anda bersama HUMANIKA. Tim
-            kami siap membantu dan mendukung perjalanan Anda di dunia teknologi.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/contact"
-              className="px-8 py-4 bg-white text-primary-700 rounded-lg hover:bg-grey-50 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
-            >
-              Hubungi Kami
-            </Link>
-            <Link
-              href="/auth/register"
-              className="px-8 py-4 bg-transparent border-2 border-red-500 text-white rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300 font-semibold"
-            >
-              Daftar Menjadi Anggota
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Call to Action */}
+      <CTASection />
     </div>
   );
 }

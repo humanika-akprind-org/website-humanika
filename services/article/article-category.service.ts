@@ -14,6 +14,25 @@ export async function getArticleCategories(): Promise<ArticleCategory[]> {
   });
 }
 
+export async function getArticleCategoriesWithCount(): Promise<
+  ArticleCategory[]
+> {
+  return await prisma.articleCategory.findMany({
+    orderBy: { name: "asc" },
+    include: {
+      _count: {
+        select: {
+          articles: {
+            where: {
+              status: "PUBLISH",
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 export async function getArticleCategoryById(
   id: string
 ): Promise<ArticleCategory | null> {

@@ -1,148 +1,208 @@
 "use client";
 
-import ArticleCard from "@/components/public/article/ArticleCard";
-import { useState, useEffect } from "react";
-import type { Article } from "@/types/article";
+import { useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import { useArticleCategories } from "@/hooks/article-category/useArticleCategories";
+import { useArticleData } from "@/hooks/article/useArticleData";
+import { useArticleFilters } from "@/hooks/article/useArticleFilters";
+import {
+  createCategoryOptions,
+  filterArticles,
+  sortArticles,
+} from "@/hooks/article/utils";
+import { CATEGORY_COLORS, ARTICLES_PER_PAGE } from "@/hooks/article/constants";
+import { HeroSection } from "@/components/public/sections/article/HeroSection";
+import { ControlBar } from "@/components/public/article/ControlBar";
+import { ArticleGrid } from "@/components/public/article/ArticleGrid";
+import { ArticleList } from "@/components/public/article/ArticleList";
+import { LoadingState } from "@/components/public/article/LoadingState";
+import { ErrorState } from "@/components/public/article/ErrorState";
+import { EmptyState } from "@/components/public/article/EmptyState";
+import { PopularCategories } from "@/components/public/article/PopularCategories";
 
 interface ArticlePageType extends React.FC {
   fetchArticles?: () => void;
 }
 
 const ArticlePage: ArticlePageType = () => {
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category");
 
-  // Initialize fetchArticles as static property
-  ArticlePage.fetchArticles = ArticlePage.fetchArticles || (() => {});
+  // Data fetching
+  const { articles, loading, error, fetchArticles } = useArticleData();
 
+  // Categories
+  const { categories: dynamicCategories } = useArticleCategories();
+
+  // Filters and state
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    sortBy,
+    setSortBy,
+    viewMode,
+    setViewMode,
+    page,
+    setPage,
+    resetFilters,
+  } = useArticleFilters(initialCategory);
+
+  // Expose fetchArticles for manual reload button usage
+  ArticlePage.fetchArticles = fetchArticles;
+
+  // Create categories with colors
+  const categories = useMemo(
+    () =>
+      createCategoryOptions(
+        dynamicCategories,
+        articles.length,
+        CATEGORY_COLORS
+      ),
+    [dynamicCategories, articles.length]
+  );
+
+  // Filter and sort articles
+  const filteredAndSortedArticles = useMemo(() => {
+    const filtered = filterArticles(articles, searchQuery, selectedCategory);
+    const sorted = sortArticles(filtered, sortBy);
+    return sorted.slice(0, page * ARTICLES_PER_PAGE);
+  }, [articles, searchQuery, selectedCategory, sortBy, page]);
+
+  // Check if more articles are available
+  const hasMore = useMemo(() => {
+    const filtered = filterArticles(articles, searchQuery, selectedCategory);
+    return filtered.length > page * ARTICLES_PER_PAGE;
+  }, [articles, searchQuery, selectedCategory, page]);
+
+  // Load more handler
+  const loadMore = () => {
+    setPage((prev) => prev + 1);
+  };
+
+  // Initial data fetch
   useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const response = await fetch("/api/article?isPublished=true");
-        if (!response.ok) {
-          throw new Error("Failed to fetch articles");
-        }
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setArticles(data);
-        } else {
-          console.warn("Unexpected data format from articles API:", data);
-          setArticles([]);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Expose fetchArticles for manual reload button usage
-    ArticlePage.fetchArticles = fetchArticles;
-
     fetchArticles();
-  }, []);
+  }, [fetchArticles]);
+
+  // Loading state for initial load
+  if (loading && page === 1) {
+    return <LoadingState />;
+  }
+
+  const hasActiveFilters = Boolean(
+    searchQuery.trim() || selectedCategory !== "all"
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-r from-blue-700 to-blue-900 text-white rounded-xl p-8 mb-12 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-0 left-20 w-32 h-32 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob" />
-            <div className="absolute bottom-20 right-20 w-32 h-32 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000" />
-          </div>
-          <div className="relative z-10 text-center">
-            <h1 className="text-4xl font-bold mb-4">Artikel HUMANIKA</h1>
-            <p className="text-xl max-w-3xl mx-auto">
-              Temukan artikel menarik seputar teknologi, karir, dan kegiatan
-              mahasiswa informatika.
-            </p>
-          </div>
-        </section>
+    <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
+      {/* Hero Section */}
+      <HeroSection
+        articles={articles}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        dynamicCategories={dynamicCategories}
+      />
 
-        {/* Article List */}
-        <section>
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 border-b-4 border-red-600 pb-2 inline-block">
-              Artikel Terbaru
-            </h2>
-            <div className="flex items-center space-x-4">
-              <select className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium">
-                <option>Semua Kategori</option>
-                <option>Teknologi</option>
-                <option>Event</option>
-                <option>Karir</option>
-                <option>Prestasi</option>
-              </select>
-              <button className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors font-medium">
-                Urutkan
-              </button>
-            </div>
-          </div>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-12">
+        {/* Control Bar */}
+        <ControlBar
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onRefresh={() => {
+            setPage(1);
+            fetchArticles();
+          }}
+          searchQuery={searchQuery}
+          onSearchClear={() => setSearchQuery("")}
+          onResetFilters={resetFilters}
+        />
 
-          {loading && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">Memuat artikel...</p>
-            </div>
+        {/* Article Content */}
+        <div className="mt-12">
+          {/* Error State */}
+          {error && <ErrorState error={error} onRetry={fetchArticles} />}
+
+          {/* Empty State */}
+          {!loading && !error && filteredAndSortedArticles.length === 0 && (
+            <EmptyState
+              hasFilters={hasActiveFilters}
+              onResetFilters={resetFilters}
+            />
           )}
 
-          {error && (
-            <div className="text-center py-12">
-              <p className="text-red-500">{error}</p>
-            </div>
-          )}
+          {/* Articles Display */}
+          {filteredAndSortedArticles.length > 0 && (
+            <>
+              {/* Results Info */}
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-2xl font-bold text-grey-900">
+                    {searchQuery
+                      ? `Hasil pencarian "${searchQuery}"`
+                      : "Artikel Terbaru"}
+                  </h2>
+                  <p className="text-grey-600 mt-2">
+                    Menampilkan {filteredAndSortedArticles.length} dari{" "}
+                    {articles.length} artikel
+                  </p>
+                </div>
+                <div className="text-sm text-grey-600">
+                  Halaman {page} •{" "}
+                  {Math.ceil(articles.length / ARTICLES_PER_PAGE)} total halaman
+                </div>
+              </div>
 
-          {!loading && !error && articles.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">Tidak ada artikel ditemukan.</p>
-              <button
-                onClick={() => {
-                  setLoading(true);
-                  setError(null);
-                  setArticles([]);
-                  ArticlePage.fetchArticles?.();
-                }}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium shadow-md"
-              >
-                Muat Ulang
-              </button>
-            </div>
-          )}
+              {/* Articles */}
+              {viewMode === "grid" ? (
+                <ArticleGrid articles={filteredAndSortedArticles} />
+              ) : (
+                <ArticleList articles={filteredAndSortedArticles} />
+              )}
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article) => {
-              const formattedDate = article.createdAt
-                ? new Date(article.createdAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })
-                : "";
-              const truncatedContent =
-                article.content && article.content.length > 150
-                  ? `${article.content.substring(0, 150)}...`
-                  : article.content || "";
-              return (
-                <ArticleCard
-                  key={article.id}
-                  article={article}
-                  formattedDate={formattedDate}
-                  truncatedContent={truncatedContent}
-                />
-              );
-            })}
-          </div>
-
-          {!loading && !error && articles.length > 0 && (
-            <div className="mt-12 text-center">
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium shadow-md">
-                Muat Lebih Banyak
-              </button>
-            </div>
+              {/* Load More */}
+              {hasMore && (
+                <div className="mt-12 text-center">
+                  <button
+                    onClick={loadMore}
+                    disabled={loading}
+                    className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-5 h-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Memuat...
+                      </>
+                    ) : (
+                      <>
+                        <span>Muat Lebih Banyak</span>
+                        <div className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                  <p className="text-grey-600 text-sm mt-4">
+                    Menampilkan {filteredAndSortedArticles.length} dari{" "}
+                    {articles.length} artikel
+                  </p>
+                </div>
+              )}
+            </>
           )}
-        </section>
-      </main>
+        </div>
+
+        {/* Popular Categories */}
+        <PopularCategories
+          categories={categories}
+          selectedCategory={selectedCategory}
+        />
+      </div>
     </div>
   );
 };

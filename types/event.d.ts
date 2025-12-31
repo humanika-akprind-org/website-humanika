@@ -73,7 +73,7 @@ export interface UpdateEventInput extends Partial<CreateEventInput> {
 
 export interface EventFilter {
   department?: Department;
-  status?: Status;
+  status?: Status | string;
   periodId?: string;
   workProgramId?: string;
   search?: string;
