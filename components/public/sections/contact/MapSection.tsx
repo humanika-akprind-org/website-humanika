@@ -52,16 +52,16 @@ export default function MapSection() {
           {/* Overlay Info */}
           <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg max-w-xs">
             <h3 className="font-bold text-grey-900 mb-2">
-              Universitas AKPRIND
+              Universitas AKPRIND Indonesia
             </h3>
             <p className="text-sm text-grey-600">
-              Gedung Teknik Informatika, Lantai 3
+              Kampus 1, Jl. Kalisahak No.28, Klitren, Kec. Gondokusuman, Kota
             </p>
             <p className="text-sm text-grey-600 mt-1">🕒 09:00 - 17:00 WIB</p>
           </div>
         </div>
 
-        <div className="p-6 bg-grey-50 border-t border-grey-200">
+        {/* <div className="p-6 bg-grey-50 border-t border-grey-200">
           <div className="grid md:grid-cols-3 gap-6 text-sm text-grey-700">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 bg-green-500 rounded-full" />
@@ -76,7 +76,7 @@ export default function MapSection() {
               <span>Fasilitas lengkap</span>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </motion.section>
   );

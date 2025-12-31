@@ -16,25 +16,25 @@ import {
 export const STATS_DATA = [
   {
     icon: <Users className="w-6 h-6" />,
-    value: "200+",
+    value: "100+",
     label: "Anggota Aktif",
     color: "from-blue-500 to-blue-600",
   },
   {
     icon: <Calendar className="w-6 h-6" />,
-    value: "50+",
+    value: "10+",
     label: "Event Tahunan",
     color: "from-purple-500 to-purple-600",
   },
   {
     icon: <Code className="w-6 h-6" />,
-    value: "30+",
+    value: "5+",
     label: "Proyek Inovasi",
     color: "from-green-500 to-green-600",
   },
   {
     icon: <Award className="w-6 h-6" />,
-    value: "15+",
+    value: "5+",
     label: "Penghargaan",
     color: "from-orange-500 to-orange-600",
   },
@@ -46,7 +46,7 @@ export const STATS_DATA = [
   },
   {
     icon: <BookOpen className="w-6 h-6" />,
-    value: "100+",
+    value: "50+",
     label: "Materi Pembelajaran",
     color: "from-cyan-500 to-cyan-600",
   },

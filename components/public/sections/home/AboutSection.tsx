@@ -47,7 +47,7 @@ export default function AboutSection() {
                       </div>
                       <div>
                         <div className="text-2xl font-bold text-primary-700">
-                          500+
+                          100+
                         </div>
                         <div className="text-sm text-grey-600">
                           Anggota Aktif
@@ -63,7 +63,7 @@ export default function AboutSection() {
                       </div>
                       <div>
                         <div className="text-2xl font-bold text-primary-700">
-                          20+
+                          5+
                         </div>
                         <div className="text-sm text-grey-600">
                           Proyek Aktif

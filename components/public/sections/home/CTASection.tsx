@@ -54,7 +54,7 @@ export default function CTASection() {
           </div>
 
           <p className="text-primary-200/80 text-sm mt-8">
-            Bergabung dengan 500+ anggota aktif yang telah mengembangkan proyek
+            Bergabung dengan 100+ anggota aktif yang telah mengembangkan proyek
             inovatif
           </p>
         </motion.div>
