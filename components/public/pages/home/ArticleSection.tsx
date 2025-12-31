@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { type ArticleCategory } from "@/types/article-category";
+import { Status } from "@/types/enums";
 
 interface ArticleSectionType extends React.FC {
   fetchArticles?: () => void;
@@ -32,7 +33,7 @@ const ArticleSection: ArticleSectionType = () => {
     try {
       setLoading(true);
       setRefreshing(true);
-      const response = await fetch("/api/article?isPublished=true");
+      const response = await fetch(`/api/article?status=${Status.PUBLISH}`);
       if (!response.ok) {
         throw new Error("Failed to fetch articles");
       }

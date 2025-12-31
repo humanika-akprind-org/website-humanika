@@ -26,9 +26,7 @@ export default function Home() {
       <Divider />
 
       {/* Artikel Terbaru */}
-      <div className="bg-gradient-to-b from-white to-grey-50">
-        <ArticleSection />
-      </div>
+      <ArticleSection />
 
       {/* About Section */}
       <AboutSection />

@@ -8,7 +8,7 @@ import { getGalleries } from "@/use-cases/api/gallery";
 import { getEvents } from "@/use-cases/api/event";
 import type { Gallery } from "@/types/gallery";
 import type { Event } from "@/types/event";
-import { Status } from "@/types/enums";
+
 import {
   Camera,
   Image as ImageIcon,
@@ -18,28 +18,10 @@ import {
   Album,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { Status } from "@/types/enums";
+import { getPreviewUrl } from "@/lib/utils";
 
 export default function GallerySection() {
-  // Helper function to get preview URL from image (file ID or URL)
-  function getPreviewUrl(image: string | null | undefined): string {
-    if (!image) return "";
-
-    if (image.includes("drive.google.com")) {
-      // It's a full Google Drive URL, convert to direct image URL
-      const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (fileIdMatch) {
-        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
-      }
-      return image;
-    } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
-      // It's a Google Drive file ID, construct direct URL
-      return `/api/drive-image?fileId=${image}`;
-    } else {
-      // It's a direct URL or other format
-      return image;
-    }
-  }
-
   const [events, setEvents] = useState<Event[]>([]);
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -55,7 +37,12 @@ export default function GallerySection() {
           getGalleries(),
         ]);
         setEvents(eventsData);
-        setGalleries(galleriesData.slice(0, 12)); // Limit to 12 for preview
+        // Filter galleries to only include those from published events
+        const publishedEventIds = eventsData.map((event) => event.id);
+        const filteredGalleries = galleriesData.filter((gallery) =>
+          publishedEventIds.includes(gallery.eventId)
+        );
+        setGalleries(filteredGalleries.slice(0, 12)); // Limit to 12 for preview
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load gallery data"
