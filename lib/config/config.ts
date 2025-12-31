@@ -103,6 +103,19 @@ class AppConfig {
     return process.env.LETTER_FOLDER_ID || "1ut1OpVtAxHCC62N_rai-EunNqbnXd80_";
   }
 
+  get accountabilityReportFolderId(): string {
+    return (
+      process.env.ACCOUNTABILITY_REPORT_FOLDER_ID ||
+      "1sibwRnUbSaEO2b0TdbSg2V93geHpS5DX"
+    );
+  }
+
+  get proposalFolderId(): string {
+    return (
+      process.env.PROPOSAL_FOLDER_ID || "1xcGXiSvYFJF4YQohM48-wUSl4RbUssNy"
+    );
+  }
+
   // Email
   get resendApiKey(): string {
     return process.env.RESEND_API_KEY || "";
@@ -131,6 +144,8 @@ export const {
   galleryFolderId,
   articleFolderId,
   documentFolderId,
+  accountabilityReportFolderId,
+  proposalFolderId,
   structureFolderId,
   organizationalStructureFolderId,
   financeFolderId,
