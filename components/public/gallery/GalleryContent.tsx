@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Camera, Grid3x3 } from "lucide-react";
-import AlbumGrid from "../card/gallery/album/AlbumGrid";
+import AlbumGrid from "../card/album/AlbumGrid";
 import GalleryGrid from "../card/gallery/GalleryGrid";
 import type { Album } from "@/lib/gallery-utils";
 import type { Gallery } from "@/types/gallery";
