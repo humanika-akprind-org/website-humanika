@@ -8,6 +8,7 @@ import {
   ChevronRight,
   FolderOpen,
   Clock,
+  Calendar,
 } from "lucide-react";
 
 interface AlbumCardProps {
@@ -100,7 +101,7 @@ export default function AlbumCard({ album, index = 0 }: AlbumCardProps) {
             {/* Event Info */}
             {album.eventName && (
               <p className="text-sm text-grey-600 mb-3 line-clamp-1">
-                📅 {album.eventName}
+                <Calendar className="w-4 h-4 inline mr-1" /> {album.eventName}
               </p>
             )}
 
@@ -117,9 +118,6 @@ export default function AlbumCard({ album, index = 0 }: AlbumCardProps) {
               </div>
             </div>
           </div>
-
-          {/* Hover Effect Line */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
         </div>
       </Link>
     </motion.div>

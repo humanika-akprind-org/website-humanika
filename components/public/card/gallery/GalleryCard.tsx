@@ -115,7 +115,8 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
                 </h3>
                 {gallery.event?.name && (
                   <p className="text-xs text-grey-600 mt-1 line-clamp-1">
-                    📅 {gallery.event.name}
+                    <Calendar className="w-4 h-4 inline mr-1" />{" "}
+                    {gallery.event.name}
                   </p>
                 )}
               </div>

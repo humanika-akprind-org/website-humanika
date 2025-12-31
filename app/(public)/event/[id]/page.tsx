@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Calendar } from "lucide-react";
 import { useEventDetailPage } from "hooks/event/useEventDetailPage";
 import EventDetailHeroSection from "@/components/public/sections/event/detail/EventDetailHeroSection";
 import EventDetailContentSection from "@/components/public/sections/event/detail/EventDetailContentSection";
@@ -67,7 +67,7 @@ export default function EventDetail() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-grey-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-grey-400 text-6xl mb-4">📅</div>
+          <Calendar className="text-grey-400 text-6xl mb-4" />
           <h1 className="text-2xl font-bold text-grey-900 mb-2">
             Event Not Found
           </h1>
