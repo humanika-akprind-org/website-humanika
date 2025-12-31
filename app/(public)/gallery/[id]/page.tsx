@@ -3,7 +3,7 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useGalleryDetail } from "@/hooks/gallery/useGalleryDetail";
-import GalleryDetailHeroSection from "@/components/public/gallery/GalleryDetailHeroSection";
+import GalleryDetailHeroSection from "@/components/public/sections/gallery/GalleryDetailHeroSection";
 import GalleryDetailAlbumThumbnail from "@/components/public/gallery/GalleryDetailAlbumThumbnail";
 import GalleryDetailAlbumDescription from "@/components/public/gallery/GalleryDetailAlbumDescription";
 import GalleryDetailPhotoGrid from "@/components/public/card/gallery/GalleryDetailPhotoGrid";
