@@ -1,10 +1,21 @@
 import { PrismaClient, UserRole, Department, Position } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import { colors } from "../lib/random-color";
 
 const prisma = new PrismaClient();
 
+// Function to shuffle array and get unique colors
+function getUniqueRandomColors(count: number): string[] {
+  const shuffled = [...colors].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
+
 async function main() {
   const hashedPassword = await bcrypt.hash("password123", 10);
+
+  // Get unique random colors for all users
+  const userColors = getUniqueRandomColors(18);
+  let colorIndex = 0;
 
   const users = [
     // =========================
@@ -16,7 +27,10 @@ async function main() {
       username: "dpo",
       password: hashedPassword,
       role: UserRole.DPO,
+      isActive: true,
       verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
 
     // =========================
@@ -29,7 +43,10 @@ async function main() {
       password: hashedPassword,
       role: UserRole.BPH,
       position: Position.KETUA_UMUM,
+      isActive: true,
       verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Wakil Ketua BPH",
@@ -38,7 +55,10 @@ async function main() {
       password: hashedPassword,
       role: UserRole.BPH,
       position: Position.WAKIL_KETUA_UMUM,
+      isActive: true,
       verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Sekretaris BPH",
@@ -47,6 +67,10 @@ async function main() {
       password: hashedPassword,
       role: UserRole.BPH,
       position: Position.SEKRETARIS,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Bendahara BPH",
@@ -55,6 +79,10 @@ async function main() {
       password: hashedPassword,
       role: UserRole.BPH,
       position: Position.BENDAHARA,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
 
     // =========================
@@ -68,6 +96,10 @@ async function main() {
       role: UserRole.PENGURUS,
       department: Department.INFOKOM,
       position: Position.KEPALA_DEPARTEMEN,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Staff Infokom",
@@ -77,6 +109,10 @@ async function main() {
       role: UserRole.PENGURUS,
       department: Department.INFOKOM,
       position: Position.STAFF_DEPARTEMEN,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Kepala PSDM",
@@ -86,6 +122,10 @@ async function main() {
       role: UserRole.PENGURUS,
       department: Department.PSDM,
       position: Position.KEPALA_DEPARTEMEN,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Staff PSDM",
@@ -95,6 +135,10 @@ async function main() {
       role: UserRole.PENGURUS,
       department: Department.PSDM,
       position: Position.STAFF_DEPARTEMEN,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Kepala Litbang",
@@ -104,6 +148,10 @@ async function main() {
       role: UserRole.PENGURUS,
       department: Department.LITBANG,
       position: Position.KEPALA_DEPARTEMEN,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Staff Litbang",
@@ -113,6 +161,10 @@ async function main() {
       role: UserRole.PENGURUS,
       department: Department.LITBANG,
       position: Position.STAFF_DEPARTEMEN,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Kepala KWU",
@@ -122,6 +174,10 @@ async function main() {
       role: UserRole.PENGURUS,
       department: Department.KWU,
       position: Position.KEPALA_DEPARTEMEN,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Staff KWU",
@@ -131,6 +187,10 @@ async function main() {
       role: UserRole.PENGURUS,
       department: Department.KWU,
       position: Position.STAFF_DEPARTEMEN,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
 
     // =========================
@@ -142,6 +202,10 @@ async function main() {
       username: "anggota1",
       password: hashedPassword,
       role: UserRole.ANGGOTA,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
     {
       name: "Anggota 2",
@@ -149,6 +213,10 @@ async function main() {
       username: "anggota2",
       password: hashedPassword,
       role: UserRole.ANGGOTA,
+      isActive: true,
+      verifiedAccount: true,
+      attemptLogin: 0,
+      avatarColor: userColors[colorIndex++],
     },
   ];
 
