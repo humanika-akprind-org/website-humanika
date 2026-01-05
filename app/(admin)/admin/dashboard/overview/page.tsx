@@ -25,7 +25,14 @@ import type { Article } from "@/types/article";
 import type { ActivityLog } from "@/types/activity-log";
 import type { Period } from "@/types/period";
 import { Status } from "@/types/enums";
-import { Icons } from "@/components/icons";
+import {
+  TrendingUp,
+  Activity,
+  Calendar,
+  AlertCircle,
+  CheckCircle,
+  Users,
+} from "lucide-react";
 import { MetricCard } from "@/components/admin/dashboard/MetricCard";
 import LoadingOverview from "@/components/admin/dashboard/LoadingOverview";
 
@@ -230,7 +237,7 @@ export default function OverviewPage() {
     <div>
       <div className="flex items-center mb-8">
         <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mr-4">
-          <Icons.trendingUp className="h-8 w-8 text-white" />
+          <TrendingUp className="h-8 w-8 text-white" />
         </div>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -456,7 +463,7 @@ export default function OverviewPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center mb-6">
             <div className="p-2 bg-blue-50 rounded-lg mr-3">
-              <Icons.activity className="h-5 w-5 text-blue-600" />
+              <Activity className="h-5 w-5 text-blue-600" />
             </div>
             <h2 className="text-xl font-semibold text-gray-900">
               Recent Activity
@@ -493,7 +500,7 @@ export default function OverviewPage() {
               ))
             ) : (
               <div className="text-center py-8">
-                <Icons.activity className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                <Activity className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-sm text-gray-500">No recent activity</p>
               </div>
             )}
@@ -504,7 +511,7 @@ export default function OverviewPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center mb-6">
             <div className="p-2 bg-green-50 rounded-lg mr-3">
-              <Icons.trendingUp className="h-5 w-5 text-green-600" />
+              <TrendingUp className="h-5 w-5 text-green-600" />
             </div>
             <h2 className="text-xl font-semibold text-gray-900">
               System Overview
@@ -513,7 +520,7 @@ export default function OverviewPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center">
-                <Icons.calendar className="h-5 w-5 text-blue-600 mr-3" />
+                <Calendar className="h-5 w-5 text-blue-600 mr-3" />
                 <span className="text-sm font-medium text-gray-700">
                   Active Period
                 </span>
@@ -525,7 +532,7 @@ export default function OverviewPage() {
 
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center">
-                <Icons.alertCircle className="h-5 w-5 text-orange-600 mr-3" />
+                <AlertCircle className="h-5 w-5 text-orange-600 mr-3" />
                 <span className="text-sm font-medium text-gray-700">
                   Pending Approvals
                 </span>
@@ -537,7 +544,7 @@ export default function OverviewPage() {
 
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center">
-                <Icons.checkCircle className="h-5 w-5 text-green-600 mr-3" />
+                <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
                 <span className="text-sm font-medium text-gray-700">
                   System Health
                 </span>
@@ -549,7 +556,7 @@ export default function OverviewPage() {
 
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center">
-                <Icons.users className="h-5 w-5 text-purple-600 mr-3" />
+                <Users className="h-5 w-5 text-purple-600 mr-3" />
                 <span className="text-sm font-medium text-gray-700">
                   User Engagement
                 </span>

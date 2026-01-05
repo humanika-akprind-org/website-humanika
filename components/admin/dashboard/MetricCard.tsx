@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Icons } from "@/components/icons";
+import * as LucideIcons from "lucide-react";
+import type { ComponentType } from "react";
 
 interface MetricCardProps {
-  icon: keyof typeof Icons;
+  icon: string;
   color: string;
   value: string | number;
   title: string;
-  statusIcon: keyof typeof Icons;
+  statusIcon: string;
   statusColor: string;
   statusText: string;
   fontMedium?: boolean;
@@ -26,8 +27,13 @@ export function MetricCard({
   valueSize = "2xl",
   href,
 }: MetricCardProps) {
-  const IconComponent = Icons[icon];
-  const StatusIconComponent = Icons[statusIcon];
+  const IconComponent = LucideIcons[
+    (icon.charAt(0).toUpperCase() + icon.slice(1)) as keyof typeof LucideIcons
+  ] as ComponentType<{ className?: string }>;
+  const StatusIconComponent = LucideIcons[
+    (statusIcon.charAt(0).toUpperCase() +
+      statusIcon.slice(1)) as keyof typeof LucideIcons
+  ] as ComponentType<{ className?: string }>;
 
   const cardContent = (
     <div

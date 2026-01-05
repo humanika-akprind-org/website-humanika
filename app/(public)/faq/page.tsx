@@ -2,9 +2,9 @@
 
 import HeroSection from "../../../components/public/sections/faq/HeroSection";
 import SearchSection from "../../../components/public/sections/faq/SearchSection";
-import FAQGrid from "../../../components/public/faq/FAQGrid";
-import ContactCTA from "../../../components/public/faq/ContactCTA";
-import QuickLinks from "../../../components/public/faq/QuickLinks";
+import FAQGrid from "../../../components/public/pages/faq/FAQGrid";
+import ContactCTA from "../../../components/public/pages/faq/ContactCTA";
+import QuickLinks from "../../../components/public/pages/faq/QuickLinks";
 import { useFAQ } from "../../../hooks/faq/useFAQ";
 
 export default function FAQPage() {

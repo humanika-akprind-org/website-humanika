@@ -12,13 +12,13 @@ import {
 } from "@/hooks/article/utils";
 import { CATEGORY_COLORS, ARTICLES_PER_PAGE } from "@/hooks/article/constants";
 import { HeroSection } from "@/components/public/sections/article/HeroSection";
-import { ControlBar } from "@/components/public/article/ControlBar";
-import { ArticleGrid } from "@/components/public/article/ArticleGrid";
-import { ArticleList } from "@/components/public/article/ArticleList";
-import { LoadingState } from "@/components/public/article/LoadingState";
-import { ErrorState } from "@/components/public/article/ErrorState";
-import { EmptyState } from "@/components/public/article/EmptyState";
-import { PopularCategories } from "@/components/public/article/PopularCategories";
+import { ControlBar } from "@/components/public/pages/article/ControlBar";
+import { ArticleGrid } from "@/components/public/pages/article/ArticleGrid";
+import { ArticleList } from "@/components/public/pages/article/ArticleList";
+import { LoadingState } from "@/components/public/pages/article/LoadingState";
+import { ErrorState } from "@/components/public/pages/article/ErrorState";
+import { EmptyState } from "@/components/public/pages/article/EmptyState";
+import { PopularCategories } from "@/components/public/pages/article/PopularCategories";
 
 interface ArticlePageType extends React.FC {
   fetchArticles?: () => void;

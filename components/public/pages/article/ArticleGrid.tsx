@@ -1,10 +1,10 @@
 import { AnimatePresence } from "framer-motion";
-import ArticleCard from "@/components/public/card/article/ArticleCard";
+import ArticleCard from "@/components/public/pages/card/article/ArticleCard";
 import type { Article } from "@/types/article";
 import {
   formatArticleDate,
   truncateContent,
-} from "../../../hooks/article/utils";
+} from "../../../../hooks/article/utils";
 
 interface ArticleGridProps {
   articles: Article[];

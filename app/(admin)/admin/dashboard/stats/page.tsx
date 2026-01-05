@@ -19,7 +19,7 @@ import {
   PolarRadiusAxis,
   Radar,
 } from "recharts";
-import { Icons } from "@/components/icons";
+import { TrendingUp, Mail, Users, BarChart3 } from "lucide-react";
 import { MetricCard } from "@/components/admin/dashboard/MetricCard";
 import { useFinances } from "@/hooks/finance/useFinances";
 import { useLetters } from "@/hooks/letter/useLetters";
@@ -198,7 +198,7 @@ export default function DashboardPage() {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
       <div className="flex items-center mb-6">
         <div className="p-2 bg-green-50 rounded-lg mr-3">
-          <Icons.trendingUp className="h-5 w-5 text-green-600" />
+          <TrendingUp className="h-5 w-5 text-green-600" />
         </div>
         <h2 className="text-xl font-semibold text-gray-900">
           Keuangan: Pendapatan vs Pengeluaran
@@ -272,7 +272,7 @@ export default function DashboardPage() {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center mb-6">
         <div className="p-2 bg-blue-50 rounded-lg mr-3">
-          <Icons.mail className="h-5 w-5 text-blue-600" />
+          <Mail className="h-5 w-5 text-blue-600" />
         </div>
         <h2 className="text-xl font-semibold text-gray-900">
           Surat: Masuk vs Keluar
@@ -317,7 +317,7 @@ export default function DashboardPage() {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center mb-6">
         <div className="p-2 bg-purple-50 rounded-lg mr-3">
-          <Icons.users className="h-5 w-5 text-purple-600" />
+          <Users className="h-5 w-5 text-purple-600" />
         </div>
         <h2 className="text-xl font-semibold text-gray-900">
           Kontribusi Organisasi
@@ -358,7 +358,7 @@ export default function DashboardPage() {
     <div>
       <div className="flex items-center mb-8">
         <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mr-4">
-          <Icons.barChart className="h-8 w-8 text-white" />
+          <BarChart3 className="h-8 w-8 text-white" />
         </div>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Quick Stats</h1>

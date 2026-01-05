@@ -7,9 +7,9 @@ import { useShare } from "hooks/article/useShare";
 import ArticleHeroSection from "@/components/public/sections/article/detail/ArticleHeroSection";
 import ArticleContentSection from "@/components/public/sections/article/detail/ArticleContentSection";
 import RelatedArticlesSection from "@/components/public/sections/article/RelatedArticlesSection";
-import { LoadingState } from "@/components/public/article/LoadingState";
-import NotFoundState from "components/public/article/NotFoundState";
-import { ErrorState } from "components/public/article/ErrorState";
+import { LoadingState } from "@/components/public/pages/article/LoadingState";
+import NotFoundState from "@/components/public/pages/article/NotFoundState";
+import { ErrorState } from "@/components/public/pages/article/ErrorState";
 
 export default function ArticleDetail({
   params,

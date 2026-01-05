@@ -1,6 +1,6 @@
 "use client";
 
-import ContactHero from "@/components/public/contact/ContactHero";
+import ContactHero from "@/components/public/pages/contact/ContactHero";
 import ContactInfoSection from "@/components/public/sections/contact/ContactInfoSection";
 import ContactFormSection from "@/components/public/sections/contact/ContactFormSection";
 import MapSection from "@/components/public/sections/contact/MapSection";

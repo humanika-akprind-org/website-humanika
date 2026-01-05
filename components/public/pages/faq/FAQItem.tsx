@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { HelpCircle, ChevronRight } from "lucide-react";
-import { type FAQItem as FAQItemType } from "../../../hooks/faq/constants";
+import { type FAQItem as FAQItemType } from "../../../../hooks/faq/constants";
 
 interface FAQItemProps {
   faq: FAQItemType;

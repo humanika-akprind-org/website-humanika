@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { type FAQItem as FAQItemType } from "../../../hooks/faq/constants";
+import { type FAQItem as FAQItemType } from "../../../../hooks/faq/constants";
 import FAQItem from "./FAQItem";
 
 interface FAQGridProps {

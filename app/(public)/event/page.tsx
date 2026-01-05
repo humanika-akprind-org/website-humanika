@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
-import EventCard from "@/components/public/card/event/EventCard";
+import EventCard from "@/components/public/pages/card/event/EventCard";
 import { useEventCategories } from "@/hooks/event-category/useEventCategories";
 import {
   useEventData,
@@ -14,17 +14,17 @@ import {
 import {
   generateCategories,
   truncateDescription,
-} from "@/components/public/event/utils";
+} from "@/components/public/pages/event/utils";
 import EventHeroSection from "@/components/public/sections/event/EventHeroSection";
-import EventTabs from "@/components/public/event/EventTabs";
-import EventControlBar from "@/components/public/event/EventControlBar";
-import EventEmptyState from "@/components/public/event/EventEmptyState";
-import EventCalendarView from "@/components/public/event/EventCalendarView";
-import EventLoadMore from "@/components/public/event/EventLoadMore";
-import FeaturedPastEvents from "@/components/public/event/FeaturedPastEvents";
-import PopularCategories from "@/components/public/event/PopularCategories";
-import LoadingState from "@/components/public/event/LoadingState";
-import ErrorState from "@/components/public/event/ErrorState";
+import EventTabs from "@/components/public/pages/event/EventTabs";
+import EventControlBar from "@/components/public/pages/event/EventControlBar";
+import EventEmptyState from "@/components/public/pages/event/EventEmptyState";
+import EventCalendarView from "@/components/public/pages/event/EventCalendarView";
+import EventLoadMore from "@/components/public/pages/event/EventLoadMore";
+import FeaturedPastEvents from "@/components/public/pages/event/FeaturedPastEvents";
+import PopularCategories from "@/components/public/pages/event/PopularCategories";
+import LoadingState from "@/components/public/pages/event/LoadingState";
+import ErrorState from "@/components/public/pages/event/ErrorState";
 
 export default function EventPage() {
   // Custom hooks for data management
