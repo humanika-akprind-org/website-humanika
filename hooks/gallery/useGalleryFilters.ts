@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { DEFAULT_FILTERS } from "@/components/public/gallery/constants";
+import { DEFAULT_FILTERS } from "@/components/public/pages/gallery/constants";
 
 export type GalleryFilters = typeof DEFAULT_FILTERS;
 

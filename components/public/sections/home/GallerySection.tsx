@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { LatestGalleryGrid } from "../../card/gallery/LatestGalleryGrid";
-import AlbumGrid from "../../card/album/AlbumGrid";
+import { LatestGalleryGrid } from "../../pages/card/gallery/LatestGalleryGrid";
+import AlbumGrid from "../../pages/card/album/AlbumGrid";
 import { getGalleries } from "@/use-cases/api/gallery";
 import { getEvents } from "@/use-cases/api/event";
 import type { Gallery } from "@/types/gallery";

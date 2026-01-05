@@ -2,9 +2,9 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import EventCard from "../../card/event/EventCard";
+import EventCard from "../../pages/card/event/EventCard";
 import type { Event } from "@/types/event";
-import { truncateDescription } from "../../event/utils";
+import { truncateDescription } from "../../pages/event/utils";
 
 interface EventSectionsProps {
   pastEvents: Event[];

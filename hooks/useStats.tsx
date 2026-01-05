@@ -1,5 +1,5 @@
+import { Briefcase, CalendarDays, TrendingUp, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Icons } from "@/components/icons";
 
 interface Stat {
   number: string;
@@ -11,22 +11,22 @@ const initialStats: Stat[] = [
   {
     number: "0",
     label: "Anggota Aktif",
-    icon: <Icons.users className="h-6 w-6" />,
+    icon: <Users className="h-6 w-6" />,
   },
   {
     number: "0",
     label: "Kegiatan Tahunan",
-    icon: <Icons.calendarDays className="h-6 w-6" />,
+    icon: <CalendarDays className="h-6 w-6" />,
   },
   {
     number: "0",
     label: "Proyek Kolaborasi",
-    icon: <Icons.briefcase className="h-6 w-6" />,
+    icon: <Briefcase className="h-6 w-6" />,
   },
   {
     number: "0",
     label: "Penghargaan",
-    icon: <Icons.trendingUp className="h-6 w-6" />,
+    icon: <TrendingUp className="h-6 w-6" />,
   },
 ];
 

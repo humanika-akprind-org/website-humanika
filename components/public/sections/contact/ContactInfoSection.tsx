@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CONTACT_INFO, SOCIAL_MEDIA } from "../../contact/constants";
+import { CONTACT_INFO, SOCIAL_MEDIA } from "../../pages/contact/constants";
 
 export default function ContactInfoSection() {
   return (

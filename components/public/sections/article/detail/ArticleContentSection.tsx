@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { FileText } from "lucide-react";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
-import ActionBar from "@/components/public/article/ActionBar";
+import ActionBar from "@/components/public/pages/article/ActionBar";
 import type { Article } from "types/article";
 import { getPreviewUrl } from "lib/utils";
 

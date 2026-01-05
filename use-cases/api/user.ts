@@ -1,4 +1,3 @@
-// @lib/api/user.ts
 import { UserRole, Department, Position } from "@/types/enums";
 import type {
   User,
@@ -11,7 +10,6 @@ import { apiUrl } from "@/lib/config/config";
 
 const API_BASE_URL = apiUrl;
 
-// Fungsi fetch dasar yang dapat digunakan oleh semua fungsi API
 async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}

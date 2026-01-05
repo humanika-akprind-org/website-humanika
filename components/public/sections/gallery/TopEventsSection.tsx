@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Calendar, Image as ImageIcon } from "lucide-react";
 import type { Album } from "@/lib/gallery-utils";
-import { ANIMATION_DELAYS } from "../../gallery/constants";
+import { ANIMATION_DELAYS } from "../../pages/gallery/constants";
 
 interface TopEventsSectionProps {
   albums: Album[];

@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import ArticleCard from "@/components/public/card/article/ArticleCard";
+import ArticleCard from "@/components/public/pages/card/article/ArticleCard";
 import type { Article } from "types/article";
 
 interface RelatedArticlesSectionProps {
