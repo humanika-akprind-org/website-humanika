@@ -8,7 +8,7 @@ import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/components/admin/layout/UserInfo";
 import { geistSans, geistMono } from "@/app/ui/fonts";
 import SidebarMobile from "@/components/admin/layout/SidebarMobile";
-import RefreshHandler from "@/components/admin/RefreshHandler";
+import RefreshHandler from "@/components/admin/ui/RefreshHandler";
 
 export const metadata: Metadata = {
   title: "Organizational Management System",
