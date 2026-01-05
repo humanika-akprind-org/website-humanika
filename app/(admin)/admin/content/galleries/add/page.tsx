@@ -1,6 +1,6 @@
 "use client";
 
-import GalleryForm from "@/components/admin/gallery/Form";
+import GalleryForm from "@/components/admin/pages/gallery/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import Alert from "@/components/admin/ui/alert/Alert";

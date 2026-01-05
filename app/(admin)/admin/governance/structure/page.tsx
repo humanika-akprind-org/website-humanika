@@ -1,8 +1,8 @@
 "use client";
 
-import StructureStats from "@/components/admin/structure/Stats";
-import StructureFilters from "@/components/admin/structure/Filters";
-import StructureTable from "@/components/admin/structure/Table";
+import StructureStats from "@/components/admin/pages/structure/Stats";
+import StructureFilters from "@/components/admin/pages/structure/Filters";
+import StructureTable from "@/components/admin/pages/structure/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

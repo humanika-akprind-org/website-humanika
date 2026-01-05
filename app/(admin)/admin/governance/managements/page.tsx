@@ -1,8 +1,8 @@
 "use client";
 
-import ManagementStats from "@/components/admin/management/Stats";
-import ManagementFilters from "@/components/admin/management/Filters";
-import ManagementTable from "@/components/admin/management/Table";
+import ManagementStats from "@/components/admin/pages/management/Stats";
+import ManagementFilters from "@/components/admin/pages/management/Filters";
+import ManagementTable from "@/components/admin/pages/management/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

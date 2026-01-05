@@ -1,8 +1,8 @@
 "use client";
 
-import EventCategoryStats from "@/components/admin/event/category/Stats";
-import EventCategoryFilters from "@/components/admin/event/category/Filters";
-import EventCategoryTable from "@/components/admin/event/category/Table";
+import EventCategoryStats from "@/components/admin/pages/event/category/Stats";
+import EventCategoryFilters from "@/components/admin/pages/event/category/Filters";
+import EventCategoryTable from "@/components/admin/pages/event/category/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

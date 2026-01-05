@@ -2,8 +2,8 @@
 
 import LoadingActivity from "@/components/admin/layout/loading/LoadingActivity";
 import ManagementHeader from "@/components/admin/ui/ManagementHeader";
-import ActivityFilters from "@/components/admin/activity/Filters";
-import ActivityTable from "@/components/admin/activity/Table";
+import ActivityFilters from "@/components/admin/pages/activity/Filters";
+import ActivityTable from "@/components/admin/pages/activity/Table";
 import { useActivityPage } from "@/hooks/activity-log/useActivityPage";
 
 export default function ActivityLogPage() {

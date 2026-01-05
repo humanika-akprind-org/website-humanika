@@ -20,7 +20,7 @@ import {
   Radar,
 } from "recharts";
 import { TrendingUp, Mail, Users, BarChart3 } from "lucide-react";
-import { MetricCard } from "@/components/admin/dashboard/MetricCard";
+import { MetricCard } from "@/components/admin/pages/dashboard/MetricCard";
 import { useFinances } from "@/hooks/finance/useFinances";
 import { useLetters } from "@/hooks/letter/useLetters";
 import { useArticles } from "@/hooks/article/useArticles";
@@ -28,7 +28,7 @@ import { useGalleries } from "@/hooks/gallery/useGalleries";
 import { useEvents } from "@/hooks/event/useEvents";
 import { useManagements } from "@/hooks/management/useManagements";
 import { useActivityStats } from "@/hooks/activity/useActivityStats";
-import LoadingStats from "@/components/admin/dashboard/LoadingStats";
+import LoadingStats from "@/components/admin/pages/dashboard/LoadingStats";
 
 // Custom hook for dashboard data processing
 const useDashboardData = () => {

@@ -1,8 +1,8 @@
 "use client";
 
-import PeriodStats from "@/components/admin/period/Stats";
-import PeriodFilters from "@/components/admin/period/Filters";
-import PeriodTable from "@/components/admin/period/Table";
+import PeriodStats from "@/components/admin/pages/period/Stats";
+import PeriodFilters from "@/components/admin/pages/period/Filters";
+import PeriodTable from "@/components/admin/pages/period/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

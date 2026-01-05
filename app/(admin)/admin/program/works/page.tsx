@@ -1,8 +1,8 @@
 "use client";
 
-import WorkStats from "@/components/admin/work/Stats";
-import WorkFilters from "@/components/admin/work/Filters";
-import WorkTable from "@/components/admin/work/Table";
+import WorkStats from "@/components/admin/pages/work/Stats";
+import WorkFilters from "@/components/admin/pages/work/Filters";
+import WorkTable from "@/components/admin/pages/work/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";
@@ -15,7 +15,7 @@ import StatusApprovalChip from "@/components/admin/ui/chip/StatusApproval";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 import { useWorkManagement } from "@/hooks/work-program/useWorkManagement";
-import ExportButtons from "@/components/admin/work/export-button/ExportButtons";
+import ExportButtons from "@/components/admin/pages/work/export-button/ExportButtons";
 
 export default function WorkProgramPage() {
   const {

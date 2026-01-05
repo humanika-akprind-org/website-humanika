@@ -1,8 +1,8 @@
 "use client";
 
-import TaskStats from "@/components/admin/task/Stats";
-import TaskFilters from "@/components/admin/task/Filters";
-import TaskTable from "@/components/admin/task/Table";
+import TaskStats from "@/components/admin/pages/task/Stats";
+import TaskFilters from "@/components/admin/pages/task/Filters";
+import TaskTable from "@/components/admin/pages/task/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

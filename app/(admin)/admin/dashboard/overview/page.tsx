@@ -33,8 +33,8 @@ import {
   CheckCircle,
   Users,
 } from "lucide-react";
-import { MetricCard } from "@/components/admin/dashboard/MetricCard";
-import LoadingOverview from "@/components/admin/dashboard/LoadingOverview";
+import { MetricCard } from "@/components/admin/pages/dashboard/MetricCard";
+import LoadingOverview from "@/components/admin/pages/dashboard/LoadingOverview";
 
 interface OverviewData {
   totalUsers: number;

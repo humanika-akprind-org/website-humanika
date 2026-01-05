@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EventForm from "@/components/admin/event/Form";
+import EventForm from "@/components/admin/pages/event/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import Alert from "@/components/admin/ui/alert/Alert";

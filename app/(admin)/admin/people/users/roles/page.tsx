@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import UserStats from "@/components/admin/user/roles/Stats";
-import UserFilters from "@/components/admin/user/roles/Filters";
-import UserTable from "@/components/admin/user/roles/Table";
+import UserStats from "@/components/admin/pages/user/roles/Stats";
+import UserFilters from "@/components/admin/pages/user/roles/Filters";
+import UserTable from "@/components/admin/pages/user/roles/Table";
 import Loading from "@/components/admin/layout/loading/Loading";
 import Alert, { type AlertType } from "@/components/admin/ui/alert/Alert";
 import ManagementHeader from "@/components/admin/ui/ManagementHeader";

@@ -1,8 +1,8 @@
 "use client";
 
-import ArticleCategoryStats from "@/components/admin/article/category/Stats";
-import ArticleCategoryFilters from "@/components/admin/article/category/Filters";
-import ArticleCategoryTable from "@/components/admin/article/category/Table";
+import ArticleCategoryStats from "@/components/admin/pages/article/category/Stats";
+import ArticleCategoryFilters from "@/components/admin/pages/article/category/Filters";
+import ArticleCategoryTable from "@/components/admin/pages/article/category/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

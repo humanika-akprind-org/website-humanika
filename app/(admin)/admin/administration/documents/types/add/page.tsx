@@ -1,6 +1,6 @@
 "use client";
 
-import DocumentTypeForm from "@/components/admin/document/type/Form";
+import DocumentTypeForm from "@/components/admin/pages/document/type/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import Alert from "@/components/admin/ui/alert/Alert";

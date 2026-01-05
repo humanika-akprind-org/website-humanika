@@ -1,7 +1,7 @@
 // app/(admin)/admin/people/users/add/page.tsx
 "use client";
 
-import UserForm from "@/components/admin/user/Form";
+import UserForm from "@/components/admin/pages/user/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import Alert from "@/components/admin/ui/alert/Alert";

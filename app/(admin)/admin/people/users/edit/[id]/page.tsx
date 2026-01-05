@@ -2,7 +2,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import UserEditForm from "@/components/admin/user/EditForm";
+import UserEditForm from "@/components/admin/pages/user/EditForm";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import Alert from "@/components/admin/ui/alert/Alert";
 import PageHeader from "@/components/admin/ui/PageHeader";

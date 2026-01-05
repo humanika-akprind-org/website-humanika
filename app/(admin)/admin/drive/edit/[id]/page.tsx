@@ -1,5 +1,5 @@
-import DriveForm from "@/components/admin/drive/Form";
-import PageHeader from "@/components/admin/drive/PageHeader";
+import DriveForm from "@/components/admin/pages/drive/Form";
+import PageHeader from "@/components/admin/pages/drive/PageHeader";
 import { getGoogleDriveFile } from "@/lib/google-drive/google-drive";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";

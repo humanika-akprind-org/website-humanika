@@ -1,8 +1,8 @@
 "use client";
 
-import LetterStats from "@/components/admin/letter/Stats";
-import LetterFilters from "@/components/admin/letter/Filters";
-import LetterTable from "@/components/admin/letter/Table";
+import LetterStats from "@/components/admin/pages/letter/Stats";
+import LetterFilters from "@/components/admin/pages/letter/Filters";
+import LetterTable from "@/components/admin/pages/letter/Table";
 import DeleteModal from "components/admin/ui/modal/DeleteModal";
 import ViewModal from "components/admin/ui/modal/ViewModal";
 import Loading from "components/admin/layout/loading/Loading";

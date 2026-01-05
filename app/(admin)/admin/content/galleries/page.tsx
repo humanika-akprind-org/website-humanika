@@ -1,8 +1,8 @@
 "use client";
 
-import GalleryStats from "components/admin/gallery/Stats";
-import GalleryFilters from "components/admin/gallery/Filters";
-import GalleryTable from "@/components/admin/gallery/Table";
+import GalleryStats from "@/components/admin/pages/gallery/Stats";
+import GalleryFilters from "@/components/admin/pages/gallery/Filters";
+import GalleryTable from "@/components/admin/pages/gallery/Table";
 import DeleteModal from "components/admin/ui/modal/DeleteModal";
 import ViewModal from "components/admin/ui/modal/ViewModal";
 import Loading from "components/admin/layout/loading/Loading";

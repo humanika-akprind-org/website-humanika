@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Stats from "@/components/admin/finance/Stats";
-import Filters from "@/components/admin/finance/Filters";
-import FinanceTable from "@/components/admin/finance/Table";
+import Stats from "@/components/admin/pages/finance/Stats";
+import Filters from "@/components/admin/pages/finance/Filters";
+import FinanceTable from "@/components/admin/pages/finance/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";
@@ -16,7 +16,7 @@ import StatusApprovalChip from "@/components/admin/ui/chip/StatusApproval";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import ImageView from "@/components/admin/ui/avatar/ImageView";
 import { useFinanceManagement } from "@/hooks/finance/useFinanceManagement";
-import ExportButtons from "@/components/admin/finance/export-button/ExportButtons";
+import ExportButtons from "@/components/admin/pages/finance/export-button/ExportButtons";
 
 export default function FinanceTransactionsPage() {
   const [statusFilter, setStatusFilter] = useState("all");

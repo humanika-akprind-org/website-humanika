@@ -1,8 +1,8 @@
 "use client";
 
-import UserStats from "@/components/admin/user/Stats";
-import UserFilters from "@/components/admin/user/Filters";
-import UserTable from "@/components/admin/user/Table";
+import UserStats from "@/components/admin/pages/user/Stats";
+import UserFilters from "@/components/admin/pages/user/Filters";
+import UserTable from "@/components/admin/pages/user/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

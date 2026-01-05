@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import StructureForm from "@/components/admin/structure/Form";
+import StructureForm from "@/components/admin/pages/structure/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import Alert from "@/components/admin/ui/alert/Alert";
 import PageHeader from "@/components/admin/ui/PageHeader";

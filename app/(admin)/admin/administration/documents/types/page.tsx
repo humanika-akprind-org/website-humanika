@@ -1,8 +1,8 @@
 "use client";
 
-import DocumentTypeStats from "@/components/admin/document/type/Stats";
-import DocumentTypeFilters from "@/components/admin/document/type/Filters";
-import DocumentTypeTable from "@/components/admin/document/type/Table";
+import DocumentTypeStats from "@/components/admin/pages/document/type/Stats";
+import DocumentTypeFilters from "@/components/admin/pages/document/type/Filters";
+import DocumentTypeTable from "@/components/admin/pages/document/type/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

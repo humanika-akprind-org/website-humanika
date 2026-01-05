@@ -1,9 +1,9 @@
 "use client";
 
 import { useDocumentApproval } from "hooks/document/useDocumentApproval";
-import ApprovalFilters from "components/admin/approval/Filters";
-import ApprovalTable from "components/admin/approval/Table";
-import ApprovalActionModal from "components/admin/approval/ActionModal";
+import ApprovalFilters from "@/components/admin/pages/approval/Filters";
+import ApprovalTable from "@/components/admin/pages/approval/Table";
+import ApprovalActionModal from "@/components/admin/pages/approval/ActionModal";
 import Alert from "components/admin/ui/alert/Alert";
 import LoadingApproval from "components/admin/layout/loading/LoadingApproval";
 import ManagementHeader from "components/admin/ui/ManagementHeader";

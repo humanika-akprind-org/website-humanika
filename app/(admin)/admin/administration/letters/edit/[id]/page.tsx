@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import LetterForm from "@/components/admin/letter/Form";
+import LetterForm from "@/components/admin/pages/letter/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import Alert from "@/components/admin/ui/alert/Alert";

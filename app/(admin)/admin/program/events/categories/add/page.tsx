@@ -1,6 +1,6 @@
 "use client";
 
-import EventCategoryForm from "@/components/admin/event/category/Form";
+import EventCategoryForm from "@/components/admin/pages/event/category/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import Alert from "@/components/admin/ui/alert/Alert";

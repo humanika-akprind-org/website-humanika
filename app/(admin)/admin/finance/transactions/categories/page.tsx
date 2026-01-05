@@ -1,8 +1,8 @@
 "use client";
 
-import FinanceCategoryStats from "@/components/admin/finance/category/Stats";
-import FinanceCategoryFilters from "@/components/admin/finance/category/Filters";
-import FinanceCategoryTable from "@/components/admin/finance/category/Table";
+import FinanceCategoryStats from "@/components/admin/pages/finance/category/Stats";
+import FinanceCategoryFilters from "@/components/admin/pages/finance/category/Filters";
+import FinanceCategoryTable from "@/components/admin/pages/finance/category/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

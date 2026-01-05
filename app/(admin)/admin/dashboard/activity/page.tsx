@@ -20,8 +20,8 @@ import {
 
 import type { ActivityLog } from "@/types/activity-log";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
-import ExportButtons from "@/components/admin/activity/export-button/ExportButtons";
-import LoadingActivityDashboard from "@/components/admin/activity/LoadingActivityDashboard";
+import ExportButtons from "@/components/admin/pages/activity/export-button/ExportButtons";
+import LoadingActivityDashboard from "@/components/admin/pages/activity/LoadingActivityDashboard";
 import StatCard from "@/components/admin/ui/card/StatCard";
 
 export default function ActivityPage() {

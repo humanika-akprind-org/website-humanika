@@ -1,6 +1,6 @@
 "use client";
 
-import StructureForm from "@/components/admin/structure/Form";
+import StructureForm from "@/components/admin/pages/structure/Form";
 import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import Alert from "@/components/admin/ui/alert/Alert";

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import DocumentStats from "@/components/admin/document/Stats";
-import DocumentFilters from "@/components/admin/document/Filters";
-import DocumentTable from "@/components/admin/document/Table";
+import DocumentStats from "@/components/admin/pages/document/Stats";
+import DocumentFilters from "@/components/admin/pages/document/Filters";
+import DocumentTable from "@/components/admin/pages/document/Table";
 import DeleteModal from "components/admin/ui/modal/DeleteModal";
 import ViewModal from "components/admin/ui/modal/ViewModal";
 import Loading from "components/admin/layout/loading/Loading";

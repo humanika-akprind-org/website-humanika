@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { UserRole } from "@/types/enums";
-import { type CreateUserData } from "@/components/admin/user/Form";
+import { type CreateUserData } from "@/components/admin/pages/user/Form";
 import { type AlertType } from "@/components/admin/ui/alert/Alert";
 
 export const useUserForm = (

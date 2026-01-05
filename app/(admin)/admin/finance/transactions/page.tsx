@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Stats from "@/components/admin/finance/Stats";
-import Filters from "@/components/admin/finance/Filters";
-import FinanceTable from "@/components/admin/finance/Table";
+import Stats from "@/components/admin/pages/finance/Stats";
+import Filters from "@/components/admin/pages/finance/Filters";
+import FinanceTable from "@/components/admin/pages/finance/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

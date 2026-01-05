@@ -1,8 +1,8 @@
 "use client";
 
-import GalleryCategoryStats from "@/components/admin/gallery/category/Stats";
-import GalleryCategoryFilters from "@/components/admin/gallery/category/Filters";
-import GalleryCategoryTable from "@/components/admin/gallery/category/Table";
+import GalleryCategoryStats from "@/components/admin/pages/gallery/category/Stats";
+import GalleryCategoryFilters from "@/components/admin/pages/gallery/category/Filters";
+import GalleryCategoryTable from "@/components/admin/pages/gallery/category/Table";
 import DeleteModal from "@/components/admin/ui/modal/DeleteModal";
 import ViewModal from "@/components/admin/ui/modal/ViewModal";
 import Loading from "@/components/admin/layout/loading/Loading";

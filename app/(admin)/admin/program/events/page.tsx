@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import EventStats from "components/admin/event/Stats";
-import EventFilters from "components/admin/event/Filters";
-import EventTable from "components/admin/event/Table";
+import EventStats from "@/components/admin/pages/event/Stats";
+import EventFilters from "@/components/admin/pages/event/Filters";
+import EventTable from "@/components/admin/pages/event/Table";
 import DeleteModal from "components/admin/ui/modal/DeleteModal";
 import ViewModal from "components/admin/ui/modal/ViewModal";
 import Loading from "components/admin/layout/loading/Loading";
