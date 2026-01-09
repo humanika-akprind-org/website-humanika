@@ -66,7 +66,7 @@
     "framer-motion": "^12.23.26",
     "googleapis": "^144.0.0",
     "html-react-parser": "^5.2.10",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.447.0",
