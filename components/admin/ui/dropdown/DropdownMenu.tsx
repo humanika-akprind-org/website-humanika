@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { FiMoreVertical } from "react-icons/fi";
 import DropdownMenuItem from "./DropdownMenuItem";
 
@@ -7,7 +8,11 @@ interface DropdownMenuProps {
   boundaryRef?: React.RefObject<HTMLElement>;
   isLastItem?: boolean;
   hasMultipleItems?: boolean;
-  itemCount?: number;
+}
+
+interface DropdownPosition {
+  top: number;
+  left: number;
 }
 
 export default function DropdownMenu({
@@ -17,15 +22,21 @@ export default function DropdownMenu({
   hasMultipleItems,
 }: DropdownMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState<"bottom" | "top">("bottom");
+  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({
+    top: 0,
+    left: 0,
+  });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(event.target as Node) &&
+        (!portalRef.current ||
+          !portalRef.current.contains(event.target as Node))
       ) {
         setIsOpen(false);
       }
@@ -41,17 +52,40 @@ export default function DropdownMenu({
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      const dropdownHeight = 200; // Approximate height of dropdown
+      const windowWidth = window.innerWidth;
+      const dropdownWidth = 192; // w-48 = 192px
+      const dropdownHeight = 180; // Approximate height of dropdown
       const bottomMargin = 200; // Approximate height for pagination/footer
+      const padding = 8; // Small padding from edges
 
       const spaceBelow = windowHeight - bottomMargin - rect.bottom;
-      const itemCount = React.Children.count(children);
 
       // Determine position: open upwards if only 1 item or if last item and has multiple items, otherwise downwards
-      if (itemCount === 1 || (isLastItem && hasMultipleItems)) {
-        setPosition("top");
+      const shouldOpenUpwards =
+        React.Children.count(children) === 1 ||
+        (isLastItem && hasMultipleItems);
+
+      // Calculate horizontal position (right-aligned with viewport)
+      let left = windowWidth - dropdownWidth - padding;
+
+      // Ensure it doesn't go off the left edge
+      if (left < padding) {
+        left = rect.right - dropdownWidth;
+      }
+
+      // Ensure dropdown doesn't go off the right edge
+      if (left + dropdownWidth > windowWidth - padding) {
+        left = windowWidth - dropdownWidth - padding;
+      }
+
+      // Calculate vertical position
+      let top: number;
+      if (shouldOpenUpwards) {
+        // Position above the button
+        top = rect.top - dropdownHeight - padding;
       } else {
-        setPosition("bottom");
+        // Position below the button
+        top = rect.bottom + padding;
       }
 
       // If opening and boundaryRef provided, and space below is insufficient (cut off by pagination), increase row height
@@ -65,9 +99,17 @@ export default function DropdownMenu({
       if (isOpen && boundaryRef?.current) {
         boundaryRef.current.style.minHeight = "";
       }
+
+      setDropdownPosition({ top, left });
     }
     setIsOpen(!isOpen);
   };
+
+  // Check if we're in a browser environment for createPortal
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -80,15 +122,21 @@ export default function DropdownMenu({
         <FiMoreVertical size={16} />
       </button>
 
-      {isOpen && (
-        <div
-          className={`absolute right-0 w-48 bg-white rounded-md shadow-lg z-[9999] border border-gray-200 ${
-            position === "top" ? "bottom-full mb-2" : "top-full mt-2"
-          }`}
-        >
-          <div className="py-1">{children}</div>
-        </div>
-      )}
+      {isOpen &&
+        mounted &&
+        createPortal(
+          <div
+            className="fixed w-48 bg-white rounded-md shadow-lg z-[9999] border border-gray-200"
+            style={{
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+            }}
+            ref={portalRef}
+          >
+            <div className="py-1">{children}</div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
