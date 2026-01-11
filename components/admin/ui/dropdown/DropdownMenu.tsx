@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FiMoreVertical } from "react-icons/fi";
-import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import DropdownMenuItem from "./DropdownMenuItem";
 
@@ -131,39 +130,63 @@ export default function DropdownMenu({
     setMounted(true);
   }, []);
 
-  // Mobile bottom sheet content
-  const bottomSheetContent = (
-    <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
-      <Dialog.Trigger asChild>
-        <button
-          ref={buttonRef}
-          className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-          title="More actions"
-        >
-          <FiMoreVertical size={16} />
-        </button>
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[9999] bg-black/50 animate-in fade-in-0" />
-        <Dialog.Content
+  // Handle item click - close bottom sheet after action
+  const handleItemClick = (onClick: () => void) => {
+    onClick();
+    setIsOpen(false);
+  };
+
+  // Mobile bottom sheet content (using custom implementation to avoid Radix UI event issues)
+  const bottomSheetContent =
+    isOpen &&
+    mounted &&
+    createPortal(
+      <>
+        {/* Backdrop overlay */}
+        <div
+          className="fixed inset-0 z-[9999] bg-black/50 animate-in fade-in-0"
+          onClick={() => setIsOpen(false)}
+          style={{ pointerEvents: "auto" }}
+        />
+        {/* Bottom sheet content */}
+        <div
           className="fixed bottom-0 left-0 right-0 z-[10000] bg-white rounded-t-xl p-4 pb-8 shadow-lg animate-in slide-in-from-bottom-0 duration-300"
-          style={{ maxHeight: "70vh", overflowY: "auto" }}
+          style={{
+            maxHeight: "70vh",
+            overflowY: "auto",
+            pointerEvents: "auto",
+          }}
+          ref={portalRef}
         >
           {/* Drag indicator */}
           <div className="flex justify-center mb-4">
             <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
           </div>
 
-          <div className="space-y-1">{children}</div>
+          <div className="space-y-1">
+            {React.Children.map(children, (child) => {
+              if (React.isValidElement(child)) {
+                const childOnClick = (child.props as any).onClick;
+                return React.cloneElement(child as React.ReactElement<any>, {
+                  onClick: () => handleItemClick(childOnClick),
+                });
+              }
+              return child;
+            })}
+          </div>
 
-          <Dialog.Close className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity">
+          {/* Close button */}
+          <button
+            className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
+            onClick={() => setIsOpen(false)}
+          >
             <Cross2Icon className="h-4 w-4" />
             <span className="sr-only">Close</span>
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
+          </button>
+        </div>
+      </>,
+      document.body
+    );
 
   // Desktop dropdown content
   const dropdownContent =
@@ -187,7 +210,17 @@ export default function DropdownMenu({
     <div className="relative" ref={dropdownRef}>
       {/* Show bottom sheet on mobile, dropdown on desktop */}
       {isMobile ? (
-        bottomSheetContent
+        <>
+          <button
+            ref={buttonRef}
+            onClick={handleButtonClick}
+            className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+            title="More actions"
+          >
+            <FiMoreVertical size={16} />
+          </button>
+          {bottomSheetContent}
+        </>
       ) : (
         <>
           <button
