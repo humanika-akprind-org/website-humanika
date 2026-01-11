@@ -250,7 +250,13 @@ export default function DocumentTable({
                 ref={(el) => {
                   rowRefs.current[index] = el;
                 }}
-                className="hover:bg-gray-50 transition-colors"
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => {
+                  window.open(
+                    `https://drive.google.com/file/d/${document.document}/view`,
+                    "_blank"
+                  );
+                }}
               >
                 <td className="pl-6 pr-2 py-4 whitespace-nowrap">
                   <Checkbox
