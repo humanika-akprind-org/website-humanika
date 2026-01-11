@@ -38,6 +38,7 @@
     }
   ],
   "env": {
-    "PRISMA_GENERATE": "true"
+    "PRISMA_GENERATE": "true",
+    "POSTINSTALL_GENERATE": "true"
   }
 }

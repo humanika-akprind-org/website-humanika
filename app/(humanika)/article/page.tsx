@@ -116,10 +116,6 @@ const ArticlePage: ArticlePageType = () => {
           onSortChange={setSortBy}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
-          onRefresh={() => {
-            setPage(1);
-            fetchArticles();
-          }}
           searchQuery={searchQuery}
           onSearchClear={() => setSearchQuery("")}
           onResetFilters={resetFilters}
@@ -201,6 +197,7 @@ const ArticlePage: ArticlePageType = () => {
         <PopularCategories
           categories={categories}
           selectedCategory={selectedCategory}
+          onCategoryClick={setSelectedCategory}
         />
       </div>
     </div>

@@ -37,10 +37,7 @@ export const useStats = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/stats`,
-          { cache: "no-store" }
-        );
+        const response = await fetch("/api/stats", { cache: "no-store" });
         if (response.ok) {
           const data = await response.json();
           data.forEach((stat: Stat, index: number) => {

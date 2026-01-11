@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Tag } from "lucide-react";
-import Link from "next/link";
 
 interface PopularCategoriesProps {
   categories: Array<{
@@ -10,12 +9,20 @@ interface PopularCategoriesProps {
     color: string;
   }>;
   selectedCategory: string;
+  onCategoryClick?: (categoryId: string) => void;
 }
 
 export default function PopularCategories({
   categories,
   selectedCategory,
+  onCategoryClick,
 }: PopularCategoriesProps) {
+  const handleCategoryClick = (categoryId: string) => {
+    if (onCategoryClick) {
+      onCategoryClick(categoryId);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -36,9 +43,9 @@ export default function PopularCategories({
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
         {categories.map((category) => (
-          <Link
+          <button
             key={category.id}
-            href={`/event?category=${category.id}`}
+            onClick={() => handleCategoryClick(category.id)}
             className={`group flex flex-col items-center justify-center p-6 rounded-2xl transition-all duration-300 ${
               selectedCategory === category.id
                 ? `bg-gradient-to-br ${category.color} text-white shadow-lg scale-105`
@@ -72,7 +79,7 @@ export default function PopularCategories({
             >
               {category.count} event
             </span>
-          </Link>
+          </button>
         ))}
       </div>
     </motion.div>

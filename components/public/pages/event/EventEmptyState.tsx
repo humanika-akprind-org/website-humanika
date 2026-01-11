@@ -1,29 +1,14 @@
 import { Calendar, X } from "lucide-react";
-import type { EventTab } from "@/hooks/event/useEventPage";
 
 interface EventEmptyStateProps {
-  activeTab: EventTab;
-  searchQuery: string;
-  selectedCategory: string;
-  selectedType: string;
-  selectedStatus: string;
+  hasFilters: boolean;
   onResetFilters: () => void;
 }
 
 export default function EventEmptyState({
-  activeTab,
-  searchQuery,
-  selectedCategory,
-  selectedType,
-  selectedStatus,
+  hasFilters,
   onResetFilters,
 }: EventEmptyStateProps) {
-  const hasFilters =
-    searchQuery ||
-    selectedCategory !== "all" ||
-    selectedType !== "all" ||
-    selectedStatus !== "all";
-
   return (
     <div className="text-center py-20">
       <div className="inline-flex flex-col items-center gap-6 max-w-md mx-auto">
@@ -37,9 +22,7 @@ export default function EventEmptyState({
           <p className="text-grey-600 mb-8">
             {hasFilters
               ? "Coba ubah filter atau kata kunci pencarian Anda."
-              : activeTab === "upcoming"
-              ? "Belum ada event mendatang. Silakan kembali lagi nanti."
-              : "Belum ada event terdahulu yang tercatat."}
+              : "Belum ada event yang tersedia saat ini."}
           </p>
         </div>
         {hasFilters && (
