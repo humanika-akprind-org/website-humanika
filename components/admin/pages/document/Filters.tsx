@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DocumentType, Status } from "@/types/enums";
+import { DocumentType, Status, StatusApproval } from "@/types/enums";
 import SearchInput from "../../ui/input/SearchInput";
 import DeleteSelectedButton from "../../ui/button/DeleteSelectedButton";
 import SelectFilter from "../../ui/input/SelectFilter";
@@ -19,6 +19,8 @@ interface DocumentFiltersProps {
   selectedCount: number;
   onDeleteSelected: () => void;
   showTypeFilter?: boolean;
+  approvalStatusFilter: string;
+  onApprovalStatusFilterChange: (status: string) => void;
 }
 
 export default function DocumentFilters({
@@ -28,11 +30,11 @@ export default function DocumentFilters({
   onStatusFilterChange,
   typeFilter,
   onTypeFilterChange,
-  userFilter,
-  onUserFilterChange,
   selectedCount,
   onDeleteSelected,
   showTypeFilter = true,
+  approvalStatusFilter,
+  onApprovalStatusFilterChange,
 }: DocumentFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -40,7 +42,7 @@ export default function DocumentFilters({
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <SearchInput
-          placeholder="Cari dokumen..."
+          placeholder="Search document..."
           value={searchTerm}
           onChange={onSearchChange}
         />
@@ -53,13 +55,13 @@ export default function DocumentFilters({
 
       {/* Advanced Filters */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
           <SelectFilter
             label="Status"
             value={statusFilter}
             onChange={onStatusFilterChange}
             options={[
-              { value: "all", label: "Semua Status" },
+              { value: "all", label: "All Status" },
               ...Object.values(Status).map((status) => ({
                 value: status,
                 label:
@@ -68,6 +70,7 @@ export default function DocumentFilters({
               })),
             ]}
           />
+
           {showTypeFilter && (
             <SelectFilter
               label="Type"
@@ -85,16 +88,25 @@ export default function DocumentFilters({
               ]}
             />
           )}
-          <SelectFilter
-            label="User"
-            value={userFilter}
-            onChange={onUserFilterChange}
-            options={[
-              { value: "all", label: "All Users" },
-              // TODO: Add user options
-            ]}
-          />
-          <div className="flex items-end md:col-span-3">
+
+          {showTypeFilter && (
+            <SelectFilter
+              label="Approval Status"
+              value={approvalStatusFilter}
+              onChange={onApprovalStatusFilterChange}
+              options={[
+                { value: "all", label: "All Approval Status" },
+                ...Object.values(StatusApproval).map((status) => ({
+                  value: status,
+                  label:
+                    status.charAt(0).toUpperCase() +
+                    status.slice(1).toLowerCase(),
+                })),
+              ]}
+            />
+          )}
+
+          <div className="flex items-end">
             <DeleteSelectedButton
               selectedCount={selectedCount}
               onClick={onDeleteSelected}

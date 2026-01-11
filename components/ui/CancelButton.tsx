@@ -12,7 +12,7 @@ interface CancelButtonProps {
 const CancelButton: React.FC<CancelButtonProps> = ({
   onClick,
   disabled = false,
-  children = "Batal",
+  children = "Cancel",
   className = "",
 }) => (
   <button

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Department, Status } from "@/types/enums";
+import { Status } from "@/types/enums";
 import { PeriodApi } from "@/use-cases/api/period";
 import { useWorkPrograms } from "@/hooks/work-program/useWorkPrograms";
+import { useEventCategories } from "@/hooks/event-category/useEventCategories";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";
@@ -20,6 +21,8 @@ interface EventFiltersProps {
   onDepartmentFilterChange: (department: string) => void;
   workProgramFilter: string;
   onWorkProgramFilterChange: (workProgram: string) => void;
+  categoryFilter: string;
+  onCategoryFilterChange: (category: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
 }
@@ -31,10 +34,10 @@ export default function EventFilters({
   onStatusFilterChange,
   periodFilter,
   onPeriodFilterChange,
-  departmentFilter,
-  onDepartmentFilterChange,
   workProgramFilter,
   onWorkProgramFilterChange,
+  categoryFilter,
+  onCategoryFilterChange,
   selectedCount,
   onDeleteSelected,
 }: EventFiltersProps) {
@@ -45,6 +48,10 @@ export default function EventFilters({
 
   // Fetch work programs
   const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
+
+  // Fetch event categories
+  const { categories: eventCategories, isLoading: categoriesLoading } =
+    useEventCategories();
 
   // Fetch periods on component mount
   useEffect(() => {
@@ -93,19 +100,19 @@ export default function EventFilters({
     })),
   ];
 
-  const departmentOptions = [
-    { value: "all", label: "All Departments" },
-    ...Object.values(Department).map((dept) => ({
-      value: dept,
-      label: dept,
-    })),
-  ];
-
   const workProgramOptions = [
     { value: "all", label: "Semua Work Program" },
     ...workPrograms.map((workProgram) => ({
       value: workProgram.id,
       label: workProgram.name,
+    })),
+  ];
+
+  const categoryOptions = [
+    { value: "all", label: "Semua Category" },
+    ...eventCategories.map((category) => ({
+      value: category.id,
+      label: category.name,
     })),
   ];
 
@@ -145,12 +152,20 @@ export default function EventFilters({
             )}
             {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
           </div>
-          <SelectFilter
-            label="Department"
-            value={departmentFilter}
-            onChange={onDepartmentFilterChange}
-            options={departmentOptions}
-          />
+          <div>
+            <SelectFilter
+              label="Category"
+              value={categoryFilter}
+              onChange={onCategoryFilterChange}
+              options={categoryOptions}
+              side="bottom"
+            />
+            {categoriesLoading && (
+              <p className="text-xs text-gray-500 mt-1">
+                Loading categories...
+              </p>
+            )}
+          </div>
           <div>
             <SelectFilter
               label="Work Program"

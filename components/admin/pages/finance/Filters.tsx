@@ -81,12 +81,16 @@ export default function FinanceFilters({
     fetchWorkPrograms();
   }, []);
 
-  // Fetch categories on component mount
+  // Fetch categories on component mount and when typeFilter changes
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoadingCategories(true);
-        const categoryData = await getFinanceCategories();
+        const filter =
+          typeFilter !== "all"
+            ? { type: typeFilter as FinanceType }
+            : undefined;
+        const categoryData = await getFinanceCategories(filter);
         const categoryOptions = categoryData.map((category) => ({
           id: category.id,
           name: category.name,
@@ -104,10 +108,10 @@ export default function FinanceFilters({
     };
 
     fetchCategories();
-  }, []);
+  }, [typeFilter]);
 
   const statusOptions = [
-    { value: "all", label: "Semua Status" },
+    { value: "all", label: "All Status" },
     ...Object.values(Status).map((status) => ({
       value: status,
       label:
@@ -117,15 +121,15 @@ export default function FinanceFilters({
   ];
 
   const typeOptions = [
-    { value: "all", label: "Semua Tipe" },
+    { value: "all", label: "All Type" },
     ...Object.values(FinanceType).map((type) => ({
       value: type,
-      label: type === FinanceType.INCOME ? "Pemasukan" : "Pengeluaran",
+      label: type === FinanceType.INCOME ? "Income" : "Expense",
     })),
   ];
 
   const categoryOptions = [
-    { value: "all", label: "Semua Kategori" },
+    { value: "all", label: "All Category" },
     ...categories.map((category) => ({
       value: category.id,
       label: category.name,
@@ -133,7 +137,7 @@ export default function FinanceFilters({
   ];
 
   const workProgramOptions = [
-    { value: "all", label: "Semua Program Kerja" },
+    { value: "all", label: "All Work Program" },
     ...workPrograms.map((workProgram) => ({
       value: workProgram.id,
       label: workProgram.name,
@@ -144,7 +148,7 @@ export default function FinanceFilters({
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <SearchInput
-          placeholder="Cari transaksi..."
+          placeholder="Search transaction..."
           value={searchTerm}
           onChange={onSearchChange}
         />
@@ -165,17 +169,18 @@ export default function FinanceFilters({
             options={statusOptions}
           />
           <SelectFilter
-            label="Tipe"
+            label="Type"
             value={typeFilter}
             onChange={onTypeFilterChange}
             options={typeOptions}
           />
           <div>
             <SelectFilter
-              label="Kategori"
+              label="Category"
               value={categoryFilter}
               onChange={onCategoryFilterChange}
               options={categoryOptions}
+              side="bottom"
             />
             {loadingCategories && (
               <p className="text-xs text-gray-500 mt-1">
@@ -188,7 +193,7 @@ export default function FinanceFilters({
           </div>
           <div>
             <SelectFilter
-              label="Program Kerja"
+              label="Work Program"
               value={workProgramFilter}
               onChange={onWorkProgramFilterChange}
               options={workProgramOptions}
@@ -203,14 +208,10 @@ export default function FinanceFilters({
         </div>
       )}
 
-      {selectedCount > 0 && (
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <DeleteSelectedButton
-            selectedCount={selectedCount}
-            onClick={onDeleteSelected}
-          />
-        </div>
-      )}
+      <DeleteSelectedButton
+        selectedCount={selectedCount}
+        onClick={onDeleteSelected}
+      />
     </div>
   );
 }

@@ -27,6 +27,7 @@ export default function UserTable({
   loading,
   currentPage,
   totalPages,
+  currentUserId,
   onUserSelect,
   onSelectAll,
   onViewUser,
@@ -40,8 +41,13 @@ export default function UserTable({
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
+  // Filter out current user
+  const filteredUsers = currentUserId
+    ? users.filter((user) => user.id !== currentUserId)
+    : users;
+
   // Sort users
-  const sortedUsers = [...users].sort((a, b) => {
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
     let aValue, bValue;
 
     switch (sortField) {

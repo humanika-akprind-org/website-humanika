@@ -1,23 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LetterType, LetterPriority, LetterClassification } from "types/enums";
 import type { LetterFilter } from "types/letter";
+import { PeriodApi } from "@/use-cases/api/period";
 import SearchInput from "../../ui/input/SearchInput";
 import SelectFilter from "../../ui/input/SelectFilter";
 import FilterButton from "../../ui/button/FilterButton";
+import DeleteSelectedButton from "../../ui/button/DeleteSelectedButton";
 
 interface LetterFiltersProps {
   onFilter: (filter: LetterFilter) => void;
   isLoading?: boolean;
+  selectedCount: number;
+  onDeleteSelected: () => void;
 }
 
 export default function LetterFilters({
   onFilter,
   isLoading,
+  selectedCount,
+  onDeleteSelected,
 }: LetterFiltersProps) {
   const [filters, setFilters] = useState<LetterFilter>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
+  const [loadingPeriods, setLoadingPeriods] = useState(true);
+
+  // Fetch periods on component mount
+  useEffect(() => {
+    const fetchPeriods = async () => {
+      try {
+        setLoadingPeriods(true);
+        const periodData = await PeriodApi.getPeriods();
+        const periodOptions = periodData.map((period) => ({
+          id: period.id,
+          name: period.name,
+        }));
+        setPeriods(periodOptions);
+      } catch (err) {
+        console.error("Error fetching periods:", err);
+        // Fallback to empty array
+        setPeriods([]);
+      } finally {
+        setLoadingPeriods(false);
+      }
+    };
+
+    fetchPeriods();
+  }, []);
 
   const handleFilterChange = <K extends keyof LetterFilter>(
     key: K,
@@ -69,7 +100,7 @@ export default function LetterFilters({
 
       {/* Advanced Filters */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
           <SelectFilter
             label="Type"
             value={filters.type || ""}
@@ -130,8 +161,18 @@ export default function LetterFilters({
             onChange={(value) => handleFilterChange("periodId", value)}
             options={[
               { value: "", label: "All Periods" },
-              // Period options would be populated from API
+              ...periods.map((period) => ({
+                value: period.id,
+                label: period.name,
+              })),
             ]}
+          />
+          {loadingPeriods && (
+            <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
+          )}
+          <DeleteSelectedButton
+            selectedCount={selectedCount}
+            onClick={onDeleteSelected}
           />
         </div>
       )}
