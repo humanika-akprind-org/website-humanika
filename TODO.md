@@ -1,32 +1,34 @@
-# Work Program Approval Implementation
+a# Plan: Add Hide/Show Password Toggle to Login Page
 
-## Tasks to Complete
+## Goal
 
-### 1. Update Type Definitions
+Improve user experience on the login page by allowing users to toggle password visibility.
 
-- [ ]  Update WorkProgram interface to include approval information
-- [ ]  Add approval-related fields to WorkProgram type
+## Changes to be made in `app/auth/login/page.tsx`
 
-### 2. Modify API Routes
+1. **Imports**:
 
-- [ ]  Update work POST route to handle approval submission
-- [ ]  Update work PUT route to handle approval status changes
-- [ ]  Add logic to create approval records when status changes to PENDING
-- [ ]  Add logic to update work program status based on approval outcomes
+   - Import `Eye` and `EyeOff` icons from `lucide-react`.
 
-### 3. Update Frontend Components
+2. **State Management**:
 
-- [ ]  Update WorkProgramTable to show approval status
-- [ ]  Add approval submission button/action
-- [ ]  Update status display to reflect approval workflow
+   - Add `showPassword` state variable (boolean) to track password visibility.
 
-### 4. Update Use Cases
+3. **UI Updates (Password Field)**:
 
-- [ ]  Add approval-related functions to work use-cases
-- [ ]  Update existing functions to handle approval data
+   - Wrap the password input in a `relative` div (already has `relative` on inputs, so we can keep it or adjust).
+   - Replace the standard `password` type `input` with a container that includes:
+     - The input field (type changes between `password` and `text`).
+     - A button/icon on the right side to toggle visibility.
 
-### 5. Testing
+4. **Functionality**:
+   - Add a toggle function or inline logic to switch `showPassword` state.
 
-- [ ]  Test approval submission workflow
-- [ ]  Test approval status changes
-- [ ]  Test UI updates
+## Implementation Steps
+
+1. Add imports for `Eye` and `EyeOff` from `lucide-react`.
+2. Initialize `const [showPassword, setShowPassword] = useState(false);`.
+3. Update the password field:
+   - Change `type` to `{showPassword ? "text" : "password"}`.
+   - Add a button on the right side of the input using absolute positioning.
+   - Button will toggle the state and show the appropriate icon.
