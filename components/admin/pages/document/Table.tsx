@@ -78,10 +78,6 @@ export default function DocumentTable({
         aValue = a.status.toLowerCase();
         bValue = b.status.toLowerCase();
         break;
-      case "createdAt":
-        aValue = new Date(a.createdAt).getTime();
-        bValue = new Date(b.createdAt).getTime();
-        break;
 
       default:
         aValue = a.name.toLowerCase();
@@ -224,21 +220,6 @@ export default function DocumentTable({
               </th>
               <th
                 scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("createdAt")}
-              >
-                <div className="flex items-center">
-                  Created At
-                  <SortIcon
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                    field="createdAt"
-                    iconType="arrow"
-                  />
-                </div>
-              </th>
-              <th
-                scope="col"
                 className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               />
             </tr>
@@ -251,12 +232,6 @@ export default function DocumentTable({
                   rowRefs.current[index] = el;
                 }}
                 className="hover:bg-gray-50 transition-colors cursor-pointer"
-                onClick={() => {
-                  window.open(
-                    `https://drive.google.com/file/d/${document.document}/view`,
-                    "_blank"
-                  );
-                }}
               >
                 <td className="pl-6 pr-2 py-4 whitespace-nowrap">
                   <Checkbox
@@ -264,17 +239,51 @@ export default function DocumentTable({
                     onChange={() => handleDocumentSelect(document.id)}
                   />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">{document.name}</td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${document.document}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
+                  {document.name}
+                </td>
+                <td
+                  className="px-4 py-4 whitespace-nowrap text-sm text-gray-600"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${document.document}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   {document.documentType?.name
                     .replace(/_/g, " ")
                     .toLowerCase()
                     .replace(/\b\w/g, (l) => l.toUpperCase())}
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${document.document}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   <StatusChip status={document.status} />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${document.document}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   <StatusApproval
                     status={
                       document.approvals && document.approvals.length > 0
@@ -286,13 +295,6 @@ export default function DocumentTable({
                         : "PENDING"
                     }
                   />
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Intl.DateTimeFormat("id-ID", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(new Date(document.createdAt))}
                 </td>
 
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
