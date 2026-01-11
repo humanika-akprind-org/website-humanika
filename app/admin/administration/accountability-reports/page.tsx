@@ -40,6 +40,8 @@ export default function AccountabilityReportsPage() {
     setStatusFilter: setStatusFilterHook,
     setTypeFilter: setTypeFilterHook,
     setUserFilter: setUserFilterHook,
+    approvalStatusFilter,
+    setApprovalStatusFilter: onApprovalStatusFilterChange,
     toggleDocumentSelection,
     toggleSelectAll,
     handleAddDocument,
@@ -97,6 +99,9 @@ export default function AccountabilityReportsPage() {
         selectedCount={selectedDocuments.length}
         onDeleteSelected={() => handleDelete()}
         showTypeFilter={false}
+        showApprovalStatusFilter={true}
+        approvalStatusFilter={approvalStatusFilter}
+        onApprovalStatusFilterChange={onApprovalStatusFilterChange}
       />
 
       <DocumentTable

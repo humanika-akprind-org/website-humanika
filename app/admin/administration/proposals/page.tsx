@@ -40,6 +40,8 @@ export default function ProposalsPage() {
     setStatusFilter: setStatusFilterHook,
     setTypeFilter: setTypeFilterHook,
     setUserFilter: setUserFilterHook,
+    approvalStatusFilter,
+    setApprovalStatusFilter: onApprovalStatusFilterChange,
     toggleDocumentSelection,
     toggleSelectAll,
     handleAddDocument,
@@ -97,6 +99,9 @@ export default function ProposalsPage() {
         selectedCount={selectedDocuments.length}
         onDeleteSelected={() => handleDelete()}
         showTypeFilter={false}
+        showApprovalStatusFilter={true}
+        approvalStatusFilter={approvalStatusFilter}
+        onApprovalStatusFilterChange={onApprovalStatusFilterChange}
       />
 
       <DocumentTable

@@ -19,8 +19,9 @@ interface DocumentFiltersProps {
   selectedCount: number;
   onDeleteSelected: () => void;
   showTypeFilter?: boolean;
-  approvalStatusFilter: string;
-  onApprovalStatusFilterChange: (status: string) => void;
+  showApprovalStatusFilter?: boolean;
+  approvalStatusFilter?: string;
+  onApprovalStatusFilterChange?: (status: string) => void;
 }
 
 export default function DocumentFilters({
@@ -33,8 +34,9 @@ export default function DocumentFilters({
   selectedCount,
   onDeleteSelected,
   showTypeFilter = true,
-  approvalStatusFilter,
-  onApprovalStatusFilterChange,
+  showApprovalStatusFilter = false,
+  approvalStatusFilter = "all",
+  onApprovalStatusFilterChange = () => {},
 }: DocumentFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -89,7 +91,7 @@ export default function DocumentFilters({
             />
           )}
 
-          {showTypeFilter && (
+          {showApprovalStatusFilter && (
             <SelectFilter
               label="Approval Status"
               value={approvalStatusFilter}

@@ -29,6 +29,7 @@ export function useDocumentManagement(
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [userFilter, setUserFilter] = useState("all");
+  const [approvalStatusFilter, setApprovalStatusFilter] = useState("all");
 
   // Apply client-side filtering and pagination
   const filteredDocuments = documents.filter((document) => {
@@ -43,6 +44,13 @@ export function useDocumentManagement(
       statusFilter === "all" || document.status === statusFilter;
     const matchesType = typeFilter === "all" || document.type === typeFilter;
     const matchesUser = userFilter === "all" || document.userId === userFilter;
+    const matchesApprovalStatus =
+      approvalStatusFilter === "all" ||
+      (document.approvals &&
+        document.approvals.length > 0 &&
+        document.approvals.some(
+          (approval) => approval.status === approvalStatusFilter
+        ));
     const notExcluded = !excludeTypes?.some(
       (excludeType) =>
         excludeType === document.type.toLowerCase().replace(/[\s\-]/g, "")
@@ -53,6 +61,7 @@ export function useDocumentManagement(
       matchesStatus &&
       matchesType &&
       matchesUser &&
+      matchesApprovalStatus &&
       notExcluded
     );
   });
@@ -145,6 +154,7 @@ export function useDocumentManagement(
     statusFilter,
     typeFilter,
     userFilter,
+    approvalStatusFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -153,6 +163,7 @@ export function useDocumentManagement(
     setStatusFilter,
     setTypeFilter,
     setUserFilter,
+    setApprovalStatusFilter,
     toggleDocumentSelection,
     toggleSelectAll,
     handleAddDocument,
