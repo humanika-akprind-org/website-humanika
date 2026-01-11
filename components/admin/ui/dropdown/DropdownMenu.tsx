@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { FiMoreVertical } from "react-icons/fi";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import DropdownMenuItem from "./DropdownMenuItem";
@@ -138,53 +139,82 @@ export default function DropdownMenu({
 
   // Mobile bottom sheet content (using custom implementation to avoid Radix UI event issues)
   const bottomSheetContent =
-    isOpen &&
     mounted &&
     createPortal(
-      <>
-        {/* Backdrop overlay */}
-        <div
-          className="fixed inset-0 z-[9999] bg-black/50 animate-in fade-in-0"
-          onClick={() => setIsOpen(false)}
-          style={{ pointerEvents: "auto" }}
-        />
-        {/* Bottom sheet content */}
-        <div
-          className="fixed bottom-0 left-0 right-0 z-[10000] bg-white rounded-t-xl p-4 pb-8 shadow-lg animate-in slide-in-from-bottom-0 duration-300"
-          style={{
-            maxHeight: "70vh",
-            overflowY: "auto",
-            pointerEvents: "auto",
-          }}
-          ref={portalRef}
-        >
-          {/* Drag indicator */}
-          <div className="flex justify-center mb-4">
-            <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
-          </div>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] bg-black/50"
+              onClick={() => setIsOpen(false)}
+              style={{ pointerEvents: "auto" }}
+            />
+            {/* Bottom sheet content */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{
+                duration: 0.3,
+                ease: [0.25, 0.1, 0.25, 1],
+              }}
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(
+                _: MouseEvent | TouchEvent | PointerEvent,
+                info: PanInfo
+              ) => {
+                if (info.offset.y > 100) {
+                  // Close if dragged down more than 100px
+                  setIsOpen(false);
+                }
+              }}
+              className="fixed bottom-0 left-0 right-0 z-[10000] bg-white rounded-t-xl p-4 pb-8 shadow-lg touch-none"
+              style={{
+                maxHeight: "70vh",
+                overflowY: "auto",
+                pointerEvents: "auto",
+                cursor: "grab",
+              }}
+              ref={portalRef}
+            >
+              {/* Drag indicator */}
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+              </div>
 
-          <div className="space-y-1">
-            {React.Children.map(children, (child) => {
-              if (React.isValidElement(child)) {
-                const childOnClick = (child.props as any).onClick;
-                return React.cloneElement(child as React.ReactElement<any>, {
-                  onClick: () => handleItemClick(childOnClick),
-                });
-              }
-              return child;
-            })}
-          </div>
+              <div className="space-y-1">
+                {React.Children.map(children, (child) => {
+                  if (React.isValidElement(child)) {
+                    const childOnClick = (child.props as any).onClick;
+                    return React.cloneElement(
+                      child as React.ReactElement<any>,
+                      {
+                        onClick: () => handleItemClick(childOnClick),
+                      }
+                    );
+                  }
+                  return child;
+                })}
+              </div>
 
-          {/* Close button */}
-          <button
-            className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
-            onClick={() => setIsOpen(false)}
-          >
-            <Cross2Icon className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </button>
-        </div>
-      </>,
+              {/* Close button */}
+              <button
+                className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
+                onClick={() => setIsOpen(false)}
+              >
+                <Cross2Icon className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>,
       document.body
     );
 
