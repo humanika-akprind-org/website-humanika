@@ -191,13 +191,13 @@ export default function DropdownMenu({
               <div className="space-y-1">
                 {React.Children.map(children, (child) => {
                   if (React.isValidElement(child)) {
-                    const childOnClick = (child.props as any).onClick;
-                    return React.cloneElement(
-                      child as React.ReactElement<any>,
-                      {
-                        onClick: () => handleItemClick(childOnClick),
-                      }
-                    );
+                    const childElement = child as React.ReactElement<{
+                      onClick: () => void;
+                    }>;
+                    const childOnClick = childElement.props.onClick;
+                    return React.cloneElement(childElement, {
+                      onClick: () => handleItemClick(childOnClick),
+                    });
                   }
                   return child;
                 })}
