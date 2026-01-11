@@ -58,10 +58,13 @@ export default function ManagementsPage() {
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <ManagementHeader
-          title="Management Structure"
-          description="Manage all management members and their positions"
+          title="Profile Management Structure"
+          description="Manage all profile management members and their positions"
         />
-        <AddButton onClick={handleAddManagement} text="Add Management" />
+        <AddButton
+          onClick={handleAddManagement}
+          text="Add Profile Management"
+        />
       </div>
 
       <ManagementStats managements={managements} />
@@ -105,7 +108,7 @@ export default function ManagementsPage() {
 
       <ViewModal
         isOpen={showViewModal}
-        title="Management Details"
+        title="Profile Management Details"
         onClose={() => {
           setShowViewModal(false);
           setCurrentManagement(null);

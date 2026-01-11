@@ -369,10 +369,10 @@ export default function Sidebar() {
                 roles: [UserRole.BPH, UserRole.PENGURUS],
               },
             ]) && (
-              <NavDropdown icon={UserCog} title="Managements">
+              <NavDropdown icon={UserCog} title="Profile Managements">
                 {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
                   <NavDropdownItem href="/admin/governance/managements">
-                    All Management
+                    All Profile Management
                   </NavDropdownItem>
                 )}
                 {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (

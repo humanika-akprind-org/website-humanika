@@ -299,7 +299,7 @@ export default function SidebarMobile() {
                   roles: [UserRole.BPH, UserRole.PENGURUS],
                 },
               ]) && (
-                <NavDropdown icon={UserCog} title="Managements">
+                <NavDropdown icon={UserCog} title="Profile Managements">
                   {hasAccess([
                     UserRole.DPO,
                     UserRole.BPH,
@@ -309,7 +309,7 @@ export default function SidebarMobile() {
                       href="/admin/governance/managements"
                       onClick={toggleSidebar}
                     >
-                      All Management
+                      All Profile Management
                     </NavDropdownItem>
                   )}
                   {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (

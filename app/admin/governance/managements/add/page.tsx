@@ -13,7 +13,7 @@ export default function AddManagementPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <PageHeader title="Add New Management" onBack={handleBack} />
+      <PageHeader title="Add New Profile Management" onBack={handleBack} />
 
       {error && <Alert type="error" message={error} />}
 

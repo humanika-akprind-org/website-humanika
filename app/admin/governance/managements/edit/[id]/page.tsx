@@ -16,7 +16,7 @@ export default function EditManagementPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <PageHeader title="Edit Management" onBack={handleBack} />
+      <PageHeader title="Edit Profile Management" onBack={handleBack} />
 
       {alert && <Alert type={alert.type} message={alert.message} />}
 
