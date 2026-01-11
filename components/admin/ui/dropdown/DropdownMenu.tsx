@@ -1,7 +1,26 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { FiMoreVertical } from "react-icons/fi";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Cross2Icon } from "@radix-ui/react-icons";
 import DropdownMenuItem from "./DropdownMenuItem";
+
+// Custom hook to detect mobile screen
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile;
+}
 
 interface DropdownMenuProps {
   children: React.ReactNode;
@@ -29,6 +48,7 @@ export default function DropdownMenu({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -111,32 +131,76 @@ export default function DropdownMenu({
     setMounted(true);
   }, []);
 
+  // Mobile bottom sheet content
+  const bottomSheetContent = (
+    <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog.Trigger asChild>
+        <button
+          ref={buttonRef}
+          className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+          title="More actions"
+        >
+          <FiMoreVertical size={16} />
+        </button>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-[9999] bg-black/50 animate-in fade-in-0" />
+        <Dialog.Content
+          className="fixed bottom-0 left-0 right-0 z-[10000] bg-white rounded-t-xl p-4 pb-8 shadow-lg animate-in slide-in-from-bottom-0 duration-300"
+          style={{ maxHeight: "70vh", overflowY: "auto" }}
+        >
+          {/* Drag indicator */}
+          <div className="flex justify-center mb-4">
+            <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+          </div>
+
+          <div className="space-y-1">{children}</div>
+
+          <Dialog.Close className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity">
+            <Cross2Icon className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+
+  // Desktop dropdown content
+  const dropdownContent =
+    isOpen &&
+    mounted &&
+    createPortal(
+      <div
+        className="fixed w-48 bg-white rounded-md shadow-lg z-[9999] border border-gray-200"
+        style={{
+          top: dropdownPosition.top,
+          left: dropdownPosition.left,
+        }}
+        ref={portalRef}
+      >
+        <div className="py-1">{children}</div>
+      </div>,
+      document.body
+    );
+
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        ref={buttonRef}
-        onClick={handleButtonClick}
-        className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-        title="More actions"
-      >
-        <FiMoreVertical size={16} />
-      </button>
-
-      {isOpen &&
-        mounted &&
-        createPortal(
-          <div
-            className="fixed w-48 bg-white rounded-md shadow-lg z-[9999] border border-gray-200"
-            style={{
-              top: dropdownPosition.top,
-              left: dropdownPosition.left,
-            }}
-            ref={portalRef}
+      {/* Show bottom sheet on mobile, dropdown on desktop */}
+      {isMobile ? (
+        bottomSheetContent
+      ) : (
+        <>
+          <button
+            ref={buttonRef}
+            onClick={handleButtonClick}
+            className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+            title="More actions"
           >
-            <div className="py-1">{children}</div>
-          </div>,
-          document.body
-        )}
+            <FiMoreVertical size={16} />
+          </button>
+          {dropdownContent}
+        </>
+      )}
     </div>
   );
 }
