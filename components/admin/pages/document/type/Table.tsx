@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiTrash, FiFolder } from "react-icons/fi";
+import { FiEdit, FiTrash, FiFolder, FiEye } from "react-icons/fi";
 import type { DocumentType } from "@/types/document-type";
 import Checkbox from "../../../ui/checkbox/Checkbox";
 import DropdownMenu, {
@@ -234,7 +234,7 @@ const DocumentTypeTable: React.FC<DocumentTypeTableProps> = ({
                       onClick={() => onViewType(type)}
                       color="default"
                     >
-                      <FiFolder className="mr-2" size={14} />
+                      <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
                     <DropdownMenuItem

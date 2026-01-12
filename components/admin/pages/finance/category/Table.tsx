@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiTrash, FiTag } from "react-icons/fi";
+import { FiEdit, FiTrash, FiTag, FiEye } from "react-icons/fi";
 import type { FinanceCategory } from "@/types/finance-category";
 import { FinanceType } from "@/types/enums";
 import Checkbox from "../../../ui/checkbox/Checkbox";
@@ -276,7 +276,7 @@ const FinanceCategoryTable: React.FC<FinanceCategoryTableProps> = ({
                       onClick={() => onViewCategory(category)}
                       color="default"
                     >
-                      <FiTag className="mr-2" size={14} />
+                      <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
                     <DropdownMenuItem

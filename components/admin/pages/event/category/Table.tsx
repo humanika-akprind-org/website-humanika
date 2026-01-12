@@ -1,10 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiTrash, FiFolder } from "react-icons/fi";
+import { FiEdit, FiTrash, FiFolder, FiEye } from "react-icons/fi";
 import type { EventCategory } from "@/types/event-category";
 import Checkbox from "../../../ui/checkbox/Checkbox";
-import DropdownMenu, { DropdownMenuItem } from "../../../ui/dropdown/DropdownMenu";
+import DropdownMenu, {
+  DropdownMenuItem,
+} from "../../../ui/dropdown/DropdownMenu";
 import EmptyState from "../../../ui/EmptyState";
 import AddButton from "../../../ui/button/AddButton";
 import SortIcon from "../../../ui/SortIcon";
@@ -232,7 +234,7 @@ const EventCategoryTable: React.FC<EventCategoryTableProps> = ({
                       onClick={() => onViewCategory(category)}
                       color="default"
                     >
-                      <FiFolder className="mr-2" size={14} />
+                      <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
                     <DropdownMenuItem

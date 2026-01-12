@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiTrash, FiFolder } from "react-icons/fi";
+import { FiEdit, FiTrash, FiFolder, FiEye } from "react-icons/fi";
 import type { ArticleCategory } from "@/types/article-category";
 import Checkbox from "../../../ui/checkbox/Checkbox";
 import DropdownMenu, {
@@ -234,7 +234,7 @@ const ArticleCategoryTable: React.FC<ArticleCategoryTableProps> = ({
                       onClick={() => onViewCategory(category)}
                       color="default"
                     >
-                      <FiFolder className="mr-2" size={14} />
+                      <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
                     <DropdownMenuItem
