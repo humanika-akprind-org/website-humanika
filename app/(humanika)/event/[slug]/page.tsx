@@ -17,7 +17,9 @@ import { handleShare } from "lib/eventDetailUtils";
 export default function EventDetail() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+
+  // Use the full slug for API calls (API routes query by slug field)
+  const slugParam = params.slug as string;
 
   const {
     event,
@@ -27,7 +29,7 @@ export default function EventDetail() {
     setIsBookmarked,
     pastEvents,
     relatedEvents,
-  } = useEventDetailPage(id);
+  } = useEventDetailPage(slugParam);
 
   // Loading state
   if (loading) {

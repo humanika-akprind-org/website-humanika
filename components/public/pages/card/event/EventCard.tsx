@@ -211,7 +211,7 @@ export default function EventCard({
         {/* Action Buttons */}
         <div className="flex items-center justify-end pt-4 border-t border-grey-100">
           <Link
-            href={`/event/${event.id}`}
+            href={`/event/${event.slug}`}
             className="group/link inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg"
           >
             <span>Detail</span>

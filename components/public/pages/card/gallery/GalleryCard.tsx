@@ -265,8 +265,13 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
                           className="aspect-square bg-grey-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() => {
                             setIsDialogOpen(false);
-                            // Navigate to the related gallery (you might need to implement this)
-                            window.location.href = `/gallery/${relatedGallery.id}`;
+                            // Navigate to the related gallery using event slug
+                            const eventSlug = relatedGallery.event?.slug;
+                            if (eventSlug) {
+                              window.location.href = `/gallery/${eventSlug}`;
+                            } else {
+                              window.location.href = `/gallery/${relatedGallery.id}`;
+                            }
                           }}
                         >
                           <Image

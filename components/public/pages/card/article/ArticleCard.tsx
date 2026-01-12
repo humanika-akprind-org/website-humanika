@@ -134,7 +134,7 @@ export default function ArticleCard({
         {/* Author & Read Button */}
         <div className="flex items-center justify-end pt-4 border-t border-grey-100">
           <Link
-            href={`/article/${article.id}`}
+            href={`/article/${article.slug}`}
             className="group/link inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-all duration-300 font-semibold"
           >
             <span>Baca</span>

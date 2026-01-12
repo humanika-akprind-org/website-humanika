@@ -151,6 +151,45 @@ export const getEvent = async (id: string) => {
   return event;
 };
 
+export const getEventBySlug = async (slug: string) => {
+  const event = await prisma.event.findUnique({
+    where: { slug },
+    include: {
+      period: true,
+      responsible: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          department: true,
+        },
+      },
+      workProgram: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      category: true,
+      approvals: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+      galleries: true,
+      letters: true,
+    },
+  });
+
+  return event;
+};
+
 export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
   // Generate slug from name
   const slug = data.name

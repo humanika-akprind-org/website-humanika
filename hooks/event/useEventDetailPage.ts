@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getEvent, getEvents } from "use-cases/api/event";
+import { getEventBySlug, getEvents } from "use-cases/api/event";
 import type { Event } from "types/event";
 import { getPastEvents, getRelatedEvents } from "lib/eventDetailUtils";
 
@@ -16,10 +16,10 @@ interface UseEventDetailPageReturn {
 
 /**
  * Custom hook for managing event detail page state and data fetching
- * @param id - Event ID from URL params
+ * @param slug - Event slug from URL params
  * @returns Object containing all state and data for the event detail page
  */
-export function useEventDetailPage(id: string): UseEventDetailPageReturn {
+export function useEventDetailPage(slug: string): UseEventDetailPageReturn {
   const [event, setEvent] = useState<Event | null>(null);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
@@ -28,12 +28,12 @@ export function useEventDetailPage(id: string): UseEventDetailPageReturn {
   const [error, setError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  // Fetch event data
+  // Fetch event data by slug
   useEffect(() => {
     async function loadEvent() {
       try {
         setLoading(true);
-        const eventData = await getEvent(id);
+        const eventData = await getEventBySlug(slug);
         setEvent(eventData);
       } catch (err) {
         setError(
@@ -44,7 +44,7 @@ export function useEventDetailPage(id: string): UseEventDetailPageReturn {
       }
     }
     loadEvent();
-  }, [id]);
+  }, [slug]);
 
   // Fetch all events and compute related/past events
   useEffect(() => {

@@ -15,7 +15,9 @@ import GalleryDetailNotFoundState from "@/components/public/pages/gallery/Galler
 export default function GalleryDetail() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+
+  // Use the full slug for API calls (API routes query by slug field)
+  const slugParam = params.slug as string;
 
   const {
     event,
@@ -26,7 +28,7 @@ export default function GalleryDetail() {
     error,
     album,
     formattedDate,
-  } = useGalleryDetail(id);
+  } = useGalleryDetail(slugParam);
 
   const handleDownloadAll = () => {
     alert("Fitur download semua foto akan segera tersedia!");

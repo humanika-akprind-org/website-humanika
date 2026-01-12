@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useParams } from "next/navigation";
 import { useArticleDetail } from "hooks/article/useArticleDetail";
 import { useBookmark } from "hooks/article/useBookmark";
 import { useShare } from "hooks/article/useShare";
@@ -11,23 +12,12 @@ import ArticleDetailLoadingState from "@/components/public/pages/article/Article
 import NotFoundState from "@/components/public/pages/article/NotFoundState";
 import { ErrorState } from "@/components/public/pages/article/ErrorState";
 
-export default function ArticleDetail({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const [id, setId] = useState<string>("");
-
-  useEffect(() => {
-    async function resolveParams() {
-      const resolvedParams = await params;
-      setId(resolvedParams.id);
-    }
-    resolveParams();
-  }, [params]);
+export default function ArticleDetail() {
+  const params = useParams();
+  const slugParam = params.slug as string;
 
   const { article, relatedArticles, loading, error, refetch } =
-    useArticleDetail(id);
+    useArticleDetail(slugParam);
   const { isBookmarked, toggleBookmark } = useBookmark();
   const { handleShare } = useShare();
 

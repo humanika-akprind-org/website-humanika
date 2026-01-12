@@ -14,9 +14,13 @@ export const getEvents = async (filter?: EventFilter): Promise<Event[]> => {
   if (filter?.department) params.append("department", filter.department);
   if (filter?.status) params.append("status", filter.status.toString());
   if (filter?.periodId) params.append("periodId", filter.periodId);
-  if (filter?.workProgramId) params.append("workProgramId", filter.workProgramId);
+  if (filter?.workProgramId) {
+    params.append("workProgramId", filter.workProgramId);
+  }
   if (filter?.search) params.append("search", filter.search);
-  if (filter?.startDate) params.append("startDate", filter.startDate.toISOString());
+  if (filter?.startDate) {
+    params.append("startDate", filter.startDate.toISOString());
+  }
   if (filter?.endDate) params.append("endDate", filter.endDate.toISOString());
 
   const response = await fetch(`${API_URL}/event?${params.toString()}`, {
@@ -47,6 +51,23 @@ export const getEvent = async (id: string): Promise<Event> => {
 
   if (!response.ok) {
     throw new Error("Failed to fetch event");
+  }
+
+  return response.json();
+};
+
+export const getEventBySlug = async (slug: string): Promise<Event> => {
+  const response = await fetch(`${API_URL}/event/${slug}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch event by slug");
   }
 
   return response.json();
@@ -117,6 +138,7 @@ export const deleteEvent = async (id: string): Promise<void> => {
 export const EventApi = {
   getEvents,
   getEvent,
+  getEventBySlug,
   createEvent,
   updateEvent,
   deleteEvent,

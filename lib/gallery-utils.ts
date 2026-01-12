@@ -9,6 +9,7 @@ export interface Album {
   cover: string;
   lastUpdated: Date;
   eventName: string;
+  eventSlug: string;
   category: string;
   date: Date;
   year: string;
@@ -68,6 +69,7 @@ export const transformEventsToAlbums = (
         cover: getPreviewUrl(event.thumbnail),
         lastUpdated: event.updatedAt,
         eventName: event.name,
+        eventSlug: event.slug,
         category: event.department?.toString() || "General",
         date: eventDate,
         year: eventDate.getFullYear().toString(),
