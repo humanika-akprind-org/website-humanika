@@ -2,13 +2,6 @@
 
 import React, { useState, useCallback, useRef } from "react";
 import {
-  Search,
-  FolderPlus,
-  Upload,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  Info,
   Folder,
   File,
   Image as ImageIcon,
@@ -18,14 +11,7 @@ import {
   Video,
   Music,
   Archive,
-  Check,
-  Link as LinkIcon,
-  FolderOpen,
-  Edit2,
-  Trash2,
   ExternalLink,
-  List,
-  Grid as GridIcon,
 } from "lucide-react";
 import { callApi } from "@/use-cases/api/google-drive";
 import {
@@ -39,6 +25,15 @@ import type { DriveTableProps } from "@/types/google-drive";
 import CreateFolderModal from "./modal/CreateFolderModal";
 import UploadProgressModal from "./modal/UploadProgressModal";
 import { useToast } from "./hooks/useToast";
+import {
+  DriveControlBar,
+  DriveErrorState,
+  DriveEmptyState,
+  DriveLoadingState,
+  DriveToast,
+  DriveGridView,
+  DriveListView,
+} from "./index";
 
 const DriveGrid: React.FC<DriveTableProps> = ({
   files: initialFiles = [],
@@ -358,23 +353,7 @@ const DriveGrid: React.FC<DriveTableProps> = ({
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-sm border border-gray-100">
       {/* Toast Notification */}
-      {toast && (
-        <div
-          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg transition-all duration-300 flex items-center gap-2 ${
-            toast.type === "success"
-              ? "bg-green-500 text-white"
-              : toast.type === "error"
-              ? "bg-red-500 text-white"
-              : "bg-blue-500 text-white"
-          }`}
-          role="alert"
-        >
-          {toast.type === "success" && <CheckCircle className="w-5 h-5" />}
-          {toast.type === "error" && <XCircle className="w-5 h-5" />}
-          {toast.type === "info" && <Info className="w-5 h-5" />}
-          <span className="font-medium">{toast.message}</span>
-        </div>
-      )}
+      <DriveToast toast={toast} />
 
       {/* Hidden file input for upload */}
       <input
@@ -419,103 +398,21 @@ const DriveGrid: React.FC<DriveTableProps> = ({
         isLoading={isOperating}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Search Input */}
-          <div className="relative w-full sm:w-64">
-            <input
-              type="text"
-              placeholder="Cari file..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
-              aria-label="Cari file"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
+      {/* Control Bar */}
+      <DriveControlBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onCreateFolder={handleCreateFolderClick}
+        onUpload={handleUploadClick}
+        onRefresh={fetchFiles}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        isLoading={isLoading.files}
+        isOperating={isOperating}
+      />
 
-          {/* Create Folder Button */}
-          <button
-            onClick={handleCreateFolderClick}
-            className="px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors flex items-center gap-2 text-sm"
-            aria-label="Buat folder baru"
-          >
-            <FolderPlus className="h-4 w-4" />
-            Folder
-          </button>
-
-          {/* Upload Button */}
-          <button
-            onClick={handleUploadClick}
-            disabled={isOperating}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
-            aria-label="Unggah file"
-          >
-            <Upload className="h-4 w-4" />
-            Unggah
-          </button>
-
-          {/* Refresh Button */}
-          <button
-            onClick={fetchFiles}
-            disabled={isLoading.files}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
-            aria-label="Segarkan file"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${isLoading.files ? "animate-spin" : ""}`}
-            />
-            Segarkan
-          </button>
-        </div>
-
-        {/* View Toggle Buttons */}
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-          <button
-            onClick={() => setViewMode("grid")}
-            className={`p-2 rounded-md transition-colors ${
-              viewMode === "grid"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            aria-label="Tampilan grid"
-            title="Tampilan grid"
-          >
-            <GridIcon className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setViewMode("list")}
-            className={`p-2 rounded-md transition-colors ${
-              viewMode === "list"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            aria-label="Tampilan list"
-            title="Tampilan list"
-          >
-            <List className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-
-      {displayError && (
-        <div
-          className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-start"
-          role="alert"
-        >
-          <XCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-          <div>
-            <h3 className="font-medium">Error</h3>
-            <p className="text-sm">{displayError}</p>
-          </div>
-          <button
-            onClick={() => fetchFiles()}
-            className="ml-auto text-sm underline hover:no-underline"
-          >
-            Coba lagi
-          </button>
-        </div>
-      )}
+      {/* Error State */}
+      <DriveErrorState error={displayError} onRetry={fetchFiles} />
 
       {/* Breadcrumbs Navigation */}
       <Breadcrumbs
@@ -528,330 +425,47 @@ const DriveGrid: React.FC<DriveTableProps> = ({
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         {isLoading.files && files.length === 0 ? (
           // Initial loading state
-          <div className="p-8">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {Array.from({ length: 10 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="animate-pulse bg-gray-100 rounded-lg p-4"
-                >
-                  <div className="h-12 w-12 bg-gray-200 rounded mx-auto mb-3" />
-                  <div className="h-3 bg-gray-200 rounded w-3/4 mx-auto" />
-                </div>
-              ))}
-            </div>
-          </div>
+          <DriveLoadingState count={10} />
         ) : filteredFiles.length === 0 ? (
           // Empty state
-          <div className="text-center py-16 bg-gray-50 rounded-lg border border-gray-200">
-            <FolderOpen className="mx-auto h-16 w-16 text-gray-300" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
-              {searchQuery ? "File tidak ditemukan" : "Folder ini kosong"}
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              {searchQuery
-                ? `Tidak ada file yang cocok dengan "${searchQuery}"`
-                : "Unggah file pertama Anda atau buat folder untuk memulai."}
-            </p>
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                Hapus pencarian
-              </button>
-            )}
-          </div>
+          <DriveEmptyState
+            searchQuery={searchQuery}
+            onClearSearch={() => setSearchQuery("")}
+          />
         ) : viewMode === "list" ? (
-          // List view
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 overflow-hidden">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Nama
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Jenis
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ukuran
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredFiles.map((file) => (
-                  <tr key={file.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {file.mimeType?.includes("folder") ||
-                        isFolderShortcut(file) ? (
-                          <button
-                            onClick={() => {
-                              if (isFolderShortcut(file)) {
-                                const targetId = getShortcutTargetId(file);
-                                if (targetId) {
-                                  navigateToFolder(
-                                    targetId,
-                                    file.name || "Shortcut"
-                                  );
-                                }
-                              } else {
-                                navigateToFolder(
-                                  file.id || "",
-                                  file.name || ""
-                                );
-                              }
-                            }}
-                            disabled={isLoading.files}
-                            className="flex items-center hover:bg-blue-50 rounded p-1 -m-1 transition-colors"
-                          >
-                            <FolderOpen className="flex-shrink-0 h-12 w-12 text-yellow-500" />
-                            <span className="ml-3 truncate max-w-[320px] text-gray-900 hover:text-blue-600 cursor-pointer">
-                              {file.name}
-                            </span>
-                          </button>
-                        ) : (
-                          <>
-                            <div className="flex-shrink-0 h-12 w-12">
-                              {getFileIcon(file.mimeType)}
-                            </div>
-                            <span className="ml-3 truncate max-w-[320px]">
-                              {file.name}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {file.mimeType?.includes("folder") ||
-                      isFolderShortcut(file)
-                        ? "Folder"
-                        : file.mimeType?.includes("image")
-                        ? "Gambar"
-                        : file.mimeType?.includes("pdf")
-                        ? "PDF"
-                        : file.mimeType?.includes("word") ||
-                          file.mimeType?.includes("document")
-                        ? "Dokumen"
-                        : file.mimeType?.includes("excel") ||
-                          file.mimeType?.includes("spreadsheet")
-                        ? "Spreadsheet"
-                        : file.mimeType?.includes("powerpoint") ||
-                          file.mimeType?.includes("presentation")
-                        ? "Presentasi"
-                        : file.mimeType?.includes("video")
-                        ? "Video"
-                        : file.mimeType?.includes("audio")
-                        ? "Audio"
-                        : file.mimeType?.includes("zip") ||
-                          file.mimeType?.includes("rar")
-                        ? "Arsip"
-                        : "File"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {file.mimeType?.includes("folder") ||
-                      isFolderShortcut(file)
-                        ? "-"
-                        : formatFileSize(file.size)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex gap-1">
-                        {!file.mimeType?.includes("folder") &&
-                          !isFolderShortcut(file) && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCopyUrl(file.id);
-                              }}
-                              disabled={isOperating}
-                              className={`p-1.5 rounded transition-colors ${
-                                copiedFileId === file.id
-                                  ? "bg-green-50 text-green-600"
-                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                              }`}
-                              title="Salin URL"
-                              aria-label="Salin URL file"
-                            >
-                              {copiedFileId === file.id ? (
-                                <Check className="w-4 h-4" />
-                              ) : (
-                                <LinkIcon className="w-4 h-4" />
-                              )}
-                            </button>
-                          )}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenInDrive(file.id);
-                          }}
-                          className="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
-                          title="Buka di Drive"
-                          aria-label="Buka file di Google Drive"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRename(file.id, file.name);
-                          }}
-                          disabled={isOperating}
-                          className="p-1.5 bg-purple-50 text-purple-600 rounded hover:bg-purple-100 transition-colors"
-                          title="Ubah Nama"
-                          aria-label="Ubah nama file"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(file.id, file.name);
-                          }}
-                          disabled={isOperating}
-                          className="p-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors"
-                          title="Hapus"
-                          aria-label="Hapus file"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          // List view - Using DriveListView component
+          <DriveListView
+            files={filteredFiles}
+            getFileIcon={getFileIcon}
+            formatFileSize={formatFileSize}
+            isFolderShortcut={isFolderShortcut}
+            getShortcutTargetId={getShortcutTargetId}
+            navigateToFolder={navigateToFolder}
+            handleCopyUrl={handleCopyUrl}
+            handleOpenInDrive={handleOpenInDrive}
+            handleRename={handleRename}
+            handleDelete={handleDelete}
+            isLoading={isLoading.files}
+            isOperating={isOperating}
+            copiedFileId={copiedFileId}
+          />
         ) : (
-          // Grid view
-          <div className="p-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {filteredFiles.map((file) => (
-                <div
-                  key={file.id}
-                  className="group relative bg-gray-50 hover:bg-blue-50 rounded-lg p-4 transition-all duration-200 border border-transparent hover:border-blue-200 cursor-pointer"
-                >
-                  {/* Folder/File Icon */}
-                  <div className="flex justify-center mb-3">
-                    {file.mimeType?.includes("folder") ||
-                    isFolderShortcut(file) ? (
-                      <button
-                        onClick={() => {
-                          // Check if it's a folder shortcut - navigate to the target folder
-                          if (isFolderShortcut(file)) {
-                            const targetId = getShortcutTargetId(file);
-                            if (targetId) {
-                              navigateToFolder(
-                                targetId,
-                                file.name || "Shortcut"
-                              );
-                            }
-                          } else {
-                            // Regular folder - navigate using the file's own ID
-                            navigateToFolder(file.id || "", file.name || "");
-                          }
-                        }}
-                        disabled={isLoading.files}
-                        className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
-                        aria-label={`Buka folder ${file.name}`}
-                      >
-                        <FolderOpen className="w-12 h-12 text-yellow-500" />
-                      </button>
-                    ) : (
-                      <div
-                        className="p-2"
-                        role="img"
-                        aria-label={file.mimeType || "File"}
-                      >
-                        {getFileIcon(file.mimeType)}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* File Name */}
-                  <div className="text-center">
-                    <p
-                      className="text-sm font-medium text-gray-700 truncate px-2"
-                      title={file.name || undefined}
-                    >
-                      {file.name || "Untitled"}
-                    </p>
-                  </div>
-
-                  {/* File Info */}
-                  <div className="text-center mt-1">
-                    <p className="text-xs text-gray-400">
-                      {file.mimeType?.includes("folder") ||
-                      isFolderShortcut(file)
-                        ? "Folder"
-                        : formatFileSize(file.size)}
-                    </p>
-                  </div>
-
-                  {/* Action Buttons - Show on hover */}
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-1">
-                    {!file.mimeType?.includes("folder") &&
-                      !isFolderShortcut(file) && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCopyUrl(file.id);
-                          }}
-                          disabled={isOperating}
-                          className="p-1.5 bg-white text-gray-600 rounded shadow-sm hover:bg-gray-50 border border-gray-200 text-xs"
-                          title="Salin URL"
-                          aria-label="Salin URL file"
-                        >
-                          {copiedFileId === file.id ? (
-                            <Check className="w-3.5 h-3.5 text-green-500" />
-                          ) : (
-                            <LinkIcon className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                      )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenInDrive(file.id);
-                      }}
-                      className="p-1.5 bg-blue-50 text-blue-600 rounded shadow-sm hover:bg-blue-100 border border-blue-200 text-xs"
-                      title="Buka di Drive"
-                      aria-label="Buka file di Google Drive"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRename(file.id, file.name);
-                      }}
-                      disabled={isOperating}
-                      className="p-1.5 bg-purple-50 text-purple-600 rounded shadow-sm hover:bg-purple-100 border border-purple-200 text-xs"
-                      title="Ubah Nama"
-                      aria-label="Ubah nama file"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(file.id, file.name);
-                      }}
-                      disabled={isOperating}
-                      className="p-1.5 bg-red-50 text-red-600 rounded shadow-sm hover:bg-red-100 border border-red-200 text-xs"
-                      title="Hapus"
-                      aria-label="Hapus file"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          // Grid view - Using DriveGridView component
+          <DriveGridView
+            files={filteredFiles}
+            getFileIcon={getFileIcon}
+            formatFileSize={formatFileSize}
+            isFolderShortcut={isFolderShortcut}
+            getShortcutTargetId={getShortcutTargetId}
+            navigateToFolder={navigateToFolder}
+            handleCopyUrl={handleCopyUrl}
+            handleOpenInDrive={handleOpenInDrive}
+            handleRename={handleRename}
+            handleDelete={handleDelete}
+            isLoading={isLoading.files}
+            isOperating={isOperating}
+            copiedFileId={copiedFileId}
+          />
         )}
       </div>
 
