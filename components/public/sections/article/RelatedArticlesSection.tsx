@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Newspaper } from "lucide-react";
 import ArticleCard from "@/components/public/pages/card/article/ArticleCard";
 import type { Article } from "types/article";
 
@@ -11,7 +11,55 @@ interface RelatedArticlesSectionProps {
 export default function RelatedArticlesSection({
   relatedArticles,
 }: RelatedArticlesSectionProps) {
-  if (relatedArticles.length === 0) return null;
+  if (relatedArticles.length === 0) {
+    return (
+      <section className="py-16 bg-gradient-to-b from-grey-50/50 to-white">
+        <div className="container mx-auto px-4">
+          {/* Section Header */}
+          <div className="max-w-7xl mx-auto mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-grey-900 mb-2">
+                Artikel Terkait
+              </h2>
+              <p className="text-grey-600 text-lg">
+                Temukan artikel menarik lainnya yang mungkin Anda suka
+              </p>
+            </div>
+          </div>
+
+          {/* Empty State */}
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center py-16">
+              <div className="inline-flex flex-col items-center gap-6 max-w-md mx-auto">
+                <div className="relative">
+                  <div className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center">
+                    <Newspaper className="w-12 h-12 text-primary-600" />
+                  </div>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-50 rounded-full opacity-50 blur-xl" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-grey-900 mb-2">
+                    Tidak Ada Artikel Terkait
+                  </h3>
+                  <p className="text-grey-600">
+                    Belum ada artikel lain dalam kategori yang sama. Jelajahi
+                    artikel menarik lainnya dari HUMANIKA!
+                  </p>
+                </div>
+                <Link
+                  href="/article"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium shadow-lg shadow-primary-600/20"
+                >
+                  <span>Jelajahi Semua Artikel</span>
+                  <ArrowLeft className="w-4 h-4 rotate-180" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-gradient-to-b from-grey-50/50 to-white">
