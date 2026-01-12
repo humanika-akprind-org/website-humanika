@@ -35,6 +35,23 @@ export interface PageHeaderProps {
 export interface DriveTableProps {
   files: DriveFile[];
   accessToken: string;
+  currentFolderId?: string;
+  folderPath?: BreadcrumbItem[];
+  onNavigateToFolder?: (folderId: string, folderName: string) => void;
+  onNavigateToParent?: () => void;
 }
 
 export interface LoadingStateTable extends LoadingState {}
+
+// Breadcrumb navigation types
+export interface BreadcrumbItem {
+  id: string;
+  name: string;
+}
+
+export interface BreadcrumbsProps {
+  items: BreadcrumbItem[];
+  currentFolderId?: string;
+  onNavigate: (folderId: string) => void;
+  isLoading?: boolean;
+}

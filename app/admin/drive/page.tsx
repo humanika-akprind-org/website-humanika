@@ -1,5 +1,5 @@
 import { getGoogleDriveFiles } from "@/lib/google-drive/google-drive";
-import DriveTable from "@/components/admin/pages/drive/Table";
+import DriveGrid from "@/components/admin/pages/drive/Grid";
 import PageHeader from "@/components/admin/pages/drive/PageHeader";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
@@ -10,7 +10,8 @@ export default async function DashboardPage() {
   let files = [];
   if (accessToken) {
     try {
-      files = await getGoogleDriveFiles(accessToken);
+      // Fetch files from root folder (My Drive) first time
+      files = await getGoogleDriveFiles(accessToken, "root");
     } catch (error) {
       console.error("Failed to fetch Google Drive files:", error);
     }
@@ -18,13 +19,9 @@ export default async function DashboardPage() {
 
   return (
     <AuthGuard accessToken={accessToken}>
-      <div className="min-h-screen bg-gray-50">
-        <main className="p-6 space-y-6">
-          <PageHeader title="Google Drive Manager" showAddButton={true} />
-          <div className="">
-            <DriveTable files={files} accessToken={accessToken} />
-          </div>
-        </main>
+      <PageHeader title="Google Drive Manager" />
+      <div className="">
+        <DriveGrid files={files} accessToken={accessToken} />
       </div>
     </AuthGuard>
   );
