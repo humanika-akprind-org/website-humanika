@@ -3,6 +3,12 @@ import { useRouter } from "next/navigation";
 import { deleteFinance } from "@/use-cases/api/finance";
 import type { Finance } from "@/types/finance";
 import { useFinances } from "./useFinances";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 export function useFinanceManagement() {
   const router = useRouter();
@@ -107,12 +113,34 @@ export function useFinanceManagement() {
 
   const confirmDelete = async () => {
     try {
+      // Get access token for Google Drive operations
+      const accessToken = await getAccessTokenAction();
+
       if (currentFinance) {
+        // Single finance deletion: Delete file from Google Drive first, then delete database record
+        if (currentFinance.proof && isGoogleDriveFile(currentFinance.proof)) {
+          const fileId = getFileIdFromFile(currentFinance.proof);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
         await deleteFinance(currentFinance.id);
         setSuccess("Finance deleted successfully");
         refetch();
       } else if (selectedFinances.length > 0) {
+        // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const financeId of selectedFinances) {
+          // Find the finance object to get the proof URL
+          const financeToDelete = finances.find((f) => f.id === financeId);
+          if (
+            financeToDelete?.proof &&
+            isGoogleDriveFile(financeToDelete.proof)
+          ) {
+            const fileId = getFileIdFromFile(financeToDelete.proof);
+            if (fileId) {
+              await deleteGoogleDriveFile(fileId, accessToken);
+            }
+          }
           await deleteFinance(financeId);
         }
         setSelectedFinances([]);

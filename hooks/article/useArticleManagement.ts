@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Article } from "@/types/article";
 import { getArticles, deleteArticle } from "@/use-cases/api/article";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 export const useArticleManagement = () => {
   const router = useRouter();
@@ -50,7 +56,9 @@ export const useArticleManagement = () => {
 
   const toggleSelectAll = useCallback(() => {
     setSelectedArticles((prev) =>
-      prev.length === articles.length ? [] : articles.map((article) => article.id)
+      prev.length === articles.length
+        ? []
+        : articles.map((article) => article.id)
     );
   }, [articles]);
 
@@ -58,9 +66,12 @@ export const useArticleManagement = () => {
     router.push("/admin/content/articles/add");
   }, [router]);
 
-  const handleEditArticle = useCallback((id: string) => {
-    router.push(`/admin/content/articles/edit/${id}`);
-  }, [router]);
+  const handleEditArticle = useCallback(
+    (id: string) => {
+      router.push(`/admin/content/articles/edit/${id}`);
+    },
+    [router]
+  );
 
   const handleViewArticle = useCallback((article: Article) => {
     setCurrentArticle(article);
@@ -77,14 +88,37 @@ export const useArticleManagement = () => {
   const confirmDelete = useCallback(async () => {
     try {
       setError(null);
+      // Get access token for Google Drive operations
+      const accessToken = await getAccessTokenAction();
+
       if (selectedArticles.length > 0) {
-        // Bulk delete
-        await Promise.all(
-          selectedArticles.map((id) => deleteArticle(id))
-        );
+        // Bulk delete: Delete files from Google Drive first, then delete database records
+        for (const articleId of selectedArticles) {
+          // Find the article object to get the thumbnail URL
+          const articleToDelete = articles.find((a) => a.id === articleId);
+          if (
+            articleToDelete?.thumbnail &&
+            isGoogleDriveFile(articleToDelete.thumbnail)
+          ) {
+            const fileId = getFileIdFromFile(articleToDelete.thumbnail);
+            if (fileId) {
+              await deleteGoogleDriveFile(fileId, accessToken);
+            }
+          }
+          await deleteArticle(articleId);
+        }
         setSuccess(`${selectedArticles.length} articles deleted successfully`);
       } else if (currentArticle) {
-        // Single delete
+        // Single delete: Delete file from Google Drive first, then delete database record
+        if (
+          currentArticle.thumbnail &&
+          isGoogleDriveFile(currentArticle.thumbnail)
+        ) {
+          const fileId = getFileIdFromFile(currentArticle.thumbnail);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
         await deleteArticle(currentArticle.id);
         setSuccess("Article deleted successfully");
       }
@@ -97,7 +131,7 @@ export const useArticleManagement = () => {
       console.error("Error deleting article:", err);
       setError("Failed to delete article");
     }
-  }, [selectedArticles, currentArticle, fetchArticles]);
+  }, [selectedArticles, currentArticle, articles, fetchArticles]);
 
   return {
     articles,
