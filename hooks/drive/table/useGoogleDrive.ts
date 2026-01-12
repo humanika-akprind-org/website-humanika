@@ -286,6 +286,112 @@ export const useFileOperations = (
     }
   };
 
+  const createFolder = async (
+    folderName: string,
+    parentFolderId?: string
+  ): Promise<boolean> => {
+    setIsOperating(true);
+    setOperationError(null);
+
+    try {
+      const res = await callApi({
+        action: "createFolder",
+        fileName: folderName,
+        folderId: parentFolderId || "root",
+        accessToken,
+      });
+
+      if (res.success) {
+        return true;
+      } else {
+        throw new Error(res.message || "Failed to create folder");
+      }
+    } catch (err) {
+      console.error("Create folder error:", err);
+      setOperationError(
+        err instanceof Error
+          ? err.message
+          : "Failed to create folder. Please try again."
+      );
+      return false;
+    } finally {
+      setIsOperating(false);
+    }
+  };
+
+  const uploadFile = async (
+    file: File,
+    fileName?: string,
+    folderId?: string
+  ): Promise<boolean> => {
+    setIsOperating(true);
+    setOperationError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("action", "upload");
+      formData.append("accessToken", accessToken);
+      formData.append("folderId", folderId || "root");
+      formData.append("fileName", fileName || file.name);
+
+      const res = await callApi(
+        {
+          action: "upload",
+          accessToken,
+        },
+        formData
+      );
+
+      if (res.success) {
+        return true;
+      } else {
+        throw new Error(res.message || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setOperationError(
+        err instanceof Error ? err.message : "Upload failed. Please try again."
+      );
+      return false;
+    } finally {
+      setIsOperating(false);
+    }
+  };
+
+  const renameFile = async (
+    fileId: string,
+    newName: string
+  ): Promise<boolean> => {
+    setIsOperating(true);
+    setOperationError(null);
+
+    try {
+      const res = await callApi({
+        action: "rename",
+        fileId,
+        newName,
+        accessToken,
+      });
+
+      if (res.success) {
+        return true;
+      } else {
+        throw new Error(res.message || "Failed to rename file");
+      }
+    } catch (err) {
+      console.error("Rename error:", err);
+      setOperationError(
+        err instanceof Error
+          ? err.message
+          : "Failed to rename file. Please try again."
+      );
+      return false;
+    } finally {
+      setIsOperating(false);
+    }
+  };
+
   return {
     copiedFileId,
     isOperating,
@@ -293,5 +399,8 @@ export const useFileOperations = (
     handleApiOperation,
     handleCopyUrl,
     setOperationError,
+    createFolder,
+    uploadFile,
+    renameFile,
   };
 };

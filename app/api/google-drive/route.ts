@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle other actions (rename, delete, etc.)
-    const { action, fileId, fileName, accessToken, permission } =
+    const { action, fileId, fileName, accessToken, permission, folderId } =
       await request.json();
 
     if (!accessToken) {
@@ -264,6 +264,27 @@ export async function POST(request: NextRequest) {
           requestBody: permission,
         });
         return NextResponse.json({ success: true });
+
+      case "createFolder":
+        if (!fileName) {
+          throw new Error("Missing folder name");
+        }
+        const { data: folderData } = await drive.files.create({
+          requestBody: {
+            name: fileName,
+            mimeType: "application/vnd.google-apps.folder",
+            parents: folderId && folderId !== "root" ? [folderId] : undefined,
+          },
+          fields: "id,name,mimeType",
+        });
+        return NextResponse.json({
+          success: true,
+          folder: {
+            id: folderData.id,
+            name: folderData.name,
+            mimeType: folderData.mimeType,
+          },
+        });
 
       default:
         throw new Error("Invalid action");

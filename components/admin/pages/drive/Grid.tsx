@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
-import Link from "next/link";
+import React, { useState, useCallback, useRef } from "react";
 import {
   Search,
   FolderPlus,
@@ -25,6 +24,7 @@ import {
   Edit2,
   Trash2,
   ExternalLink,
+  X,
 } from "lucide-react";
 import { callApi } from "@/use-cases/api/google-drive";
 import {
@@ -32,6 +32,7 @@ import {
   useFileOperations,
 } from "@/hooks/drive/table/useGoogleDrive";
 import DeleteModal from "./modal/DeleteModal";
+import RenameModal from "./modal/RenameModal";
 import Breadcrumbs from "./Breadcrumbs";
 import type { DriveTableProps } from "@/types/google-drive";
 
@@ -53,6 +54,193 @@ const useToast = () => {
   return { toast, showToast };
 };
 
+// Create Folder Modal Component
+interface CreateFolderModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (folderName: string) => Promise<void>;
+  isLoading: boolean;
+}
+
+const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  isLoading,
+}) => {
+  const [folderName, setFolderName] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!folderName.trim()) {
+      setError("Nama folder tidak boleh kosong");
+      return;
+    }
+    setError("");
+    await onConfirm(folderName.trim());
+  };
+
+  const handleClose = () => {
+    setFolderName("");
+    setError("");
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black bg-opacity-50"
+        onClick={handleClose}
+      />
+      <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          disabled={isLoading}
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          Buat Folder Baru
+        </h2>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              htmlFor="folderName"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Nama Folder
+            </label>
+            <input
+              id="folderName"
+              type="text"
+              value={folderName}
+              onChange={(e) => {
+                setFolderName(e.target.value);
+                if (error) setError("");
+              }}
+              placeholder="Masukkan nama folder"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              disabled={isLoading}
+              autoFocus
+            />
+            {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={isLoading}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading || !folderName.trim()}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Membuat...
+                </>
+              ) : (
+                <>
+                  <FolderPlus className="w-4 h-4" />
+                  Buat Folder
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Upload Progress Modal Component
+interface UploadProgressModalProps {
+  isOpen: boolean;
+  fileName: string;
+  progress: number;
+  status: "uploading" | "success" | "error";
+  error?: string;
+}
+
+const UploadProgressModal: React.FC<UploadProgressModalProps> = ({
+  isOpen,
+  fileName,
+  progress,
+  status,
+  error,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black bg-opacity-50"
+        onClick={() => {}}
+      />
+      <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+        <div className="text-center">
+          {status === "uploading" && (
+            <>
+              <div className="w-16 h-16 mx-auto mb-4">
+                <div className="w-full h-full border-4 border-blue-100 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              </div>
+              <p className="text-lg font-medium text-gray-900 mb-2">
+                Mengunggah {fileName}
+              </p>
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                <div
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-sm text-gray-500">{progress}% selesai</p>
+            </>
+          )}
+
+          {status === "success" && (
+            <>
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-10 h-10 text-green-500" />
+              </div>
+              <p className="text-lg font-medium text-gray-900 mb-2">
+                Berhasil Diunggah
+              </p>
+              <p className="text-sm text-gray-500">{fileName}</p>
+            </>
+          )}
+
+          {status === "error" && (
+            <>
+              <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                <XCircle className="w-10 h-10 text-red-500" />
+              </div>
+              <p className="text-lg font-medium text-gray-900 mb-2">
+                Gagal Mengunggah
+              </p>
+              <p className="text-sm text-gray-500 mb-2">{error || fileName}</p>
+              <p className="text-sm text-red-500">Silakan coba lagi</p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const DriveGrid: React.FC<DriveTableProps> = ({
   files: initialFiles = [],
   accessToken,
@@ -67,8 +255,34 @@ const DriveGrid: React.FC<DriveTableProps> = ({
     fileName: "",
   });
 
+  const [createFolderModal, setCreateFolderModal] = useState(false);
+  const [renameModal, setRenameModal] = useState<{
+    open: boolean;
+    fileId: string | null;
+    fileName: string;
+    newName: string;
+  }>({
+    open: false,
+    fileId: null,
+    fileName: "",
+    newName: "",
+  });
+  const [uploadProgress, setUploadProgress] = useState<{
+    isOpen: boolean;
+    fileName: string;
+    progress: number;
+    status: "uploading" | "success" | "error";
+    error?: string;
+  }>({
+    isOpen: false,
+    fileName: "",
+    progress: 0,
+    status: "uploading",
+  });
+
   const [pageSize] = useState(20);
   const [searchQuery, setSearchQuery] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     files,
@@ -87,6 +301,8 @@ const DriveGrid: React.FC<DriveTableProps> = ({
     operationError,
     handleApiOperation,
     handleCopyUrl,
+    createFolder,
+    uploadFile,
   } = useFileOperations(accessToken, fetchFiles);
 
   const { toast, showToast } = useToast();
@@ -95,7 +311,7 @@ const DriveGrid: React.FC<DriveTableProps> = ({
   const displayError = error || operationError;
 
   // Filter files based on search query
-  const filteredFiles = useMemo(() => {
+  const filteredFiles = React.useMemo(() => {
     if (!searchQuery.trim()) return files;
     const query = searchQuery.toLowerCase();
     return files.filter(
@@ -132,6 +348,42 @@ const DriveGrid: React.FC<DriveTableProps> = ({
     setDeleteModal({ isOpen: false, fileId: null, fileName: "" });
     showToast("File berhasil dihapus", "success");
   }, [deleteModal.fileId, handleApiOperation, accessToken, showToast]);
+
+  const handleRename = useCallback(
+    (fileId?: string | null, fileName?: string | null) => {
+      if (!fileId) return;
+
+      setRenameModal({
+        open: true,
+        fileId,
+        fileName: fileName || "this file",
+        newName: fileName || "",
+      });
+    },
+    []
+  );
+
+  const confirmRename = useCallback(async () => {
+    if (!renameModal.fileId || !renameModal.newName.trim()) return;
+
+    await handleApiOperation(async () => {
+      await callApi({
+        action: "rename",
+        fileId: renameModal.fileId,
+        newName: renameModal.newName,
+        accessToken,
+      });
+    }, "File renamed successfully");
+
+    setRenameModal({ open: false, fileId: null, fileName: "", newName: "" });
+    showToast("File berhasil diubah nama", "success");
+  }, [
+    renameModal.fileId,
+    renameModal.newName,
+    handleApiOperation,
+    accessToken,
+    showToast,
+  ]);
 
   const formatFileSize = useCallback((bytes?: number | string | null) => {
     if (!bytes) return "-";
@@ -216,13 +468,92 @@ const DriveGrid: React.FC<DriveTableProps> = ({
     window.open(`https://drive.google.com/file/d/${fileId}/view`, "_blank");
   }, []);
 
+  // Handle file upload button click
   const handleUploadClick = useCallback(() => {
-    showToast("Fitur upload akan segera hadir", "info");
-  }, [showToast]);
+    fileInputRef.current?.click();
+  }, []);
 
-  const handleCreateFolder = useCallback(() => {
-    showToast("Fitur buat folder akan segera hadir", "info");
-  }, [showToast]);
+  // Handle file selection
+  const handleFileSelect = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      // Show progress modal
+      setUploadProgress({
+        isOpen: true,
+        fileName: file.name,
+        progress: 0,
+        status: "uploading",
+      });
+
+      // Simulate progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => ({
+          ...prev,
+          progress: Math.min(prev.progress + 10, 90),
+        }));
+      }, 200);
+
+      try {
+        const success = await uploadFile(file, undefined, currentFolderId);
+
+        clearInterval(progressInterval);
+
+        if (success) {
+          setUploadProgress((prev) => ({
+            ...prev,
+            progress: 100,
+            status: "success",
+          }));
+
+          // Refresh files
+          await fetchFiles();
+
+          // Close modal after delay
+          setTimeout(() => {
+            setUploadProgress((prev) => ({ ...prev, isOpen: false }));
+            showToast("File berhasil diunggah", "success");
+          }, 1500);
+        } else {
+          throw new Error("Upload failed");
+        }
+      } catch (err) {
+        clearInterval(progressInterval);
+
+        setUploadProgress((prev) => ({
+          ...prev,
+          status: "error",
+          error: err instanceof Error ? err.message : "Upload failed",
+        }));
+      }
+    },
+    [currentFolderId, uploadFile, fetchFiles, showToast]
+  );
+
+  // Handle create folder button click
+  const handleCreateFolderClick = useCallback(() => {
+    setCreateFolderModal(true);
+  }, []);
+
+  // Handle create folder confirmation
+  const handleCreateFolderConfirm = useCallback(
+    async (folderName: string) => {
+      const success = await createFolder(folderName, currentFolderId);
+
+      if (success) {
+        setCreateFolderModal(false);
+        await fetchFiles();
+        showToast(`Folder "${folderName}" berhasil dibuat`, "success");
+      }
+    },
+    [createFolder, currentFolderId, fetchFiles, showToast]
+  );
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -245,16 +576,59 @@ const DriveGrid: React.FC<DriveTableProps> = ({
         </div>
       )}
 
+      {/* Hidden file input for upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileSelect}
+        className="hidden"
+        accept="*/*"
+        aria-label="Pilih file untuk diunggah"
+      />
+
+      {/* Create Folder Modal */}
+      <CreateFolderModal
+        isOpen={createFolderModal}
+        onClose={() => setCreateFolderModal(false)}
+        onConfirm={handleCreateFolderConfirm}
+        isLoading={isOperating}
+      />
+
+      {/* Upload Progress Modal */}
+      <UploadProgressModal
+        isOpen={uploadProgress.isOpen}
+        fileName={uploadProgress.fileName}
+        progress={uploadProgress.progress}
+        status={uploadProgress.status}
+        error={uploadProgress.error}
+      />
+
+      {/* Rename Modal */}
+      <RenameModal
+        isOpen={renameModal.open}
+        onClose={() =>
+          setRenameModal({
+            open: false,
+            fileId: null,
+            fileName: "",
+            newName: "",
+          })
+        }
+        onConfirm={confirmRename}
+        currentName={renameModal.fileName}
+        isLoading={isOperating}
+      />
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div className="flex flex-wrap items-center gap-3">
           {/* Search Input */}
-          <div className="relative">
+          <div className="relative w-full sm:w-64">
             <input
               type="text"
               placeholder="Cari file..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-48"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
               aria-label="Cari file"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -262,7 +636,7 @@ const DriveGrid: React.FC<DriveTableProps> = ({
 
           {/* Create Folder Button */}
           <button
-            onClick={handleCreateFolder}
+            onClick={handleCreateFolderClick}
             className="px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors flex items-center gap-2 text-sm"
             aria-label="Buat folder baru"
           >
@@ -273,7 +647,8 @@ const DriveGrid: React.FC<DriveTableProps> = ({
           {/* Upload Button */}
           <button
             onClick={handleUploadClick}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm"
+            disabled={isOperating}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm disabled:opacity-50"
             aria-label="Unggah file"
           >
             <Upload className="h-4 w-4" />
@@ -457,15 +832,18 @@ const DriveGrid: React.FC<DriveTableProps> = ({
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                     </button>
-                    <Link
-                      href={`/admin/drive/edit/${file.id}`}
-                      className="p-1.5 bg-yellow-50 text-yellow-600 rounded shadow-sm hover:bg-yellow-100 border border-yellow-200 text-xs flex items-center justify-center"
-                      title="Edit"
-                      aria-label="Edit file"
-                      onClick={(e) => e.stopPropagation()}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRename(file.id, file.name);
+                      }}
+                      disabled={isOperating}
+                      className="p-1.5 bg-purple-50 text-purple-600 rounded shadow-sm hover:bg-purple-100 border border-purple-200 text-xs"
+                      title="Ubah Nama"
+                      aria-label="Ubah nama file"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
-                    </Link>
+                    </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -485,22 +863,6 @@ const DriveGrid: React.FC<DriveTableProps> = ({
           </div>
         )}
       </div>
-
-      {isOperating && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
-          role="status"
-          aria-live="polite"
-        >
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-            <div
-              className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"
-              aria-hidden="true"
-            />
-            <p className="text-gray-700">Memproses permintaan Anda...</p>
-          </div>
-        </div>
-      )}
 
       <DeleteModal
         isOpen={deleteModal.isOpen}
