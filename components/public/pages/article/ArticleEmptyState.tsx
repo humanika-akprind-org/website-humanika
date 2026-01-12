@@ -1,11 +1,14 @@
 import { Newspaper, X } from "lucide-react";
 
-interface EmptyStateProps {
+interface ArticleEmptyStateProps {
   hasFilters: boolean;
   onResetFilters: () => void;
 }
 
-export const EmptyState = ({ hasFilters, onResetFilters }: EmptyStateProps) => (
+export const ArticleEmptyState = ({
+  hasFilters,
+  onResetFilters,
+}: ArticleEmptyStateProps) => (
   <div className="text-center py-20">
     <div className="inline-flex flex-col items-center gap-6 max-w-md mx-auto">
       <div className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center">

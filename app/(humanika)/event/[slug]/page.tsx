@@ -7,8 +7,8 @@ import EventDetailHeroSection from "@/components/public/sections/event/detail/Ev
 import EventDetailContentSection from "@/components/public/sections/event/detail/EventDetailContentSection";
 import EventSections from "@/components/public/sections/event/EventSections";
 import EventDetailLoadingState from "@/components/public/pages/event/EventDetailLoadingState";
-import EventErrorState from "@/components/public/pages/event/ErrorState";
-import EventNotFoundState from "@/components/public/pages/event/NotFoundState";
+import EventErrorState from "@/components/public/pages/event/EventErrorState";
+import EventNotFoundState from "@/components/public/pages/event/EventNotFoundState";
 import { handleShare } from "lib/eventDetailUtils";
 
 /**

@@ -14,9 +14,9 @@ import EventControlBar from "@/components/public/pages/event/EventControlBar";
 import EventEmptyState from "@/components/public/pages/event/EventEmptyState";
 import EventCalendarView from "@/components/public/pages/event/EventCalendarView";
 import EventLoadMore from "@/components/public/pages/event/EventLoadMore";
-import LoadingState from "@/components/public/pages/event/LoadingState";
-import ErrorState from "@/components/public/pages/event/ErrorState";
-import PopularCategories from "@/components/public/pages/event/PopularCategories";
+import LoadingState from "@/components/public/pages/event/EventLoadingState";
+import ErrorState from "@/components/public/pages/event/EventErrorState";
+import PopularCategories from "@/components/public/pages/event/EventPopularCategories";
 import type {
   EventFilters,
   ViewMode,

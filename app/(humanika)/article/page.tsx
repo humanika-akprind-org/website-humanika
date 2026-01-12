@@ -16,9 +16,9 @@ import { ControlBar } from "@/components/public/pages/article/ControlBar";
 import { ArticleGrid } from "@/components/public/pages/article/ArticleGrid";
 import { ArticleList } from "@/components/public/pages/article/ArticleList";
 import ArticlePageLoadingState from "@/components/public/pages/article/ArticlePageLoadingState";
-import ErrorState from "@/components/public/pages/article/ErrorState";
-import { EmptyState } from "@/components/public/pages/article/EmptyState";
-import { PopularCategories } from "@/components/public/pages/article/PopularCategories";
+import ArticleErrorState from "@/components/public/pages/article/ArticleErrorState";
+import { ArticleEmptyState } from "@/components/public/pages/article/ArticleEmptyState";
+import { PopularCategories } from "@/components/public/pages/article/EventPopularCategories";
 
 interface ArticlePageType extends React.FC {
   fetchArticles?: () => void;
@@ -124,11 +124,11 @@ const ArticlePage: ArticlePageType = () => {
         {/* Article Content */}
         <div className="mt-12">
           {/* Error State */}
-          {error && <ErrorState error={error} onRetry={fetchArticles} />}
+          {error && <ArticleErrorState error={error} onRetry={fetchArticles} />}
 
           {/* Empty State */}
           {!loading && !error && filteredAndSortedArticles.length === 0 && (
-            <EmptyState
+            <ArticleEmptyState
               hasFilters={hasActiveFilters}
               onResetFilters={resetFilters}
             />

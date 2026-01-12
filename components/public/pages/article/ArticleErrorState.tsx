@@ -1,12 +1,12 @@
 import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface ErrorStateProps {
+interface ArticleErrorStateProps {
   error: string;
   onRetry: () => void;
 }
 
-export default function ErrorState({ onRetry }: ErrorStateProps) {
+export default function ArticleErrorState({ onRetry }: ArticleErrorStateProps) {
   const router = useRouter();
 
   return (

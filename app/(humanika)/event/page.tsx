@@ -22,9 +22,9 @@ import EventEmptyState from "@/components/public/pages/event/EventEmptyState";
 import EventCalendarView from "@/components/public/pages/event/EventCalendarView";
 import EventLoadMore from "@/components/public/pages/event/EventLoadMore";
 import FeaturedPastEvents from "@/components/public/pages/event/FeaturedPastEvents";
-import PopularCategories from "@/components/public/pages/event/PopularCategories";
+import PopularCategories from "@/components/public/pages/event/EventPopularCategories";
 import EventPageLoadingState from "@/components/public/pages/event/EventPageLoadingState";
-import ErrorState from "@/components/public/pages/event/ErrorState";
+import EventErrorState from "@/components/public/pages/event/EventErrorState";
 
 export default function EventPage() {
   // Custom hooks for data management
@@ -98,7 +98,7 @@ export default function EventPage() {
         {/* Events Content */}
         <div className="mt-12">
           {/* Error State */}
-          {error && <ErrorState error={error} onRetry={refetch} />}
+          {error && <EventErrorState error={error} onRetry={refetch} />}
 
           {/* Empty State */}
           {!loading && !error && filteredEvents.length === 0 && (

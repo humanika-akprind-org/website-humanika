@@ -7,10 +7,10 @@ import { useBookmark } from "hooks/article/useBookmark";
 import { useShare } from "hooks/article/useShare";
 import ArticleHeroSection from "@/components/public/sections/article/detail/ArticleHeroSection";
 import ArticleContentSection from "@/components/public/sections/article/detail/ArticleContentSection";
-import RelatedArticlesSection from "@/components/public/sections/article/RelatedArticlesSection";
 import ArticleDetailLoadingState from "@/components/public/pages/article/ArticleDetailLoadingState";
-import NotFoundState from "@/components/public/pages/article/NotFoundState";
-import ErrorState from "@/components/public/pages/article/ErrorState";
+import ArticleNotFoundState from "@/components/public/pages/article/ArticleNotFoundState";
+import ArticleErrorState from "@/components/public/pages/article/ArticleErrorState";
+import RelatedArticlesSection from "@/components/public/sections/article/RelatedArticlesSection";
 
 export default function ArticleDetail() {
   const params = useParams();
@@ -36,11 +36,11 @@ export default function ArticleDetail() {
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={refetch} />;
+    return <ArticleErrorState error={error} onRetry={refetch} />;
   }
 
   if (!article) {
-    return <NotFoundState />;
+    return <ArticleNotFoundState />;
   }
 
   return (
