@@ -4,48 +4,11 @@ import { deleteDocument } from "@/use-cases/api/document";
 import type { Document } from "@/types/document";
 import { useDocuments } from "./useDocuments";
 import { getAccessTokenAction } from "@/lib/actions/accessToken";
-import { callApi } from "@/use-cases/api/google-drive";
-
-// Helper function to check if a document is from Google Drive
-const isGoogleDriveDocument = (doc: string | null | undefined): boolean => {
-  if (!doc) return false;
-  return (
-    doc.includes("drive.google.com") || doc.match(/^[a-zA-Z0-9_-]+$/) !== null
-  );
-};
-
-// Helper function to get file ID from document URL or file ID
-const getFileIdFromDocument = (
-  doc: string | null | undefined
-): string | null => {
-  if (!doc) return null;
-
-  if (doc.includes("drive.google.com")) {
-    const fileIdMatch = doc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    return fileIdMatch ? fileIdMatch[1] : null;
-  } else if (doc.match(/^[a-zA-Z0-9_-]+$/)) {
-    return doc;
-  }
-  return null;
-};
-
-// Function to delete file from Google Drive
-const deleteGoogleDriveFile = async (
-  fileId: string,
-  accessToken: string
-): Promise<boolean> => {
-  try {
-    await callApi({
-      action: "delete",
-      fileId,
-      accessToken,
-    });
-    return true;
-  } catch (error) {
-    console.error("Failed to delete file from Google Drive:", error);
-    return false;
-  }
-};
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 interface UseDocumentManagementOptions {
   addPath?: string;
@@ -167,9 +130,9 @@ export function useDocumentManagement(
         // Single document deletion: Delete file from Google Drive first, then delete database record
         if (
           currentDocument.document &&
-          isGoogleDriveDocument(currentDocument.document)
+          isGoogleDriveFile(currentDocument.document)
         ) {
-          const fileId = getFileIdFromDocument(currentDocument.document);
+          const fileId = getFileIdFromFile(currentDocument.document);
           if (fileId) {
             await deleteGoogleDriveFile(fileId, accessToken);
           }
@@ -184,9 +147,9 @@ export function useDocumentManagement(
           const docToDelete = documents.find((doc) => doc.id === docId);
           if (
             docToDelete?.document &&
-            isGoogleDriveDocument(docToDelete.document)
+            isGoogleDriveFile(docToDelete.document)
           ) {
-            const fileId = getFileIdFromDocument(docToDelete.document);
+            const fileId = getFileIdFromFile(docToDelete.document);
             if (fileId) {
               await deleteGoogleDriveFile(fileId, accessToken);
             }
