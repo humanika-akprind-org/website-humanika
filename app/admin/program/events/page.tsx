@@ -23,6 +23,7 @@ export default function EventsPage() {
   const [periodFilter, setPeriodFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [workProgramFilter, setWorkProgramFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const {
     events,
@@ -85,6 +86,8 @@ export default function EventsPage() {
         onDepartmentFilterChange={setDepartmentFilter}
         workProgramFilter={workProgramFilter}
         onWorkProgramFilterChange={setWorkProgramFilter}
+        categoryFilter={categoryFilter}
+        onCategoryFilterChange={setCategoryFilter}
         selectedCount={selectedEvents.length}
         onDeleteSelected={() => handleDelete()}
       />

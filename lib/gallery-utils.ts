@@ -1,5 +1,6 @@
 import type { Event } from "@/types/event";
 import type { Gallery } from "@/types/gallery";
+import { getGoogleDrivePreviewUrl } from "@/lib/google-drive/file-utils";
 
 export interface Album {
   id: string;
@@ -23,20 +24,8 @@ export interface GalleryStats {
 /**
  * Gets the preview URL for an image, handling Google Drive links
  */
-export const getPreviewUrl = (image: string | null | undefined): string => {
-  if (!image) return "";
-  if (image.includes("drive.google.com")) {
-    const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch) {
-      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
-    }
-    return image;
-  } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
-    return `/api/drive-image?fileId=${image}`;
-  } else {
-    return image;
-  }
-};
+export const getPreviewUrl = (image: string | null | undefined): string =>
+  getGoogleDrivePreviewUrl(image);
 
 /**
  * Groups galleries by eventId and counts them

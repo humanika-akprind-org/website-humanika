@@ -1,4 +1,5 @@
 import type { Event } from "types/event";
+import { getGoogleDrivePreviewUrl } from "@/lib/google-drive/file-utils";
 
 /**
  * Generates a preview URL for an image based on its source
@@ -7,18 +8,7 @@ import type { Event } from "types/event";
  */
 export function getPreviewUrl(image: string | null | undefined): string {
   if (!image) return "";
-
-  if (image.includes("drive.google.com")) {
-    const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch) {
-      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
-    }
-    return image;
-  } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
-    return `/api/drive-image?fileId=${image}`;
-  } else {
-    return image;
-  }
+  return getGoogleDrivePreviewUrl(image);
 }
 
 /**

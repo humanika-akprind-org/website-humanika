@@ -5,24 +5,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+import { getGoogleDrivePreviewUrl } from "@/lib/google-drive/file-utils";
+
 // Helper function to get preview URL from image (file ID or URL)
 export function getPreviewUrl(image: string | null | undefined): string {
   if (!image) return "";
-
-  if (image.includes("drive.google.com")) {
-    // It's a full Google Drive URL, convert to direct image URL
-    const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch) {
-      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
-    }
-    return image;
-  } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
-    // It's a Google Drive file ID, construct direct URL
-    return `/api/drive-image?fileId=${image}`;
-  } else {
-    // It's a direct URL or other format
-    return image;
-  }
+  return getGoogleDrivePreviewUrl(image);
 }
 
 // Helper function to format enum values for display
