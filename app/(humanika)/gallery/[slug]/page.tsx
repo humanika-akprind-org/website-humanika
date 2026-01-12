@@ -52,7 +52,9 @@ export default function GalleryDetail() {
   }
 
   if (error) {
-    return <GalleryDetailErrorState error={error} />;
+    return (
+      <GalleryDetailErrorState error={error} onRetry={() => router.refresh()} />
+    );
   }
 
   if (!event || !album) {

@@ -10,7 +10,7 @@ import ArticleContentSection from "@/components/public/sections/article/detail/A
 import RelatedArticlesSection from "@/components/public/sections/article/RelatedArticlesSection";
 import ArticleDetailLoadingState from "@/components/public/pages/article/ArticleDetailLoadingState";
 import NotFoundState from "@/components/public/pages/article/NotFoundState";
-import { ErrorState } from "@/components/public/pages/article/ErrorState";
+import ErrorState from "@/components/public/pages/article/ErrorState";
 
 export default function ArticleDetail() {
   const params = useParams();

@@ -16,7 +16,7 @@ import { ControlBar } from "@/components/public/pages/article/ControlBar";
 import { ArticleGrid } from "@/components/public/pages/article/ArticleGrid";
 import { ArticleList } from "@/components/public/pages/article/ArticleList";
 import ArticlePageLoadingState from "@/components/public/pages/article/ArticlePageLoadingState";
-import { ErrorState } from "@/components/public/pages/article/ErrorState";
+import ErrorState from "@/components/public/pages/article/ErrorState";
 import { EmptyState } from "@/components/public/pages/article/EmptyState";
 import { PopularCategories } from "@/components/public/pages/article/PopularCategories";
 

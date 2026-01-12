@@ -1,4 +1,4 @@
-import { AlertCircle, Loader2, ArrowLeft } from "lucide-react";
+import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface ErrorStateProps {
@@ -6,7 +6,7 @@ interface ErrorStateProps {
   onRetry: () => void;
 }
 
-export default function ErrorState({ error, onRetry }: ErrorStateProps) {
+export default function ErrorState({ onRetry }: ErrorStateProps) {
   const router = useRouter();
 
   return (
@@ -23,7 +23,7 @@ export default function ErrorState({ error, onRetry }: ErrorStateProps) {
           Gagal Memuat Event
         </h3>
         <p className="text-grey-600 mb-8 leading-relaxed">
-          {error || "Terjadi kesalahan saat memuat data. Silakan coba lagi."}
+          Terjadi kesalahan saat memuat data. Silakan coba lagi.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -31,7 +31,7 @@ export default function ErrorState({ error, onRetry }: ErrorStateProps) {
             onClick={onRetry}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium shadow-lg shadow-primary-600/20"
           >
-            <Loader2 className="w-4 h-4" />
+            <RefreshCw className="w-4 h-4" />
             Coba Lagi
           </button>
           <button
