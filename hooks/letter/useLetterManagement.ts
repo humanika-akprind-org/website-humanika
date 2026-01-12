@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Letter } from "@/types/letter";
 import { useToast } from "@/hooks/use-toast";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 interface UseLetterManagementOptions {
   addPath?: string;
@@ -154,7 +160,31 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
 
   const confirmDelete = async () => {
     try {
+      // Get access token for Google Drive operations
+      const accessToken = await getAccessTokenAction();
+
       if (currentLetter) {
+        // Single letter deletion: Delete files from Google Drive first, then delete database record
+        // Delete main letter file from Google Drive if applicable
+        if (currentLetter.letter && isGoogleDriveFile(currentLetter.letter)) {
+          const fileId = getFileIdFromFile(currentLetter.letter);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
+
+        // Delete attachments from Google Drive if applicable
+        if (currentLetter.attachments && currentLetter.attachments.length > 0) {
+          for (const attachment of currentLetter.attachments) {
+            if (attachment.document && isGoogleDriveFile(attachment.document)) {
+              const fileId = getFileIdFromFile(attachment.document);
+              if (fileId) {
+                await deleteGoogleDriveFile(fileId, accessToken);
+              }
+            }
+          }
+        }
+
         const response = await fetch(`/api/letter/${currentLetter.id}`, {
           method: "DELETE",
         });
@@ -181,6 +211,42 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
 
         for (const letterId of selectedLetters) {
           try {
+            // Find the letter object to get the letter file and attachments
+            const letterToDelete = letters.find(
+              (letter) => letter.id === letterId
+            );
+
+            if (letterToDelete) {
+              // Delete main letter file from Google Drive if applicable
+              if (
+                letterToDelete.letter &&
+                isGoogleDriveFile(letterToDelete.letter)
+              ) {
+                const fileId = getFileIdFromFile(letterToDelete.letter);
+                if (fileId) {
+                  await deleteGoogleDriveFile(fileId, accessToken);
+                }
+              }
+
+              // Delete attachments from Google Drive if applicable
+              if (
+                letterToDelete.attachments &&
+                letterToDelete.attachments.length > 0
+              ) {
+                for (const attachment of letterToDelete.attachments) {
+                  if (
+                    attachment.document &&
+                    isGoogleDriveFile(attachment.document)
+                  ) {
+                    const fileId = getFileIdFromFile(attachment.document);
+                    if (fileId) {
+                      await deleteGoogleDriveFile(fileId, accessToken);
+                    }
+                  }
+                }
+              }
+            }
+
             const response = await fetch(`/api/letter/${letterId}`, {
               method: "DELETE",
             });
