@@ -24,6 +24,8 @@ import {
   Edit2,
   Trash2,
   ExternalLink,
+  List,
+  Grid as GridIcon,
 } from "lucide-react";
 import { callApi } from "@/use-cases/api/google-drive";
 import {
@@ -79,6 +81,7 @@ const DriveGrid: React.FC<DriveTableProps> = ({
 
   const [pageSize] = useState(20);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -465,6 +468,34 @@ const DriveGrid: React.FC<DriveTableProps> = ({
             Segarkan
           </button>
         </div>
+
+        {/* View Toggle Buttons */}
+        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+          <button
+            onClick={() => setViewMode("grid")}
+            className={`p-2 rounded-md transition-colors ${
+              viewMode === "grid"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+            aria-label="Tampilan grid"
+            title="Tampilan grid"
+          >
+            <GridIcon className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={`p-2 rounded-md transition-colors ${
+              viewMode === "list"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+            aria-label="Tampilan list"
+            title="Tampilan list"
+          >
+            <List className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {displayError && (
@@ -530,6 +561,169 @@ const DriveGrid: React.FC<DriveTableProps> = ({
                 Hapus pencarian
               </button>
             )}
+          </div>
+        ) : viewMode === "list" ? (
+          // List view
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 overflow-hidden">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Nama
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Jenis
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ukuran
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredFiles.map((file) => (
+                  <tr key={file.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {file.mimeType?.includes("folder") ||
+                        isFolderShortcut(file) ? (
+                          <button
+                            onClick={() => {
+                              if (isFolderShortcut(file)) {
+                                const targetId = getShortcutTargetId(file);
+                                if (targetId) {
+                                  navigateToFolder(
+                                    targetId,
+                                    file.name || "Shortcut"
+                                  );
+                                }
+                              } else {
+                                navigateToFolder(
+                                  file.id || "",
+                                  file.name || ""
+                                );
+                              }
+                            }}
+                            disabled={isLoading.files}
+                            className="flex items-center hover:bg-blue-50 rounded p-1 -m-1 transition-colors"
+                          >
+                            <FolderOpen className="flex-shrink-0 h-12 w-12 text-yellow-500" />
+                            <span className="ml-3 truncate max-w-[320px] text-gray-900 hover:text-blue-600 cursor-pointer">
+                              {file.name}
+                            </span>
+                          </button>
+                        ) : (
+                          <>
+                            <div className="flex-shrink-0 h-12 w-12">
+                              {getFileIcon(file.mimeType)}
+                            </div>
+                            <span className="ml-3 truncate max-w-[320px]">
+                              {file.name}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {file.mimeType?.includes("folder") ||
+                      isFolderShortcut(file)
+                        ? "Folder"
+                        : file.mimeType?.includes("image")
+                        ? "Gambar"
+                        : file.mimeType?.includes("pdf")
+                        ? "PDF"
+                        : file.mimeType?.includes("word") ||
+                          file.mimeType?.includes("document")
+                        ? "Dokumen"
+                        : file.mimeType?.includes("excel") ||
+                          file.mimeType?.includes("spreadsheet")
+                        ? "Spreadsheet"
+                        : file.mimeType?.includes("powerpoint") ||
+                          file.mimeType?.includes("presentation")
+                        ? "Presentasi"
+                        : file.mimeType?.includes("video")
+                        ? "Video"
+                        : file.mimeType?.includes("audio")
+                        ? "Audio"
+                        : file.mimeType?.includes("zip") ||
+                          file.mimeType?.includes("rar")
+                        ? "Arsip"
+                        : "File"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {file.mimeType?.includes("folder") ||
+                      isFolderShortcut(file)
+                        ? "-"
+                        : formatFileSize(file.size)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="flex gap-1">
+                        {!file.mimeType?.includes("folder") &&
+                          !isFolderShortcut(file) && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyUrl(file.id);
+                              }}
+                              disabled={isOperating}
+                              className={`p-1.5 rounded transition-colors ${
+                                copiedFileId === file.id
+                                  ? "bg-green-50 text-green-600"
+                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              }`}
+                              title="Salin URL"
+                              aria-label="Salin URL file"
+                            >
+                              {copiedFileId === file.id ? (
+                                <Check className="w-4 h-4" />
+                              ) : (
+                                <LinkIcon className="w-4 h-4" />
+                              )}
+                            </button>
+                          )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenInDrive(file.id);
+                          }}
+                          className="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                          title="Buka di Drive"
+                          aria-label="Buka file di Google Drive"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRename(file.id, file.name);
+                          }}
+                          disabled={isOperating}
+                          className="p-1.5 bg-purple-50 text-purple-600 rounded hover:bg-purple-100 transition-colors"
+                          title="Ubah Nama"
+                          aria-label="Ubah nama file"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(file.id, file.name);
+                          }}
+                          disabled={isOperating}
+                          className="p-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors"
+                          title="Hapus"
+                          aria-label="Hapus file"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
           // Grid view
