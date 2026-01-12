@@ -61,7 +61,7 @@ export const getArticle = async (id: string): Promise<Article> => {
 };
 
 export const getArticleBySlug = async (slug: string): Promise<Article> => {
-  const response = await fetch(`${API_URL}/article/${slug}`, {
+  const response = await fetch(`${API_URL}/article/slug/${slug}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

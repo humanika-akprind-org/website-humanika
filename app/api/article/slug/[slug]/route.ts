@@ -2,9 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getArticleBySlug } from "@/services/article/article.service";
 
 /**
- * Article API Route - uses slug for public URLs
+ * Article Slug API Route - uses slug for public URLs
  * GET: Finds article by slug
- * PUT/DELETE: Uses parameter as ID (admin operations)
  */
 export async function GET(
   _request: NextRequest,

@@ -57,7 +57,7 @@ export const getEvent = async (id: string): Promise<Event> => {
 };
 
 export const getEventBySlug = async (slug: string): Promise<Event> => {
-  const response = await fetch(`${API_URL}/event/${slug}`, {
+  const response = await fetch(`${API_URL}/event/slug/${slug}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
