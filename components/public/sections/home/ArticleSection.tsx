@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import { type ArticleCategory } from "@/types/article-category";
 import { Status } from "@/types/enums";
+import SectionHeaderSkeleton from "@/components/public/ui/skeleton/SectionHeaderSkeleton";
+import CardSkeleton from "@/components/public/ui/skeleton/CardSkeleton";
+import CategoryPillsSkeleton from "@/components/public/ui/skeleton/CategoryPillsSkeleton";
 
 interface ArticleSectionType extends React.FC {
   fetchArticles?: () => void;
@@ -107,14 +110,13 @@ const ArticleSection: ArticleSectionType = () => {
           </p>
         </motion.div>
 
-        {/* Loading State */}
+        {/* Loading State with Skeleton */}
         {loading && !refreshing && (
-          <div className="text-center py-16">
-            <div className="inline-flex flex-col items-center gap-4">
-              <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
-              <p className="text-grey-600 font-medium">
-                Memuat artikel terbaru...
-              </p>
+          <div className="space-y-12">
+            <SectionHeaderSkeleton />
+            <CardSkeleton count={6} />
+            <div className="flex justify-center">
+              <CategoryPillsSkeleton count={5} />
             </div>
           </div>
         )}

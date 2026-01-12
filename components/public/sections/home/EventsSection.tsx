@@ -5,16 +5,18 @@ import Link from "next/link";
 import EventCard from "@/components/public/pages/card/event/EventCard";
 import type { Event } from "@/types/event";
 import {
-  Calendar,
   Filter,
   CalendarDays,
   Sparkles,
   ChevronRight,
-  Loader2,
   TrendingUp,
   Clock,
+  Calendar,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import SectionHeaderSkeleton from "@/components/public/ui/skeleton/SectionHeaderSkeleton";
+import EventsControlSkeleton from "@/components/public/ui/skeleton/EventsControlSkeleton";
+import CardSkeleton from "@/components/public/ui/skeleton/CardSkeleton";
 
 export default function EventsSection() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
@@ -80,38 +82,12 @@ export default function EventsSection() {
     return (
       <section className="py-20 bg-gradient-to-b from-white to-primary-50/30">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
-          >
-            <div className="inline-flex items-center gap-2 text-primary-600 font-semibold uppercase tracking-wider text-sm mb-4">
-              <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
-              KEGIATAN TERDEKAT
-            </div>
-
-            <h2 className="text-4xl md:text-5xl font-bold text-grey-900 mb-6">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
-                Event Mendatang
-              </span>
-              <br />
-              yang Wajib Diikuti
-            </h2>
-
-            <p className="text-lg text-grey-600 max-w-2xl mx-auto leading-relaxed">
-              Temukan acara terbaru yang akan membantu Anda mengembangkan skill
-              dan memperluas jaringan profesional
-            </p>
-          </motion.div>
-
-          <div className="text-center py-20">
-            <div className="inline-flex flex-col items-center gap-4">
-              <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
-              <p className="text-grey-600 font-medium">
-                Memuat event terdekat...
-              </p>
-            </div>
-          </div>
+          <SectionHeaderSkeleton />
+          <EventsControlSkeleton />
+          <CardSkeleton
+            count={6}
+            gridClass="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+          />
         </div>
       </section>
     );
