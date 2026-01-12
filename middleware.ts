@@ -362,6 +362,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow OAuth2 callback API route to proceed without authentication check
+  if (pathname === "/api/oauth2/callback") {
+    return NextResponse.next();
+  }
+
   // Only apply middleware to /admin routes
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();

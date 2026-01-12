@@ -16,6 +16,23 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Authorization code not found" });
   }
 
+  // Try to get the previous page from Referer header
+  let redirectURL: string | null = null;
+  const referer = req.headers.get("referer");
+  if (referer) {
+    try {
+      const refererUrl = new URL(referer);
+      redirectURL = refererUrl.pathname + refererUrl.search;
+    } catch {
+      // Invalid referer URL, use default
+    }
+  }
+
+  // If no referer or invalid, use default redirect
+  if (!redirectURL) {
+    redirectURL = "/";
+  }
+
   //let's exchange the code for an access token
   try {
     const { tokens } = await oauth2Client.getToken(code);
@@ -44,9 +61,7 @@ export async function GET(req: Request) {
       });
     }
 
-    return NextResponse.redirect(
-      new URL("/admin/dashboard/overview?refresh=true", req.url)
-    );
+    return NextResponse.redirect(new URL(redirectURL, req.url));
   } catch (error) {
     return NextResponse.json({
       error: "Failed to exchange code for access token" + error,
