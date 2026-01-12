@@ -23,7 +23,7 @@ import EventCalendarView from "@/components/public/pages/event/EventCalendarView
 import EventLoadMore from "@/components/public/pages/event/EventLoadMore";
 import FeaturedPastEvents from "@/components/public/pages/event/FeaturedPastEvents";
 import PopularCategories from "@/components/public/pages/event/PopularCategories";
-import LoadingState from "@/components/public/pages/event/LoadingState";
+import EventPageLoadingState from "@/components/public/pages/event/EventPageLoadingState";
 import ErrorState from "@/components/public/pages/event/ErrorState";
 
 export default function EventPage() {
@@ -61,7 +61,7 @@ export default function EventPage() {
 
   // Loading state for initial load
   if (loading && filters.page === 1) {
-    return <LoadingState />;
+    return <EventPageLoadingState />;
   }
 
   return (

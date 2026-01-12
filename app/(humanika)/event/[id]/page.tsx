@@ -7,6 +7,7 @@ import { useEventDetailPage } from "hooks/event/useEventDetailPage";
 import EventDetailHeroSection from "@/components/public/sections/event/detail/EventDetailHeroSection";
 import EventDetailContentSection from "@/components/public/sections/event/detail/EventDetailContentSection";
 import EventSections from "@/components/public/sections/event/EventSections";
+import EventDetailLoadingState from "@/components/public/pages/event/EventDetailLoadingState";
 import { handleShare } from "lib/eventDetailUtils";
 
 /**
@@ -30,14 +31,7 @@ export default function EventDetail() {
 
   // Loading state
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-grey-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto" />
-          <p className="mt-4 text-grey-600">Loading event details...</p>
-        </div>
-      </div>
-    );
+    return <EventDetailLoadingState />;
   }
 
   // Error state

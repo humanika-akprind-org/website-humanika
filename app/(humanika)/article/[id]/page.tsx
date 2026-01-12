@@ -7,7 +7,7 @@ import { useShare } from "hooks/article/useShare";
 import ArticleHeroSection from "@/components/public/sections/article/detail/ArticleHeroSection";
 import ArticleContentSection from "@/components/public/sections/article/detail/ArticleContentSection";
 import RelatedArticlesSection from "@/components/public/sections/article/RelatedArticlesSection";
-import { LoadingState } from "@/components/public/pages/article/LoadingState";
+import ArticleDetailLoadingState from "@/components/public/pages/article/ArticleDetailLoadingState";
 import NotFoundState from "@/components/public/pages/article/NotFoundState";
 import { ErrorState } from "@/components/public/pages/article/ErrorState";
 
@@ -42,7 +42,7 @@ export default function ArticleDetail({
   };
 
   if (loading) {
-    return <LoadingState />;
+    return <ArticleDetailLoadingState />;
   }
 
   if (error) {
