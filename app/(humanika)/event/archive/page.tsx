@@ -200,8 +200,6 @@ export default function EventArchivePage() {
       <EventHeroSection
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        n
-        p
         stats={stats}
       />
 

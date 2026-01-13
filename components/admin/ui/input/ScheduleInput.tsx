@@ -12,6 +12,8 @@ import {
 import { GripHorizontal, GripVertical } from "lucide-react";
 import type { ScheduleItem } from "@/types/event";
 import TextInput from "./TextInput";
+import DateInput from "@/components/admin/ui/date/DateInput";
+import TimeInput from "./TimeInput";
 import {
   DndContext,
   closestCenter,
@@ -150,20 +152,12 @@ function SortableScheduleItem({
         <div className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date *
-              </label>
-              <input
-                type="date"
-                name="scheduleDate"
+              <DateInput
+                label="Date"
                 value={editForm.date}
-                onChange={(e) => onEditFormChange({ date: e.target.value })}
+                onChange={(value) => onEditFormChange({ date: value })}
                 required
-                className={`block w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                  dateError
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                }`}
+                error={dateError}
               />
             </div>
             <TextInput
@@ -177,43 +171,18 @@ function SortableScheduleItem({
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Time
-              </label>
-              <input
-                type="time"
-                name="startTime"
-                value={editForm.startTime || ""}
-                onChange={(e) =>
-                  onEditFormChange({ startTime: e.target.value })
-                }
-                className={`block w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                  timeError
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                }`}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Time
-              </label>
-              <input
-                type="time"
-                name="endTime"
-                value={editForm.endTime || ""}
-                onChange={(e) => onEditFormChange({ endTime: e.target.value })}
-                className={`block w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                  timeError
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                }`}
-              />
-            </div>
+            <TimeInput
+              label="Start Time"
+              value={editForm.startTime || ""}
+              onChange={(value) => onEditFormChange({ startTime: value })}
+              error={timeError}
+            />
+            <TimeInput
+              label="End Time"
+              value={editForm.endTime || ""}
+              onChange={(value) => onEditFormChange({ endTime: value })}
+            />
           </div>
-          {timeError && <p className="text-sm text-red-600">{timeError}</p>}
-          {dateError && <p className="text-sm text-red-600">{dateError}</p>}
           <TextInput
             label="Notes (optional)"
             name="notes"
@@ -388,15 +357,20 @@ export default function ScheduleInput({
   const handleSaveSchedule = () => {
     if (!editForm.date || !editForm.location) return;
 
-    // Validate time: start time must be before end time
-    if (!isTimeValid(editForm.startTime, editForm.endTime)) {
+    // Validate both time and date
+    const hasTimeError = !isTimeValid(editForm.startTime, editForm.endTime);
+    const hasDateError = !isDateValid(editForm.date, schedules, editingIndex);
+
+    // Set errors for both if invalid
+    if (hasTimeError) {
       setTimeError("Start time must be before end time");
-      return;
+    }
+    if (hasDateError) {
+      setDateError("Date must be in chronological order");
     }
 
-    // Validate date: must be in correct order
-    if (!isDateValid(editForm.date, schedules, editingIndex)) {
-      setDateError("Date must be in chronological order");
+    // Don't save if either validation fails
+    if (hasTimeError || hasDateError) {
       return;
     }
 
@@ -528,7 +502,7 @@ export default function ScheduleInput({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <label className="block text-sm font-medium text-gray-700">
-          Event Schedules *
+          Event Schedules
         </label>
         <button
           type="button"
@@ -605,26 +579,16 @@ export default function ScheduleInput({
         <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
           <div className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date *
-                </label>
-                <input
-                  type="date"
-                  name="scheduleDate"
-                  value={editForm.date}
-                  onChange={(e) => {
-                    setDateError("");
-                    setEditForm((prev) => ({ ...prev, date: e.target.value }));
-                  }}
-                  required
-                  className={`block w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                    dateError
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  }`}
-                />
-              </div>
+              <DateInput
+                label="Date"
+                value={editForm.date}
+                onChange={(value) => {
+                  setDateError("");
+                  setEditForm((prev) => ({ ...prev, date: value }));
+                }}
+                required
+                error={dateError}
+              />
               <TextInput
                 label="Location"
                 name="location"
@@ -641,53 +605,28 @@ export default function ScheduleInput({
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Time
-                </label>
-                <input
-                  type="time"
-                  name="startTime"
-                  value={editForm.startTime || ""}
-                  onChange={(e) => {
-                    setTimeError("");
-                    setEditForm((prev) => ({
-                      ...prev,
-                      startTime: e.target.value,
-                    }));
-                  }}
-                  className={`block w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                    timeError
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  End Time
-                </label>
-                <input
-                  type="time"
-                  name="endTime"
-                  value={editForm.endTime || ""}
-                  onChange={(e) => {
-                    setTimeError("");
-                    setEditForm((prev) => ({
-                      ...prev,
-                      endTime: e.target.value,
-                    }));
-                  }}
-                  className={`block w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
-                    timeError
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  }`}
-                />
-              </div>
+              <TimeInput
+                label="Start Time"
+                value={editForm.startTime || ""}
+                onChange={(value) =>
+                  setEditForm((prev) => ({
+                    ...prev,
+                    startTime: value,
+                  }))
+                }
+                error={timeError}
+              />
+              <TimeInput
+                label="End Time"
+                value={editForm.endTime || ""}
+                onChange={(value) =>
+                  setEditForm((prev) => ({
+                    ...prev,
+                    endTime: value,
+                  }))
+                }
+              />
             </div>
-            {timeError && <p className="text-sm text-red-600">{timeError}</p>}
-            {dateError && <p className="text-sm text-red-600">{dateError}</p>}
             <TextInput
               label="Notes (optional)"
               name="notes"
