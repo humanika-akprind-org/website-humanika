@@ -251,8 +251,7 @@ model Event {
   goal          String // Tujuan kegiatan
   department    Department // Departemen penyelenggara
   periodId      String     @db.ObjectId // ID periode kegiatan
-  startDate     DateTime // Tanggal dan waktu mulai kegiatan
-  endDate       DateTime // Tanggal dan waktu selesai kegiatan
+  schedules     Json       @default("[]") // Jadwal kegiatan (array of schedule items with date, location, startTime, endTime, notes)
   status        Status     @default(DRAFT) // Status kegiatan
   workProgramId String?    @db.ObjectId // ID program kerja terkait (opsional)
   categoryId    String?    @db.ObjectId // ID kategori kegiatan
@@ -268,7 +267,7 @@ model Event {
   letters     Letter[] // Surat yang terkait dengan kegiatan
   responsible User           @relation(fields: [responsibleId], references: [id], onDelete: Cascade, name: "EventResponsible") // Pengguna yang bertanggung jawab
 
-  @@index([startDate, status, periodId, department])
+  @@index([status, periodId, department])
   @@map("events")
 }
 

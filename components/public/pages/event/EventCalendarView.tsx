@@ -1,7 +1,18 @@
-import type { Event } from "@/types/event";
+import type { Event, ScheduleItem } from "@/types/event";
 
 interface EventCalendarViewProps {
   allEvents: Event[];
+}
+
+// Helper function to check if event has a schedule on a specific day
+function eventHasScheduleOnDay(
+  schedules: ScheduleItem[] | null | undefined,
+  day: number
+): boolean {
+  if (!schedules || schedules.length === 0) return false;
+  return schedules.some(
+    (schedule) => new Date(schedule.date).getDate() === day
+  );
 }
 
 export default function EventCalendarView({
@@ -26,8 +37,8 @@ export default function EventCalendarView({
         ))}
         {Array.from({ length: 35 }).map((_, i) => {
           const day = i + 1;
-          const hasEvent = allEvents.some(
-            (event) => new Date(event.startDate).getDate() === day
+          const hasEvent = allEvents.some((event) =>
+            eventHasScheduleOnDay(event.schedules, day)
           );
           return (
             <div

@@ -25,6 +25,16 @@ import FeaturedPastEvents from "@/components/public/pages/event/FeaturedPastEven
 import PopularCategories from "@/components/public/pages/event/EventPopularCategories";
 import EventPageLoadingState from "@/components/public/pages/event/EventPageLoadingState";
 import EventErrorState from "@/components/public/pages/event/EventErrorState";
+import type { ScheduleItem } from "@/types/event";
+
+// Helper function to get the latest schedule date from an event
+function getLatestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date).getTime());
+  return new Date(Math.max(...dates));
+}
 
 export default function EventPage() {
   // Custom hooks for data management
@@ -47,7 +57,10 @@ export default function EventPage() {
   const pastEvents = useMemo(() => {
     const now = new Date();
     return allEvents
-      .filter((event) => new Date(event.endDate) < now)
+      .filter((event) => {
+        const latestDate = getLatestScheduleDate(event.schedules);
+        return latestDate && latestDate < now;
+      })
       .slice(0, 4);
   }, [allEvents]);
 
@@ -117,6 +130,8 @@ export default function EventPage() {
                   <h2 className="text-2xl font-bold text-grey-900">
                     {filters.activeTab === "upcoming"
                       ? "Event Mendatang"
+                      : filters.activeTab === "ongoing"
+                      ? "Event Sedang Berlangsung"
                       : filters.activeTab === "past"
                       ? "Event Terdahulu"
                       : "Semua Event"}

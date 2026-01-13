@@ -18,10 +18,6 @@ export const getEvents = async (filter?: EventFilter): Promise<Event[]> => {
     params.append("workProgramId", filter.workProgramId);
   }
   if (filter?.search) params.append("search", filter.search);
-  if (filter?.startDate) {
-    params.append("startDate", filter.startDate.toISOString());
-  }
-  if (filter?.endDate) params.append("endDate", filter.endDate.toISOString());
 
   const response = await fetch(`${API_URL}/event?${params.toString()}`, {
     method: "GET",

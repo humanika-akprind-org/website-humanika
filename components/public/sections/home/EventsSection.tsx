@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import EventCard from "@/components/public/pages/card/event/EventCard";
-import type { Event } from "@/types/event";
+import type { Event, ScheduleItem } from "@/types/event";
 import {
   Filter,
   CalendarDays,
@@ -17,6 +17,27 @@ import { motion } from "framer-motion";
 import SectionHeaderSkeleton from "@/components/public/ui/skeleton/SectionHeaderSkeleton";
 import EventsControlSkeleton from "@/components/public/ui/skeleton/EventsControlSkeleton";
 import CardSkeleton from "@/components/public/ui/skeleton/CardSkeleton";
+
+// Helper function to get the earliest schedule date from an event
+function getEarliestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date).getTime());
+  return new Date(Math.min(...dates));
+}
+
+// Helper function to get the time from the earliest schedule
+function getEarliestScheduleTime(
+  schedules: ScheduleItem[] | null | undefined
+): string {
+  const earliest = getEarliestScheduleDate(schedules);
+  if (!earliest) return "";
+  return earliest.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export default function EventsSection() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
@@ -49,10 +70,11 @@ export default function EventsSection() {
 
   const now = new Date();
 
-  // Filter upcoming events
-  const upcomingEvents = allEvents.filter(
-    (event) => new Date(event.startDate) > now
-  );
+  // Filter upcoming events - events with at least one schedule in the future
+  const upcomingEvents = allEvents.filter((event) => {
+    const earliestDate = getEarliestScheduleDate(event.schedules);
+    return earliestDate && earliestDate > now;
+  });
 
   // Get unique categories
   const categories = [
@@ -73,10 +95,14 @@ export default function EventsSection() {
             event.department?.toString().toLowerCase() === selectedCategory
         );
 
-  // Sort by date (nearest first)
-  const sortedEvents = [...filteredEvents].sort(
-    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-  );
+  // Sort by date (nearest first) - using earliest schedule date
+  const sortedEvents = [...filteredEvents].sort((a, b) => {
+    const dateA = getEarliestScheduleDate(a.schedules);
+    const dateB = getEarliestScheduleDate(b.schedules);
+    if (!dateA) return 1;
+    if (!dateB) return -1;
+    return dateA.getTime() - dateB.getTime();
+  });
 
   if (loading) {
     return (
@@ -236,73 +262,76 @@ export default function EventsSection() {
                 className="mb-16"
               >
                 <div className="space-y-6">
-                  {sortedEvents.slice(0, 4).map((event, index) => (
-                    <motion.div
-                      key={event.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      whileHover={{ x: 5 }}
-                      className="group bg-white rounded-xl shadow-lg hover:shadow-xl border border-grey-200 overflow-hidden transition-all duration-300"
-                    >
-                      <div className="flex flex-col md:flex-row">
-                        {/* Date Badge */}
-                        <div className="md:w-32 bg-gradient-to-b from-primary-600 to-primary-700 text-white p-6 flex flex-col items-center justify-center">
-                          <div className="text-3xl font-bold">
-                            {new Date(event.startDate).getDate()}
+                  {sortedEvents.slice(0, 4).map((event, index) => {
+                    const earliestDate = getEarliestScheduleDate(
+                      event.schedules
+                    );
+                    return (
+                      <motion.div
+                        key={event.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        whileHover={{ x: 5 }}
+                        className="group bg-white rounded-xl shadow-lg hover:shadow-xl border border-grey-200 overflow-hidden transition-all duration-300"
+                      >
+                        <div className="flex flex-col md:flex-row">
+                          {/* Date Badge */}
+                          <div className="md:w-32 bg-gradient-to-b from-primary-600 to-primary-700 text-white p-6 flex flex-col items-center justify-center">
+                            <div className="text-3xl font-bold">
+                              {earliestDate ? earliestDate.getDate() : "-"}
+                            </div>
+                            <div className="text-sm uppercase font-semibold mt-1">
+                              {earliestDate
+                                ? earliestDate.toLocaleString("id-ID", {
+                                    month: "short",
+                                  })
+                                : "-"}
+                            </div>
+                            <div className="text-xs opacity-80 mt-1">
+                              {earliestDate
+                                ? earliestDate.toLocaleString("id-ID", {
+                                    weekday: "short",
+                                  })
+                                : "-"}
+                            </div>
                           </div>
-                          <div className="text-sm uppercase font-semibold mt-1">
-                            {new Date(event.startDate).toLocaleString("id-ID", {
-                              month: "short",
-                            })}
-                          </div>
-                          <div className="text-xs opacity-80 mt-1">
-                            {new Date(event.startDate).toLocaleString("id-ID", {
-                              weekday: "short",
-                            })}
-                          </div>
-                        </div>
 
-                        {/* Event Details */}
-                        <div className="flex-1 p-6">
-                          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="px-3 py-1 bg-primary-100 text-primary-700 text-xs font-semibold rounded-full">
-                                  {event.department || "General"}
-                                </span>
-                                <span className="text-sm text-grey-600 flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {new Date(event.startDate).toLocaleTimeString(
-                                    "id-ID",
-                                    {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    }
-                                  )}
-                                </span>
+                          {/* Event Details */}
+                          <div className="flex-1 p-6">
+                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <span className="px-3 py-1 bg-primary-100 text-primary-700 text-xs font-semibold rounded-full">
+                                    {event.department || "General"}
+                                  </span>
+                                  <span className="text-sm text-grey-600 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {getEarliestScheduleTime(event.schedules)}
+                                  </span>
+                                </div>
+
+                                <h3 className="text-xl font-bold text-grey-900 mb-3 group-hover:text-primary-600 transition-colors">
+                                  {event.name}
+                                </h3>
+
+                                {event.description && (
+                                  <p className="text-grey-600 line-clamp-2 mb-4">
+                                    {event.description.length > 200
+                                      ? `${event.description.substring(
+                                          0,
+                                          200
+                                        )}...`
+                                      : event.description}
+                                  </p>
+                                )}
                               </div>
-
-                              <h3 className="text-xl font-bold text-grey-900 mb-3 group-hover:text-primary-600 transition-colors">
-                                {event.name}
-                              </h3>
-
-                              {event.description && (
-                                <p className="text-grey-600 line-clamp-2 mb-4">
-                                  {event.description.length > 200
-                                    ? `${event.description.substring(
-                                        0,
-                                        200
-                                      )}...`
-                                    : event.description}
-                                </p>
-                              )}
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </motion.div>
             )}

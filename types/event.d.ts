@@ -9,6 +9,14 @@ import { Finance } from "./finance";
 import { Letter } from "./letter";
 import { Document } from "./document";
 
+export interface ScheduleItem {
+  date: string; // ISO 8601 string: "2024-10-15T09:00:00.000Z"
+  location: string; // Location of the schedule (e.g., "Jakarta Convention Center")
+  startTime?: string; // Optional: "09:00"
+  endTime?: string; // Optional: "17:00"
+  notes?: string; // Optional: "Session 1 - Opening"
+}
+
 export interface Event {
   id: string;
   name: string;
@@ -36,8 +44,7 @@ export interface Event {
   department: Department;
   periodId: string;
   period: Period;
-  startDate: Date;
-  endDate: Date;
+  schedules: ScheduleItem[];
   status: Status;
   workProgramId?: string | null;
   workProgram?: WorkProgram | null;
@@ -52,6 +59,26 @@ export interface Event {
   updatedAt: Date;
 }
 
+// Helper type for components that need date range from schedules
+export type EventDateRange = {
+  startDate: Date | null;
+  endDate: Date | null;
+  hasSchedules: boolean;
+};
+
+export interface EventFormData {
+  name: string;
+  description: string;
+  goal: string;
+  department: Department;
+  periodId: string;
+  responsibleId: string;
+  schedules: ScheduleItem[];
+  workProgramId: string;
+  categoryId: string;
+  thumbnailFile?: File;
+}
+
 export interface CreateEventInput {
   name: string;
   thumbnail?: string | null;
@@ -60,8 +87,7 @@ export interface CreateEventInput {
   goal: string;
   department: Department;
   periodId: string;
-  startDate: Date;
-  endDate: Date;
+  schedules: ScheduleItem[];
   funds: number;
   workProgramId?: string;
   categoryId?: string;
@@ -77,6 +103,8 @@ export interface EventFilter {
   periodId?: string;
   workProgramId?: string;
   search?: string;
-  startDate?: Date;
-  endDate?: Date;
+  scheduleStartDate?: string;
+  scheduleEndDate?: string;
+  date?: string;
+  location?: string;
 }

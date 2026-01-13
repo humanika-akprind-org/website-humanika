@@ -93,7 +93,14 @@ export const useGalleryDetail = (slug: string): UseGalleryDetailReturn => {
     ? {
         id: event.id,
         title: event.name,
-        date: new Date(event.startDate),
+        date:
+          event.schedules && event.schedules.length > 0
+            ? new Date(
+                Math.min(
+                  ...event.schedules.map((s) => new Date(s.date).getTime())
+                )
+              )
+            : new Date(event.createdAt),
         description: event.description,
         photos: galleries.map((gallery) => ({
           id: gallery.id,

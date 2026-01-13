@@ -1,34 +1,53 @@
-a# Plan: Add Hide/Show Password Toggle to Login Page
+# Event Schedules Migration TODO
 
-## Goal
+## Overview
 
-Improve user experience on the login page by allowing users to toggle password visibility.
+Migrate Event model from startDate/endDate to schedules array structure.
 
-## Changes to be made in `app/auth/login/page.tsx`
+## Tasks
 
-1. **Imports**:
+### Type Definitions
 
-   - Import `Eye` and `EyeOff` icons from `lucide-react`.
+- [x] Update types/event.d.ts to include ScheduleItem type and update Event interface
 
-2. **State Management**:
+### Services & API
 
-   - Add `showPassword` state variable (boolean) to track password visibility.
+- [x] Update services/event/event.service.ts - remove startDate/endDate references
+- [x] Update use-cases/api/event.ts - update filtering logic for schedules
 
-3. **UI Updates (Password Field)**:
+### Hooks
 
-   - Wrap the password input in a `relative` div (already has `relative` on inputs, so we can keep it or adjust).
-   - Replace the standard `password` type `input` with a container that includes:
-     - The input field (type changes between `password` and `text`).
-     - A button/icon on the right side to toggle visibility.
+- [x] Update hooks/event/useEventForm.ts - change form handling for schedules
+- [x] Update hooks/event/useEventFormRefactored.ts - update form data structure
+- [x] Update hooks/event/useEventPage.ts - update filtering and sorting
+- [x] Update hooks/event/useEventManagement.ts - update management logic
 
-4. **Functionality**:
-   - Add a toggle function or inline logic to switch `showPassword` state.
+### Admin Components
 
-## Implementation Steps
+- [ ] Update components/admin/pages/event/Form.tsx - change form inputs for schedules
+- [ ] Update components/admin/pages/event/Table.tsx - update table display logic
 
-1. Add imports for `Eye` and `EyeOff` from `lucide-react`.
-2. Initialize `const [showPassword, setShowPassword] = useState(false);`.
-3. Update the password field:
-   - Change `type` to `{showPassword ? "text" : "password"}`.
-   - Add a button on the right side of the input using absolute positioning.
-   - Button will toggle the state and show the appropriate icon.
+### Public Components
+
+- [ ] Update components/public/sections/event/detail/EventDetailHeroSection.tsx - display schedules
+- [ ] Update components/public/pages/card/event/EventCard.tsx - show schedule info
+- [ ] Update components/public/pages/event/EventCalendarView.tsx - calendar display
+- [ ] Update components/public/pages/event/FeaturedPastEvents.tsx - past events logic
+
+### Utility Functions
+
+- [ ] Update lib/event-utils.ts - helper functions for schedules
+- [ ] Update lib/eventDetailUtils.ts - detail utilities
+- [ ] Update lib/gallery-utils.ts - gallery related event utils
+
+### Other Files
+
+- [ ] Update components/admin/pages/activity/Filters.tsx - activity filtering
+- [ ] Update components/public/sections/gallery/GalleryDetailRelatedAlbumsSection.tsx - gallery display
+- [ ] Update hooks/gallery/useGalleryDetail.ts - gallery detail logic
+
+### Testing & Validation
+
+- [x] Run prisma generate
+- [ ] Test event creation, editing, and display
+- [ ] Verify filtering and sorting works with schedules

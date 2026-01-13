@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import type { Event } from "@/types/event";
+import type { Event, ScheduleItem } from "@/types/event";
 
-export type EventTab = "upcoming" | "past" | "all";
+export type EventTab = "upcoming" | "ongoing" | "past" | "all";
 export type ViewMode = "grid" | "calendar";
 export type SortBy = "date" | "popular" | "name";
 
@@ -18,8 +18,31 @@ export interface EventFilters {
 export interface EventStats {
   total: number;
   upcoming: number;
+  ongoing: number;
   past: number;
 }
+
+/**
+ * Helper function to get the latest date from schedules
+ */
+const getLatestScheduleDate = (
+  schedules: ScheduleItem[] | null | undefined
+): Date | null => {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date));
+  return new Date(Math.max(...dates.map((d) => d.getTime())));
+};
+
+/**
+ * Helper function to get the earliest date from schedules
+ */
+const getEarliestScheduleDate = (
+  schedules: ScheduleItem[] | null | undefined
+): Date | null => {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date));
+  return new Date(Math.min(...dates.map((d) => d.getTime())));
+};
 
 export function useEventData() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
@@ -117,11 +140,25 @@ export function useFilteredEvents(allEvents: Event[], filters: EventFilters) {
     const now = new Date();
     let filtered = [...allEvents];
 
-    // Filter by active tab
+    // Filter by active tab based on schedules
     if (filters.activeTab === "upcoming") {
-      filtered = filtered.filter((event) => new Date(event.startDate) > now);
+      filtered = filtered.filter((event) => {
+        const earliestDate = getEarliestScheduleDate(event.schedules);
+        return earliestDate ? earliestDate > now : false;
+      });
+    } else if (filters.activeTab === "ongoing") {
+      filtered = filtered.filter((event) => {
+        const earliestDate = getEarliestScheduleDate(event.schedules);
+        const latestDate = getLatestScheduleDate(event.schedules);
+        return earliestDate && latestDate
+          ? earliestDate <= now && latestDate >= now
+          : false;
+      });
     } else if (filters.activeTab === "past") {
-      filtered = filtered.filter((event) => new Date(event.endDate) < now);
+      filtered = filtered.filter((event) => {
+        const latestDate = getLatestScheduleDate(event.schedules);
+        return latestDate ? latestDate < now : false;
+      });
     }
 
     // Filter by search query
@@ -156,13 +193,23 @@ export function useFilteredEvents(allEvents: Event[], filters: EventFilters) {
     let totalFiltered = [...allEvents];
 
     if (filters.activeTab === "upcoming") {
-      totalFiltered = totalFiltered.filter(
-        (event) => new Date(event.startDate) > now
-      );
+      totalFiltered = totalFiltered.filter((event) => {
+        const earliestDate = getEarliestScheduleDate(event.schedules);
+        return earliestDate ? earliestDate > now : false;
+      });
+    } else if (filters.activeTab === "ongoing") {
+      totalFiltered = totalFiltered.filter((event) => {
+        const earliestDate = getEarliestScheduleDate(event.schedules);
+        const latestDate = getLatestScheduleDate(event.schedules);
+        return earliestDate && latestDate
+          ? earliestDate <= now && latestDate >= now
+          : false;
+      });
     } else if (filters.activeTab === "past") {
-      totalFiltered = totalFiltered.filter(
-        (event) => new Date(event.endDate) < now
-      );
+      totalFiltered = totalFiltered.filter((event) => {
+        const latestDate = getLatestScheduleDate(event.schedules);
+        return latestDate ? latestDate < now : false;
+      });
     }
 
     if (filters.searchQuery.trim()) {
@@ -199,8 +246,21 @@ export function useEventStats(allEvents: Event[]) {
     const now = new Date();
     return {
       total: allEvents.length,
-      upcoming: allEvents.filter((e) => new Date(e.startDate) > now).length,
-      past: allEvents.filter((e) => new Date(e.endDate) < now).length,
+      upcoming: allEvents.filter((e) => {
+        const earliestDate = getEarliestScheduleDate(e.schedules);
+        return earliestDate ? earliestDate > now : false;
+      }).length,
+      ongoing: allEvents.filter((e) => {
+        const earliestDate = getEarliestScheduleDate(e.schedules);
+        const latestDate = getLatestScheduleDate(e.schedules);
+        return earliestDate && latestDate
+          ? earliestDate <= now && latestDate >= now
+          : false;
+      }).length,
+      past: allEvents.filter((e) => {
+        const latestDate = getLatestScheduleDate(e.schedules);
+        return latestDate ? latestDate < now : false;
+      }).length,
     };
   }, [allEvents]);
 }

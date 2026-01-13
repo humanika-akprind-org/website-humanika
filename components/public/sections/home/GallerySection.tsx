@@ -7,7 +7,7 @@ import AlbumGrid from "../../pages/card/album/AlbumGrid";
 import { getGalleries } from "@/use-cases/api/gallery";
 import { getEvents } from "@/use-cases/api/event";
 import type { Gallery } from "@/types/gallery";
-import type { Event } from "@/types/event";
+import type { Event, ScheduleItem } from "@/types/event";
 
 import {
   Camera,
@@ -21,6 +21,15 @@ import { Status } from "@/types/enums";
 import { getPreviewUrl } from "@/lib/utils";
 import SectionHeaderSkeleton from "@/components/public/ui/skeleton/SectionHeaderSkeleton";
 import GalleryGridSkeleton from "@/components/public/ui/skeleton/GalleryGridSkeleton";
+
+// Helper function to get the earliest schedule date from an event
+function getEarliestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date).getTime());
+  return new Date(Math.min(...dates));
+}
 
 export default function GallerySection() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -64,7 +73,7 @@ export default function GallerySection() {
   // Prepare albums data with additional info
   const albums = events
     .map((event) => {
-      const eventDate = new Date(event.startDate);
+      const eventDate = getEarliestScheduleDate(event.schedules);
       return {
         id: event.id,
         title: event.name,
@@ -73,8 +82,8 @@ export default function GallerySection() {
         lastUpdated: event.updatedAt,
         eventName: event.name,
         category: event.department?.toString() || "General",
-        date: eventDate,
-        year: eventDate.getFullYear().toString(),
+        date: eventDate || new Date(),
+        year: eventDate ? eventDate.getFullYear().toString() : "Unknown",
       };
     })
     .filter((album) => album.count > 0); // Only show albums with photos

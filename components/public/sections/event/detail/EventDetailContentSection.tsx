@@ -2,13 +2,32 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Calendar, Trophy, Sparkles, Target } from "lucide-react";
-import type { Event } from "types/event";
+import type { Event, ScheduleItem } from "types/event";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
-import { getPreviewUrl, getEventStatus } from "lib/eventDetailUtils";
+import {
+  getPreviewUrl,
+  getEventStatus,
+  getEarliestScheduleDate,
+  getLatestScheduleDate,
+} from "lib/eventDetailUtils";
 
 interface EventDetailContentSectionProps {
   event: Event;
 }
+
+/**
+ * Helper function to get dates from schedules
+ */
+const getDatesFromSchedules = (
+  schedules: ScheduleItem[] | null | undefined
+) => {
+  if (!schedules || schedules.length === 0) {
+    return { eventDate: new Date(), endDate: new Date() };
+  }
+  const eventDate = getEarliestScheduleDate(schedules);
+  const endDate = getLatestScheduleDate(schedules);
+  return { eventDate: eventDate || new Date(), endDate: endDate || new Date() };
+};
 
 /**
  * Main content section component for event detail page
@@ -17,9 +36,11 @@ interface EventDetailContentSectionProps {
 export default function EventDetailContentSection({
   event,
 }: EventDetailContentSectionProps) {
-  const eventDate = new Date(event.startDate);
-  const endDate = new Date(event.endDate);
-  const { isPastEvent, isUpcomingEvent } = getEventStatus(eventDate, endDate);
+  // Get dates from schedules for status calculation
+  getDatesFromSchedules(event.schedules || []);
+  const { isPastEvent, isUpcomingEvent } = getEventStatus(
+    event.schedules || []
+  );
 
   const getStatusIcon = () => {
     if (isPastEvent) return <Trophy className="w-6 h-6" />;
@@ -41,22 +62,6 @@ export default function EventDetailContentSection({
     if (isPastEvent) return "bg-gradient-to-br from-grey-700 to-grey-800";
     if (isUpcomingEvent) return "bg-gradient-to-br from-green-500 to-green-600";
     return "bg-gradient-to-br from-blue-500 to-blue-600";
-  };
-
-  const getStatusBadgeText = () => {
-    if (isPastEvent) {
-      return "Berakhir";
-    }
-    if (isUpcomingEvent) {
-      return "Mendatang";
-    }
-    return "Berlangsung";
-  };
-
-  const getStatusBadgeColorSmall = () => {
-    if (isPastEvent) return "bg-grey-700 text-white";
-    if (isUpcomingEvent) return "bg-green-500 text-white";
-    return "bg-blue-500 text-white";
   };
 
   return (
@@ -90,11 +95,30 @@ export default function EventDetailContentSection({
             )}
 
             {/* Event Status Badge */}
-            <div className="absolute top-6 right-6">
+            <div className="absolute top-4 left-4 z-10">
               <div
-                className={`px-4 py-2 rounded-full font-medium shadow-lg ${getStatusBadgeColorSmall()}`}
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm ${
+                  isUpcomingEvent
+                    ? "bg-blue-500/20 text-blue-600 border border-blue-500/30"
+                    : isPastEvent
+                    ? "bg-gray-500/20 text-gray-600 border border-gray-500/30"
+                    : "bg-green-500/20 text-green-600 border border-green-500/30"
+                }`}
               >
-                {getStatusBadgeText()}
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isUpcomingEvent
+                      ? "bg-blue-500"
+                      : isPastEvent
+                      ? "bg-gray-500"
+                      : "bg-green-500"
+                  } animate-pulse`}
+                />
+                {isUpcomingEvent
+                  ? "Coming Soon"
+                  : isPastEvent
+                  ? "Selesai"
+                  : "Sedang Berlangsung"}
               </div>
             </div>
           </div>

@@ -2,10 +2,19 @@ import { motion } from "framer-motion";
 import { Trophy, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import PastEventCard from "../card/event/PastEventCard";
-import type { Event } from "@/types/event";
+import type { Event, ScheduleItem } from "@/types/event";
 
 interface FeaturedPastEventsProps {
   pastEvents: Event[];
+}
+
+// Helper function to get the latest schedule date from an event
+function getLatestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date).getTime());
+  return new Date(Math.max(...dates));
 }
 
 export default function FeaturedPastEvents({
@@ -42,15 +51,18 @@ export default function FeaturedPastEvents({
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {pastEvents.map((event) => (
-          <PastEventCard
-            key={event.id}
-            id={event.id}
-            title={event.name}
-            date={event.endDate}
-            image={event.thumbnail || undefined}
-          />
-        ))}
+        {pastEvents.map((event) => {
+          const latestDate = getLatestScheduleDate(event.schedules);
+          return (
+            <PastEventCard
+              key={event.id}
+              id={event.id}
+              title={event.name}
+              date={latestDate ? latestDate.toISOString() : ""}
+              image={event.thumbnail || undefined}
+            />
+          );
+        })}
       </div>
     </motion.div>
   );

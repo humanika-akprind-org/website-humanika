@@ -19,7 +19,7 @@ import { StructureApi } from "@/use-cases/api/structure";
 import type { Document } from "@/types/document";
 import type { WorkProgram } from "@/types/work";
 import type { Finance } from "@/types/finance";
-import type { Event } from "@/types/event";
+import type { Event, ScheduleItem } from "@/types/event";
 import type { Article } from "@/types/article";
 
 import type { ActivityLog } from "@/types/activity-log";
@@ -35,6 +35,15 @@ import {
 } from "lucide-react";
 import { MetricCard } from "@/components/admin/pages/dashboard/MetricCard";
 import LoadingOverview from "@/components/admin/pages/dashboard/LoadingOverview";
+
+// Helper function to get the earliest schedule date from an event
+function getEarliestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date).getTime());
+  return new Date(Math.min(...dates));
+}
 
 interface OverviewData {
   totalUsers: number;
@@ -112,17 +121,23 @@ export default function OverviewPage() {
         // Calculate upcoming events (events with future dates)
         const now = new Date();
         const upcomingEvents = events.filter((event: Event) => {
-          const eventDate = new Date(event.startDate);
-          return eventDate > now;
+          const eventDate = getEarliestScheduleDate(event.schedules);
+          return eventDate && eventDate > now;
         }).length;
 
         // Find next upcoming event
         const nextEvent = events
-          .filter((event: Event) => new Date(event.startDate) > now)
-          .sort(
-            (a: Event, b: Event) =>
-              new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-          )[0];
+          .filter((event: Event) => {
+            const eventDate = getEarliestScheduleDate(event.schedules);
+            return eventDate && eventDate > now;
+          })
+          .sort((a: Event, b: Event) => {
+            const dateA = getEarliestScheduleDate(a.schedules);
+            const dateB = getEarliestScheduleDate(b.schedules);
+            if (!dateA) return 1;
+            if (!dateB) return -1;
+            return dateA.getTime() - dateB.getTime();
+          })[0];
 
         // Calculate total budget (net balance: income - expense)
         const totalIncome = finances

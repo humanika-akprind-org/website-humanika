@@ -260,8 +260,8 @@ Mengambil list event/kegiatan.
 - `periodId` (string): Filter berdasarkan periode
 - `categoryId` (string): Filter berdasarkan kategori
 - `department` (Department): Filter berdasarkan departemen
-- `startDate` (string): Tanggal mulai
-- `endDate` (string): Tanggal akhir
+- `scheduleStartDate` (string): Tanggal mulai jadwal (filter dari schedules)
+- `scheduleEndDate` (string): Tanggal akhir jadwal (filter dari schedules)
 - `search` (string): Pencarian
 
 **Response:**
@@ -288,8 +288,15 @@ Membuat event baru.
   "responsibleId": "user-id",
   "goal": "Meningkatkan pengetahuan anggota",
   "department": "INFOKOM",
-  "startDate": "2024-02-15T09:00:00Z",
-  "endDate": "2024-02-15T17:00:00Z",
+  "schedules": [
+    {
+      "date": "2024-10-15",
+      "location": "Jakarta Convention Center",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "notes": "Session 1 - Opening"
+    }
+  ],
   "status": "DRAFT"
 }
 ```

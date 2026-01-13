@@ -1,6 +1,7 @@
 import type { Event } from "@/types/event";
 import type { Gallery } from "@/types/gallery";
 import { getGoogleDrivePreviewUrl } from "@/lib/google-drive/file-utils";
+import { getEarliestScheduleDate } from "@/lib/event-utils";
 
 export interface Album {
   id: string;
@@ -45,7 +46,10 @@ export const getGalleryCounts = (
 export const getYearsFromEvents = (events: Event[]): string[] => {
   const years = Array.from(
     new Set(
-      events.map((event) => new Date(event.startDate).getFullYear().toString())
+      events
+        .map((event) => getEarliestScheduleDate(event.schedules))
+        .filter((date): date is Date => date !== null)
+        .map((date) => date.getFullYear().toString())
     )
   ).sort((a, b) => b.localeCompare(a));
 
@@ -61,7 +65,15 @@ export const transformEventsToAlbums = (
 ): Album[] =>
   events
     .map((event) => {
-      const eventDate = new Date(event.startDate);
+      // Get earliest date from schedules
+      const eventDate =
+        event.schedules && event.schedules.length > 0
+          ? new Date(
+              Math.min(
+                ...event.schedules.map((s) => new Date(s.date).getTime())
+              )
+            )
+          : new Date(event.createdAt);
       return {
         id: event.id,
         title: event.name,

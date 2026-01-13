@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
+import type {
+  Event,
+  CreateEventInput,
+  UpdateEventInput,
+  ScheduleItem,
+} from "@/types/event";
 import { Department as DepartmentEnum, Status } from "@/types/enums";
 import { useFile } from "@/hooks/useFile";
 import { useWorkPrograms } from "@/hooks/work-program/useWorkPrograms";
@@ -63,8 +68,7 @@ export interface EventFormData {
   department: DepartmentEnum;
   periodId: string;
   responsibleId: string;
-  startDate: string;
-  endDate: string;
+  schedules: ScheduleItem[];
   workProgramId: string;
   categoryId: string;
   thumbnailFile?: File;
@@ -104,12 +108,7 @@ export const useEventForm = (
     department: event?.department || DepartmentEnum.BPH,
     periodId: event?.period?.id || "",
     responsibleId: event?.responsible?.id || "",
-    startDate: event?.startDate
-      ? new Date(event.startDate).toISOString().split("T")[0]
-      : "",
-    endDate: event?.endDate
-      ? new Date(event.endDate).toISOString().split("T")[0]
-      : "",
+    schedules: event?.schedules || [],
     workProgramId: event?.workProgram?.id || "",
     categoryId: event?.category?.id || "",
   });
@@ -203,12 +202,8 @@ export const useEventForm = (
       setError("Please select responsible person");
       return false;
     }
-    if (!formData.startDate) {
-      setError("Please select start date");
-      return false;
-    }
-    if (!formData.endDate) {
-      setError("Please select end date");
+    if (!formData.schedules || formData.schedules.length === 0) {
+      setError("Please add at least one schedule");
       return false;
     }
 
@@ -287,8 +282,6 @@ export const useEventForm = (
       const submitData = {
         ...dataToSend,
         thumbnail: thumbnailUrl,
-        startDate: new Date(formData.startDate),
-        endDate: new Date(formData.endDate),
         workProgramId:
           formData.workProgramId && formData.workProgramId.trim() !== ""
             ? formData.workProgramId

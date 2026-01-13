@@ -22,7 +22,12 @@ export default function GalleryDetailRelatedAlbumsSection({
     title: event.name,
     count: galleryCounts[event.id] || 0,
     cover: getPreviewUrl(event.thumbnail),
-    lastUpdated: event.startDate,
+    lastUpdated:
+      event.schedules && event.schedules.length > 0
+        ? new Date(
+            Math.min(...event.schedules.map((s) => new Date(s.date).getTime()))
+          )
+        : new Date(event.createdAt),
     eventName: event.name,
     category: event.category?.name,
   }));

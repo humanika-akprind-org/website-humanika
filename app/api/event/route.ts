@@ -13,8 +13,10 @@ function extractEventQueryParams(request: NextRequest) {
     periodId: searchParams.get("periodId") || undefined,
     workProgramId: searchParams.get("workProgramId") || undefined,
     search: searchParams.get("search") || undefined,
-    startDate: searchParams.get("startDate") || undefined,
-    endDate: searchParams.get("endDate") || undefined,
+    scheduleStartDate: searchParams.get("scheduleStartDate") || undefined,
+    scheduleEndDate: searchParams.get("scheduleEndDate") || undefined,
+    date: searchParams.get("date") || undefined,
+    location: searchParams.get("location") || undefined,
   };
 }
 
@@ -31,8 +33,8 @@ function validateCreateEventInput(body: CreateEventInput) {
     !body.department ||
     !body.periodId ||
     !body.responsibleId ||
-    !body.startDate ||
-    !body.endDate
+    !body.schedules ||
+    body.schedules.length === 0
   ) {
     return { isValid: false, error: "Missing required fields" };
   }

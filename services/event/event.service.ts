@@ -8,14 +8,37 @@ import type { User } from "@/types/user";
 
 type UserWithId = Pick<User, "id">;
 
+// Type for schedule filter conditions (used for MongoDB JSON array filtering)
+type ScheduleFilterCondition = {
+  date?: {
+    gte?: string;
+    lte?: string;
+  };
+  location?: {
+    contains: string;
+    mode: "insensitive";
+  };
+};
+
+// Helper function to create MongoDB JSON array filter for schedules
+// Uses Prisma's JSON path and array_contains for MongoDB JSON array filtering
+function buildSchedulesFilter(condition: ScheduleFilterCondition) {
+  return {
+    path: [],
+    array_contains: condition,
+  } as any;
+}
+
 export const getEvents = async (filter: {
   department?: Department;
   status?: Status;
   periodId?: string;
   workProgramId?: string;
   search?: string;
-  startDate?: string;
-  endDate?: string;
+  scheduleStartDate?: string;
+  scheduleEndDate?: string;
+  date?: string;
+  location?: string;
 }) => {
   const where: Prisma.EventWhereInput = {};
 
@@ -25,6 +48,7 @@ export const getEvents = async (filter: {
   }
   if (filter.periodId) where.periodId = filter.periodId;
   if (filter.workProgramId) where.workProgramId = filter.workProgramId;
+
   const orConditions: Prisma.EventWhereInput[] = [];
 
   if (filter.search) {
@@ -35,38 +59,65 @@ export const getEvents = async (filter: {
     );
   }
 
-  if (filter.startDate || filter.endDate) {
-    orConditions.push(
-      // Events that start within the range
-      {
-        startDate: {
-          gte: filter.startDate ? new Date(filter.startDate) : undefined,
-          lte: filter.endDate ? new Date(filter.endDate) : undefined,
+  // Handle date range filtering based on schedules
+  if (filter.scheduleStartDate || filter.scheduleEndDate) {
+    const rangeStart = filter.scheduleStartDate
+      ? new Date(filter.scheduleStartDate)
+      : undefined;
+    const rangeEnd = filter.scheduleEndDate
+      ? new Date(filter.scheduleEndDate)
+      : undefined;
+
+    const dateFilter: ScheduleFilterCondition = {};
+
+    if (rangeStart && rangeEnd) {
+      dateFilter.date = {
+        gte: rangeStart.toISOString(),
+        lte: rangeEnd.toISOString(),
+      };
+    } else if (rangeStart) {
+      dateFilter.date = {
+        gte: rangeStart.toISOString(),
+      };
+    } else if (rangeEnd) {
+      dateFilter.date = {
+        lte: rangeEnd.toISOString(),
+      };
+    }
+
+    orConditions.push({
+      schedules: buildSchedulesFilter(dateFilter),
+    });
+  }
+
+  // Handle specific date filtering - find events that have a schedule on this exact date
+  if (filter.date) {
+    const targetDate = new Date(filter.date);
+    const startOfDay = new Date(targetDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(targetDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    orConditions.push({
+      schedules: buildSchedulesFilter({
+        date: {
+          gte: startOfDay.toISOString(),
+          lte: endOfDay.toISOString(),
         },
-      },
-      // Events that end within the range
-      {
-        endDate: {
-          gte: filter.startDate ? new Date(filter.startDate) : undefined,
-          lte: filter.endDate ? new Date(filter.endDate) : undefined,
+      }),
+    });
+  }
+
+  // Handle location filtering - find events that have a schedule at this location
+  if (filter.location) {
+    orConditions.push({
+      schedules: buildSchedulesFilter({
+        location: {
+          contains: filter.location,
+          mode: "insensitive",
         },
-      },
-      // Events that span the entire range
-      {
-        AND: [
-          {
-            startDate: {
-              lte: filter.startDate ? new Date(filter.startDate) : undefined,
-            },
-          },
-          {
-            endDate: {
-              gte: filter.endDate ? new Date(filter.endDate) : undefined,
-            },
-          },
-        ],
-      }
-    );
+      }),
+    });
   }
 
   if (orConditions.length > 0) {
@@ -106,7 +157,7 @@ export const getEvents = async (filter: {
       galleries: true,
       letters: true,
     },
-    orderBy: { startDate: "desc" },
+    orderBy: { createdAt: "desc" },
   });
 
   return events;
@@ -197,6 +248,9 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
+  // Ensure schedules is an array
+  const schedules = Array.isArray(data.schedules) ? data.schedules : [];
+
   const eventData: Prisma.EventCreateInput = {
     name: data.name,
     slug,
@@ -204,10 +258,9 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
     description: data.description || "",
     goal: data.goal || "",
     department: data.department,
+    schedules: schedules as unknown as Prisma.InputJsonValue,
     period: { connect: { id: data.periodId } },
     responsible: { connect: { id: data.responsibleId } },
-    startDate: new Date(data.startDate),
-    endDate: new Date(data.endDate),
   };
 
   // Only include workProgramId if it's provided and not empty
@@ -279,8 +332,7 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
         department: event.department,
         periodId: event.periodId,
         responsibleId: event.responsibleId,
-        startDate: event.startDate,
-        endDate: event.endDate,
+        schedules: event.schedules,
       },
     },
   });
@@ -303,7 +355,30 @@ export const updateEvent = async (
     throw new Error("Event not found");
   }
 
-  const updateData = { ...data } as Prisma.EventUpdateInput;
+  const updateData: Prisma.EventUpdateInput = {
+    name: data.name,
+    slug: data.name
+      ? data.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "")
+      : undefined,
+    description: data.description,
+    goal: data.goal,
+    department: data.department,
+    schedules: data.schedules as unknown as Prisma.InputJsonValue | undefined,
+    period: data.periodId ? { connect: { id: data.periodId } } : undefined,
+    responsible: data.responsibleId
+      ? { connect: { id: data.responsibleId } }
+      : undefined,
+    workProgram: data.workProgramId
+      ? { connect: { id: data.workProgramId } }
+      : undefined,
+    category: data.categoryId
+      ? { connect: { id: data.categoryId } }
+      : undefined,
+    status: data.status,
+  };
 
   // Check if there are changes to the event (excluding status)
   const hasChanges =
@@ -313,17 +388,15 @@ export const updateEvent = async (
     (data.goal !== undefined && data.goal !== existingEvent.goal) ||
     (data.department !== undefined &&
       data.department !== existingEvent.department) ||
-    (data.startDate !== undefined &&
-      new Date(data.startDate).getTime() !==
-        existingEvent.startDate.getTime()) ||
-    (data.endDate !== undefined &&
-      new Date(data.endDate).getTime() !== existingEvent.endDate.getTime()) ||
     (data.responsibleId !== undefined &&
       data.responsibleId !== existingEvent.responsibleId) ||
     (data.workProgramId !== undefined &&
       data.workProgramId !== existingEvent.workProgramId) ||
     (data.categoryId !== undefined &&
-      data.categoryId !== existingEvent.categoryId);
+      data.categoryId !== existingEvent.categoryId) ||
+    (data.schedules !== undefined &&
+      JSON.stringify(data.schedules) !==
+        JSON.stringify(existingEvent.schedules));
 
   // If there are changes and the event has an existing approval that is APPROVED or REJECTED,
   // reset the approval to PENDING
@@ -358,18 +431,6 @@ export const updateEvent = async (
       },
     });
   }
-
-  // Handle slug generation if name is updated
-  if (data.name) {
-    updateData.slug = data.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  }
-
-  // Handle date conversions
-  if (data.startDate) updateData.startDate = new Date(data.startDate);
-  if (data.endDate) updateData.endDate = new Date(data.endDate);
 
   const event = await prisma.event.update({
     where: { id },
@@ -419,15 +480,13 @@ export const updateEvent = async (
         name: existingEvent.name,
         department: existingEvent.department,
         status: existingEvent.status,
-        startDate: existingEvent.startDate,
-        endDate: existingEvent.endDate,
+        schedules: existingEvent.schedules,
       },
       newData: {
         name: event.name,
         department: event.department,
         status: event.status,
-        startDate: event.startDate,
-        endDate: event.endDate,
+        schedules: event.schedules,
       },
     },
   });
@@ -461,8 +520,7 @@ export const deleteEvent = async (id: string, user: UserWithId) => {
         name: existingEvent.name,
         department: existingEvent.department,
         status: existingEvent.status,
-        startDate: existingEvent.startDate,
-        endDate: existingEvent.endDate,
+        schedules: existingEvent.schedules,
       },
       newData: null,
     },

@@ -14,7 +14,7 @@ import EventControlBar from "@/components/public/pages/event/EventControlBar";
 import EventEmptyState from "@/components/public/pages/event/EventEmptyState";
 import EventCalendarView from "@/components/public/pages/event/EventCalendarView";
 import EventLoadMore from "@/components/public/pages/event/EventLoadMore";
-import LoadingState from "@/components/public/pages/event/EventLoadingState";
+import ArchivePageLoadingState from "@/components/public/pages/event/ArchivePageLoadingState";
 import ErrorState from "@/components/public/pages/event/EventErrorState";
 import PopularCategories from "@/components/public/pages/event/EventPopularCategories";
 import type {
@@ -22,6 +22,25 @@ import type {
   ViewMode,
   SortBy,
 } from "@/hooks/event/useEventPage";
+import type { ScheduleItem } from "@/types/event";
+
+// Helper function to get the latest schedule date from an event
+function getLatestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date).getTime());
+  return new Date(Math.max(...dates));
+}
+
+// Helper function to get the earliest schedule date from an event
+function getEarliestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date).getTime());
+  return new Date(Math.min(...dates));
+}
 
 export default function EventArchivePage() {
   // Custom hooks for data management
@@ -46,7 +65,10 @@ export default function EventArchivePage() {
   // Get only past events for archive page
   const archiveEvents = useMemo(() => {
     const now = new Date();
-    return allEvents.filter((event) => new Date(event.endDate) < now);
+    return allEvents.filter((event) => {
+      const latestDate = getLatestScheduleDate(event.schedules);
+      return latestDate && latestDate < now;
+    });
   }, [allEvents]);
 
   // Filters object for EventControlBar
@@ -107,10 +129,13 @@ export default function EventArchivePage() {
 
     // Apply sorting
     if (sortBy === "date") {
-      events.sort(
-        (a, b) =>
-          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-      );
+      events.sort((a, b) => {
+        const dateA = getEarliestScheduleDate(a.schedules);
+        const dateB = getEarliestScheduleDate(b.schedules);
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dateB.getTime() - dateA.getTime();
+      });
     } else if (sortBy === "name") {
       events.sort((a, b) => a.name.localeCompare(b.name));
     }
@@ -145,16 +170,28 @@ export default function EventArchivePage() {
   // Calculate stats
   const stats = useMemo(() => {
     const now = new Date();
+    const upcoming = allEvents.filter((e) => {
+      const earliestDate = getEarliestScheduleDate(e.schedules);
+      return earliestDate && earliestDate > now;
+    });
+    const ongoing = allEvents.filter((e) => {
+      const earliestDate = getEarliestScheduleDate(e.schedules);
+      const latestDate = getLatestScheduleDate(e.schedules);
+      return earliestDate && latestDate
+        ? earliestDate <= now && latestDate >= now
+        : false;
+    });
     return {
       total: allEvents.length,
-      upcoming: allEvents.filter((e) => new Date(e.startDate) > now).length,
+      upcoming: upcoming.length,
+      ongoing: ongoing.length,
       past: archiveEvents.length,
     };
   }, [allEvents, archiveEvents]);
 
   // Loading state for initial load
   if (loading && page === 1) {
-    return <LoadingState />;
+    return <ArchivePageLoadingState />;
   }
 
   return (
@@ -163,6 +200,8 @@ export default function EventArchivePage() {
       <EventHeroSection
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        n
+        p
         stats={stats}
       />
 

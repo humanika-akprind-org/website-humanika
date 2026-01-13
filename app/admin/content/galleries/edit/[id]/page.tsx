@@ -37,7 +37,7 @@ async function EditGalleryPage({
             },
           },
         },
-        orderBy: { startDate: "desc" },
+        orderBy: { createdAt: "desc" },
       }),
       prisma.gallery.findUnique({
         where: { id: id },
