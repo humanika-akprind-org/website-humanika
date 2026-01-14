@@ -225,7 +225,7 @@ export default function MissionArrayInput({
       {missionInputs.map((mission, index) => (
         <div key={index} className="flex items-start gap-2">
           {withIcon && typeof mission === "object" && (
-            <div className="pt-6">
+            <div>
               <IconPicker
                 value={mission.icon || ""}
                 onChange={(iconValue) => updateMissionIcon(index, iconValue)}

@@ -227,6 +227,53 @@ function renderMissionIcon(
   return <IconComponent className={className} />;
 }
 
+// Empty State Component for Vision
+function VisionEmptyState() {
+  return (
+    <div className="bg-gradient-to-br from-primary-800 to-primary-900 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="p-8 md:p-12 text-white">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+            <FiIcons.FiTarget className="w-8 h-8" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-primary-200 uppercase tracking-wider">
+              ARAH & TUJUAN
+            </div>
+            <h2 className="text-3xl font-bold">Visi Kami</h2>
+          </div>
+        </div>
+        <div className="max-w-3xl">
+          <p className="text-2xl md:text-3xl font-medium leading-relaxed text-primary-100 italic">
+            &quot;Visi organisasi akan ditampilkan di sini.&quot;
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Empty State Component for Mission
+function MissionEmptyState() {
+  return (
+    <div className="text-center py-20">
+      <div className="inline-flex flex-col items-center gap-6 max-w-md mx-auto">
+        <div className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center">
+          <FiIcons.FiTarget className="w-12 h-12 text-primary-600" />
+        </div>
+        <div>
+          <h3 className="text-2xl font-bold text-grey-900 mb-2">
+            Misi Belum Ditentukan
+          </h3>
+          <p className="text-grey-600">
+            Misi organisasi akan ditampilkan di sini.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Skeleton Components for Loading States
 function VisionCardSkeleton() {
   return (
@@ -333,6 +380,8 @@ export default function VisionTab() {
       {/* Vision Card */}
       {orgLoading ? (
         <VisionCardSkeleton />
+      ) : !organizationContact?.vision ? (
+        <VisionEmptyState />
       ) : (
         <div className="bg-gradient-to-br from-primary-800 to-primary-900 rounded-2xl shadow-2xl overflow-hidden">
           <div className="p-8 md:p-12 text-white">
@@ -377,6 +426,8 @@ export default function VisionTab() {
 
         {orgLoading ? (
           <MissionCardSkeleton count={missions.length || 4} />
+        ) : missions.length === 0 ? (
+          <MissionEmptyState />
         ) : (
           <div
             className={`grid gap-6 ${
