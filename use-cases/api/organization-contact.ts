@@ -56,7 +56,7 @@ export const getOrganizationContact = async (
 export const getActivePeriodOrganizationContact =
   async (): Promise<OrganizationContact | null> => {
     const response = await fetch(
-      `${API_URL}/organization-contact/active-period`,
+      `${API_URL}/organization-contact?period=active`,
       {
         method: "GET",
         headers: {

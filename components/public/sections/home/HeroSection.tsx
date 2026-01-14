@@ -2,13 +2,21 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, ChevronRight, Sparkles } from "lucide-react";
-import { useStats } from "@/hooks/useStats";
+import {
+  ArrowRight,
+  Briefcase,
+  CalendarDays,
+  ChevronRight,
+  Sparkles,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { useActivePeriodStatistic } from "@/hooks/statistic/useStatistics";
 
 import StatsSkeleton from "@/components/public/ui/skeleton/StatsSkeleton";
 
 export default function HeroSection() {
-  const { stats, loading } = useStats();
+  const { statistic, isLoading: loading } = useActivePeriodStatistic();
 
   return (
     <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden rounded-bl-[100px] rounded-br-[100px]">
@@ -105,28 +113,85 @@ export default function HeroSection() {
               transition={{ delay: 0.5, duration: 0.8 }}
               className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto"
             >
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 * index + 0.5 }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  className="group text-center p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:border-white/40 transition-all duration-300 hover:bg-white/15"
-                >
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-700/30 rounded-lg mb-4 group-hover:scale-110 transition-transform text-white">
-                    {stat.icon}
-                  </div>
-                  <div className="text-4xl font-bold text-white mb-2">
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">
-                      {stat.number}
-                    </span>
-                  </div>
-                  <div className="text-sm font-medium text-primary-100/80">
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                className="group text-center p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:border-white/40 transition-all duration-300 hover:bg-white/15"
+              >
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-700/30 rounded-lg mb-4 group-hover:scale-110 transition-transform text-white">
+                  <Users className="h-6 w-6" />
+                </div>
+                <div className="text-4xl font-bold text-white mb-2">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">
+                    {statistic?.activeMembers || 0}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-primary-100/80">
+                  Anggota Aktif
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                className="group text-center p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:border-white/40 transition-all duration-300 hover:bg-white/15"
+              >
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-700/30 rounded-lg mb-4 group-hover:scale-110 transition-transform text-white">
+                  <CalendarDays className="h-6 w-6" />
+                </div>
+                <div className="text-4xl font-bold text-white mb-2">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">
+                    {statistic?.annualEvents || 0}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-primary-100/80">
+                  Kegiatan Tahunan
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                className="group text-center p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:border-white/40 transition-all duration-300 hover:bg-white/15"
+              >
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-700/30 rounded-lg mb-4 group-hover:scale-110 transition-transform text-white">
+                  <Briefcase className="h-6 w-6" />
+                </div>
+                <div className="text-4xl font-bold text-white mb-2">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">
+                    {statistic?.collaborativeProjects || 0}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-primary-100/80">
+                  Proyek Kolaborasi
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                className="group text-center p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 hover:border-white/40 transition-all duration-300 hover:bg-white/15"
+              >
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-700/30 rounded-lg mb-4 group-hover:scale-110 transition-transform text-white">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+                <div className="text-4xl font-bold text-white mb-2">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-primary-200">
+                    {statistic?.awards || 0}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-primary-100/80">
+                  Penghargaan
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </motion.div>

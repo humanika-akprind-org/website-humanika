@@ -30,4 +30,5 @@ export interface UpdateStatisticInput extends Partial<CreateStatisticInput> {}
 
 export interface StatisticFilter {
   periodId?: string;
+  period?: string;
 }

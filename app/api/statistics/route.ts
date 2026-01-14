@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import type { CreateStatisticInput, StatisticFilter } from "@/types/statistic";
 import {
   getStatistics,
+  getActivePeriodStatistic,
   createStatistic,
 } from "@/services/statistic/statistic.service";
 import { getCurrentUser } from "@/lib/auth-server";
@@ -11,6 +12,7 @@ function extractStatisticQueryParams(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   return {
     periodId: searchParams.get("periodId") || undefined,
+    period: searchParams.get("period") || undefined,
   };
 }
 
@@ -43,7 +45,15 @@ export async function GET(request: NextRequest) {
     // 1. Extract payload
     const queryParams = extractStatisticQueryParams(request);
 
-    // 2. Business logic
+    // 2. Business logic - handle period=active query parameter
+    if (queryParams.period === "active") {
+      const statistic = await getActivePeriodStatistic();
+      if (!statistic) {
+        return NextResponse.json(null, { status: 200 });
+      }
+      return NextResponse.json(statistic);
+    }
+
     const statistics = await getStatistics(queryParams as StatisticFilter);
 
     // 3. Response

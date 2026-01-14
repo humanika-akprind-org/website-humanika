@@ -5,6 +5,7 @@ import type {
 } from "@/types/organization-contact";
 import {
   getOrganizationContacts,
+  getActivePeriodOrganizationContact,
   createOrganizationContact,
 } from "@/services/organization-contact/organization-contact.service";
 import { getCurrentUser } from "@/lib/auth-server";
@@ -14,6 +15,7 @@ function extractOrganizationContactQueryParams(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   return {
     periodId: searchParams.get("periodId") || undefined,
+    period: searchParams.get("period") || undefined,
   };
 }
 
@@ -52,7 +54,15 @@ export async function GET(request: NextRequest) {
     // 1. Extract payload
     const queryParams = extractOrganizationContactQueryParams(request);
 
-    // 2. Business logic
+    // 2. Business logic - handle period=active query parameter
+    if (queryParams.period === "active") {
+      const organizationContact = await getActivePeriodOrganizationContact();
+      if (!organizationContact) {
+        return NextResponse.json(null, { status: 200 });
+      }
+      return NextResponse.json(organizationContact);
+    }
+
     const organizationContacts = await getOrganizationContacts(
       queryParams as OrganizationContactFilter
     );

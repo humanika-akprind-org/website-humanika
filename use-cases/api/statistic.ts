@@ -69,7 +69,7 @@ export const getStatisticByPeriod = async (
 };
 
 export const getActivePeriodStatistic = async (): Promise<Statistic | null> => {
-  const response = await fetch(`${API_URL}/statistics/active-period`, {
+  const response = await fetch(`${API_URL}/statistics?period=active`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

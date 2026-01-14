@@ -27,4 +27,5 @@ export interface UpdateOrganizationContactInput
 
 export interface OrganizationContactFilter {
   periodId?: string;
+  period?: string;
 }

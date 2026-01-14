@@ -7,13 +7,14 @@ import type {
 import { logActivity } from "@/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
+import type { Prisma } from "@prisma/client";
 
 type UserWithId = Pick<User, "id">;
 
 export const getOrganizationContacts = async (
   filter?: OrganizationContactFilter
 ) => {
-  const where: any = {};
+  const where: Prisma.OrganizationContactWhereInput = {};
 
   if (filter?.periodId) {
     where.periodId = filter.periodId;

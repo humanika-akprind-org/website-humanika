@@ -80,12 +80,42 @@ export default function MissionArrayInput({
     return undefined;
   };
 
+  // Format mission display: bold the title before "-"
+  const formatMissionDisplay = (mission: string): React.ReactNode => {
+    if (!mission) return mission;
+    const dashIndex = mission.indexOf(" - ");
+    if (dashIndex === -1) {
+      // Try with single "-"
+      const singleDashIndex = mission.indexOf("-");
+      if (singleDashIndex > 0) {
+        return (
+          <>
+            <strong>{mission.substring(0, singleDashIndex)}</strong>
+            {mission.substring(singleDashIndex)}
+          </>
+        );
+      }
+      return mission;
+    }
+    return (
+      <>
+        <strong>{mission.substring(0, dashIndex)}</strong>
+        {mission.substring(dashIndex)}
+      </>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label} {required && "*"}
-        </label>
+        <div className="flex items-center gap-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {label} {required && "*"}
+          </label>
+          <span className="text-xs text-gray-500">
+            (format: <strong>Title</strong> - Description)
+          </span>
+        </div>
         <Button
           type="button"
           variant="outline"
@@ -130,6 +160,20 @@ export default function MissionArrayInput({
           )}
         </div>
       ))}
+
+      {/* Display formatted missions with bold title */}
+      {missionInputs.some((m) => m.trim()) && (
+        <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-200">
+          <p className="text-xs font-medium text-gray-500 mb-2">Preview:</p>
+          <ul className="space-y-1">
+            {missionInputs.map((mission, index) => (
+              <li key={index} className="text-sm text-gray-700">
+                {formatMissionDisplay(mission)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Minimum items notice */}
       {missionInputs.length === minItems && (

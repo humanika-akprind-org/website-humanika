@@ -31,37 +31,6 @@ Sebagian besar API endpoints memerlukan authentication. Gunakan NextAuth.js sess
 
 ## 🔗 API Endpoints
 
-### 📊 Statistics API
-
-#### GET /api/stats
-
-Mengambil statistik umum untuk dashboard.
-
-**Authentication:** Tidak diperlukan
-
-**Response:**
-
-```json
-[
-  {
-    "number": "150",
-    "label": "Anggota Aktif"
-  },
-  {
-    "number": "25",
-    "label": "Kegiatan Tahunan"
-  },
-  {
-    "number": "10",
-    "label": "Proyek Kolaborasi"
-  },
-  {
-    "number": "15",
-    "label": "Penghargaan"
-  }
-]
-```
-
 ### 👥 User Management API
 
 #### GET /api/user
