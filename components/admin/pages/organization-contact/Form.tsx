@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { FiSave, FiX, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiSave, FiX } from "react-icons/fi";
 import Button from "@/components/admin/ui/button/Button";
 import TextInput from "@/components/admin/ui/input/TextInput";
-import TextEditor from "@/components/admin/ui/text-area/TextEditor";
+import TextAreaInput from "@/components/admin/ui/input/TextAreaInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
+import MissionArrayInput from "@/components/admin/ui/input/MissionArrayInput";
 
 const organizationContactSchema = z.object({
   vision: z.string().min(1, "Vision is required"),
@@ -38,16 +38,7 @@ export default function OrganizationContactForm({
   loading = false,
   periods = [],
 }: OrganizationContactFormProps) {
-  const [missionInputs, setMissionInputs] = useState<string[]>(
-    initialData?.mission
-      ? Array.isArray(initialData.mission)
-        ? initialData.mission
-        : [initialData.mission as string]
-      : [""]
-  );
-
   const {
-    register,
     handleSubmit,
     setValue,
     watch,
@@ -65,27 +56,7 @@ export default function OrganizationContactForm({
   });
 
   const watchPeriodId = watch("periodId");
-
-  const addMission = () => {
-    const newMissionInputs = [...missionInputs, ""];
-    setMissionInputs(newMissionInputs);
-    setValue("mission", newMissionInputs);
-  };
-
-  const removeMission = (index: number) => {
-    if (missionInputs.length > 1) {
-      const newMissionInputs = missionInputs.filter((_, i) => i !== index);
-      setMissionInputs(newMissionInputs);
-      setValue("mission", newMissionInputs);
-    }
-  };
-
-  const updateMission = (index: number, value: string) => {
-    const newMissionInputs = [...missionInputs];
-    newMissionInputs[index] = value;
-    setMissionInputs(newMissionInputs);
-    setValue("mission", newMissionInputs);
-  };
+  const watchMission = watch("mission");
 
   const onFormSubmit = (data: OrganizationContactFormData) => {
     onSubmit(data);
@@ -113,81 +84,44 @@ export default function OrganizationContactForm({
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Vision <span className="text-red-500">*</span>
-          </label>
-          <TextEditor
-            value={initialData?.vision || ""}
-            onChange={(data) => setValue("vision", data)}
-            disabled={loading}
+          <TextAreaInput
+            label="Vision"
+            name="vision"
+            value={watch("vision") || ""}
+            onChange={(e) => setValue("vision", e.target.value)}
+            placeholder="Enter organization vision"
+            required
+            error={errors.vision?.message}
+            rows={4}
             height="150px"
           />
-          {errors.vision && (
-            <p className="mt-1 text-sm text-red-600">{errors.vision.message}</p>
-          )}
         </div>
       </div>
 
       {/* Mission Array */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-700">
-            Mission <span className="text-red-500">*</span>
-          </label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addMission}
-            icon={<FiPlus size={14} />}
-          >
-            Add Mission
-          </Button>
-        </div>
-
-        {errors.mission && typeof errors.mission.message === "string" && (
-          <p className="text-sm text-red-600">{errors.mission.message}</p>
-        )}
-
-        {missionInputs.map((mission, index) => (
-          <div key={index} className="flex items-start gap-2">
-            <div className="flex-1">
-              <TextInput
-                label={`Mission ${index + 1}`}
-                name={`mission.${index}`}
-                placeholder={`Mission ${index + 1}`}
-                value={mission}
-                onChange={(e) => updateMission(index, e.target.value)}
-                error={
-                  errors.mission &&
-                  Array.isArray(errors.mission) &&
-                  errors.mission[index]?.message
-                }
-              />
-            </div>
-            {missionInputs.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => removeMission(index)}
-                className="mt-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                icon={<FiTrash2 size={16} />}
-              >
-                Remove
-              </Button>
-            )}
-          </div>
-        ))}
-      </div>
+      <MissionArrayInput
+        label="Mission"
+        name="mission"
+        value={watchMission || []}
+        onChange={(value) => setValue("mission", value)}
+        error={
+          errors.mission && typeof errors.mission.message === "string"
+            ? errors.mission.message
+            : errors.mission && Array.isArray(errors.mission)
+            ? errors.mission
+            : undefined
+        }
+        required
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <TextInput
             label="Email"
             type="email"
-            {...register("email")}
+            name="email"
             value={watch("email") || ""}
+            onChange={(e) => setValue("email", e.target.value)}
             error={errors.email?.message}
             placeholder="Enter email address"
             required
@@ -197,28 +131,26 @@ export default function OrganizationContactForm({
         <div>
           <TextInput
             label="Phone (Optional)"
-            {...register("phone")}
+            name="phone"
             value={watch("phone") || ""}
+            onChange={(e) => setValue("phone", e.target.value)}
             error={errors.phone?.message}
             placeholder="Enter phone number"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Address <span className="text-red-500">*</span>
-          </label>
-          <TextEditor
-            value={initialData?.address || ""}
-            onChange={(data) => setValue("address", data)}
-            disabled={loading}
+          <TextAreaInput
+            label="Address"
+            name="address"
+            value={watch("address") || ""}
+            onChange={(e) => setValue("address", e.target.value)}
+            placeholder="Enter organization address"
+            required
+            error={errors.address?.message}
+            rows={3}
             height="100px"
           />
-          {errors.address && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.address.message}
-            </p>
-          )}
         </div>
       </div>
 

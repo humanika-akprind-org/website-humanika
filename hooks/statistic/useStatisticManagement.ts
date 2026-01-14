@@ -89,13 +89,13 @@ export function useStatisticManagement() {
 
       if (currentStatistic) {
         // Single statistic deletion
-        await deleteStatistic(currentStatistic.id, { id: user.id });
+        await deleteStatistic(currentStatistic.id);
         setSuccess("Statistic deleted successfully");
         refetch();
       } else if (selectedStatistics.length > 0) {
         // Bulk deletion
         for (const statisticId of selectedStatistics) {
-          await deleteStatistic(statisticId, { id: user.id });
+          await deleteStatistic(statisticId);
         }
         setSelectedStatistics([]);
         setSuccess(

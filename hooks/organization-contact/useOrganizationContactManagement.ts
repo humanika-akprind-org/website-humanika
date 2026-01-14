@@ -94,13 +94,13 @@ export function useOrganizationContactManagement() {
 
       if (currentContact) {
         // Single contact deletion
-        await deleteOrganizationContact(currentContact.id, { id: user.id });
+        await deleteOrganizationContact(currentContact.id);
         setSuccess("Organization contact deleted successfully");
         refetch();
       } else if (selectedContacts.length > 0) {
         // Bulk deletion
         for (const contactId of selectedContacts) {
-          await deleteOrganizationContact(contactId, { id: user.id });
+          await deleteOrganizationContact(contactId);
         }
         setSelectedContacts([]);
         setSuccess(
