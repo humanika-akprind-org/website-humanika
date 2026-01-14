@@ -380,7 +380,6 @@ Humanika menyediakan RESTful API yang komprehensif untuk semua operasi:
 
 ### Core Endpoints
 
-- **`/api/stats`** - Dashboard statistics
 - **`/api/user`** - User management (CRUD)
 - **`/api/article`** - Content management
 - **`/api/event`** - Event management
