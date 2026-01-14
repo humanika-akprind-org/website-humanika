@@ -11,10 +11,11 @@ import PageHeader from "components/admin/ui/PageHeader";
 import { useOrganizationContactManagement } from "hooks/organization-contact/useOrganizationContactManagement";
 import { usePeriods } from "@/hooks/period/usePeriods";
 import { getOrganizationContact } from "@/use-cases/api/organization-contact";
+import { MissionItem } from "@/components/admin/ui/input/MissionArrayInput";
 
 interface InitialData {
   vision: string;
-  mission: string[];
+  mission: MissionItem[];
   phone?: string;
   email: string;
   address: string;
@@ -49,16 +50,44 @@ export default function EditOrganizationContactPage() {
       try {
         const data = await getOrganizationContact(id);
         if (data) {
-          // Normalize mission to string array
+          // Normalize mission to MissionItem array
           const missionData = data.mission;
-          let missionArray: string[] = [];
+          let missionArray: MissionItem[] = [];
 
           if (Array.isArray(missionData)) {
-            missionArray = missionData.filter(
-              (m): m is string => typeof m === "string"
-            );
+            missionArray = missionData.map((m) => {
+              if (typeof m === "string") {
+                // Convert legacy string format to MissionItem
+                // Format expected: "Title - Description"
+                const dashIndex = m.indexOf(" - ");
+                if (dashIndex > 0) {
+                  return {
+                    icon: "",
+                    title: m.substring(0, dashIndex).trim(),
+                    description: m.substring(dashIndex + 3).trim(),
+                  };
+                }
+                return { icon: "", title: m.trim(), description: "" };
+              }
+              // Already a MissionItem object
+              return m as MissionItem;
+            });
           } else if (typeof missionData === "string" && missionData) {
-            missionArray = [missionData];
+            // Single string legacy format
+            const dashIndex = missionData.indexOf(" - ");
+            if (dashIndex > 0) {
+              missionArray = [
+                {
+                  icon: "",
+                  title: missionData.substring(0, dashIndex).trim(),
+                  description: missionData.substring(dashIndex + 3).trim(),
+                },
+              ];
+            } else {
+              missionArray = [
+                { icon: "", title: missionData.trim(), description: "" },
+              ];
+            }
           }
 
           setInitialData({

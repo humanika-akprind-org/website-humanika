@@ -60,23 +60,6 @@ export default function MapSection() {
             <p className="text-sm text-grey-600 mt-1">🕒 09:00 - 17:00 WIB</p>
           </div>
         </div>
-
-        {/* <div className="p-6 bg-grey-50 border-t border-grey-200">
-          <div className="grid md:grid-cols-3 gap-6 text-sm text-grey-700">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-green-500 rounded-full" />
-              <span>Parkir luas tersedia</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-blue-500 rounded-full" />
-              <span>Akses transportasi umum mudah</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-purple-500 rounded-full" />
-              <span>Fasilitas lengkap</span>
-            </div>
-          </div>
-        </div> */}
       </div>
     </motion.section>
   );

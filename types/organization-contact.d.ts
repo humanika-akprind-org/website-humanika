@@ -1,9 +1,15 @@
 import { Period } from "./period";
 
+export interface MissionItem {
+  icon?: string;
+  title: string;
+  description: string;
+}
+
 export interface OrganizationContact {
   id: string;
   vision: string;
-  mission: string | string[]; // Json type from database, can be string or array of strings
+  mission: string | string[] | MissionItem[]; // Json type from database, can be string, array of strings, or array of MissionItem objects
   phone?: string | null;
   email: string;
   address: string;

@@ -8,11 +8,21 @@ import Button from "@/components/admin/ui/button/Button";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import TextAreaInput from "@/components/admin/ui/input/TextAreaInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
-import MissionArrayInput from "@/components/admin/ui/input/MissionArrayInput";
+import MissionArrayInput, {
+  type MissionItem,
+} from "@/components/admin/ui/input/MissionArrayInput";
 
 const organizationContactSchema = z.object({
   vision: z.string().min(1, "Vision is required"),
-  mission: z.array(z.string()).min(1, "At least one mission is required"),
+  mission: z
+    .array(
+      z.object({
+        icon: z.string().optional(),
+        title: z.string().min(1, "Title is required"),
+        description: z.string().min(1, "Description is required"),
+      })
+    )
+    .min(1, "At least one mission is required"),
   phone: z.string().optional(),
   email: z.string().email("Invalid email address"),
   address: z.string().min(1, "Address is required"),
@@ -21,7 +31,7 @@ const organizationContactSchema = z.object({
 
 export type OrganizationContactFormData = z.infer<
   typeof organizationContactSchema
->;
+> & { mission: MissionItem[] };
 
 interface OrganizationContactFormProps {
   initialData?: Partial<OrganizationContactFormData> & { periodId?: string };
@@ -47,7 +57,9 @@ export default function OrganizationContactForm({
     resolver: zodResolver(organizationContactSchema),
     defaultValues: {
       vision: initialData?.vision || "",
-      mission: initialData?.mission || [""],
+      mission: initialData?.mission || [
+        { icon: "", title: "", description: "" },
+      ],
       phone: initialData?.phone || "",
       email: initialData?.email || "",
       address: initialData?.address || "",
@@ -103,15 +115,10 @@ export default function OrganizationContactForm({
         label="Mission"
         name="mission"
         value={watchMission || []}
-        onChange={(value) => setValue("mission", value)}
-        error={
-          errors.mission && typeof errors.mission.message === "string"
-            ? errors.mission.message
-            : errors.mission && Array.isArray(errors.mission)
-            ? errors.mission
-            : undefined
-        }
+        onChange={(value) => setValue("mission", value as MissionItem[])}
+        error={errors.mission?.message as string | string[] | undefined}
         required
+        withIcon
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

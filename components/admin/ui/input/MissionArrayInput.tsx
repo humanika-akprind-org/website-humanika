@@ -3,18 +3,27 @@
 import { useState, useEffect, useRef } from "react";
 import Button from "@/components/admin/ui/button/Button";
 import TextInput from "@/components/admin/ui/input/TextInput";
+import IconPicker, { type IconOption, defaultIcons } from "./IconPicker";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
+
+export interface MissionItem {
+  icon?: string;
+  title: string;
+  description: string;
+}
 
 interface MissionArrayInputProps {
   label?: string;
   name?: string;
-  value?: string[];
-  onChange?: (value: string[]) => void;
-  error?: string | string[];
+  value?: MissionItem[] | string[];
+  onChange?: (value: MissionItem[] | string[]) => void;
+  error?: string | string[] | { title?: string; description?: string }[];
   placeholder?: string;
   required?: boolean;
   minItems?: number;
   maxItems?: number;
+  withIcon?: boolean;
+  iconOptions?: IconOption[];
 }
 
 export default function MissionArrayInput({
@@ -27,14 +36,25 @@ export default function MissionArrayInput({
   required = false,
   minItems = 1,
   maxItems,
+  withIcon = false,
+  iconOptions = defaultIcons,
 }: MissionArrayInputProps) {
-  // Initialize with value or default to one empty string
-  const [missionInputs, setMissionInputs] = useState<string[]>(() => {
-    if (value && value.length > 0) {
-      return Array.isArray(value) ? value : [value];
+  // Initialize with value or default to one empty string/object
+  const [missionInputs, setMissionInputs] = useState<MissionItem[] | string[]>(
+    () => {
+      if (value && value.length > 0) {
+        if (Array.isArray(value)) {
+          // Check if it's an array of objects (with icon) or strings
+          if (value.length > 0 && typeof value[0] === "object") {
+            return value as MissionItem[];
+          }
+          return value as string[];
+        }
+        return [value];
+      }
+      return withIcon ? [{ icon: "", title: "", description: "" }] : [""];
     }
-    return [""];
-  });
+  );
 
   // Update local state when prop value changes
   const prevValueRef = useRef<string | null>(null);
@@ -42,8 +62,15 @@ export default function MissionArrayInput({
     const valueStr = JSON.stringify(value);
     if (valueStr !== prevValueRef.current && value && value.length > 0) {
       prevValueRef.current = valueStr;
-      const newValue = Array.isArray(value) ? value : [value];
-      setMissionInputs(newValue);
+      if (Array.isArray(value)) {
+        if (value.length > 0 && typeof value[0] === "object") {
+          setMissionInputs(value as MissionItem[]);
+        } else {
+          setMissionInputs(value as string[]);
+        }
+      } else {
+        setMissionInputs([value]);
+      }
     }
   }, [value]);
 
@@ -51,31 +78,92 @@ export default function MissionArrayInput({
     if (maxItems && missionInputs.length >= maxItems) {
       return;
     }
-    const newMissionInputs = [...missionInputs, ""];
+    let newMissionInputs: MissionItem[] | string[];
+    if (withIcon) {
+      newMissionInputs = [
+        ...(missionInputs as MissionItem[]),
+        { icon: "", title: "", description: "" },
+      ];
+    } else {
+      newMissionInputs = [...(missionInputs as string[]), ""];
+    }
     setMissionInputs(newMissionInputs);
     onChange?.(newMissionInputs);
   };
 
   const removeMission = (index: number) => {
     if (missionInputs.length > minItems) {
-      const newMissionInputs = missionInputs.filter((_, i) => i !== index);
+      let newMissionInputs: MissionItem[] | string[];
+      if (withIcon) {
+        newMissionInputs = (missionInputs as MissionItem[]).filter(
+          (_, i) => i !== index
+        );
+      } else {
+        newMissionInputs = missionInputs.filter(
+          (_, i) => i !== index
+        ) as string[];
+      }
       setMissionInputs(newMissionInputs);
       onChange?.(newMissionInputs);
     }
   };
 
-  const updateMission = (index: number, newValue: string) => {
-    const newMissionInputs = [...missionInputs];
-    newMissionInputs[index] = newValue;
+  const updateMissionTitle = (index: number, newValue: string) => {
+    const missionArray = missionInputs as MissionItem[];
+    const newMissionInputs: MissionItem[] = [
+      ...missionArray.slice(0, index),
+      { ...missionArray[index], title: newValue },
+      ...missionArray.slice(index + 1),
+    ];
     setMissionInputs(newMissionInputs);
     onChange?.(newMissionInputs);
   };
 
-  const getErrorMessage = (errorIndex: number): string | undefined => {
+  const updateMissionDescription = (index: number, newValue: string) => {
+    const missionArray = missionInputs as MissionItem[];
+    const newMissionInputs: MissionItem[] = [
+      ...missionArray.slice(0, index),
+      { ...missionArray[index], description: newValue },
+      ...missionArray.slice(index + 1),
+    ];
+    setMissionInputs(newMissionInputs);
+    onChange?.(newMissionInputs);
+  };
+
+  const updateMissionIcon = (index: number, iconValue: string) => {
+    const missionArray = missionInputs as MissionItem[];
+    const newMissionInputs: MissionItem[] = [
+      ...missionArray.slice(0, index),
+      { ...missionArray[index], icon: iconValue },
+      ...missionArray.slice(index + 1),
+    ];
+    setMissionInputs(newMissionInputs);
+    onChange?.(newMissionInputs);
+  };
+
+  const getErrorMessage = (
+    errorIndex: number,
+    field: "title" | "description"
+  ): string | undefined => {
     if (!error) return undefined;
     if (typeof error === "string") return error;
-    if (Array.isArray(error) && error[errorIndex]) {
-      return error[errorIndex];
+    if (Array.isArray(error)) {
+      // Check for object-based error format with title/description
+      if (
+        error.length > errorIndex &&
+        typeof error[errorIndex] === "object" &&
+        error[errorIndex] !== null
+      ) {
+        const errorObj = error[errorIndex] as {
+          title?: string;
+          description?: string;
+        };
+        return errorObj[field];
+      }
+      // Fallback to old string array format
+      if (typeof error[errorIndex] === "string") {
+        return error[errorIndex] as string;
+      }
     }
     return undefined;
   };
@@ -135,16 +223,43 @@ export default function MissionArrayInput({
 
       {/* Mission inputs */}
       {missionInputs.map((mission, index) => (
-        <div key={index} className="flex items-center gap-2">
-          <div className="flex-1">
-            <TextInput
-              label={`${label} ${index + 1}`}
-              name={`${name}.${index}`}
-              placeholder={`${placeholder} ${index + 1}`}
-              value={mission}
-              onChange={(e) => updateMission(index, e.target.value)}
-              error={getErrorMessage(index)}
-            />
+        <div key={index} className="flex items-start gap-2">
+          {withIcon && typeof mission === "object" && (
+            <div className="pt-6">
+              <IconPicker
+                value={mission.icon || ""}
+                onChange={(iconValue) => updateMissionIcon(index, iconValue)}
+                options={iconOptions}
+                placeholder="Select icon"
+                label={index === 0 ? "Icon" : undefined}
+              />
+            </div>
+          )}
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <TextInput
+                label={`Title ${index + 1}`}
+                name={`${name}.${index}.title`}
+                placeholder={placeholder}
+                value={typeof mission === "string" ? mission : mission.title}
+                onChange={(e) => updateMissionTitle(index, e.target.value)}
+                error={getErrorMessage(index, "title")}
+              />
+            </div>
+            <div>
+              <TextInput
+                label={`Description ${index + 1}`}
+                name={`${name}.${index}.description`}
+                placeholder="Enter description"
+                value={
+                  typeof mission === "string" ? mission : mission.description
+                }
+                onChange={(e) =>
+                  updateMissionDescription(index, e.target.value)
+                }
+                error={getErrorMessage(index, "description")}
+              />
+            </div>
           </div>
           {missionInputs.length > minItems && (
             <Button
@@ -152,7 +267,7 @@ export default function MissionArrayInput({
               variant="ghost"
               size="sm"
               onClick={() => removeMission(index)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 mt-6"
               icon={<FiTrash2 size={16} />}
             >
               Remove
@@ -162,15 +277,58 @@ export default function MissionArrayInput({
       ))}
 
       {/* Display formatted missions with bold title */}
-      {missionInputs.some((m) => m.trim()) && (
+      {missionInputs.some((m) =>
+        typeof m === "string"
+          ? m.trim()
+          : m.title.trim() || m.description.trim()
+      ) && (
         <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-200">
           <p className="text-xs font-medium text-gray-500 mb-2">Preview:</p>
-          <ul className="space-y-1">
-            {missionInputs.map((mission, index) => (
-              <li key={index} className="text-sm text-gray-700">
-                {formatMissionDisplay(mission)}
-              </li>
-            ))}
+          <ul className="space-y-2">
+            {missionInputs.map((mission, index) => {
+              const missionTitle =
+                typeof mission === "string" ? "" : mission.title;
+              const missionDescription =
+                typeof mission === "string" ? mission : mission.description;
+              if (!missionTitle.trim() && !missionDescription.trim()) {
+                return null;
+              }
+              return (
+                <li key={index} className="text-sm text-gray-700">
+                  {withIcon && typeof mission === "object" && mission.icon ? (
+                    <span className="flex items-start gap-2">
+                      <span className="flex items-center mt-0.5">
+                        {(() => {
+                          const iconOption = iconOptions.find(
+                            (opt) => opt.value === mission.icon
+                          );
+                          const IconComponent = iconOption?.icon;
+                          return IconComponent ? (
+                            <IconComponent
+                              size={16}
+                              className="text-blue-600"
+                            />
+                          ) : null;
+                        })()}
+                      </span>
+                      <span>
+                        {missionTitle && <strong>{missionTitle}</strong>}
+                        {missionTitle && missionDescription && " - "}
+                        {missionDescription}
+                      </span>
+                    </span>
+                  ) : typeof mission === "string" ? (
+                    formatMissionDisplay(mission)
+                  ) : (
+                    <span>
+                      {mission.title && <strong>{mission.title}</strong>}
+                      {mission.title && mission.description && " - "}
+                      {mission.description}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

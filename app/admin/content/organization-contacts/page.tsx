@@ -121,8 +121,27 @@ export default function OrganizationContactsPage() {
                   {Array.isArray(currentContact.mission) ? (
                     <ul className="list-disc list-inside">
                       {currentContact.mission.map(
-                        (mission: string, index: number) => (
-                          <li key={index}>{mission}</li>
+                        (
+                          mission:
+                            | string
+                            | {
+                                title?: string;
+                                description?: string;
+                                icon?: string;
+                              },
+                          index: number
+                        ) => (
+                          <li key={index}>
+                            {typeof mission === "string"
+                              ? mission
+                              : mission.title
+                              ? `${mission.title}${
+                                  mission.description
+                                    ? ` - ${mission.description}`
+                                    : ""
+                                }`
+                              : JSON.stringify(mission)}
+                          </li>
                         )
                       )}
                     </ul>
