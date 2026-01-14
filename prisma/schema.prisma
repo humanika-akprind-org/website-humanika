@@ -183,6 +183,8 @@ model Period {
   events                   Event[] // Kegiatan dalam periode ini
   articles                 Article[] // Artikel yang dibuat dalam periode ini
   organizationalStructures OrganizationalStructure[] @relation("OrganizationalStructurePeriod") // Struktur organisasi periode ini
+  organizationContacts     OrganizationContact[] // Kontak organisasi periode ini
+  statistics               Statistic[] // Statistik organisasi periode ini
 
   @@index([isActive, startYear, endYear])
   @@map("periods")
@@ -449,6 +451,54 @@ model OrganizationalStructure {
 
   @@index([status])
   @@map("organizationalStructures")
+}
+
+// Model untuk data kontak organisasi
+// Menyimpan informasi kontak organisasi berdasarkan periode aktif
+model OrganizationContact {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  vision    String
+  mission   Json     // To store array of missions (can be more than one)
+  phone     String?   @map("phone_number")
+  email     String
+  address   String
+
+  // Foreign key ke Period
+  periodId  String    @db.ObjectId @map("period_id")
+  period    Period    @relation(fields: [periodId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("organization_contacts")
+
+  @@index([periodId])
+}
+
+// Model untuk data statistik organisasi
+// Menyimpan statistik organisasi berdasarkan periode aktif
+model Statistic {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Field statistik
+  activeMembers       Int      @default(0) @map("active_members")
+  annualEvents        Int      @default(0) @map("annual_events")
+  collaborativeProjects Int    @default(0) @map("collaborative_projects")
+  innovationProjects  Int      @default(0) @map("innovation_projects")
+  awards              Int      @default(0)
+  memberSatisfaction  Int      @default(0) @map("member_satisfaction")
+  learningMaterials   Int      @default(0) @map("learning_materials")
+
+  // Foreign key ke Period
+  periodId            String   @db.ObjectId @map("period_id")
+  period              Period   @relation(fields: [periodId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("statistics")
+
+  @@index([periodId])
 }
 
 model DepartmentTask {
