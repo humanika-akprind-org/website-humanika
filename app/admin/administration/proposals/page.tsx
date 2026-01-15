@@ -129,6 +129,7 @@ export default function ProposalsPage() {
           setCurrentDocument(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal

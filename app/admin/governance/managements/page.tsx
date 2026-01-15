@@ -104,6 +104,7 @@ export default function ManagementsPage() {
           setCurrentManagement(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal

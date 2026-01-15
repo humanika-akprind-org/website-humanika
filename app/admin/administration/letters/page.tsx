@@ -115,6 +115,7 @@ export default function LettersPage() {
           setCurrentLetter(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal

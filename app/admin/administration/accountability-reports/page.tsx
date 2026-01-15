@@ -129,6 +129,7 @@ export default function AccountabilityReportsPage() {
           setCurrentDocument(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal

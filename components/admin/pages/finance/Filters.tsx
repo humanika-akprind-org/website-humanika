@@ -161,7 +161,7 @@ export default function FinanceFilters({
 
       {/* Advanced Filters */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-gray-100">
           <SelectFilter
             label="Status"
             value={statusFilter}
@@ -205,13 +205,14 @@ export default function FinanceFilters({
               <p className="text-xs text-red-500 mt-1">{errorWorkPrograms}</p>
             )}
           </div>
+          <div className="flex items-end">
+            <DeleteSelectedButton
+              selectedCount={selectedCount}
+              onClick={onDeleteSelected}
+            />
+          </div>
         </div>
       )}
-
-      <DeleteSelectedButton
-        selectedCount={selectedCount}
-        onClick={onDeleteSelected}
-      />
     </div>
   );
 }

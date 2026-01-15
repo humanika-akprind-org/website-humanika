@@ -116,6 +116,7 @@ export default function EventsPage() {
           setCurrentEvent(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal

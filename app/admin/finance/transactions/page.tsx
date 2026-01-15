@@ -112,6 +112,7 @@ export default function FinanceTransactionsPage() {
           setCurrentFinance(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal

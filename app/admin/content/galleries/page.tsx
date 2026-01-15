@@ -103,6 +103,7 @@ export default function GalleriesPage() {
           setCurrentGallery(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal
