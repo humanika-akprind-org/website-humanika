@@ -326,7 +326,10 @@ export default function Sidebar() {
             href: "/admin/governance/tasks",
             roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
           },
-          { href: "/admin/governance/tasks/add", roles: [UserRole.PENGURUS] },
+          {
+            href: "/admin/governance/tasks/add",
+            roles: [UserRole.BPH, UserRole.PENGURUS],
+          },
         ]) && (
           <>
             <div className="mt-6 mb-2">
@@ -414,7 +417,7 @@ export default function Sidebar() {
               },
               {
                 href: "/admin/governance/tasks/add",
-                roles: [UserRole.PENGURUS],
+                roles: [UserRole.BPH, UserRole.PENGURUS],
               },
             ]) && (
               <NavDropdown icon={ClipboardList} title="Department Tasks">
@@ -423,7 +426,7 @@ export default function Sidebar() {
                     All Tasks
                   </NavDropdownItem>
                 )}
-                {hasAccess([UserRole.PENGURUS]) && (
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                   <NavDropdownItem href="/admin/governance/tasks/add">
                     Add New
                   </NavDropdownItem>
@@ -539,7 +542,10 @@ export default function Sidebar() {
                 href: "/admin/program/events",
                 roles: [UserRole.BPH, UserRole.PENGURUS],
               },
-              { href: "/admin/program/events/add", roles: [UserRole.PENGURUS] },
+              {
+                href: "/admin/program/events/add",
+                roles: [UserRole.BPH, UserRole.PENGURUS],
+              },
               {
                 href: "/admin/program/events/categories",
                 roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
@@ -555,7 +561,7 @@ export default function Sidebar() {
                     All Events
                   </NavDropdownItem>
                 )}
-                {hasAccess([UserRole.PENGURUS]) && (
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                   <NavDropdownItem href="/admin/program/events/add">
                     Add New
                   </NavDropdownItem>
@@ -773,7 +779,10 @@ export default function Sidebar() {
             href: "/admin/content/articles",
             roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
           },
-          { href: "/admin/content/articles/add", roles: [UserRole.PENGURUS] },
+          {
+            href: "/admin/content/articles/add",
+            roles: [UserRole.BPH, UserRole.PENGURUS],
+          },
           {
             href: "/admin/content/articles/categories",
             roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
@@ -782,7 +791,10 @@ export default function Sidebar() {
             href: "/admin/content/galleries",
             roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
           },
-          { href: "/admin/content/galleries/add", roles: [UserRole.PENGURUS] },
+          {
+            href: "/admin/content/galleries/add",
+            roles: [UserRole.BPH, UserRole.PENGURUS],
+          },
           {
             href: "/admin/content/galleries/categories",
             roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
@@ -802,7 +814,7 @@ export default function Sidebar() {
               },
               {
                 href: "/admin/content/articles/add",
-                roles: [UserRole.PENGURUS],
+                roles: [UserRole.BPH, UserRole.PENGURUS],
               },
               {
                 href: "/admin/content/articles/categories",
@@ -815,7 +827,7 @@ export default function Sidebar() {
                     All Article
                   </NavDropdownItem>
                 )}
-                {hasAccess([UserRole.PENGURUS]) && (
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                   <NavDropdownItem href="/admin/content/articles/add">
                     Add New
                   </NavDropdownItem>
@@ -835,7 +847,7 @@ export default function Sidebar() {
               },
               {
                 href: "/admin/content/galleries/add",
-                roles: [UserRole.PENGURUS],
+                roles: [UserRole.BPH, UserRole.PENGURUS],
               },
               {
                 href: "/admin/content/galleries/categories",
@@ -848,7 +860,7 @@ export default function Sidebar() {
                     All Gallery
                   </NavDropdownItem>
                 )}
-                {hasAccess([UserRole.PENGURUS]) && (
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                   <NavDropdownItem href="/admin/content/galleries/add">
                     Add New
                   </NavDropdownItem>
@@ -860,6 +872,47 @@ export default function Sidebar() {
                 )}
               </NavDropdown>
             )}
+          </>
+        )}
+
+        {/* Organization Management Section - BPH Only */}
+        {hasDropdownAccess([
+          {
+            href: "/admin/content/organization-contacts",
+            roles: [UserRole.BPH],
+          },
+          {
+            href: "/admin/content/organization-contacts/add",
+            roles: [UserRole.BPH],
+          },
+          {
+            href: "/admin/content/statistics",
+            roles: [UserRole.BPH],
+          },
+          {
+            href: "/admin/content/statistics/add",
+            roles: [UserRole.BPH],
+          },
+        ]) && (
+          <>
+            <div className="mt-6 mb-2">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+                Organization Management
+              </h3>
+            </div>
+
+            <NavDropdown icon={Landmark} title="Organization">
+              {hasAccess([UserRole.BPH]) && (
+                <NavDropdownItem href="/admin/content/organization-contacts">
+                  Organization Contacts
+                </NavDropdownItem>
+              )}
+              {hasAccess([UserRole.BPH]) && (
+                <NavDropdownItem href="/admin/content/statistics">
+                  Statistics
+                </NavDropdownItem>
+              )}
+            </NavDropdown>
           </>
         )}
 

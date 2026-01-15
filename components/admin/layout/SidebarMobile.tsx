@@ -246,7 +246,10 @@ export default function SidebarMobile() {
               href: "/admin/governance/tasks",
               roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
             },
-            { href: "/admin/governance/tasks/add", roles: [UserRole.PENGURUS] },
+            {
+              href: "/admin/governance/tasks/add",
+              roles: [UserRole.BPH, UserRole.PENGURUS],
+            },
           ]) && (
             <>
               <div className="mt-6 mb-2">
@@ -364,7 +367,7 @@ export default function SidebarMobile() {
                 },
                 {
                   href: "/admin/governance/tasks/add",
-                  roles: [UserRole.PENGURUS],
+                  roles: [UserRole.BPH, UserRole.PENGURUS],
                 },
               ]) && (
                 <NavDropdown icon={ClipboardList} title="Department Tasks">
@@ -380,7 +383,7 @@ export default function SidebarMobile() {
                       All Tasks
                     </NavDropdownItem>
                   )}
-                  {hasAccess([UserRole.PENGURUS]) && (
+                  {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                     <NavDropdownItem
                       href="/admin/governance/tasks/add"
                       onClick={toggleSidebar}
@@ -453,7 +456,10 @@ export default function SidebarMobile() {
               href: "/admin/program/events",
               roles: [UserRole.BPH, UserRole.PENGURUS],
             },
-            { href: "/admin/program/events/add", roles: [UserRole.PENGURUS] },
+            {
+              href: "/admin/program/events/add",
+              roles: [UserRole.BPH, UserRole.PENGURUS],
+            },
             {
               href: "/admin/program/events/categories",
               roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
@@ -514,7 +520,7 @@ export default function SidebarMobile() {
                 },
                 {
                   href: "/admin/program/events/add",
-                  roles: [UserRole.PENGURUS],
+                  roles: [UserRole.BPH, UserRole.PENGURUS],
                 },
                 {
                   href: "/admin/program/events/categories",
@@ -534,7 +540,7 @@ export default function SidebarMobile() {
                       All Events
                     </NavDropdownItem>
                   )}
-                  {hasAccess([UserRole.PENGURUS]) && (
+                  {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                     <NavDropdownItem
                       href="/admin/program/events/add"
                       onClick={toggleSidebar}
@@ -812,7 +818,10 @@ export default function SidebarMobile() {
               href: "/admin/content/articles",
               roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
             },
-            { href: "/admin/content/articles/add", roles: [UserRole.PENGURUS] },
+            {
+              href: "/admin/content/articles/add",
+              roles: [UserRole.BPH, UserRole.PENGURUS],
+            },
             {
               href: "/admin/content/articles/categories",
               roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
@@ -823,7 +832,7 @@ export default function SidebarMobile() {
             },
             {
               href: "/admin/content/galleries/add",
-              roles: [UserRole.PENGURUS],
+              roles: [UserRole.BPH, UserRole.PENGURUS],
             },
             {
               href: "/admin/content/galleries/categories",
@@ -844,7 +853,7 @@ export default function SidebarMobile() {
                 },
                 {
                   href: "/admin/content/articles/add",
-                  roles: [UserRole.PENGURUS],
+                  roles: [UserRole.BPH, UserRole.PENGURUS],
                 },
                 {
                   href: "/admin/content/articles/categories",
@@ -864,7 +873,7 @@ export default function SidebarMobile() {
                       All Article
                     </NavDropdownItem>
                   )}
-                  {hasAccess([UserRole.PENGURUS]) && (
+                  {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                     <NavDropdownItem
                       href="/admin/content/articles/add"
                       onClick={toggleSidebar}
@@ -894,7 +903,7 @@ export default function SidebarMobile() {
                 },
                 {
                   href: "/admin/content/galleries/add",
-                  roles: [UserRole.PENGURUS],
+                  roles: [UserRole.BPH, UserRole.PENGURUS],
                 },
                 {
                   href: "/admin/content/galleries/categories",
@@ -914,7 +923,7 @@ export default function SidebarMobile() {
                       All Gallery
                     </NavDropdownItem>
                   )}
-                  {hasAccess([UserRole.PENGURUS]) && (
+                  {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                     <NavDropdownItem
                       href="/admin/content/galleries/add"
                       onClick={toggleSidebar}
@@ -993,6 +1002,53 @@ export default function SidebarMobile() {
                 {hasAccess([UserRole.DPO, UserRole.BPH]) && (
                   <NavDropdownItem href="/admin/finance/transactions/reports">
                     Reports
+                  </NavDropdownItem>
+                )}
+              </NavDropdown>
+            </>
+          )}
+
+          {/* Organization Management Section - BPH Only */}
+          {hasDropdownAccess([
+            {
+              href: "/admin/content/organization-contacts",
+              roles: [UserRole.BPH],
+            },
+            {
+              href: "/admin/content/organization-contacts/add",
+              roles: [UserRole.BPH],
+            },
+            {
+              href: "/admin/content/statistics",
+              roles: [UserRole.BPH],
+            },
+            {
+              href: "/admin/content/statistics/add",
+              roles: [UserRole.BPH],
+            },
+          ]) && (
+            <>
+              <div className="mt-6 mb-2">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+                  Organization Management
+                </h3>
+              </div>
+
+              <NavDropdown icon={Landmark} title="Organization">
+                {hasAccess([UserRole.BPH]) && (
+                  <NavDropdownItem
+                    href="/admin/content/organization-contacts"
+                    onClick={toggleSidebar}
+                  >
+                    Organization Contacts
+                  </NavDropdownItem>
+                )}
+                {hasAccess([UserRole.BPH]) && (
+                  <NavDropdownItem
+                    href="/admin/content/statistics"
+                    onClick={toggleSidebar}
+                  >
+                    Statistics
                   </NavDropdownItem>
                 )}
               </NavDropdown>
