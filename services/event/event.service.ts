@@ -21,12 +21,16 @@ type ScheduleFilterCondition = {
 };
 
 // Helper function to create MongoDB JSON array filter for schedules
-// Uses Prisma's JSON path and array_contains for MongoDB JSON array filtering
+// Uses Prisma's JSON filtering with proper path targeting for MongoDB JSON arrays
 function buildSchedulesFilter(condition: ScheduleFilterCondition) {
+  // For MongoDB JSON arrays, we need to use the correct Prisma syntax
+  // The path should be empty string to match any element in the array
+  // and array_contains should contain the filter conditions
+  // Using Record<string, unknown> to avoid TypeScript type issues with Prisma's JsonFilter
   return {
-    path: [],
+    path: "",
     array_contains: condition,
-  } as any;
+  } as Record<string, unknown>;
 }
 
 export const getEvents = async (filter: {
