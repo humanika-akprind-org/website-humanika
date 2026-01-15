@@ -17,6 +17,7 @@ import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import StatusChip from "../../ui/chip/Status";
 import StatusApproval from "../../ui/chip/StatusApproval";
+import { getGoogleDriveDirectUrl } from "@/lib/google-drive/file-utils";
 
 interface FinanceTableProps {
   finances: Finance[];
@@ -103,6 +104,16 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
 
   const handleAddFinance = () => {
     onAddFinance();
+  };
+
+  // Handle download proof
+  const handleDownloadProof = (finance: Finance) => {
+    if (finance.proof) {
+      const downloadUrl = getGoogleDriveDirectUrl(finance.proof, "download");
+      if (downloadUrl) {
+        window.open(downloadUrl, "_blank");
+      }
+    }
   };
 
   // Format currency
@@ -313,6 +324,13 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                     >
                       <FiEdit className="mr-2" size={14} />
                       Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDownloadProof(finance)}
+                      color="default"
+                    >
+                      <FiDownload className="mr-2" size={14} />
+                      Download
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onDeleteFinance(finance)}

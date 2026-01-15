@@ -8,6 +8,7 @@ import {
   FiTrash,
   FiClipboard,
   FiTarget,
+  FiDownload,
 } from "react-icons/fi";
 import type { Letter } from "@/types/letter";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -20,6 +21,7 @@ import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
+import { getGoogleDriveDirectUrl } from "@/lib/google-drive/file-utils";
 
 interface LetterTableProps {
   letters: Letter[];
@@ -114,6 +116,16 @@ export default function LetterTable({
 
   const handleAddLetter = () => {
     onAddLetter();
+  };
+
+  // Handle download letter
+  const handleDownloadLetter = (letter: Letter) => {
+    if (letter.letter) {
+      const downloadUrl = getGoogleDriveDirectUrl(letter.letter, "download");
+      if (downloadUrl) {
+        window.open(downloadUrl, "_blank");
+      }
+    }
   };
 
   // Determine empty state props based on typeFilter
@@ -388,6 +400,13 @@ export default function LetterTable({
                     >
                       <FiEdit className="mr-2" size={14} />
                       Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDownloadLetter(letter)}
+                      color="default"
+                    >
+                      <FiDownload className="mr-2" size={14} />
+                      Download
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onDeleteLetter(letter)}

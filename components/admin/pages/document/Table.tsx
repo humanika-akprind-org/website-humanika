@@ -3,6 +3,7 @@ import {
   FiEdit,
   FiTrash,
   FiEye,
+  FiDownload,
   FiClipboard,
   FiTarget,
 } from "react-icons/fi";
@@ -17,6 +18,7 @@ import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import { useRef, useState } from "react";
+import { getGoogleDriveDirectUrl } from "@/lib/google-drive/file-utils";
 
 interface DocumentTableProps {
   documents: Document[];
@@ -115,6 +117,19 @@ export default function DocumentTable({
 
   const handleAddDocument = () => {
     onAddDocument();
+  };
+
+  // Handle download document
+  const handleDownloadDocument = (document: Document) => {
+    if (document.document) {
+      const downloadUrl = getGoogleDriveDirectUrl(
+        document.document,
+        "download"
+      );
+      if (downloadUrl) {
+        window.open(downloadUrl, "_blank");
+      }
+    }
   };
 
   // Determine empty state props based on typeFilter
@@ -316,6 +331,13 @@ export default function DocumentTable({
                     >
                       <FiEdit className="mr-2" size={14} />
                       Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDownloadDocument(document)}
+                      color="default"
+                    >
+                      <FiDownload className="mr-2" size={14} />
+                      Download
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onDeleteDocument(document)}
