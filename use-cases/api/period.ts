@@ -1,11 +1,11 @@
 import type { Period, PeriodFormData, PeriodApiResponse } from "@/types/period";
 import { apiUrl } from "@/lib/config/config";
 
-const API_BASE_URL = apiUrl;
+const API_URL = apiUrl;
 
 export const getPeriods = async (): Promise<Period[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/period`);
+    const response = await fetch(`${API_URL}/period`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch periods");
@@ -26,7 +26,7 @@ export const getPeriods = async (): Promise<Period[]> => {
 
 export const getPeriod = async (id: string): Promise<Period> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/period/${id}`);
+    const response = await fetch(`${API_URL}/period/${id}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch period");
@@ -49,7 +49,7 @@ export const createPeriod = async (
   periodData: PeriodFormData
 ): Promise<Period> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/period`, {
+    const response = await fetch(`${API_URL}/period`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const updatePeriod = async (
   periodData: PeriodFormData
 ): Promise<Period> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/period/${id}`, {
+    const response = await fetch(`${API_URL}/period/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +106,7 @@ export const updatePeriod = async (
 
 export const deletePeriod = async (id: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/period/${id}`, {
+    const response = await fetch(`${API_URL}/period/${id}`, {
       method: "DELETE",
     });
 
@@ -125,7 +125,7 @@ export const deletePeriod = async (id: string): Promise<boolean> => {
 
 export const reorderPeriods = async (periods: Period[]): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/period/reorder`, {
+    const response = await fetch(`${API_URL}/period/reorder`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
