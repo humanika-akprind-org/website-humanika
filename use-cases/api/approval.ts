@@ -7,14 +7,14 @@ import type {
 } from "@/types/approval";
 
 class ApprovalApi {
-  private static API_BASE_URL = apiUrl;
+  private static API_URL = apiUrl;
 
   private static async fetchApi<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<{ data?: T; error?: string }> {
     try {
-      const response = await fetch(`${this.API_BASE_URL}${endpoint}`, {
+      const response = await fetch(`${this.API_URL}${endpoint}`, {
         headers: {
           "Content-Type": "application/json",
           ...options.headers,

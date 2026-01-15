@@ -52,14 +52,10 @@ export function useEventData() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-        }/api/event?status=PUBLISH`,
-        {
-          cache: "no-store",
-        }
-      );
+      // Use relative URL to work in both development and production
+      const res = await fetch("/api/event?status=PUBLISH", {
+        cache: "no-store",
+      });
       const events: Event[] = await res.json();
       setAllEvents(events);
     } catch (error) {

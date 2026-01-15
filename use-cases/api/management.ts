@@ -6,12 +6,12 @@ import type {
 // import { ApiResponseStatus } from "@/types/enums";
 import { apiUrl } from "@/lib/config/config";
 
-const API_BASE_URL = apiUrl;
+const API_URL = apiUrl;
 
 export const ManagementApi = {
   async getManagements(): Promise<Management[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/management`);
+      const response = await fetch(`${API_URL}/management`);
       const result: ManagementApiResponse = await response.json();
 
       if (result.success && result.data) {
@@ -26,7 +26,7 @@ export const ManagementApi = {
 
   async getManagement(id: string): Promise<Management> {
     try {
-      const response = await fetch(`${API_BASE_URL}/management/${id}`, {
+      const response = await fetch(`${API_URL}/management/${id}`, {
         credentials: "include",
       });
       const result: ManagementApiResponse = await response.json();
@@ -43,7 +43,7 @@ export const ManagementApi = {
 
   async createManagement(formData: ManagementServerData): Promise<Management> {
     try {
-      const response = await fetch(`${API_BASE_URL}/management`, {
+      const response = await fetch(`${API_URL}/management`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export const ManagementApi = {
     formData: ManagementServerData
   ): Promise<Management> {
     try {
-      const response = await fetch(`${API_BASE_URL}/management/${id}`, {
+      const response = await fetch(`${API_URL}/management/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -101,7 +101,7 @@ export const ManagementApi = {
         headers["Authorization"] = `Bearer ${accessToken}`;
       }
 
-      const response = await fetch(`${API_BASE_URL}/management/${id}`, {
+      const response = await fetch(`${API_URL}/management/${id}`, {
         method: "DELETE",
         headers,
         credentials: "include",
