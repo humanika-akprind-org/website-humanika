@@ -53,7 +53,7 @@ export default function GalleryFilters({
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <SearchInput
-          placeholder="Cari judul gallery atau event..."
+          placeholder="Search gallery..."
           value={searchTerm}
           onChange={onSearchChange}
         />
@@ -80,10 +80,11 @@ export default function GalleryFilters({
           </div>
           <div>
             <SelectFilter
-              label="Kategori"
+              label="Category"
               value={categoryFilter}
               onChange={onCategoryFilterChange}
               options={categoryOptions}
+              side="bottom"
             />
             {isCategoriesLoading && (
               <p className="text-xs text-gray-500 mt-1">

@@ -3,6 +3,12 @@ import { useRouter } from "next/navigation";
 import { deleteEvent } from "@/use-cases/api/event";
 import type { Event } from "@/types/event";
 import { useEvents } from "./useEvents";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 export function useEventManagement() {
   const router = useRouter();
@@ -79,12 +85,37 @@ export function useEventManagement() {
 
   const confirmDelete = async () => {
     try {
+      // Get access token for Google Drive operations
+      const accessToken = await getAccessTokenAction();
+
       if (currentEvent) {
+        // Single event deletion: Delete file from Google Drive first, then delete database record
+        if (
+          currentEvent.thumbnail &&
+          isGoogleDriveFile(currentEvent.thumbnail)
+        ) {
+          const fileId = getFileIdFromFile(currentEvent.thumbnail);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
         await deleteEvent(currentEvent.id);
         setSuccess("Event deleted successfully");
         refetch();
       } else if (selectedEvents.length > 0) {
+        // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const eventId of selectedEvents) {
+          // Find the event object to get the thumbnail URL
+          const eventToDelete = events.find((e) => e.id === eventId);
+          if (
+            eventToDelete?.thumbnail &&
+            isGoogleDriveFile(eventToDelete.thumbnail)
+          ) {
+            const fileId = getFileIdFromFile(eventToDelete.thumbnail);
+            if (fileId) {
+              await deleteGoogleDriveFile(fileId, accessToken);
+            }
+          }
           await deleteEvent(eventId);
         }
         setSelectedEvents([]);

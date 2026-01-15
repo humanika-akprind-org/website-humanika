@@ -1,7 +1,6 @@
 import { ActivityType } from "@/types/enums";
 import DateInput from "../../ui/date/DateInput";
-import SelectInput from "../../ui/input/SelectInput";
-import { Activity } from "lucide-react";
+import SelectFilter from "../../ui/input/SelectFilter";
 
 interface FiltersProps {
   filter: {
@@ -22,9 +21,8 @@ export default function ActivityFilters({
 }: FiltersProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-      <SelectInput
+      <SelectFilter
         label="Activity Type"
-        name="activityType"
         value={filter.activityType}
         onChange={(value) => onFilterChange({ ...filter, activityType: value })}
         options={[
@@ -34,7 +32,6 @@ export default function ActivityFilters({
             label: type,
           })),
         ]}
-        icon={<Activity className="h-4 w-4 text-gray-400" />}
       />
 
       <DateInput

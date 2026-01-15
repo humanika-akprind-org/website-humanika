@@ -22,9 +22,19 @@ import EventEmptyState from "@/components/public/pages/event/EventEmptyState";
 import EventCalendarView from "@/components/public/pages/event/EventCalendarView";
 import EventLoadMore from "@/components/public/pages/event/EventLoadMore";
 import FeaturedPastEvents from "@/components/public/pages/event/FeaturedPastEvents";
-import PopularCategories from "@/components/public/pages/event/PopularCategories";
-import LoadingState from "@/components/public/pages/event/LoadingState";
-import ErrorState from "@/components/public/pages/event/ErrorState";
+import PopularCategories from "@/components/public/pages/event/EventPopularCategories";
+import EventPageLoadingState from "@/components/public/pages/event/EventPageLoadingState";
+import EventErrorState from "@/components/public/pages/event/EventErrorState";
+import type { ScheduleItem } from "@/types/event";
+
+// Helper function to get the latest schedule date from an event
+function getLatestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date).getTime());
+  return new Date(Math.max(...dates));
+}
 
 export default function EventPage() {
   // Custom hooks for data management
@@ -47,18 +57,24 @@ export default function EventPage() {
   const pastEvents = useMemo(() => {
     const now = new Date();
     return allEvents
-      .filter((event) => new Date(event.endDate) < now)
+      .filter((event) => {
+        const latestDate = getLatestScheduleDate(event.schedules);
+        return latestDate && latestDate < now;
+      })
       .slice(0, 4);
   }, [allEvents]);
 
-  // Loading state
-  if (loading && filters.page === 1) {
-    return <LoadingState />;
-  }
+  // Check if there are active filters
+  const hasActiveFilters = Boolean(
+    filters.searchQuery.trim() ||
+      filters.selectedCategory !== "all" ||
+      filters.selectedType !== "all" ||
+      filters.selectedStatus !== "all"
+  );
 
-  // Error state
-  if (error) {
-    return <ErrorState error={error} onRetry={refetch} />;
+  // Loading state for initial load
+  if (loading && filters.page === 1) {
+    return <EventPageLoadingState />;
   }
 
   return (
@@ -93,15 +109,14 @@ export default function EventPage() {
         />
 
         {/* Events Content */}
-        <div className="mb-12">
+        <div className="mt-12">
+          {/* Error State */}
+          {error && <EventErrorState error={error} onRetry={refetch} />}
+
           {/* Empty State */}
-          {filteredEvents.length === 0 && (
+          {!loading && !error && filteredEvents.length === 0 && (
             <EventEmptyState
-              activeTab={filters.activeTab}
-              searchQuery={filters.searchQuery}
-              selectedCategory={filters.selectedCategory}
-              selectedType={filters.selectedType}
-              selectedStatus={filters.selectedStatus}
+              hasFilters={hasActiveFilters}
               onResetFilters={actions.resetFilters}
             />
           )}
@@ -115,6 +130,8 @@ export default function EventPage() {
                   <h2 className="text-2xl font-bold text-grey-900">
                     {filters.activeTab === "upcoming"
                       ? "Event Mendatang"
+                      : filters.activeTab === "ongoing"
+                      ? "Event Sedang Berlangsung"
                       : filters.activeTab === "past"
                       ? "Event Terdahulu"
                       : "Semua Event"}
@@ -173,6 +190,7 @@ export default function EventPage() {
         <PopularCategories
           categories={categories}
           selectedCategory={filters.selectedCategory}
+          onCategoryClick={setters.setSelectedCategory}
         />
       </div>
     </div>

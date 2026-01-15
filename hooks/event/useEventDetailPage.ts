@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { getEvent, getEvents } from "use-cases/api/event";
+import { useState, useEffect, useCallback } from "react";
+import { getEventBySlug, getEvents } from "use-cases/api/event";
 import type { Event } from "types/event";
 import { getPastEvents, getRelatedEvents } from "lib/eventDetailUtils";
 
@@ -12,14 +12,15 @@ interface UseEventDetailPageReturn {
   error: string | null;
   isBookmarked: boolean;
   setIsBookmarked: (value: boolean) => void;
+  refetch: () => void;
 }
 
 /**
  * Custom hook for managing event detail page state and data fetching
- * @param id - Event ID from URL params
+ * @param slug - Event slug from URL params
  * @returns Object containing all state and data for the event detail page
  */
-export function useEventDetailPage(id: string): UseEventDetailPageReturn {
+export function useEventDetailPage(slug: string): UseEventDetailPageReturn {
   const [event, setEvent] = useState<Event | null>(null);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
@@ -28,23 +29,25 @@ export function useEventDetailPage(id: string): UseEventDetailPageReturn {
   const [error, setError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  // Fetch event data
-  useEffect(() => {
-    async function loadEvent() {
-      try {
-        setLoading(true);
-        const eventData = await getEvent(id);
-        setEvent(eventData);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load event data"
-        );
-      } finally {
-        setLoading(false);
-      }
+  // Fetch event data by slug
+  const loadEvent = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const eventData = await getEventBySlug(slug);
+      setEvent(eventData);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load event data"
+      );
+    } finally {
+      setLoading(false);
     }
+  }, [slug]);
+
+  useEffect(() => {
     loadEvent();
-  }, [id]);
+  }, [slug, loadEvent]);
 
   // Fetch all events and compute related/past events
   useEffect(() => {
@@ -77,5 +80,6 @@ export function useEventDetailPage(id: string): UseEventDetailPageReturn {
     error,
     isBookmarked,
     setIsBookmarked,
+    refetch: loadEvent,
   };
 }

@@ -153,7 +153,7 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
 
           <div className="space-y-6">
             {/* Main Image */}
-            <div className="relative w-full h-[400px] bg-gradient-to-br from-grey-100 to-grey-200 rounded-xl overflow-hidden">
+            <div className="relative w-full aspect-video bg-gradient-to-br from-grey-100 to-grey-200 rounded-xl overflow-hidden">
               {imageError ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-grey-400">
                   <div className="w-16 h-16 bg-grey-200 rounded-full flex items-center justify-center mb-4">
@@ -265,8 +265,13 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
                           className="aspect-square bg-grey-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() => {
                             setIsDialogOpen(false);
-                            // Navigate to the related gallery (you might need to implement this)
-                            window.location.href = `/gallery/${relatedGallery.id}`;
+                            // Navigate to the related gallery using event slug
+                            const eventSlug = relatedGallery.event?.slug;
+                            if (eventSlug) {
+                              window.location.href = `/gallery/${eventSlug}`;
+                            } else {
+                              window.location.href = `/gallery/${relatedGallery.id}`;
+                            }
                           }}
                         >
                           <Image

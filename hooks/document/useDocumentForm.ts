@@ -13,14 +13,10 @@ import {
   proposalFolderId,
 } from "@/lib/config/config";
 import { getAccessTokenAction } from "@/lib/actions/accessToken";
-
-// Helper functions
-const isGoogleDriveDocument = (doc: string | null | undefined): boolean => {
-  if (!doc) return false;
-  return (
-    doc.includes("drive.google.com") || doc.match(/^[a-zA-Z0-9_-]+$/) !== null
-  );
-};
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+} from "@/lib/google-drive/file-utils";
 
 const getFolderIdForDocumentType = (
   documentTypeName: string | undefined,
@@ -145,7 +141,7 @@ export function useDocumentForm({
   };
 
   const removeDocument = () => {
-    if (isGoogleDriveDocument(existingDocument)) {
+    if (isGoogleDriveFile(existingDocument)) {
       setRemovedDocument(true);
     }
 
@@ -175,8 +171,8 @@ export function useDocumentForm({
       let documentUrl: string | null | undefined = existingDocument;
 
       if (removedDocument) {
-        if (document?.document && isGoogleDriveDocument(document.document)) {
-          const fileId = getFileIdFromDocument(document.document);
+        if (document?.document && isGoogleDriveFile(document.document)) {
+          const fileId = getFileIdFromFile(document.document);
           if (fileId) {
             try {
               await deleteFile(fileId);
@@ -226,9 +222,9 @@ export function useDocumentForm({
           if (
             !removedDocument &&
             document?.document &&
-            isGoogleDriveDocument(document.document)
+            isGoogleDriveFile(document.document)
           ) {
-            const fileId = getFileIdFromDocument(document.document);
+            const fileId = getFileIdFromFile(document.document);
             if (fileId) {
               try {
                 await deleteFile(fileId);
@@ -298,21 +294,6 @@ export function useDocumentForm({
     } finally {
       setIsLoadingState(false);
     }
-  };
-
-  // Helper function to get file ID from document (either URL or file ID)
-  const getFileIdFromDocument = (
-    doc: string | null | undefined
-  ): string | null => {
-    if (!doc) return null;
-
-    if (doc.includes("drive.google.com")) {
-      const fileIdMatch = doc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      return fileIdMatch ? fileIdMatch[1] : null;
-    } else if (doc.match(/^[a-zA-Z0-9_-]+$/)) {
-      return doc;
-    }
-    return null;
   };
 
   return {

@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import type { ActivityLog } from "@/types/activity-log";
-import SelectInput from "@/components/admin/ui/input/SelectInput";
+import SelectFilter from "@/components/admin/ui/input/SelectFilter";
 import ExportButtons from "@/components/admin/pages/activity/export-button/ExportButtons";
 import LoadingActivityDashboard from "@/components/admin/pages/activity/LoadingActivityDashboard";
 import StatCard from "@/components/admin/ui/card/StatCard";
@@ -258,9 +258,8 @@ export default function ActivityPage() {
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800 py-1">Activity Log</h1>
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 py-1">
-          <SelectInput
+          <SelectFilter
             label=""
-            name="selectedTimeFilter"
             value={selectedTimeFilter}
             onChange={setSelectedTimeFilter}
             options={[

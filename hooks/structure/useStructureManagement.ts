@@ -4,6 +4,12 @@ import { StructureApi } from "@/use-cases/api/structure";
 import { PeriodApi } from "@/use-cases/api/period";
 import type { OrganizationalStructure } from "@/types/structure";
 import type { Period } from "@/types/period";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 type StructureFiltersType = {
   status: string;
@@ -175,7 +181,20 @@ export function useStructureManagement() {
 
   const confirmDelete = async () => {
     try {
+      // Get access token for Google Drive operations
+      const accessToken = await getAccessTokenAction();
+
       if (currentStructure) {
+        // Single structure deletion: Delete file from Google Drive first, then delete database record
+        if (
+          currentStructure.decree &&
+          isGoogleDriveFile(currentStructure.decree)
+        ) {
+          const fileId = getFileIdFromFile(currentStructure.decree);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
         const response = await StructureApi.deleteStructure(
           currentStructure.id
         );
@@ -186,22 +205,28 @@ export function useStructureManagement() {
           fetchAllStructures();
         }
       } else if (selectedStructures.length > 0) {
-        let hasError = false;
+        // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const structureId of selectedStructures) {
-          const response = await StructureApi.deleteStructure(structureId);
-          if (response.error) {
-            hasError = true;
-            setError(response.error);
-            break;
-          }
-        }
-        if (!hasError) {
-          setSuccess(
-            `${selectedStructures.length} structures deleted successfully`
+          // Find the structure object to get the decree URL
+          const structureToDelete = structures.find(
+            (s) => s.id === structureId
           );
-          setSelectedStructures([]);
-          fetchAllStructures();
+          if (
+            structureToDelete?.decree &&
+            isGoogleDriveFile(structureToDelete.decree)
+          ) {
+            const fileId = getFileIdFromFile(structureToDelete.decree);
+            if (fileId) {
+              await deleteGoogleDriveFile(fileId, accessToken);
+            }
+          }
+          await StructureApi.deleteStructure(structureId);
         }
+        setSuccess(
+          `${selectedStructures.length} structures deleted successfully`
+        );
+        setSelectedStructures([]);
+        fetchAllStructures();
       }
     } catch (_error) {
       setError("Failed to delete structure(s)");

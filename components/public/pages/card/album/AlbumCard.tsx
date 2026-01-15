@@ -19,6 +19,7 @@ interface AlbumCardProps {
     cover?: string;
     lastUpdated?: Date;
     eventName?: string;
+    eventSlug?: string;
     category?: string;
   };
   index?: number;
@@ -36,6 +37,11 @@ export default function AlbumCard({ album, index = 0 }: AlbumCardProps) {
   // Format count text
   const countText = `${album.count} ${album.count === 1 ? "foto" : "foto"}`;
 
+  // Build href using eventSlug if available, otherwise use id
+  const href = album.eventSlug
+    ? `/gallery/${album.eventSlug}`
+    : `/gallery/${album.id}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -43,7 +49,7 @@ export default function AlbumCard({ album, index = 0 }: AlbumCardProps) {
       transition={{ delay: index * 0.1, duration: 0.5 }}
       whileHover={{ y: -5 }}
     >
-      <Link href={`/gallery/${album.id}`}>
+      <Link href={href}>
         <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-grey-200">
           {/* Album Cover */}
           <div className="relative aspect-video bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">

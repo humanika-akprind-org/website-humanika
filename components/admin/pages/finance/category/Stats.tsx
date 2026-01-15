@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  FiTag,
-  FiCheckCircle,
-  FiTrendingUp,
-  FiTrendingDown,
-} from "react-icons/fi";
+import { FiTag, FiTrendingUp, FiTrendingDown } from "react-icons/fi";
 import type { FinanceCategory } from "@/types/finance-category";
 import { FinanceType } from "@/types/enums";
 import StatCard from "../../../ui/card/StatCard";
@@ -23,12 +18,6 @@ export default function FinanceCategoryStats({
       value: categories.length,
       icon: FiTag,
       color: "blue",
-    },
-    {
-      title: "Active Categories",
-      value: categories.filter((category) => category.isActive).length,
-      icon: FiCheckCircle,
-      color: "green",
     },
     {
       title: "Income Categories",
@@ -49,7 +38,7 @@ export default function FinanceCategoryStats({
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
       {stats.map((stat, index) => (
         <StatCard
           key={index}

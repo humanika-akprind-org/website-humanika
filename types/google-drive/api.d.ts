@@ -24,6 +24,7 @@ export interface ApiRequestBody {
   fileName?: string;
   newName?: string;
   accessToken: string;
+  folderId?: string;
   permission?: {
     type: string;
     role: string;

@@ -3,6 +3,12 @@ import { useRouter } from "next/navigation";
 import { deleteDocument } from "@/use-cases/api/document";
 import type { Document } from "@/types/document";
 import { useDocuments } from "./useDocuments";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 interface UseDocumentManagementOptions {
   addPath?: string;
@@ -29,6 +35,7 @@ export function useDocumentManagement(
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [userFilter, setUserFilter] = useState("all");
+  const [approvalStatusFilter, setApprovalStatusFilter] = useState("all");
 
   // Apply client-side filtering and pagination
   const filteredDocuments = documents.filter((document) => {
@@ -43,6 +50,13 @@ export function useDocumentManagement(
       statusFilter === "all" || document.status === statusFilter;
     const matchesType = typeFilter === "all" || document.type === typeFilter;
     const matchesUser = userFilter === "all" || document.userId === userFilter;
+    const matchesApprovalStatus =
+      approvalStatusFilter === "all" ||
+      (document.approvals &&
+        document.approvals.length > 0 &&
+        document.approvals.some(
+          (approval) => approval.status === approvalStatusFilter
+        ));
     const notExcluded = !excludeTypes?.some(
       (excludeType) =>
         excludeType === document.type.toLowerCase().replace(/[\s\-]/g, "")
@@ -53,6 +67,7 @@ export function useDocumentManagement(
       matchesStatus &&
       matchesType &&
       matchesUser &&
+      matchesApprovalStatus &&
       notExcluded
     );
   });
@@ -108,12 +123,37 @@ export function useDocumentManagement(
 
   const confirmDelete = async () => {
     try {
+      // Get access token for Google Drive operations
+      const accessToken = await getAccessTokenAction();
+
       if (currentDocument) {
+        // Single document deletion: Delete file from Google Drive first, then delete database record
+        if (
+          currentDocument.document &&
+          isGoogleDriveFile(currentDocument.document)
+        ) {
+          const fileId = getFileIdFromFile(currentDocument.document);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
         await deleteDocument(currentDocument.id);
         setSuccess("Document deleted successfully");
         fetchDocuments();
       } else if (selectedDocuments.length > 0) {
+        // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const docId of selectedDocuments) {
+          // Find the document object to get the document URL
+          const docToDelete = documents.find((doc) => doc.id === docId);
+          if (
+            docToDelete?.document &&
+            isGoogleDriveFile(docToDelete.document)
+          ) {
+            const fileId = getFileIdFromFile(docToDelete.document);
+            if (fileId) {
+              await deleteGoogleDriveFile(fileId, accessToken);
+            }
+          }
           await deleteDocument(docId);
         }
         setSelectedDocuments([]);
@@ -145,6 +185,7 @@ export function useDocumentManagement(
     statusFilter,
     typeFilter,
     userFilter,
+    approvalStatusFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -153,6 +194,7 @@ export function useDocumentManagement(
     setStatusFilter,
     setTypeFilter,
     setUserFilter,
+    setApprovalStatusFilter,
     toggleDocumentSelection,
     toggleSelectAll,
     handleAddDocument,

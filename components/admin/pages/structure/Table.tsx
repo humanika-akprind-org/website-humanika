@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FiFileText, FiEye, FiEdit, FiTrash } from "react-icons/fi";
+import { FiFileText, FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
 import Image from "next/image";
 import type { OrganizationalStructure } from "@/types/structure";
 import StatusChip from "../../ui/chip/Status";
@@ -12,6 +12,10 @@ import AddButton from "../../ui/button/AddButton";
 import EmptyState from "../../ui/EmptyState";
 import SortIcon from "../../ui/SortIcon";
 import ViewModal from "../../ui/modal/ViewModal";
+import {
+  getGoogleDriveDirectUrl,
+  getFileIdFromFile,
+} from "@/lib/google-drive/file-utils";
 
 interface StructureTableProps {
   structures: OrganizationalStructure[];
@@ -116,6 +120,29 @@ export default function StructureTable({
 
   const handleAddStructure = () => {
     onAddStructure();
+  };
+
+  // Handle download decree
+  const handleDownloadDecree = (structure: OrganizationalStructure) => {
+    if (structure.decree) {
+      const downloadUrl = getGoogleDriveDirectUrl(structure.decree, "download");
+      if (downloadUrl) {
+        window.open(downloadUrl, "_blank");
+      }
+    }
+  };
+
+  // Handle download structure image
+  const handleDownloadImage = (structure: OrganizationalStructure) => {
+    if (structure.structure) {
+      const fileId = getFileIdFromFile(structure.structure);
+      if (fileId) {
+        const downloadUrl = getGoogleDriveDirectUrl(fileId, "download");
+        if (downloadUrl) {
+          window.open(downloadUrl, "_blank");
+        }
+      }
+    }
   };
 
   // Get image URL from structure image (file ID or URL)
@@ -338,6 +365,20 @@ export default function StructureTable({
                     >
                       <FiEdit className="mr-2" size={14} />
                       Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDownloadDecree(structure)}
+                      color="default"
+                    >
+                      <FiDownload className="mr-2" size={14} />
+                      Download Decree
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDownloadImage(structure)}
+                      color="default"
+                    >
+                      <FiDownload className="mr-2" size={14} />
+                      Download Image
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onDeleteStructure(structure)}

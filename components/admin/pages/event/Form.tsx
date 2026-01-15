@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
 import { Department as DepartmentEnum } from "@/types/enums";
@@ -14,7 +14,7 @@ import ImageUpload from "@/components/admin/ui/input/ImageUpload";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/components/ui/CancelButton";
 import { useEventForm } from "@/hooks/event/useEventForm";
-import DateInput from "../../ui/date/DateInput";
+import ScheduleInput from "../../ui/input/ScheduleInput";
 
 interface EventFormProps {
   event?: Event;
@@ -62,22 +62,6 @@ export default function EventForm({
     periods
   );
 
-  const [_dateError, setDateError] = useState<string>("");
-
-  useEffect(() => {
-    if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate);
-      const end = new Date(formData.endDate);
-      if (start > end) {
-        setDateError("Start date must be before end date");
-      } else {
-        setDateError("");
-      }
-    } else {
-      setDateError("");
-    }
-  }, [formData.startDate, formData.endDate]);
-
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
@@ -115,22 +99,15 @@ export default function EventForm({
               icon={<FiBriefcase className="text-gray-400" />}
             />
 
-            <DateInput
-              label="Start Date"
-              value={formData.startDate}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, startDate: value }))
-              }
-              required
-            />
-            <DateInput
-              label="End Date"
-              value={formData.endDate}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, endDate: value }))
-              }
-              required
-            />
+            <div className="md:col-span-2">
+              <ScheduleInput
+                schedules={formData.schedules}
+                onChange={(schedules) =>
+                  setFormData((prev) => ({ ...prev, schedules }))
+                }
+                disabled={loading}
+              />
+            </div>
             <SelectInput
               label="Period"
               name="periodId"

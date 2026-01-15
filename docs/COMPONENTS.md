@@ -302,7 +302,6 @@ Komponen UI reusable dari shadcn/ui:
 
 ### Public Hooks
 
-- `useStats.ts` - Hook untuk fetch stats
 - `useArticles.ts` - Hook untuk manajemen artikel
 - `useEvents.ts` - Hook untuk manajemen event
 - `useGalleries.ts` - Hook untuk manajemen galeri

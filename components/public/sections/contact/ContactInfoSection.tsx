@@ -1,12 +1,44 @@
 import { motion } from "framer-motion";
 import { CONTACT_INFO, SOCIAL_MEDIA } from "../../pages/contact/constants";
+import { useActivePeriodOrganizationContact } from "@/hooks/organization-contact/useOrganizationContacts";
 
 export default function ContactInfoSection() {
+  const { organizationContact, isLoading: orgLoading } =
+    useActivePeriodOrganizationContact();
+
+  const contactInfo = [
+    {
+      title: "Email",
+      value: orgLoading
+        ? "Memuat..."
+        : organizationContact?.email || "humanika@akprind.ac.id",
+      icon: CONTACT_INFO[0].icon,
+      gradient: CONTACT_INFO[0].gradient,
+    },
+    {
+      title: "Phone",
+      value: orgLoading
+        ? "Memuat..."
+        : organizationContact?.phone || "+62 xxx-xxxx-xxxx",
+      icon: CONTACT_INFO[1].icon,
+      gradient: CONTACT_INFO[1].gradient,
+    },
+    {
+      title: "Address",
+      value: orgLoading
+        ? "Memuat..."
+        : organizationContact?.address ||
+          "Jl. Kalisahak No.28, Klitren, Yogyakarta",
+      icon: CONTACT_INFO[2].icon,
+      gradient: CONTACT_INFO[2].gradient,
+    },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Contact Cards */}
       <div className="space-y-6">
-        {CONTACT_INFO.map((info, index) => (
+        {contactInfo.map((info, index) => (
           <motion.div
             key={info.title}
             initial={{ opacity: 0, y: 20 }}

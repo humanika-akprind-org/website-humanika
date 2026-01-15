@@ -9,6 +9,7 @@ import UserInfo from "@/components/admin/layout/UserInfo";
 import { geistSans, geistMono } from "@/app/ui/fonts";
 import SidebarMobile from "@/components/admin/layout/SidebarMobile";
 import RefreshHandler from "@/components/admin/ui/RefreshHandler";
+import GoogleDriveStatus from "@/components/admin/google-drive/GoogleDriveStatus";
 
 export const metadata: Metadata = {
   title: "Organizational Management System",
@@ -46,6 +47,7 @@ export default async function RootLayout({
                     Organizational Admin
                   </h1>
                   <div className="flex items-center space-x-4 ml-auto">
+                    <GoogleDriveStatus accessToken={accessToken} />
                     <UserInfo />
                   </div>
                 </div>

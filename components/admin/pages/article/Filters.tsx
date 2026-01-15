@@ -105,13 +105,11 @@ export default function ArticleFilters({
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-        <div className="flex-1 max-w-md">
-          <SearchInput
-            placeholder="Search article..."
-            value={searchTerm}
-            onChange={onSearchChange}
-          />
-        </div>
+        <SearchInput
+          placeholder="Search article..."
+          value={searchTerm}
+          onChange={onSearchChange}
+        />
 
         <button
           className="flex items-center px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50"
@@ -147,15 +145,12 @@ export default function ArticleFilters({
             value={categoryFilter}
             onChange={onCategoryFilterChange}
             options={categoryOptions}
+            side="bottom"
           />
-          <div className="flex items-end">
-            {selectedArticles.length > 0 && (
-              <DeleteSelectedButton
-                selectedCount={selectedArticles.length}
-                onClick={onDeleteSelected}
-              />
-            )}
-          </div>
+          <DeleteSelectedButton
+            selectedCount={selectedArticles.length}
+            onClick={onDeleteSelected}
+          />
         </div>
       )}
       {error && <p className="text-xs text-red-500 mt-2">{error}</p>}

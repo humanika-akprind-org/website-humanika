@@ -21,6 +21,7 @@ import {
   FileText,
   BookCheck,
   BookText,
+  Wallet,
 } from "lucide-react";
 import { LogoutButton } from "@/components/admin/auth/LogoutButton";
 import Image from "next/image";
@@ -143,6 +144,27 @@ export default function Sidebar() {
             </div>
           </div>
 
+          {/* Content & Media Section Skeleton */}
+          <div className="mt-6 mb-2">
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-32" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-16" />
+              </div>
+              <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+
           {/* Programs & Events Section Skeleton */}
           <div className="mt-6 mb-2">
             <div className="h-3 bg-gray-200 rounded animate-pulse w-36" />
@@ -185,15 +207,15 @@ export default function Sidebar() {
             </div>
           </div>
 
-          {/* Content & Media Section Skeleton */}
+          {/* Organization Management Section Skeleton */}
           <div className="mt-6 mb-2">
-            <div className="h-3 bg-gray-200 rounded animate-pulse w-32" />
+            <div className="h-3 bg-gray-200 rounded animate-pulse w-40" />
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between p-3 rounded-lg">
               <div className="flex items-center space-x-3">
                 <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
-                <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
               </div>
               <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
             </div>
@@ -310,6 +332,11 @@ export default function Sidebar() {
             roles: [UserRole.DPO, UserRole.BPH],
           },
           {
+            href: "/admin/governance/structure",
+            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+          },
+          { href: "/admin/governance/structure/add", roles: [UserRole.BPH] },
+          {
             href: "/admin/governance/managements",
             roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
           },
@@ -318,15 +345,13 @@ export default function Sidebar() {
             roles: [UserRole.BPH, UserRole.PENGURUS],
           },
           {
-            href: "/admin/governance/structure",
-            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
-          },
-          { href: "/admin/governance/structure/add", roles: [UserRole.BPH] },
-          {
             href: "/admin/governance/tasks",
             roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
           },
-          { href: "/admin/governance/tasks/add", roles: [UserRole.PENGURUS] },
+          {
+            href: "/admin/governance/tasks/add",
+            roles: [UserRole.BPH, UserRole.PENGURUS],
+          },
         ]) && (
           <>
             <div className="mt-6 mb-2">
@@ -361,30 +386,6 @@ export default function Sidebar() {
 
             {hasDropdownAccess([
               {
-                href: "/admin/governance/managements",
-                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
-              },
-              {
-                href: "/admin/governance/managements/add",
-                roles: [UserRole.BPH, UserRole.PENGURUS],
-              },
-            ]) && (
-              <NavDropdown icon={UserCog} title="Managements">
-                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
-                  <NavDropdownItem href="/admin/governance/managements">
-                    All Management
-                  </NavDropdownItem>
-                )}
-                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
-                  <NavDropdownItem href="/admin/governance/managements/add">
-                    Add New
-                  </NavDropdownItem>
-                )}
-              </NavDropdown>
-            )}
-
-            {hasDropdownAccess([
-              {
                 href: "/admin/governance/structure",
                 roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
               },
@@ -409,12 +410,36 @@ export default function Sidebar() {
 
             {hasDropdownAccess([
               {
+                href: "/admin/governance/managements",
+                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+              },
+              {
+                href: "/admin/governance/managements/add",
+                roles: [UserRole.BPH, UserRole.PENGURUS],
+              },
+            ]) && (
+              <NavDropdown icon={UserCog} title="Profile Managements">
+                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
+                  <NavDropdownItem href="/admin/governance/managements">
+                    All Profile Management
+                  </NavDropdownItem>
+                )}
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
+                  <NavDropdownItem href="/admin/governance/managements/add">
+                    Add New
+                  </NavDropdownItem>
+                )}
+              </NavDropdown>
+            )}
+
+            {hasDropdownAccess([
+              {
                 href: "/admin/governance/tasks",
                 roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
               },
               {
                 href: "/admin/governance/tasks/add",
-                roles: [UserRole.PENGURUS],
+                roles: [UserRole.BPH, UserRole.PENGURUS],
               },
             ]) && (
               <NavDropdown icon={ClipboardList} title="Department Tasks">
@@ -423,7 +448,7 @@ export default function Sidebar() {
                     All Tasks
                   </NavDropdownItem>
                 )}
-                {hasAccess([UserRole.PENGURUS]) && (
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                   <NavDropdownItem href="/admin/governance/tasks/add">
                     Add New
                   </NavDropdownItem>
@@ -463,6 +488,108 @@ export default function Sidebar() {
                 </NavDropdownItem>
               )}
             </NavDropdown>
+          </>
+        )}
+
+        {/* Content & Media Section */}
+        {hasDropdownAccess([
+          {
+            href: "/admin/content/articles",
+            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+          },
+          {
+            href: "/admin/content/articles/add",
+            roles: [UserRole.BPH, UserRole.PENGURUS],
+          },
+          {
+            href: "/admin/content/articles/categories",
+            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+          },
+          {
+            href: "/admin/content/galleries",
+            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+          },
+          {
+            href: "/admin/content/galleries/add",
+            roles: [UserRole.BPH, UserRole.PENGURUS],
+          },
+          {
+            href: "/admin/content/galleries/categories",
+            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+          },
+        ]) && (
+          <>
+            <div className="mt-6 mb-2">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
+                Content & Media
+              </h3>
+            </div>
+
+            {hasDropdownAccess([
+              {
+                href: "/admin/content/articles",
+                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+              },
+              {
+                href: "/admin/content/articles/add",
+                roles: [UserRole.BPH, UserRole.PENGURUS],
+              },
+              {
+                href: "/admin/content/articles/categories",
+                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+              },
+            ]) && (
+              <NavDropdown icon={Newspaper} title="Articles">
+                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
+                  <NavDropdownItem href="/admin/content/articles">
+                    All Article
+                  </NavDropdownItem>
+                )}
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
+                  <NavDropdownItem href="/admin/content/articles/add">
+                    Add New
+                  </NavDropdownItem>
+                )}
+                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
+                  <NavDropdownItem href="/admin/content/articles/categories">
+                    Categories
+                  </NavDropdownItem>
+                )}
+              </NavDropdown>
+            )}
+
+            {hasDropdownAccess([
+              {
+                href: "/admin/content/galleries",
+                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+              },
+              {
+                href: "/admin/content/galleries/add",
+                roles: [UserRole.BPH, UserRole.PENGURUS],
+              },
+              {
+                href: "/admin/content/galleries/categories",
+                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+              },
+            ]) && (
+              <NavDropdown icon={Images} title="Galleries">
+                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
+                  <NavDropdownItem href="/admin/content/galleries">
+                    All Gallery
+                  </NavDropdownItem>
+                )}
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
+                  <NavDropdownItem href="/admin/content/galleries/add">
+                    Add New
+                  </NavDropdownItem>
+                )}
+                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
+                  <NavDropdownItem href="/admin/content/galleries/categories">
+                    Categories
+                  </NavDropdownItem>
+                )}
+              </NavDropdown>
+            )}
           </>
         )}
 
@@ -539,7 +666,10 @@ export default function Sidebar() {
                 href: "/admin/program/events",
                 roles: [UserRole.BPH, UserRole.PENGURUS],
               },
-              { href: "/admin/program/events/add", roles: [UserRole.PENGURUS] },
+              {
+                href: "/admin/program/events/add",
+                roles: [UserRole.BPH, UserRole.PENGURUS],
+              },
               {
                 href: "/admin/program/events/categories",
                 roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
@@ -555,7 +685,7 @@ export default function Sidebar() {
                     All Events
                   </NavDropdownItem>
                 )}
-                {hasAccess([UserRole.PENGURUS]) && (
+                {hasAccess([UserRole.BPH, UserRole.PENGURUS]) && (
                   <NavDropdownItem href="/admin/program/events/add">
                     Add New
                   </NavDropdownItem>
@@ -767,99 +897,44 @@ export default function Sidebar() {
           </>
         )}
 
-        {/* Content & Media Section */}
+        {/* Organization Management Section - BPH Only */}
         {hasDropdownAccess([
           {
-            href: "/admin/content/articles",
-            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
-          },
-          { href: "/admin/content/articles/add", roles: [UserRole.PENGURUS] },
-          {
-            href: "/admin/content/articles/categories",
-            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+            href: "/admin/content/organization-contacts",
+            roles: [UserRole.BPH],
           },
           {
-            href: "/admin/content/galleries",
-            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+            href: "/admin/content/organization-contacts/add",
+            roles: [UserRole.BPH],
           },
-          { href: "/admin/content/galleries/add", roles: [UserRole.PENGURUS] },
           {
-            href: "/admin/content/galleries/categories",
-            roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
+            href: "/admin/content/statistics",
+            roles: [UserRole.BPH],
+          },
+          {
+            href: "/admin/content/statistics/add",
+            roles: [UserRole.BPH],
           },
         ]) && (
           <>
             <div className="mt-6 mb-2">
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
-                Content & Media
+                Organization Management
               </h3>
             </div>
 
-            {hasDropdownAccess([
-              {
-                href: "/admin/content/articles",
-                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
-              },
-              {
-                href: "/admin/content/articles/add",
-                roles: [UserRole.PENGURUS],
-              },
-              {
-                href: "/admin/content/articles/categories",
-                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
-              },
-            ]) && (
-              <NavDropdown icon={Newspaper} title="Articles">
-                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
-                  <NavDropdownItem href="/admin/content/articles">
-                    All Article
-                  </NavDropdownItem>
-                )}
-                {hasAccess([UserRole.PENGURUS]) && (
-                  <NavDropdownItem href="/admin/content/articles/add">
-                    Add New
-                  </NavDropdownItem>
-                )}
-                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
-                  <NavDropdownItem href="/admin/content/articles/categories">
-                    Categories
-                  </NavDropdownItem>
-                )}
-              </NavDropdown>
-            )}
-
-            {hasDropdownAccess([
-              {
-                href: "/admin/content/galleries",
-                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
-              },
-              {
-                href: "/admin/content/galleries/add",
-                roles: [UserRole.PENGURUS],
-              },
-              {
-                href: "/admin/content/galleries/categories",
-                roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
-              },
-            ]) && (
-              <NavDropdown icon={Images} title="Galleries">
-                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
-                  <NavDropdownItem href="/admin/content/galleries">
-                    All Gallery
-                  </NavDropdownItem>
-                )}
-                {hasAccess([UserRole.PENGURUS]) && (
-                  <NavDropdownItem href="/admin/content/galleries/add">
-                    Add New
-                  </NavDropdownItem>
-                )}
-                {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
-                  <NavDropdownItem href="/admin/content/galleries/categories">
-                    Categories
-                  </NavDropdownItem>
-                )}
-              </NavDropdown>
-            )}
+            <NavDropdown icon={Landmark} title="Organization">
+              {hasAccess([UserRole.BPH]) && (
+                <NavDropdownItem href="/admin/content/organization-contacts">
+                  Organization Contacts
+                </NavDropdownItem>
+              )}
+              {hasAccess([UserRole.BPH]) && (
+                <NavDropdownItem href="/admin/content/statistics">
+                  Statistics
+                </NavDropdownItem>
+              )}
+            </NavDropdown>
           </>
         )}
 
@@ -893,7 +968,7 @@ export default function Sidebar() {
               </h3>
             </div>
 
-            <NavDropdown icon={Landmark} title="Transactions">
+            <NavDropdown icon={Wallet} title="Transactions">
               {hasAccess([UserRole.DPO, UserRole.BPH, UserRole.PENGURUS]) && (
                 <NavDropdownItem href="/admin/finance/transactions">
                   All Transaction

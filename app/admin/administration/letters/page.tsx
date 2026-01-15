@@ -60,6 +60,12 @@ export default function LettersPage() {
     if (filter.search !== undefined) setSearchTerm(filter.search || "");
   };
 
+  const handleDeleteSelected = () => {
+    if (selectedLetters.length > 0) {
+      handleDelete();
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -78,7 +84,12 @@ export default function LettersPage() {
 
       {alert && <Alert type={alert.type} message={alert.message} />}
 
-      <LetterFilters onFilter={handleFilterChange} isLoading={loading} />
+      <LetterFilters
+        onFilter={handleFilterChange}
+        isLoading={loading}
+        selectedCount={selectedLetters.length}
+        onDeleteSelected={handleDeleteSelected}
+      />
 
       <LetterTable
         letters={letters}

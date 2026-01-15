@@ -1,25 +1,27 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
-import {
-  callApi,
-  fetchDriveFiles,
-  fetchDriveFolders,
-} from "@/use-cases/api/google-drive";
+import { callApi, fetchDriveFolders } from "@/use-cases/api/google-drive";
 import {
   loadFolderFromLocalStorage,
   saveFolderToLocalStorage,
 } from "@/app/utils/google-drive";
-import type { LoadingStateTable } from "@/types/google-drive";
+import type { LoadingStateTable, BreadcrumbItem } from "@/types/google-drive";
 
 export const useGoogleDriveFiles = (
   accessToken: string,
-  initialFiles: drive_v3.Schema$File[] = []
+  initialFiles: drive_v3.Schema$File[] = [],
+  pageSize: number = 20
 ) => {
   const [files, setFiles] = useState<drive_v3.Schema$File[]>(initialFiles);
   const [folders, setFolders] = useState<drive_v3.Schema$File[]>([]);
-  const [selectedFolderId] = useState<string>(
-    loadFolderFromLocalStorage() || "root"
-  );
+
+  // Folder navigation state
+  const [currentFolderId, setCurrentFolderId] = useState<string>("root");
+  const [folderPath, setFolderPath] = useState<BreadcrumbItem[]>([]);
+
+  // Store all fetched files
+  const allFilesRef = useRef<drive_v3.Schema$File[]>([]);
+
   const [isLoading, setIsLoading] = useState<LoadingStateTable>({
     files: false,
     folders: false,
@@ -31,24 +33,58 @@ export const useGoogleDriveFiles = (
     setIsLoading((prev) => ({ ...prev, [key]: value }));
   };
 
-  const fetchFiles = useCallback(async () => {
-    setLoadingState("files", true);
-    setError(null);
+  // Fetch all files for a specific folder (no pagination, fetch all at once)
+  const fetchFilesForFolder = useCallback(
+    async (folderId: string) => {
+      setLoadingState("files", true);
+      setError(null);
 
-    try {
-      const filesData = await fetchDriveFiles(accessToken);
-      setFiles(filesData);
-    } catch (err) {
-      console.error("Error fetching files:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load files. Please try again."
-      );
-    } finally {
-      setLoadingState("files", false);
-    }
-  }, [accessToken]);
+      try {
+        let currentPageToken: string | null = null;
+        let allFiles: drive_v3.Schema$File[] = [];
+        let keepFetching = true;
+
+        while (keepFetching) {
+          const res: Response = await fetch(
+            `/api/google-drive?accessToken=${accessToken}&folderId=${folderId}${
+              currentPageToken ? `&pageToken=${currentPageToken}` : ""
+            }&pageSize=${pageSize}`
+          );
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.message || "Failed to fetch files");
+          }
+
+          if (data.files) {
+            allFiles = [...allFiles, ...data.files];
+          }
+
+          currentPageToken = data.nextPageToken || null;
+          keepFetching = !!data.nextPageToken;
+        }
+
+        // Reset - new folder, start fresh
+        allFilesRef.current = allFiles;
+        setFiles(allFiles);
+        setCurrentFolderId(folderId);
+      } catch (err) {
+        console.error("Error fetching files:", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load files. Please try again."
+        );
+      } finally {
+        setLoadingState("files", false);
+      }
+    },
+    [accessToken, pageSize]
+  );
+
+  const fetchFiles = useCallback(async () => {
+    await fetchFilesForFolder(currentFolderId);
+  }, [currentFolderId, fetchFilesForFolder]);
 
   const fetchFolders = useCallback(async () => {
     setLoadingState("folders", true);
@@ -69,16 +105,104 @@ export const useGoogleDriveFiles = (
     }
   }, [accessToken]);
 
-  useEffect(() => {
-    fetchFiles();
-    fetchFolders();
-  }, [fetchFiles, fetchFolders]);
+  // Navigate to a folder
+  const navigateToFolder = useCallback(
+    (folderId: string, folderName: string) => {
+      // Reset files when navigating
+      allFilesRef.current = [];
+      setFiles([]);
 
-  useEffect(() => {
-    if (selectedFolderId) {
-      saveFolderToLocalStorage(selectedFolderId);
+      // Update path
+      if (folderId === "root") {
+        setFolderPath([]);
+      } else {
+        // Append the new folder to the current path
+        setFolderPath((prev) => [...prev, { id: folderId, name: folderName }]);
+      }
+
+      // Navigate to the folder
+      setCurrentFolderId(folderId);
+      saveFolderToLocalStorage(folderId);
+    },
+    []
+  );
+
+  // Navigate to parent folder
+  const navigateToParent = useCallback(() => {
+    // Reset files when navigating
+    allFilesRef.current = [];
+    setFiles([]);
+
+    if (folderPath.length === 0) {
+      // Go back to root
+      setCurrentFolderId("root");
+      setFolderPath([]);
+      saveFolderToLocalStorage("root");
+      return;
     }
-  }, [selectedFolderId]);
+
+    // Get the parent folder from path
+    const parentPath = folderPath.slice(0, -1);
+    const parentFolder = parentPath[parentPath.length - 1];
+
+    if (parentFolder) {
+      setCurrentFolderId(parentFolder.id);
+    } else {
+      setCurrentFolderId("root");
+    }
+
+    setFolderPath(parentPath);
+    saveFolderToLocalStorage(currentFolderId);
+  }, [folderPath, currentFolderId]);
+
+  // Navigate to any breadcrumb level
+  const navigateToBreadcrumb = useCallback(
+    (folderId: string) => {
+      // Reset files when navigating
+      allFilesRef.current = [];
+      setFiles([]);
+
+      if (folderId === "root") {
+        setCurrentFolderId("root");
+        setFolderPath([]);
+        saveFolderToLocalStorage("root");
+        return;
+      }
+
+      // Find this folder in the path
+      const pathIndex = folderPath.findIndex((item) => item.id === folderId);
+
+      if (pathIndex >= 0) {
+        // Navigate to this level in the path
+        const newPath = folderPath.slice(0, pathIndex + 1);
+        setFolderPath(newPath);
+        setCurrentFolderId(folderId);
+      } else {
+        // If not in path, navigate directly (shouldn't happen in normal use)
+        setFolderPath([]);
+        setCurrentFolderId(folderId);
+      }
+
+      saveFolderToLocalStorage(folderId);
+    },
+    [folderPath]
+  );
+
+  // Initial load - restore folder from localStorage
+  useEffect(() => {
+    const savedFolderId = loadFolderFromLocalStorage();
+    if (savedFolderId && savedFolderId !== "root") {
+      setCurrentFolderId(savedFolderId);
+    }
+  }, []);
+
+  // Fetch files when folder changes (only on client-side)
+  useEffect(() => {
+    if (accessToken) {
+      fetchFiles();
+      fetchFolders();
+    }
+  }, [accessToken, fetchFiles, fetchFolders]);
 
   return {
     files,
@@ -87,8 +211,16 @@ export const useGoogleDriveFiles = (
     error,
     fetchFiles,
     fetchFolders,
+    // Navigation state
+    currentFolderId,
+    folderPath,
+    // Navigation functions
+    navigateToFolder,
+    navigateToParent,
+    navigateToBreadcrumb,
     setLoadingState,
     setError,
+    setFiles,
   };
 };
 
@@ -154,6 +286,112 @@ export const useFileOperations = (
     }
   };
 
+  const createFolder = async (
+    folderName: string,
+    parentFolderId?: string
+  ): Promise<boolean> => {
+    setIsOperating(true);
+    setOperationError(null);
+
+    try {
+      const res = await callApi({
+        action: "createFolder",
+        fileName: folderName,
+        folderId: parentFolderId || "root",
+        accessToken,
+      });
+
+      if (res.success) {
+        return true;
+      } else {
+        throw new Error(res.message || "Failed to create folder");
+      }
+    } catch (err) {
+      console.error("Create folder error:", err);
+      setOperationError(
+        err instanceof Error
+          ? err.message
+          : "Failed to create folder. Please try again."
+      );
+      return false;
+    } finally {
+      setIsOperating(false);
+    }
+  };
+
+  const uploadFile = async (
+    file: File,
+    fileName?: string,
+    folderId?: string
+  ): Promise<boolean> => {
+    setIsOperating(true);
+    setOperationError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("action", "upload");
+      formData.append("accessToken", accessToken);
+      formData.append("folderId", folderId || "root");
+      formData.append("fileName", fileName || file.name);
+
+      const res = await callApi(
+        {
+          action: "upload",
+          accessToken,
+        },
+        formData
+      );
+
+      if (res.success) {
+        return true;
+      } else {
+        throw new Error(res.message || "Upload failed");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setOperationError(
+        err instanceof Error ? err.message : "Upload failed. Please try again."
+      );
+      return false;
+    } finally {
+      setIsOperating(false);
+    }
+  };
+
+  const renameFile = async (
+    fileId: string,
+    newName: string
+  ): Promise<boolean> => {
+    setIsOperating(true);
+    setOperationError(null);
+
+    try {
+      const res = await callApi({
+        action: "rename",
+        fileId,
+        newName,
+        accessToken,
+      });
+
+      if (res.success) {
+        return true;
+      } else {
+        throw new Error(res.message || "Failed to rename file");
+      }
+    } catch (err) {
+      console.error("Rename error:", err);
+      setOperationError(
+        err instanceof Error
+          ? err.message
+          : "Failed to rename file. Please try again."
+      );
+      return false;
+    } finally {
+      setIsOperating(false);
+    }
+  };
+
   return {
     copiedFileId,
     isOperating,
@@ -161,5 +399,8 @@ export const useFileOperations = (
     handleApiOperation,
     handleCopyUrl,
     setOperationError,
+    createFolder,
+    uploadFile,
+    renameFile,
   };
 };

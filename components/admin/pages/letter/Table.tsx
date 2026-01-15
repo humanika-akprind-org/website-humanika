@@ -3,12 +3,12 @@
 import { useRef, useState } from "react";
 import {
   FiFileText,
-  FiUser,
   FiEye,
   FiEdit,
   FiTrash,
   FiClipboard,
   FiTarget,
+  FiDownload,
 } from "react-icons/fi";
 import type { Letter } from "@/types/letter";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -21,6 +21,7 @@ import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
+import { getGoogleDriveDirectUrl } from "@/lib/google-drive/file-utils";
 
 interface LetterTableProps {
   letters: Letter[];
@@ -117,6 +118,16 @@ export default function LetterTable({
     onAddLetter();
   };
 
+  // Handle download letter
+  const handleDownloadLetter = (letter: Letter) => {
+    if (letter.letter) {
+      const downloadUrl = getGoogleDriveDirectUrl(letter.letter, "download");
+      if (downloadUrl) {
+        window.open(downloadUrl, "_blank");
+      }
+    }
+  };
+
   // Determine empty state props based on typeFilter
   const emptyStateProps = (() => {
     if (typeFilter === "proposal") {
@@ -146,13 +157,6 @@ export default function LetterTable({
       };
     }
   })();
-
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat("id-ID", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(new Date(date));
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
@@ -253,33 +257,11 @@ export default function LetterTable({
               >
                 Approval
               </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                User
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("createdAt")}
-              >
-                <div className="flex items-center">
-                  Created At
-                  <SortIcon
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                    field="createdAt"
-                    iconType="arrow"
-                  />
-                </div>
-              </th>
+
               <th
                 scope="col"
                 className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Actions
-              </th>
+              />
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -289,7 +271,7 @@ export default function LetterTable({
                 ref={(el) => {
                   rowRefs.current[index] = el;
                 }}
-                className="hover:bg-gray-50 transition-colors"
+                className="hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 <td className="pl-6 pr-2 py-4 whitespace-nowrap">
                   <Checkbox
@@ -297,33 +279,65 @@ export default function LetterTable({
                     onChange={() => onLetterSelect(letter.id)}
                   />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${letter.letter}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   <div className="text-sm font-medium text-gray-900">
                     {letter.regarding}
                   </div>
                   <div className="text-sm text-gray-500">
                     {letter.number && `No: ${letter.number}`}
-                    {letter.origin && ` • Dari: ${letter.origin}`}
+                    {letter.origin && ` • From: ${letter.origin}`}
                   </div>
                   <div className="text-sm text-gray-500">
-                    Kepada: {letter.destination}
+                    To: {letter.destination}
                   </div>
                   {letter.letter && (
                     <div className="text-sm text-blue-600 mt-1">
                       <span className="inline-flex items-center">
                         <FiFileText className="w-4 h-4 mr-1" />
-                        File terlampir
+                        Attached file
                       </span>
                     </div>
                   )}
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${letter.letter}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   <TypeChip type={letter.type} />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${letter.letter}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   <PriorityChip priority={letter.priority} />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${letter.letter}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   <div className="text-sm text-gray-900">
                     {letter.classification
                       ? letter.classification
@@ -333,10 +347,26 @@ export default function LetterTable({
                       : "-"}
                   </div>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${letter.letter}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   <StatusChip status={letter.status} />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td
+                  className="px-4 py-4 whitespace-nowrap"
+                  onClick={() => {
+                    window.open(
+                      `https://drive.google.com/file/d/${letter.letter}/view`,
+                      "_blank"
+                    );
+                  }}
+                >
                   {letter.approvals && letter.approvals.length > 0 ? (
                     <StatusApproval
                       status={
@@ -350,15 +380,6 @@ export default function LetterTable({
                   ) : (
                     <span className="text-xs text-gray-400">No approvals</span>
                   )}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <FiUser className="mr-2 text-gray-400" size={14} />
-                    {letter.createdBy?.name || "Unknown"}
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(letter.createdAt)}
                 </td>
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                   <DropdownMenu
@@ -379,6 +400,13 @@ export default function LetterTable({
                     >
                       <FiEdit className="mr-2" size={14} />
                       Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDownloadLetter(letter)}
+                      color="default"
+                    >
+                      <FiDownload className="mr-2" size={14} />
+                      Download
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onDeleteLetter(letter)}

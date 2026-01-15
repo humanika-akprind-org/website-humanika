@@ -52,6 +52,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
 
     switch (sortField) {
       case "photo":
+      case "name":
         aValue = a.user?.name?.toLowerCase() || "";
         bValue = b.user?.name?.toLowerCase() || "";
         break;
@@ -145,6 +146,21 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("name")}
+              >
+                <div className="flex items-center">
+                  Name
+                  <SortIcon
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    field="name"
+                    iconType="arrow"
+                  />
+                </div>
+              </th>
+              <th
+                scope="col"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort("department")}
               >
                 <div className="flex items-center">
@@ -210,6 +226,11 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <ManagementAvatar management={management} />
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">
+                    {management.user?.name || "Unknown User"}
+                  </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <DepartmentChip department={management.department} />

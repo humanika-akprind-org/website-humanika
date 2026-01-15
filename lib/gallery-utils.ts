@@ -1,5 +1,7 @@
 import type { Event } from "@/types/event";
 import type { Gallery } from "@/types/gallery";
+import { getGoogleDrivePreviewUrl } from "@/lib/google-drive/file-utils";
+import { getEarliestScheduleDate } from "@/lib/event-utils";
 
 export interface Album {
   id: string;
@@ -8,6 +10,7 @@ export interface Album {
   cover: string;
   lastUpdated: Date;
   eventName: string;
+  eventSlug: string;
   category: string;
   date: Date;
   year: string;
@@ -23,20 +26,8 @@ export interface GalleryStats {
 /**
  * Gets the preview URL for an image, handling Google Drive links
  */
-export const getPreviewUrl = (image: string | null | undefined): string => {
-  if (!image) return "";
-  if (image.includes("drive.google.com")) {
-    const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch) {
-      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
-    }
-    return image;
-  } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
-    return `/api/drive-image?fileId=${image}`;
-  } else {
-    return image;
-  }
-};
+export const getPreviewUrl = (image: string | null | undefined): string =>
+  getGoogleDrivePreviewUrl(image);
 
 /**
  * Groups galleries by eventId and counts them
@@ -55,7 +46,10 @@ export const getGalleryCounts = (
 export const getYearsFromEvents = (events: Event[]): string[] => {
   const years = Array.from(
     new Set(
-      events.map((event) => new Date(event.startDate).getFullYear().toString())
+      events
+        .map((event) => getEarliestScheduleDate(event.schedules))
+        .filter((date): date is Date => date !== null)
+        .map((date) => date.getFullYear().toString())
     )
   ).sort((a, b) => b.localeCompare(a));
 
@@ -71,7 +65,15 @@ export const transformEventsToAlbums = (
 ): Album[] =>
   events
     .map((event) => {
-      const eventDate = new Date(event.startDate);
+      // Get earliest date from schedules
+      const eventDate =
+        event.schedules && event.schedules.length > 0
+          ? new Date(
+              Math.min(
+                ...event.schedules.map((s) => new Date(s.date).getTime())
+              )
+            )
+          : new Date(event.createdAt);
       return {
         id: event.id,
         title: event.name,
@@ -79,6 +81,7 @@ export const transformEventsToAlbums = (
         cover: getPreviewUrl(event.thumbnail),
         lastUpdated: event.updatedAt,
         eventName: event.name,
+        eventSlug: event.slug,
         category: event.department?.toString() || "General",
         date: eventDate,
         year: eventDate.getFullYear().toString(),

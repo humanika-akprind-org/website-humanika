@@ -121,6 +121,7 @@ export default function DocumentsPage() {
           setCurrentDocument(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal

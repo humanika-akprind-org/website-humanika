@@ -5,6 +5,82 @@ import { Readable } from "stream";
 
 export const dynamic = "force-dynamic"; // Required for Next.js API routes
 
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const accessToken = searchParams.get("accessToken");
+  const folderId = searchParams.get("folderId");
+  const pageToken = searchParams.get("pageToken");
+  const pageSizeParam = searchParams.get("pageSize");
+
+  if (!accessToken) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Access token is required",
+      },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const drive = google.drive({
+      version: "v3",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    // Build query to fetch files in a specific folder
+    let query = "trashed = false";
+    if (folderId && folderId !== "root") {
+      query += ` and '${folderId}' in parents`;
+    } else {
+      // For root folder, only get files directly in root
+      query += ` and 'root' in parents`;
+    }
+
+    const pageSize = pageSizeParam ? parseInt(pageSizeParam, 10) : 20;
+
+    // Query to get files in the folder including shortcuts
+    // Shortcuts have mimeType 'application/vnd.google-apps.shortcut' and are returned with their target info
+    const { data } = await drive.files.list({
+      q: query,
+      fields:
+        "files(id,name,mimeType,size,modifiedTime,webViewLink,webContentLink,parents,shortcutDetails),nextPageToken",
+      orderBy: "name asc",
+      pageSize,
+      pageToken: pageToken || undefined,
+    });
+
+    return NextResponse.json({
+      success: true,
+      files: data.files || [],
+      folderId: folderId || "root",
+      nextPageToken: data.nextPageToken || null,
+    });
+  } catch (error: unknown) {
+    console.error("[DRIVE_FILES_ERROR]", error);
+
+    let message = "Failed to fetch files";
+    let statusCode = 500;
+
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const err = error as { response?: { status?: number; data?: unknown } };
+      statusCode = err.response?.status || 500;
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message,
+      },
+      { status: statusCode }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get("content-type") || "";
@@ -111,7 +187,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle other actions (rename, delete, etc.)
-    const { action, fileId, fileName, accessToken, permission } =
+    const { action, fileId, fileName, accessToken, permission, folderId } =
       await request.json();
 
     if (!accessToken) {
@@ -188,6 +264,27 @@ export async function POST(request: NextRequest) {
           requestBody: permission,
         });
         return NextResponse.json({ success: true });
+
+      case "createFolder":
+        if (!fileName) {
+          throw new Error("Missing folder name");
+        }
+        const { data: folderData } = await drive.files.create({
+          requestBody: {
+            name: fileName,
+            mimeType: "application/vnd.google-apps.folder",
+            parents: folderId && folderId !== "root" ? [folderId] : undefined,
+          },
+          fields: "id,name,mimeType",
+        });
+        return NextResponse.json({
+          success: true,
+          folder: {
+            id: folderData.id,
+            name: folderData.name,
+            mimeType: folderData.mimeType,
+          },
+        });
 
       default:
         throw new Error("Invalid action");

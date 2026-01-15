@@ -4,6 +4,12 @@ import { ManagementApi } from "@/use-cases/api/management";
 import { UserApi } from "@/use-cases/api/user";
 import { PeriodApi } from "@/use-cases/api/period";
 import type { Management } from "@/types/management";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 type ManagementFiltersType = {
   department: string;
@@ -190,12 +196,39 @@ export function useManagementManagement() {
 
   const confirmDelete = async () => {
     try {
+      // Get access token for Google Drive operations
+      const accessToken = await getAccessTokenAction();
+
       if (currentManagement) {
+        // Single management deletion: Delete file from Google Drive first, then delete database record
+        if (
+          currentManagement.photo &&
+          isGoogleDriveFile(currentManagement.photo)
+        ) {
+          const fileId = getFileIdFromFile(currentManagement.photo);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
         await ManagementApi.deleteManagement(currentManagement.id, "");
         setSuccess("Management deleted successfully");
         fetchAllManagements();
       } else if (selectedManagements.length > 0) {
+        // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const managementId of selectedManagements) {
+          // Find the management object to get the photo URL
+          const managementToDelete = managements.find(
+            (m) => m.id === managementId
+          );
+          if (
+            managementToDelete?.photo &&
+            isGoogleDriveFile(managementToDelete.photo)
+          ) {
+            const fileId = getFileIdFromFile(managementToDelete.photo);
+            if (fileId) {
+              await deleteGoogleDriveFile(fileId, accessToken);
+            }
+          }
           await ManagementApi.deleteManagement(managementId, "");
         }
         setSuccess(

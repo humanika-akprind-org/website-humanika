@@ -159,8 +159,7 @@ model Event {
   goal          String     // Tujuan kegiatan
   department    Department // Departemen penyelenggara
   periodId      String     @db.ObjectId
-  startDate     DateTime   // Tanggal mulai
-  endDate       DateTime   // Tanggal selesai
+  schedules     Json       @default("[]") // Jadwal kegiatan (array of schedule items)
   status        Status     @default(DRAFT)
   workProgramId String?    @db.ObjectId
   categoryId    String?    @db.ObjectId
@@ -663,7 +662,7 @@ enum ActivityType {
 @@index([authorId, status])
 
 // Event indexes
-@@index([startDate, status, periodId, department])
+@@index([status, periodId, department])
 
 // Finance indexes
 @@index([date, type, status])

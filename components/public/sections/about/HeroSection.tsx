@@ -1,8 +1,108 @@
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
-import { STATS_DATA } from "../../pages/about/constants";
+import {
+  Sparkles,
+  Users,
+  Calendar,
+  Code,
+  Award,
+  TrendingUp,
+  BookOpen,
+} from "lucide-react";
+import { useActivePeriodStatistic } from "@/hooks/statistic/useStatistics";
+
+// Fallback data when API is loading or fails
+const FALLBACK_STATS_DATA = [
+  {
+    icon: <Users className="w-6 h-6" />,
+    value: "0+",
+    label: "Anggota Aktif",
+    color: "from-blue-500 to-blue-600",
+  },
+  {
+    icon: <Calendar className="w-6 h-6" />,
+    value: "0+",
+    label: "Event Tahunan",
+    color: "from-purple-500 to-purple-600",
+  },
+  {
+    icon: <Code className="w-6 h-6" />,
+    value: "0+",
+    label: "Proyek Inovasi",
+    color: "from-green-500 to-green-600",
+  },
+  {
+    icon: <Award className="w-6 h-6" />,
+    value: "0+",
+    label: "Penghargaan",
+    color: "from-orange-500 to-orange-600",
+  },
+  {
+    icon: <TrendingUp className="w-6 h-6" />,
+    value: "0%",
+    label: "Kepuasan Anggota",
+    color: "from-red-500 to-red-600",
+  },
+  {
+    icon: <BookOpen className="w-6 h-6" />,
+    value: "0+",
+    label: "Materi Pembelajaran",
+    color: "from-cyan-500 to-cyan-600",
+  },
+];
+
+// Format number with + suffix if > threshold
+const formatStatValue = (value: number, threshold: number = 100): string => {
+  if (value >= threshold) {
+    return `${value}+`;
+  }
+  return value.toString();
+};
 
 export default function HeroSection() {
+  const { statistic, isLoading } = useActivePeriodStatistic();
+
+  // Transform API data to stats format, fallback to hardcoded data
+  const statsData = statistic
+    ? [
+        {
+          icon: <Users className="w-6 h-6" />,
+          value: formatStatValue(statistic.activeMembers),
+          label: "Anggota Aktif",
+          color: "from-blue-500 to-blue-600",
+        },
+        {
+          icon: <Calendar className="w-6 h-6" />,
+          value: formatStatValue(statistic.annualEvents),
+          label: "Event Tahunan",
+          color: "from-purple-500 to-purple-600",
+        },
+        {
+          icon: <Code className="w-6 h-6" />,
+          value: formatStatValue(statistic.innovationProjects),
+          label: "Proyek Inovasi",
+          color: "from-green-500 to-green-600",
+        },
+        {
+          icon: <Award className="w-6 h-6" />,
+          value: formatStatValue(statistic.awards),
+          label: "Penghargaan",
+          color: "from-orange-500 to-orange-600",
+        },
+        {
+          icon: <TrendingUp className="w-6 h-6" />,
+          value: `${statistic.memberSatisfaction}%`,
+          label: "Kepuasan Anggota",
+          color: "from-red-500 to-red-600",
+        },
+        {
+          icon: <BookOpen className="w-6 h-6" />,
+          value: formatStatValue(statistic.learningMaterials),
+          label: "Materi Pembelajaran",
+          color: "from-cyan-500 to-cyan-600",
+        },
+      ]
+    : FALLBACK_STATS_DATA;
+
   return (
     <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
       {/* Background Effects */}
@@ -46,26 +146,42 @@ export default function HeroSection() {
             transition={{ delay: 0.3 }}
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-16"
           >
-            {STATS_DATA.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 + 0.3 }}
-                whileHover={{ y: -5 }}
-                className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20"
-              >
-                <div
-                  className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br ${stat.color} rounded-lg mb-3 mx-auto`}
-                >
-                  <div className="text-white">{stat.icon}</div>
-                </div>
-                <div className="text-2xl font-bold text-white mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-primary-200">{stat.label}</div>
-              </motion.div>
-            ))}
+            {isLoading
+              ? // Loading skeleton
+                FALLBACK_STATS_DATA.map((_, index) => (
+                  <motion.div
+                    key={`skeleton-${index}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 + 0.3 }}
+                    className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20"
+                  >
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-lg mb-3 mx-auto animate-pulse" />
+                    <div className="h-8 bg-white/20 rounded mb-1 mx-auto animate-pulse w-16" />
+                    <div className="h-4 bg-white/20 rounded mx-auto animate-pulse w-24" />
+                  </motion.div>
+                ))
+              : // Actual stats data
+                statsData.map((stat, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 + 0.3 }}
+                    whileHover={{ y: -5 }}
+                    className="text-center p-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20"
+                  >
+                    <div
+                      className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br ${stat.color} rounded-lg mb-3 mx-auto`}
+                    >
+                      <div className="text-white">{stat.icon}</div>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-primary-200">{stat.label}</div>
+                  </motion.div>
+                ))}
           </motion.div>
         </motion.div>
       </div>

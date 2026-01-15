@@ -15,10 +15,10 @@ import { HeroSection } from "@/components/public/sections/article/HeroSection";
 import { ControlBar } from "@/components/public/pages/article/ControlBar";
 import { ArticleGrid } from "@/components/public/pages/article/ArticleGrid";
 import { ArticleList } from "@/components/public/pages/article/ArticleList";
-import { LoadingState } from "@/components/public/pages/article/LoadingState";
-import { ErrorState } from "@/components/public/pages/article/ErrorState";
-import { EmptyState } from "@/components/public/pages/article/EmptyState";
-import { PopularCategories } from "@/components/public/pages/article/PopularCategories";
+import ArticlePageLoadingState from "@/components/public/pages/article/ArticlePageLoadingState";
+import ArticleErrorState from "@/components/public/pages/article/ArticleErrorState";
+import { ArticleEmptyState } from "@/components/public/pages/article/ArticleEmptyState";
+import { PopularCategories } from "@/components/public/pages/article/EventPopularCategories";
 
 interface ArticlePageType extends React.FC {
   fetchArticles?: () => void;
@@ -88,7 +88,7 @@ const ArticlePage: ArticlePageType = () => {
 
   // Loading state for initial load
   if (loading && page === 1) {
-    return <LoadingState />;
+    return <ArticlePageLoadingState />;
   }
 
   const hasActiveFilters = Boolean(
@@ -116,10 +116,6 @@ const ArticlePage: ArticlePageType = () => {
           onSortChange={setSortBy}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
-          onRefresh={() => {
-            setPage(1);
-            fetchArticles();
-          }}
           searchQuery={searchQuery}
           onSearchClear={() => setSearchQuery("")}
           onResetFilters={resetFilters}
@@ -128,11 +124,11 @@ const ArticlePage: ArticlePageType = () => {
         {/* Article Content */}
         <div className="mt-12">
           {/* Error State */}
-          {error && <ErrorState error={error} onRetry={fetchArticles} />}
+          {error && <ArticleErrorState error={error} onRetry={fetchArticles} />}
 
           {/* Empty State */}
           {!loading && !error && filteredAndSortedArticles.length === 0 && (
-            <EmptyState
+            <ArticleEmptyState
               hasFilters={hasActiveFilters}
               onResetFilters={resetFilters}
             />
@@ -201,6 +197,7 @@ const ArticlePage: ArticlePageType = () => {
         <PopularCategories
           categories={categories}
           selectedCategory={selectedCategory}
+          onCategoryClick={setSelectedCategory}
         />
       </div>
     </div>

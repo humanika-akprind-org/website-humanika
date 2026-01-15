@@ -60,6 +60,31 @@ export const getArticle = async (id: string): Promise<Article> => {
   return response.json();
 };
 
+export const getArticleBySlug = async (slug: string): Promise<Article> => {
+  const response = await fetch(`${API_URL}/article/slug/${slug}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to fetch article by slug";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      // If we can't parse the error response, use the status text
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+};
+
 export const createArticle = async (
   data: CreateArticleInput
 ): Promise<Article> => {
@@ -132,6 +157,7 @@ export const deleteArticle = async (id: string): Promise<void> => {
 export const ArticleApi = {
   getArticles,
   getArticle,
+  getArticleBySlug,
   createArticle,
   updateArticle,
   deleteArticle,

@@ -1,20 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
-import { getArticle } from "use-cases/api/article";
+import { getArticleBySlug } from "use-cases/api/article";
 import type { Article } from "types/article";
 
-export function useArticleDetail(id: string | undefined) {
+export function useArticleDetail(slug: string | undefined) {
   const [article, setArticle] = useState<Article | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadArticle = useCallback(async () => {
-    if (!id) return;
+    if (!slug) return;
 
     try {
       setLoading(true);
       setError(null);
-      const articleData = await getArticle(id);
+      const articleData = await getArticleBySlug(slug);
       setArticle(articleData);
       setRelatedArticles(articleData.relatedArticles || []);
     } catch (err) {
@@ -24,11 +24,11 @@ export function useArticleDetail(id: string | undefined) {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [slug]);
 
   useEffect(() => {
     loadArticle();
-  }, [id, loadArticle]);
+  }, [slug, loadArticle]);
 
   const refetch = () => {
     loadArticle();

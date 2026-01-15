@@ -72,9 +72,16 @@ const EventTable: React.FC<EventTableProps> = ({
         aValue = a.status.toLowerCase();
         bValue = b.status.toLowerCase();
         break;
-      case "startDate":
-        aValue = new Date(a.startDate).getTime();
-        bValue = new Date(b.startDate).getTime();
+      case "scheduleDate":
+        // Sort by earliest schedule date
+        aValue =
+          a.schedules && a.schedules.length > 0
+            ? Math.min(...a.schedules.map((s) => new Date(s.date).getTime()))
+            : 0;
+        bValue =
+          b.schedules && b.schedules.length > 0
+            ? Math.min(...b.schedules.map((s) => new Date(s.date).getTime()))
+            : 0;
         break;
 
       default:
@@ -151,14 +158,14 @@ const EventTable: React.FC<EventTableProps> = ({
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("startDate")}
+                onClick={() => handleSort("scheduleDate")}
               >
                 <div className="flex items-center">
                   Date Range
                   <SortIcon
                     sortField={sortField}
                     sortDirection={sortDirection}
-                    field="startDate"
+                    field="scheduleDate"
                     iconType="arrow"
                   />
                 </div>
@@ -258,17 +265,47 @@ const EventTable: React.FC<EventTableProps> = ({
                   />
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Intl.DateTimeFormat("id-ID", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(new Date(event.startDate))}{" "}
-                  -{" "}
-                  {new Intl.DateTimeFormat("id-ID", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(new Date(event.endDate))}
+                  {(() => {
+                    // Get earliest and latest dates from schedules
+                    const hasSchedules =
+                      event.schedules && event.schedules.length > 0;
+                    const startDate = hasSchedules
+                      ? new Date(
+                          Math.min(
+                            ...event.schedules.map((s) =>
+                              new Date(s.date).getTime()
+                            )
+                          )
+                        )
+                      : null;
+                    const endDate = hasSchedules
+                      ? new Date(
+                          Math.max(
+                            ...event.schedules.map((s) =>
+                              new Date(s.date).getTime()
+                            )
+                          )
+                        )
+                      : startDate;
+
+                    if (!startDate) return "No date set";
+
+                    return (
+                      <>
+                        {new Intl.DateTimeFormat("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }).format(startDate)}{" "}
+                        -{" "}
+                        {new Intl.DateTimeFormat("id-ID", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }).format(endDate || startDate)}
+                      </>
+                    );
+                  })()}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <DepartmentChip department={event.department} />

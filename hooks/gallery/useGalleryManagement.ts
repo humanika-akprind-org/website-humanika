@@ -3,6 +3,12 @@ import { useRouter } from "next/navigation";
 import { deleteGallery } from "@/use-cases/api/gallery";
 import type { Gallery } from "@/types/gallery";
 import { useGalleries } from "./useGalleries";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import {
+  isGoogleDriveFile,
+  getFileIdFromFile,
+  deleteGoogleDriveFile,
+} from "@/lib/google-drive/file-utils";
 
 export function useGalleryManagement() {
   const router = useRouter();
@@ -83,12 +89,34 @@ export function useGalleryManagement() {
 
   const confirmDelete = async () => {
     try {
+      // Get access token for Google Drive operations
+      const accessToken = await getAccessTokenAction();
+
       if (currentGallery) {
+        // Single gallery deletion: Delete file from Google Drive first, then delete database record
+        if (currentGallery.image && isGoogleDriveFile(currentGallery.image)) {
+          const fileId = getFileIdFromFile(currentGallery.image);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
         await deleteGallery(currentGallery.id);
         setSuccess("Gallery deleted successfully");
         refetch();
       } else if (selectedGalleries.length > 0) {
+        // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const galleryId of selectedGalleries) {
+          // Find the gallery object to get the image URL
+          const galleryToDelete = galleries.find((g) => g.id === galleryId);
+          if (
+            galleryToDelete?.image &&
+            isGoogleDriveFile(galleryToDelete.image)
+          ) {
+            const fileId = getFileIdFromFile(galleryToDelete.image);
+            if (fileId) {
+              await deleteGoogleDriveFile(fileId, accessToken);
+            }
+          }
           await deleteGallery(galleryId);
         }
         setSelectedGalleries([]);

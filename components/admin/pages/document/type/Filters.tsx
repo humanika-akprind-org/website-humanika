@@ -16,23 +16,19 @@ export default function DocumentTypeFilters({
 }: DocumentTypeFiltersProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         {/* Search */}
-        <div className="flex-1 max-w-md">
-          <SearchInput
-            placeholder="Search types..."
-            value={searchTerm}
-            onChange={onSearchChange}
-          />
-        </div>
+        <SearchInput
+          placeholder="Search types..."
+          value={searchTerm}
+          onChange={onSearchChange}
+        />
 
         {/* Bulk Actions */}
-        {selectedCategories.length > 0 && (
-          <DeleteSelectedButton
-            selectedCount={selectedCategories.length}
-            onClick={onDeleteSelected}
-          />
-        )}
+        <DeleteSelectedButton
+          selectedCount={selectedCategories.length}
+          onClick={onDeleteSelected}
+        />
       </div>
     </div>
   );

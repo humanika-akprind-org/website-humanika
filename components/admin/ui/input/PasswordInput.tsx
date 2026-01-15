@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Eye, EyeOff } from "lucide-react";
 
 interface PasswordInputProps {
   label: string;
@@ -27,6 +28,8 @@ export default function PasswordInput({
   hint,
   className,
 }: PasswordInputProps) {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div className={cn("relative", className)}>
       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -39,17 +42,28 @@ export default function PasswordInput({
           </div>
         )}
         <Input
-          type="password"
+          type={showPassword ? "text" : "password"}
           name={name}
           required={required}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
           className={cn(
-            "w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+            "w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10",
             icon && "pl-10"
           )}
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+        >
+          {showPassword ? (
+            <EyeOff className="h-5 w-5" />
+          ) : (
+            <Eye className="h-5 w-5" />
+          )}
+        </button>
       </div>
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
       {hint && <p className="text-xs text-gray-500 mt-1">{hint}</p>}

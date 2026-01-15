@@ -8,6 +8,7 @@ import {
   useFileOperations,
 } from "@/hooks/drive/table/useGoogleDrive";
 import DeleteModal from "./modal/DeleteModal";
+import Breadcrumbs from "./Breadcrumbs";
 import type { DriveTableProps } from "@/types/google-drive";
 
 const DriveTable: React.FC<DriveTableProps> = ({
@@ -25,10 +26,16 @@ const DriveTable: React.FC<DriveTableProps> = ({
     fileName: "",
   });
 
-  const { files, isLoading, error, fetchFiles } = useGoogleDriveFiles(
-    accessToken,
-    initialFiles
-  );
+  const {
+    files,
+    isLoading,
+    error,
+    fetchFiles,
+    currentFolderId,
+    folderPath,
+    navigateToFolder,
+    navigateToBreadcrumb,
+  } = useGoogleDriveFiles(accessToken, initialFiles);
 
   const {
     copiedFileId,
@@ -135,6 +142,14 @@ const DriveTable: React.FC<DriveTableProps> = ({
         </div>
       )}
 
+      {/* Breadcrumbs Navigation */}
+      <Breadcrumbs
+        items={folderPath}
+        currentFolderId={currentFolderId}
+        onNavigate={navigateToBreadcrumb}
+        isLoading={isLoading.files}
+      />
+
       {/* Filter Controls */}
       <div className="mb-4 flex space-x-2">
         <button
@@ -226,37 +241,50 @@ const DriveTable: React.FC<DriveTableProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         {file.mimeType?.includes("folder") ? (
-                          <svg
-                            className="flex-shrink-0 h-5 w-5 text-blue-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                          <button
+                            onClick={() =>
+                              navigateToFolder(file.id || "", file.name || "")
+                            }
+                            disabled={isLoading.files}
+                            className="flex items-center hover:bg-blue-50 rounded p-1 -m-1 transition-colors"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                            />
-                          </svg>
+                            <svg
+                              className="flex-shrink-0 h-5 w-5 text-blue-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                              />
+                            </svg>
+                            <span className="ml-3 truncate max-w-[320px] text-blue-600 hover:underline cursor-pointer">
+                              {file.name}
+                            </span>
+                          </button>
                         ) : (
-                          <svg
-                            className="flex-shrink-0 h-5 w-5 text-gray-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                          </svg>
+                          <>
+                            <svg
+                              className="flex-shrink-0 h-5 w-5 text-gray-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
+                            </svg>
+                            <span className="ml-3 truncate max-w-[320px]">
+                              {file.name}
+                            </span>
+                          </>
                         )}
-                        <span className="ml-3 truncate max-w-[320px]">
-                          {file.name}
-                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

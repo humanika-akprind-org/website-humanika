@@ -9,9 +9,10 @@ interface Album {
   id: string;
   title: string;
   count: number;
-  cover?: string;
-  lastUpdated?: Date;
+  cover: string;
+  lastUpdated: Date;
   eventName?: string;
+  eventSlug?: string;
   category?: string;
 }
 

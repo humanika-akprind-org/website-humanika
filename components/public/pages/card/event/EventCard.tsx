@@ -3,7 +3,7 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import type { Event } from "@/types/event";
+import type { Event, ScheduleItem } from "@/types/event";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 import { Calendar, ArrowRight, Tag } from "lucide-react";
 import { motion } from "framer-motion";
@@ -22,6 +22,24 @@ function getPreviewUrl(image: string | null | undefined): string {
   } else {
     return image;
   }
+}
+
+// Helper function to get earliest schedule date
+function getEarliestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date));
+  return new Date(Math.min(...dates.map((d) => d.getTime())));
+}
+
+// Helper function to get latest schedule date
+function getLatestScheduleDate(
+  schedules: ScheduleItem[] | null | undefined
+): Date | null {
+  if (!schedules || schedules.length === 0) return null;
+  const dates = schedules.map((s) => new Date(s.date));
+  return new Date(Math.max(...dates.map((d) => d.getTime())));
 }
 
 // Category color mapping
@@ -57,42 +75,48 @@ export default function EventCard({
     "default";
   const categoryColor = categoryColors[category] || categoryColors.default;
 
-  // Date calculations
-  const startDate = event.startDate ? new Date(event.startDate) : null;
-  const endDate = event.endDate ? new Date(event.endDate) : null;
+  // Date calculations based on schedules
+  const earliestDate = getEarliestScheduleDate(event.schedules);
+  const latestDate = getLatestScheduleDate(event.schedules);
 
   // Format date range
   const formatDateRange = () => {
-    if (!startDate || !endDate) return "Loading...";
+    if (!earliestDate || !latestDate) return "Jadwal belum ditentukan";
 
-    if (startDate.toDateString() === endDate.toDateString()) {
-      return startDate.toLocaleDateString("id-ID", {
+    if (earliestDate.toDateString() === latestDate.toDateString()) {
+      return earliestDate.toLocaleDateString("id-ID", {
         weekday: "short",
         day: "numeric",
         month: "short",
         year: "numeric",
       });
     }
-    return `${startDate.toLocaleDateString("id-ID", {
+    return `${earliestDate.toLocaleDateString("id-ID", {
       day: "numeric",
       month: "short",
-    })} - ${endDate.toLocaleDateString("id-ID", {
+    })} - ${latestDate.toLocaleDateString("id-ID", {
       day: "numeric",
       month: "short",
       year: "numeric",
     })}`;
   };
 
-  const month = startDate?.toLocaleString("id-ID", { month: "short" }) || "N/A";
-  const day = startDate?.getDate() || null;
+  const month =
+    earliestDate?.toLocaleString("id-ID", { month: "short" }) || "N/A";
+  const day = earliestDate?.getDate() || null;
   const isMultiDay =
-    startDate &&
-    endDate &&
-    endDate.getTime() - startDate.getTime() > 24 * 60 * 60 * 1000;
+    earliestDate &&
+    latestDate &&
+    latestDate.getTime() - earliestDate.getTime() > 24 * 60 * 60 * 1000;
 
-  // Status badge
+  // Status badge based on schedules
   const now = new Date();
-  const eventStatus = startDate && startDate > now ? "upcoming" : "ongoing";
+  const eventStatus =
+    earliestDate && earliestDate > now
+      ? "upcoming"
+      : latestDate && latestDate < now
+      ? "past"
+      : "ongoing";
 
   return (
     <motion.div
@@ -110,16 +134,26 @@ export default function EventCard({
           ${
             eventStatus === "upcoming"
               ? "bg-blue-500/20 text-blue-600 border border-blue-500/30"
+              : eventStatus === "past"
+              ? "bg-gray-500/20 text-gray-600 border border-gray-500/30"
               : "bg-green-500/20 text-green-600 border border-green-500/30"
           }
         `}
         >
           <div
             className={`w-2 h-2 rounded-full ${
-              eventStatus === "upcoming" ? "bg-blue-500" : "bg-green-500"
+              eventStatus === "upcoming"
+                ? "bg-blue-500"
+                : eventStatus === "past"
+                ? "bg-gray-500"
+                : "bg-green-500"
             } animate-pulse`}
           />
-          {eventStatus === "upcoming" ? "Coming Soon" : "Sedang Berlangsung"}
+          {eventStatus === "upcoming"
+            ? "Coming Soon"
+            : eventStatus === "past"
+            ? "Selesai"
+            : "Sedang Berlangsung"}
         </div>
       </div>
 
@@ -211,7 +245,7 @@ export default function EventCard({
         {/* Action Buttons */}
         <div className="flex items-center justify-end pt-4 border-t border-grey-100">
           <Link
-            href={`/event/${event.id}`}
+            href={`/event/${event.slug}`}
             className="group/link inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 font-semibold shadow-md hover:shadow-lg"
           >
             <span>Detail</span>

@@ -23,6 +23,7 @@ export default function EventsPage() {
   const [periodFilter, setPeriodFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [workProgramFilter, setWorkProgramFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const {
     events,
@@ -85,6 +86,8 @@ export default function EventsPage() {
         onDepartmentFilterChange={setDepartmentFilter}
         workProgramFilter={workProgramFilter}
         onWorkProgramFilterChange={setWorkProgramFilter}
+        categoryFilter={categoryFilter}
+        onCategoryFilterChange={setCategoryFilter}
         selectedCount={selectedEvents.length}
         onDeleteSelected={() => handleDelete()}
       />
@@ -193,11 +196,21 @@ export default function EventsPage() {
                   Start Date
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {new Intl.DateTimeFormat("id-ID", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(new Date(currentEvent.startDate))}
+                  {currentEvent.schedules && currentEvent.schedules.length > 0
+                    ? new Intl.DateTimeFormat("id-ID", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      }).format(
+                        new Date(
+                          Math.min(
+                            ...currentEvent.schedules.map((s) =>
+                              new Date(s.date).getTime()
+                            )
+                          )
+                        )
+                      )
+                    : "No schedule set"}
                 </p>
               </div>
 
@@ -206,11 +219,21 @@ export default function EventsPage() {
                   End Date
                 </label>
                 <p className="mt-1 text-sm text-gray-900">
-                  {new Intl.DateTimeFormat("id-ID", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(new Date(currentEvent.endDate))}
+                  {currentEvent.schedules && currentEvent.schedules.length > 0
+                    ? new Intl.DateTimeFormat("id-ID", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      }).format(
+                        new Date(
+                          Math.max(
+                            ...currentEvent.schedules.map((s) =>
+                              new Date(s.date).getTime()
+                            )
+                          )
+                        )
+                      )
+                    : "No schedule set"}
                 </p>
               </div>
 

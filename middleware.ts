@@ -57,10 +57,13 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
     pattern: /^\/admin\/governance\/tasks$/,
     roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
   },
-  { pattern: /^\/admin\/governance\/tasks\/add$/, roles: [UserRole.PENGURUS] },
+  {
+    pattern: /^\/admin\/governance\/tasks\/add$/,
+    roles: [UserRole.BPH, UserRole.PENGURUS],
+  },
   {
     pattern: /^\/admin\/governance\/tasks\/edit\/[^/]+$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
 
   // People & Access Section
@@ -90,10 +93,13 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
     pattern: /^\/admin\/program\/events$/,
     roles: [UserRole.BPH, UserRole.PENGURUS],
   },
-  { pattern: /^\/admin\/program\/events\/add$/, roles: [UserRole.PENGURUS] },
+  {
+    pattern: /^\/admin\/program\/events\/add$/,
+    roles: [UserRole.BPH, UserRole.PENGURUS],
+  },
   {
     pattern: /^\/admin\/program\/events\/edit\/[^/]+$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
   {
     pattern: /^\/admin\/program\/events\/categories$/,
@@ -101,11 +107,11 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
   },
   {
     pattern: /^\/admin\/program\/events\/categories\/add$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
   {
     pattern: /^\/admin\/program\/events\/categories\/edit\/[^/]+$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
   {
     pattern: /^\/admin\/program\/events\/approval$/,
@@ -191,10 +197,13 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
     pattern: /^\/admin\/content\/articles$/,
     roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
   },
-  { pattern: /^\/admin\/content\/articles\/add$/, roles: [UserRole.PENGURUS] },
+  {
+    pattern: /^\/admin\/content\/articles\/add$/,
+    roles: [UserRole.BPH, UserRole.PENGURUS],
+  },
   {
     pattern: /^\/admin\/content\/articles\/edit\/[^/]+$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
   {
     pattern: /^\/admin\/content\/articles\/categories$/,
@@ -202,20 +211,23 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
   },
   {
     pattern: /^\/admin\/content\/articles\/categories\/add$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
   {
     pattern: /^\/admin\/content\/articles\/categories\/edit\/[^/]+$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
   {
     pattern: /^\/admin\/content\/galleries$/,
     roles: [UserRole.DPO, UserRole.BPH, UserRole.PENGURUS],
   },
-  { pattern: /^\/admin\/content\/galleries\/add$/, roles: [UserRole.PENGURUS] },
+  {
+    pattern: /^\/admin\/content\/galleries\/add$/,
+    roles: [UserRole.BPH, UserRole.PENGURUS],
+  },
   {
     pattern: /^\/admin\/content\/galleries\/edit\/[^/]+$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
   {
     pattern: /^\/admin\/content\/galleries\/categories$/,
@@ -223,11 +235,11 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
   },
   {
     pattern: /^\/admin\/content\/galleries\/categories\/add$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
   {
     pattern: /^\/admin\/content\/galleries\/categories\/edit\/[^/]+$/,
-    roles: [UserRole.PENGURUS],
+    roles: [UserRole.BPH, UserRole.PENGURUS],
   },
 
   // Finance Section
@@ -262,6 +274,32 @@ const rbacRules: { pattern: RegExp; roles: UserRole[] }[] = [
   {
     pattern: /^\/admin\/finance\/transactions\/categories\/edit\/[^/]+$/,
     roles: [UserRole.BPH, UserRole.PENGURUS],
+  },
+
+  // Organization Management Section - BPH Only
+  {
+    pattern: /^\/admin\/content\/organization-contacts$/,
+    roles: [UserRole.BPH],
+  },
+  {
+    pattern: /^\/admin\/content\/organization-contacts\/add$/,
+    roles: [UserRole.BPH],
+  },
+  {
+    pattern: /^\/admin\/content\/organization-contacts\/edit\/[^/]+$/,
+    roles: [UserRole.BPH],
+  },
+  {
+    pattern: /^\/admin\/content\/statistics$/,
+    roles: [UserRole.BPH],
+  },
+  {
+    pattern: /^\/admin\/content\/statistics\/add$/,
+    roles: [UserRole.BPH],
+  },
+  {
+    pattern: /^\/admin\/content\/statistics\/edit\/[^/]+$/,
+    roles: [UserRole.BPH],
   },
 
   // System Section
@@ -359,6 +397,11 @@ export async function middleware(request: NextRequest) {
       }
     }
     // Allow access if not logged in
+    return NextResponse.next();
+  }
+
+  // Allow OAuth2 callback API route to proceed without authentication check
+  if (pathname === "/api/oauth2/callback") {
     return NextResponse.next();
   }
 

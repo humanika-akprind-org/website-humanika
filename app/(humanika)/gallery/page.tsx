@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { Loader2, Image as ImageIcon, RefreshCw } from "lucide-react";
+import { Image as ImageIcon, RefreshCw } from "lucide-react";
 import { useGalleryPageData } from "@/hooks/gallery/useGalleryPageData";
 import { useGalleryFilters } from "@/hooks/gallery/useGalleryFilters";
 import GalleryHeroSection from "@/components/public/sections/gallery/GalleryHeroSection";
@@ -9,6 +9,7 @@ import GalleryTabs from "@/components/public/pages/gallery/GalleryTabs";
 import GalleryControlBar from "@/components/public/pages/gallery/GalleryControlBar";
 import GalleryContent from "@/components/public/pages/gallery/GalleryContent";
 import TopEventsSection from "@/components/public/sections/gallery/TopEventsSection";
+import GalleryPageLoadingState from "@/components/public/pages/gallery/GalleryPageLoadingState";
 
 export default function GalleryPage() {
   const { events, galleries, isLoading, error, refetch, albums, stats, years } =
@@ -29,19 +30,7 @@ export default function GalleryPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
-        <div className="container mx-auto px-4 py-16">
-          <div className="flex flex-col items-center justify-center py-24">
-            <div className="relative">
-              <Loader2 className="w-16 h-16 text-primary-600 animate-spin" />
-              <div className="w-8 h-8 bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full" />
-            </div>
-            <p className="mt-6 text-grey-600 font-medium">Memuat galeri...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <GalleryPageLoadingState />;
   }
 
   if (error) {

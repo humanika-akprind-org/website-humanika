@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Calendar, Trophy, BarChart3 } from "lucide-react";
+import { Calendar, Trophy, BarChart3, Clock } from "lucide-react";
 import type { EventTab, EventStats } from "@/hooks/event/useEventPage";
 
 interface EventTabsProps {
@@ -19,6 +19,12 @@ export default function EventTabs({
       label: "Mendatang",
       icon: <Calendar className="w-4 h-4" />,
       count: stats.upcoming,
+    },
+    {
+      id: "ongoing" as const,
+      label: "Sedang Berlangsung",
+      icon: <Clock className="w-4 h-4" />,
+      count: stats.ongoing,
     },
     {
       id: "past" as const,
