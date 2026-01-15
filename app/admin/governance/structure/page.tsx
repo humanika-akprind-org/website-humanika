@@ -99,6 +99,7 @@ export default function StructuresPage() {
           setCurrentStructure(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal

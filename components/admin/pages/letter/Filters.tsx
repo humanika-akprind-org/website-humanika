@@ -100,7 +100,7 @@ export default function LetterFilters({
 
       {/* Advanced Filters */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 pt-4 border-t border-gray-100">
           <SelectFilter
             label="Type"
             value={filters.type || ""}
@@ -155,25 +155,29 @@ export default function LetterFilters({
             ]}
           />
 
-          <SelectFilter
-            label="Period"
-            value={filters.periodId || ""}
-            onChange={(value) => handleFilterChange("periodId", value)}
-            options={[
-              { value: "", label: "All Periods" },
-              ...periods.map((period) => ({
-                value: period.id,
-                label: period.name,
-              })),
-            ]}
-          />
-          {loadingPeriods && (
-            <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
-          )}
-          <DeleteSelectedButton
-            selectedCount={selectedCount}
-            onClick={onDeleteSelected}
-          />
+          <div>
+            <SelectFilter
+              label="Period"
+              value={filters.periodId || ""}
+              onChange={(value) => handleFilterChange("periodId", value)}
+              options={[
+                { value: "", label: "All Periods" },
+                ...periods.map((period) => ({
+                  value: period.id,
+                  label: period.name,
+                })),
+              ]}
+            />
+            {loadingPeriods && (
+              <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
+            )}
+          </div>
+          <div className="flex items-end">
+            <DeleteSelectedButton
+              selectedCount={selectedCount}
+              onClick={onDeleteSelected}
+            />
+          </div>
         </div>
       )}
     </div>

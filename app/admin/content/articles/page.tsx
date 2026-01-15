@@ -109,6 +109,7 @@ export default function ArticlesPage() {
           setCurrentArticle(null);
         }}
         onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
       />
 
       <ViewModal
