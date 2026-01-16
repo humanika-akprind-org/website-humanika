@@ -15,6 +15,7 @@ import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import { getGoogleDriveDirectUrl } from "@/lib/google-drive/file-utils";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface LetterTableProps {
   letters: Letter[];
@@ -47,6 +48,8 @@ export default function LetterTable({
   onAddLetter,
   typeFilter,
 }: LetterTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("letters");
+
   // Filter letters by type if typeFilter is provided
   const filteredLetters = typeFilter
     ? letters.filter(
@@ -123,30 +126,34 @@ export default function LetterTable({
 
   // Determine empty state props based on typeFilter
   const emptyStateProps = (() => {
+    const actionButton = canAdd() ? (
+      <AddButton onClick={handleAddLetter} text="Add Letter" />
+    ) : null;
+
     if (typeFilter === "proposal") {
       return {
         icon: <BookText size={48} className="mx-auto" />,
         title: "No proposals found",
         description: "Try adjusting your search or filter criteria",
-        actionButton: (
+        actionButton: canAdd() ? (
           <AddButton onClick={handleAddLetter} text="Add Proposal" />
-        ),
+        ) : null,
       };
     } else if (typeFilter === "accountabilityreport") {
       return {
         icon: <BookCheck size={48} className="mx-auto" />,
         title: "No accountability reports found",
         description: "Try adjusting your search or filter criteria",
-        actionButton: (
+        actionButton: canAdd() ? (
           <AddButton onClick={handleAddLetter} text="Add Accountability" />
-        ),
+        ) : null,
       };
     } else {
       return {
         icon: <FileText size={48} className="mx-auto" />,
         title: "No letters found",
         description: "Try adjusting your search or filter criteria",
-        actionButton: <AddButton onClick={handleAddLetter} text="Add Letter" />,
+        actionButton,
       };
     }
   })();
@@ -387,13 +394,15 @@ export default function LetterTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onEditLetter(letter.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onEditLetter(letter.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={() => handleDownloadLetter(letter)}
                       color="default"
@@ -401,13 +410,15 @@ export default function LetterTable({
                       <FiDownload className="mr-2" size={14} />
                       Download
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteLetter(letter)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteLetter(letter)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>

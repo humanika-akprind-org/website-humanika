@@ -13,6 +13,7 @@ import Pagination from "../../ui/pagination/Pagination";
 import StatusChip from "../../ui/chip/Status";
 import StatusApproval from "../../ui/chip/StatusApproval";
 import { getGoogleDriveDirectUrl } from "@/lib/google-drive/file-utils";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface FinanceTableProps {
   finances: Finance[];
@@ -43,6 +44,7 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
   onPageChange,
   onAddFinance,
 }) => {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("transactions");
   const [sortField, setSortField] = useState("date");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
@@ -313,13 +315,15 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditFinance(finance.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditFinance(finance.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={() => handleDownloadProof(finance)}
                       color="default"
@@ -327,13 +331,15 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                       <FiDownload className="mr-2" size={14} />
                       Download
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteFinance(finance)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteFinance(finance)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -348,7 +354,9 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
           title="No finances found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={handleAddFinance} text="Add Finance" />
+            canAdd() ? (
+              <AddButton onClick={handleAddFinance} text="Add Finance" />
+            ) : null
           }
         />
       )}

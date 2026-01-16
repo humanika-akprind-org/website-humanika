@@ -20,6 +20,7 @@ interface ArticleFiltersProps {
   categoryFilter: string;
   onCategoryFilterChange: (category: string) => void;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 export default function ArticleFilters({
@@ -33,6 +34,7 @@ export default function ArticleFilters({
   categoryFilter,
   onCategoryFilterChange,
   onDeleteSelected,
+  canDelete,
 }: ArticleFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
@@ -146,10 +148,12 @@ export default function ArticleFilters({
             onChange={onCategoryFilterChange}
             options={categoryOptions}
           />
-          <DeleteSelectedButton
-            selectedCount={selectedArticles.length}
-            onClick={onDeleteSelected}
-          />
+          {canDelete && canDelete() && (
+            <DeleteSelectedButton
+              selectedCount={selectedArticles.length}
+              onClick={onDeleteSelected}
+            />
+          )}
         </div>
       )}
       {error && <p className="text-xs text-red-500 mt-2">{error}</p>}

@@ -13,6 +13,7 @@ interface PeriodFiltersProps {
   onStatusFilterChange: (status: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 export default function PeriodFilters({
@@ -22,6 +23,7 @@ export default function PeriodFilters({
   onStatusFilterChange,
   selectedCount,
   onDeleteSelected,
+  canDelete,
 }: PeriodFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -53,10 +55,12 @@ export default function PeriodFilters({
               { value: "INACTIVE", label: "Inactive" },
             ]}
           />
-          <DeleteSelectedButton
-            selectedCount={selectedCount}
-            onClick={onDeleteSelected}
-          />
+          {canDelete && canDelete() && (
+            <DeleteSelectedButton
+              selectedCount={selectedCount}
+              onClick={onDeleteSelected}
+            />
+          )}
         </div>
       )}
     </div>

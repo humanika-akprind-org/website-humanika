@@ -14,6 +14,7 @@ import Pagination from "../../ui/pagination/Pagination";
 import AddButton from "../../ui/button/AddButton";
 import EmptyState from "../../ui/EmptyState";
 import SortIcon from "../../ui/SortIcon";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 export default function UserTable({
   users,
@@ -32,6 +33,7 @@ export default function UserTable({
   onPageChange,
   onAddUser,
 }: UserTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("users");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -231,20 +233,24 @@ export default function UserTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onEditUser(user.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteUser(user)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onEditUser(user.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteUser(user)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                     {!user.isActive ? (
                       <DropdownMenuItem
                         onClick={() => onUnlockAccount(user.id)}
@@ -275,7 +281,9 @@ export default function UserTable({
           icon={<Users size={48} className="mx-auto" />}
           title="No users found"
           description="Try adjusting your search or filter criteria"
-          actionButton={<AddButton onClick={onAddUser} text="Add User" />}
+          actionButton={
+            canAdd() ? <AddButton onClick={onAddUser} text="Add User" /> : null
+          }
         />
       )}
 

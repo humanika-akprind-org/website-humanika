@@ -25,6 +25,7 @@ interface FinanceFiltersProps {
   onPeriodFilterChange: (period: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 export default function FinanceFilters({
@@ -42,6 +43,7 @@ export default function FinanceFilters({
   onPeriodFilterChange,
   selectedCount,
   onDeleteSelected,
+  canDelete,
 }: FinanceFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [workPrograms, setWorkPrograms] = useState<
@@ -231,10 +233,12 @@ export default function FinanceFilters({
             />
           </div>
           <div className="flex items-end">
-            <DeleteSelectedButton
-              selectedCount={selectedCount}
-              onClick={onDeleteSelected}
-            />
+            {canDelete && canDelete() && (
+              <DeleteSelectedButton
+                selectedCount={selectedCount}
+                onClick={onDeleteSelected}
+              />
+            )}
           </div>
         </div>
       )}

@@ -13,6 +13,7 @@ import DropdownMenu from "../../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../../ui/chip/Department";
 import { exportSingleTaskToPDF } from "./export-button/ExportPDFButton";
 import { exportSingleTaskToWord } from "./export-button/ExportWordButton";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface TaskTableProps {
   tasks: DepartmentTask[];
@@ -42,6 +43,7 @@ export default function TaskTable({
   onPageChange,
   onAddTask,
 }: TaskTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("tasks");
   const [sortField, setSortField] = useState("title");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -219,13 +221,15 @@ export default function TaskTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onEditTask(task.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onEditTask(task.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={() => exportSingleTaskToPDF(task)}
                       color="red"
@@ -240,13 +244,15 @@ export default function TaskTable({
                       <File className="mr-2" size={14} />
                       Export Word
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteTask([task.id])}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteTask([task.id])}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -260,7 +266,9 @@ export default function TaskTable({
           icon={<ClipboardList size={48} className="mx-auto" />}
           title="No tasks found"
           description="Try adjusting your search or filter criteria"
-          actionButton={<AddButton onClick={onAddTask} text="Add Task" />}
+          actionButton={
+            canAdd() ? <AddButton onClick={onAddTask} text="Add Task" /> : null
+          }
         />
       )}
 

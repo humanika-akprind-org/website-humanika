@@ -12,6 +12,7 @@ import EmptyState from "../../../ui/EmptyState";
 import AddButton from "../../../ui/button/AddButton";
 import SortIcon from "../../../ui/SortIcon";
 import Pagination from "../../../ui/pagination/Pagination";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface GalleryCategoryTableProps {
   categories: GalleryCategory[];
@@ -42,6 +43,8 @@ export default function GalleryCategoryTable({
   onPageChange,
   onAddCategory,
 }: GalleryCategoryTableProps) {
+  const { canAdd, canEdit, canDelete } =
+    useResourcePermission("gallery-categories");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -238,20 +241,24 @@ export default function GalleryCategoryTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditCategory(category.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteCategory(category)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditCategory(category.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteCategory(category)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -266,7 +273,9 @@ export default function GalleryCategoryTable({
           title="No categories found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={handleAddCategory} text="Add Category" />
+            canAdd() ? (
+              <AddButton onClick={handleAddCategory} text="Add Category" />
+            ) : null
           }
         />
       )}

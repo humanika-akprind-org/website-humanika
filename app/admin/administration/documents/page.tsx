@@ -14,6 +14,7 @@ import StatusChip from "components/admin/ui/chip/Status";
 import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
 import DateDisplay from "components/admin/ui/date/DateDisplay";
 import { useDocumentManagement } from "@/hooks/document/useDocumentManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 export default function DocumentsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -52,6 +53,8 @@ export default function DocumentsPage() {
     excludeTypes: ["proposal", "accountabilityreport"],
   });
 
+  const { canAdd, canDelete } = useResourcePermission("documents");
+
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
@@ -69,7 +72,9 @@ export default function DocumentsPage() {
           title="Documents Management"
           description="Manage and organize your documents"
         />
-        <AddButton onClick={handleAddDocument} text="Add Document" />
+        {canAdd() && (
+          <AddButton onClick={handleAddDocument} text="Add Document" />
+        )}
       </div>
 
       <DocumentStats documents={documents} />
@@ -98,6 +103,7 @@ export default function DocumentsPage() {
         onPeriodFilterChange={setPeriodFilter}
         selectedCount={selectedDocuments.length}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
 
       <DocumentTable

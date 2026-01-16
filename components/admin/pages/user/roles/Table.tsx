@@ -14,6 +14,8 @@ import EmptyState from "../../../ui/EmptyState";
 import DropdownMenu, {
   DropdownMenuItem,
 } from "../../../ui/dropdown/DropdownMenu";
+import { useResourcePermission } from "@/hooks/usePermission";
+
 export default function UserTable({
   users,
   selectedUsers,
@@ -26,6 +28,7 @@ export default function UserTable({
   onPageChange,
   onVerifyUser,
 }: UserTableProps & { onVerifyUser: (userId: string) => void }) {
+  const { canEdit } = useResourcePermission("user-roles");
   const unverifiedUsers = users.filter((user) => !user.verifiedAccount);
 
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
@@ -128,13 +131,15 @@ export default function UserTable({
                     isLastItem={index === filteredUsers.length - 1}
                     hasMultipleItems={filteredUsers.length > 1}
                   >
-                    <DropdownMenuItem
-                      onClick={() => onVerifyUser(user.id)}
-                      color="green"
-                    >
-                      <FiCheck className="mr-2" size={14} />
-                      Verify Account
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onVerifyUser(user.id)}
+                        color="green"
+                      >
+                        <FiCheck className="mr-2" size={14} />
+                        Verify Account
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>

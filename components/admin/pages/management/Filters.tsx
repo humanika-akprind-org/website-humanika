@@ -22,6 +22,7 @@ interface ManagementFiltersProps {
   onFilterChange: (key: keyof ManagementFiltersType, value: string) => void;
   onSearchChange: (term: string) => void;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 // Helper function to format enum values for display
@@ -49,6 +50,7 @@ export default function ManagementFilters({
   onFilterChange,
   onSearchChange,
   onDeleteSelected,
+  canDelete,
 }: ManagementFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<Period[]>([]);
@@ -113,10 +115,12 @@ export default function ManagementFilters({
             onChange={(value) => onFilterChange("periodId", value)}
             options={[{ value: "all", label: "All Periods" }, ...periodOptions]}
           />
-          <DeleteSelectedButton
-            selectedCount={selectedManagements.length}
-            onClick={onDeleteSelected}
-          />
+          {canDelete && canDelete() && (
+            <DeleteSelectedButton
+              selectedCount={selectedManagements.length}
+              onClick={onDeleteSelected}
+            />
+          )}
         </div>
       )}
     </div>

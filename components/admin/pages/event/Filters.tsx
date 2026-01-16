@@ -25,6 +25,7 @@ interface EventFiltersProps {
   onCategoryFilterChange: (category: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 export default function EventFilters({
@@ -40,6 +41,7 @@ export default function EventFilters({
   onCategoryFilterChange,
   selectedCount,
   onDeleteSelected,
+  canDelete,
 }: EventFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
@@ -160,10 +162,12 @@ export default function EventFilters({
               options={workProgramOptions}
             />
           </div>
-          <DeleteSelectedButton
-            selectedCount={selectedCount}
-            onClick={onDeleteSelected}
-          />
+          {canDelete && canDelete() && (
+            <DeleteSelectedButton
+              selectedCount={selectedCount}
+              onClick={onDeleteSelected}
+            />
+          )}
         </div>
       )}
     </div>

@@ -25,6 +25,7 @@ interface DocumentFiltersProps {
   showApprovalStatusFilter?: boolean;
   approvalStatusFilter?: string;
   onApprovalStatusFilterChange?: (status: string) => void;
+  canDelete?: () => boolean;
 }
 
 export default function DocumentFilters({
@@ -42,6 +43,7 @@ export default function DocumentFilters({
   showApprovalStatusFilter = false,
   approvalStatusFilter = "all",
   onApprovalStatusFilterChange = () => {},
+  canDelete,
 }: DocumentFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
@@ -150,10 +152,12 @@ export default function DocumentFilters({
           </div>
 
           <div className="flex items-end">
-            <DeleteSelectedButton
-              selectedCount={selectedCount}
-              onClick={onDeleteSelected}
-            />
+            {canDelete && canDelete() && (
+              <DeleteSelectedButton
+                selectedCount={selectedCount}
+                onClick={onDeleteSelected}
+              />
+            )}
           </div>
         </div>
       )}

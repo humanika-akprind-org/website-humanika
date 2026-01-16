@@ -14,6 +14,7 @@ import StatusChip from "components/admin/ui/chip/Status";
 import DateDisplay from "components/admin/ui/date/DateDisplay";
 import ImageView from "components/admin/ui/avatar/ImageView";
 import { useArticleManagement } from "hooks/article/useArticleManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 export default function ArticlesPage() {
   const {
@@ -48,6 +49,8 @@ export default function ArticlesPage() {
     confirmDelete,
   } = useArticleManagement();
 
+  const { canAdd, canDelete } = useResourcePermission("articles");
+
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
@@ -65,7 +68,9 @@ export default function ArticlesPage() {
           title="Articles"
           description="Manage articles and their details"
         />
-        <AddButton onClick={handleAddArticle} text="Add Article" />
+        {canAdd() && (
+          <AddButton onClick={handleAddArticle} text="Add Article" />
+        )}
       </div>
 
       <ArticleStats articles={articles} />
@@ -83,6 +88,7 @@ export default function ArticlesPage() {
         onCategoryFilterChange={setCategoryFilter}
         selectedArticles={selectedArticles}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
 
       <ArticleTable

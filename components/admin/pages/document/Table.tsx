@@ -12,6 +12,7 @@ import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import { useRef, useState } from "react";
 import { getGoogleDriveDirectUrl } from "@/lib/google-drive/file-utils";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface DocumentTableProps {
   documents: Document[];
@@ -44,6 +45,7 @@ export default function DocumentTable({
   onAddDocument,
   typeFilter,
 }: DocumentTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("documents");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -132,27 +134,27 @@ export default function DocumentTable({
         icon: <BookText size={48} className="mx-auto" />,
         title: "No proposals found",
         description: "Try adjusting your search or filter criteria",
-        actionButton: (
+        actionButton: canAdd() ? (
           <AddButton onClick={handleAddDocument} text="Add Proposal" />
-        ),
+        ) : null,
       };
     } else if (typeFilter === "accountabilityreport") {
       return {
         icon: <BookCheck size={48} className="mx-auto" />,
         title: "No accountability reports found",
         description: "Try adjusting your search or filter criteria",
-        actionButton: (
+        actionButton: canAdd() ? (
           <AddButton onClick={handleAddDocument} text="Add Accountability" />
-        ),
+        ) : null,
       };
     } else {
       return {
         icon: <SquareLibrary size={48} className="mx-auto" />,
         title: "No documents found",
         description: "Try adjusting your search or filter criteria",
-        actionButton: (
+        actionButton: canAdd() ? (
           <AddButton onClick={handleAddDocument} text="Add Document" />
-        ),
+        ) : null,
       };
     }
   })();
@@ -318,13 +320,15 @@ export default function DocumentTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditDocument(document.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditDocument(document.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={() => handleDownloadDocument(document)}
                       color="default"
@@ -332,13 +336,15 @@ export default function DocumentTable({
                       <FiDownload className="mr-2" size={14} />
                       Download
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteDocument(document)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteDocument(document)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>

@@ -12,6 +12,7 @@ import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import ThumbnailCell from "../../ui/ThumbnailCell";
 import StatusChip from "../../ui/chip/Status";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface ArticleTableProps {
   articles: Article[];
@@ -42,6 +43,7 @@ const ArticleTable: React.FC<ArticleTableProps> = ({
   onPageChange,
   onAddArticle,
 }) => {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("articles");
   const [sortField, setSortField] = useState("title");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -254,20 +256,24 @@ const ArticleTable: React.FC<ArticleTableProps> = ({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditArticle(article.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteArticle(article)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditArticle(article.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteArticle(article)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -282,7 +288,9 @@ const ArticleTable: React.FC<ArticleTableProps> = ({
           title="No articles found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={handleAddArticle} text="Add Article" />
+            canAdd() ? (
+              <AddButton onClick={handleAddArticle} text="Add Article" />
+            ) : null
           }
         />
       )}

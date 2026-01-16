@@ -16,6 +16,7 @@ import StatusApprovalChip from "@/components/admin/ui/chip/StatusApproval";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import ImageView from "@/components/admin/ui/avatar/ImageView";
 import { useFinanceManagement } from "@/hooks/finance/useFinanceManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 export default function FinanceTransactionsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -50,6 +51,8 @@ export default function FinanceTransactionsPage() {
     confirmDelete,
   } = useFinanceManagement();
 
+  const { canAdd, canDelete } = useResourcePermission("transactions");
+
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
@@ -67,7 +70,9 @@ export default function FinanceTransactionsPage() {
           title="Finance Transactions"
           description="Manage and organize your financial transactions"
         />
-        <AddButton onClick={handleAddFinance} text="Add Transaction" />
+        {canAdd() && (
+          <AddButton onClick={handleAddFinance} text="Add Transaction" />
+        )}
       </div>
 
       <Stats finances={finances} />
@@ -89,6 +94,7 @@ export default function FinanceTransactionsPage() {
         onPeriodFilterChange={setPeriodFilter}
         selectedCount={selectedFinances.length}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
 
       <FinanceTable

@@ -14,6 +14,7 @@ interface LetterFiltersProps {
   isLoading?: boolean;
   selectedCount: number;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 export default function LetterFilters({
@@ -21,6 +22,7 @@ export default function LetterFilters({
   isLoading,
   selectedCount,
   onDeleteSelected,
+  canDelete,
 }: LetterFiltersProps) {
   const [filters, setFilters] = useState<LetterFilter>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -166,10 +168,12 @@ export default function LetterFilters({
             />
           </div>
           <div className="flex items-end">
-            <DeleteSelectedButton
-              selectedCount={selectedCount}
-              onClick={onDeleteSelected}
-            />
+            {canDelete && canDelete() && (
+              <DeleteSelectedButton
+                selectedCount={selectedCount}
+                onClick={onDeleteSelected}
+              />
+            )}
           </div>
         </div>
       )}

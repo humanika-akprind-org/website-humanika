@@ -20,6 +20,7 @@ interface StructureFiltersProps {
   onFilterChange: (key: keyof StructureFiltersType, value: string) => void;
   onSearchChange: (term: string) => void;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 // Helper function to format enum values for display
@@ -42,6 +43,7 @@ export default function StructureFilters({
   onFilterChange,
   onSearchChange,
   onDeleteSelected,
+  canDelete,
 }: StructureFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
@@ -94,10 +96,12 @@ export default function StructureFilters({
             onChange={(value) => onFilterChange("periodId", value)}
             options={[{ value: "all", label: "All Periods" }, ...periodOptions]}
           />
-          <DeleteSelectedButton
-            selectedCount={selectedCount}
-            onClick={onDeleteSelected}
-          />
+          {canDelete && canDelete() && (
+            <DeleteSelectedButton
+              selectedCount={selectedCount}
+              onClick={onDeleteSelected}
+            />
+          )}
         </div>
       )}
     </div>

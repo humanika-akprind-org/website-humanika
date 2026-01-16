@@ -14,6 +14,7 @@ import DepartmentChip from "@/components/admin/ui/chip/Department";
 import PositionChip from "@/components/admin/ui/chip/Position";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import { useManagementManagement } from "@/hooks/management/useManagementManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 export default function ManagementsPage() {
   const {
@@ -44,6 +45,8 @@ export default function ManagementsPage() {
     handleFilterChange,
   } = useManagementManagement();
 
+  const { canAdd, canDelete } = useResourcePermission("managements");
+
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
@@ -61,10 +64,12 @@ export default function ManagementsPage() {
           title="Profile Management Structure"
           description="Manage all profile management members and their positions"
         />
-        <AddButton
-          onClick={handleAddManagement}
-          text="Add Profile Management"
-        />
+        {canAdd() && (
+          <AddButton
+            onClick={handleAddManagement}
+            text="Add Profile Management"
+          />
+        )}
       </div>
 
       <ManagementStats managements={managements} />
@@ -78,6 +83,7 @@ export default function ManagementsPage() {
         onFilterChange={handleFilterChange}
         onSearchChange={setSearchTerm}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
 
       <ManagementTable

@@ -14,6 +14,7 @@ import DropdownMenuItem from "../../ui/dropdown/DropdownMenuItem";
 import DropdownMenu from "../../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../../ui/chip/Department";
 import StatusApprovalChip from "../../ui/chip/StatusApproval";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface WorkProgramTableProps {
   workPrograms: WorkProgram[];
@@ -42,6 +43,7 @@ export default function WorkProgramTable({
   onPageChange,
   onAddProgram,
 }: WorkProgramTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("works");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -264,20 +266,24 @@ export default function WorkProgramTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onEditProgram(program.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteProgram([program.id])}
-                      color="red"
-                    >
-                      <FiTrash2 className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onEditProgram(program.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteProgram([program.id])}
+                        color="red"
+                      >
+                        <FiTrash2 className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -291,7 +297,11 @@ export default function WorkProgramTable({
           icon={<MonitorCog size={48} className="mx-auto" />}
           title="No work programs found"
           description="Try adjusting your search or filter criteria"
-          actionButton={<AddButton onClick={onAddProgram} text="Add Program" />}
+          actionButton={
+            canAdd() ? (
+              <AddButton onClick={onAddProgram} text="Add Program" />
+            ) : null
+          }
         />
       )}
 

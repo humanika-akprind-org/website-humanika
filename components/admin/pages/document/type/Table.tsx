@@ -12,6 +12,7 @@ import EmptyState from "../../../ui/EmptyState";
 import AddButton from "../../../ui/button/AddButton";
 import SortIcon from "../../../ui/SortIcon";
 import Pagination from "../../../ui/pagination/Pagination";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface DocumentTypeTableProps {
   types: DocumentType[];
@@ -42,6 +43,8 @@ const DocumentTypeTable: React.FC<DocumentTypeTableProps> = ({
   onPageChange,
   onAddType,
 }) => {
+  const { canAdd, canEdit, canDelete } =
+    useResourcePermission("document-types");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -238,20 +241,24 @@ const DocumentTypeTable: React.FC<DocumentTypeTableProps> = ({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditType(type.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteType(type)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditType(type.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteType(type)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -265,7 +272,11 @@ const DocumentTypeTable: React.FC<DocumentTypeTableProps> = ({
           icon={<Tag size={48} className="mx-auto" />}
           title="No types found"
           description="Try adjusting your search or filter criteria"
-          actionButton={<AddButton onClick={handleAddType} text="Add Type" />}
+          actionButton={
+            canAdd() ? (
+              <AddButton onClick={handleAddType} text="Add Type" />
+            ) : null
+          }
         />
       )}
 
