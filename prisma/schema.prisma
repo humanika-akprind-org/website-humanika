@@ -185,6 +185,9 @@ model Period {
   organizationalStructures OrganizationalStructure[] @relation("OrganizationalStructurePeriod") // Struktur organisasi periode ini
   organizationContacts     OrganizationContact[] // Kontak organisasi periode ini
   statistics               Statistic[] // Statistik organisasi periode ini
+  documents                Document[] // Dokumen dalam periode ini
+  galleries                Gallery[] // Galeri dalam periode ini
+  finances                 Finance[] // Transaksi keuangan dalam periode ini
 
   @@index([isActive, startYear, endYear])
   @@map("periods")
