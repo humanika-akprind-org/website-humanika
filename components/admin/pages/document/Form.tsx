@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { FiBriefcase, FiFolder } from "react-icons/fi";
+import { FiBriefcase, FiFolder, FiCalendar } from "react-icons/fi";
 import type {
   Document,
   CreateDocumentInput,
@@ -11,6 +11,7 @@ import type {
 import { Status } from "@/types/enums";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
+import type { Period } from "@/types/period";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
@@ -28,6 +29,7 @@ interface DocumentFormProps {
   loading?: boolean;
   events: Event[];
   letters: Letter[];
+  periods?: Period[];
   fixedDocumentType?: string;
 }
 
@@ -35,6 +37,7 @@ export default function DocumentForm({
   document,
   onSubmit,
   onSubmitForApproval,
+  periods = [],
   fixedDocumentType,
 }: DocumentFormProps) {
   const router = useRouter();
@@ -147,6 +150,20 @@ export default function DocumentForm({
             }))}
             placeholder="Select status"
             icon={<FiBriefcase className="text-gray-400" />}
+            disabled={isLoadingState}
+          />
+
+          <SelectInput
+            label="Period"
+            name="periodId"
+            value={formData.periodId || ""}
+            onChange={(value) => handleSelectChange("periodId", value)}
+            options={periods.map((period) => ({
+              value: period.id,
+              label: period.name,
+            }))}
+            placeholder="Select period (optional)"
+            icon={<FiCalendar className="text-gray-400" />}
             disabled={isLoadingState}
           />
         </div>

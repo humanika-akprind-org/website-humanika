@@ -1,6 +1,7 @@
 import { Status } from "./enums";
 import { GalleryCategory } from "./gallery-category";
 import { Event } from "./event";
+import { Period } from "./period";
 
 export interface Gallery {
   id: string;
@@ -10,6 +11,8 @@ export interface Gallery {
   categoryId?: string | null;
   category?: GalleryCategory;
   image: string;
+  periodId?: string | null;
+  period?: Period;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,6 +22,7 @@ export interface CreateGalleryInput {
   eventId: string;
   categoryId?: string;
   image: string;
+  periodId?: string;
 }
 
 export interface UpdateGalleryInput extends Partial<CreateGalleryInput> {}
@@ -26,4 +30,5 @@ export interface UpdateGalleryInput extends Partial<CreateGalleryInput> {}
 export interface GalleryFilter {
   eventId?: string;
   search?: string;
+  periodId?: string;
 }

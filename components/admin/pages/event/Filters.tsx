@@ -43,21 +43,18 @@ export default function EventFilters({
 }: EventFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch work programs
-  const { workPrograms, isLoading: workProgramsLoading } = useWorkPrograms();
+  const { workPrograms } = useWorkPrograms();
 
   // Fetch event categories
-  const { categories: eventCategories, isLoading: categoriesLoading } =
-    useEventCategories();
+  const { categories: eventCategories } = useEventCategories();
 
   // Fetch periods on component mount
   useEffect(() => {
     const fetchPeriods = async () => {
       try {
-        setLoading(true);
         const periodData = await PeriodApi.getPeriods();
         const periodOptions = periodData.map((period) => ({
           id: period.id,
@@ -74,8 +71,6 @@ export default function EventFilters({
           { id: "fallback-2023", name: "2023" },
           { id: "fallback-2022", name: "2022" },
         ]);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -147,9 +142,6 @@ export default function EventFilters({
               onChange={onPeriodFilterChange}
               options={periodOptions}
             />
-            {loading && (
-              <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
-            )}
             {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
           </div>
           <div>
@@ -158,13 +150,7 @@ export default function EventFilters({
               value={categoryFilter}
               onChange={onCategoryFilterChange}
               options={categoryOptions}
-              side="bottom"
             />
-            {categoriesLoading && (
-              <p className="text-xs text-gray-500 mt-1">
-                Loading categories...
-              </p>
-            )}
           </div>
           <div>
             <SelectFilter
@@ -173,11 +159,6 @@ export default function EventFilters({
               onChange={onWorkProgramFilterChange}
               options={workProgramOptions}
             />
-            {workProgramsLoading && (
-              <p className="text-xs text-gray-500 mt-1">
-                Loading work programs...
-              </p>
-            )}
           </div>
           <DeleteSelectedButton
             selectedCount={selectedCount}

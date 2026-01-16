@@ -112,6 +112,7 @@ export const useFinanceForm = ({
     categoryId: finance?.categoryId || "",
     type: finance?.type || FinanceType.EXPENSE,
     workProgramId: finance?.workProgramId || "",
+    periodId: finance?.periodId || "",
     status: finance?.status || Status.DRAFT,
     proofFile: undefined as File | undefined,
   });
@@ -161,17 +162,24 @@ export const useFinanceForm = ({
     if (file) {
       // Validasi file
       if (file.size > 5 * 1024 * 1024) {
-        setError("File size must be less than 5MB");
+        setErrors((prev) => ({
+          ...prev,
+          proof: "File size must be less than 5MB",
+        }));
         return;
       }
 
       if (!file.type.startsWith("image/")) {
-        setError("Please select an image file");
+        setErrors((prev) => ({
+          ...prev,
+          proof: "Please select an image file",
+        }));
         return;
       }
 
       setFormData((prev) => ({ ...prev, proofFile: file }));
       setError(null);
+      setErrors((prev) => ({ ...prev, proof: "" }));
 
       // Create preview URL
       const url = URL.createObjectURL(file);
@@ -197,24 +205,34 @@ export const useFinanceForm = ({
     setIsSubmitting(true);
     setError(null);
 
-    try {
-      // Validate required fields
-      if (!formData.name.trim()) {
-        throw new Error("Please enter transaction name");
-      }
-      if (isHtmlEmpty(formData.description)) {
-        throw new Error("Please enter description");
-      }
-      if (formData.amount <= 0) {
-        throw new Error("Amount must be greater than 0");
-      }
-      if (!formData.categoryId) {
-        throw new Error("Please select a category");
-      }
-      if (!formData.date) {
-        throw new Error("Please select date");
-      }
+    // Validate required fields
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "Please enter transaction name";
+    }
+    if (isHtmlEmpty(formData.description)) {
+      newErrors.description = "Please enter description";
+    }
+    if (formData.amount <= 0) {
+      newErrors.amount = "Amount must be greater than 0";
+    }
+    if (!formData.categoryId) {
+      newErrors.categoryId = "Please select a category";
+    }
+    if (!formData.date) {
+      newErrors.date = "Please select date";
+    }
+    if (!formData.proofFile && !existingProof) {
+      newErrors.proof = "Please upload a proof image";
+    }
 
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
       // Handle proof deletion if marked for removal
       let proofUrl: string | null | undefined = existingProof;
 
@@ -322,6 +340,7 @@ export const useFinanceForm = ({
     previewUrl,
     existingProof,
     photoLoading,
+    errors,
     handleInputChange,
     handleFileChange,
     removeProof,

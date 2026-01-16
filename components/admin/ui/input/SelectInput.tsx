@@ -25,6 +25,7 @@ interface SelectInputProps {
   searchPlaceholder?: string;
   maxDisplayCount?: number;
   showSearch?: boolean;
+  error?: string;
 }
 
 export default function SelectInput({
@@ -40,6 +41,7 @@ export default function SelectInput({
   searchPlaceholder = "Search...",
   maxDisplayCount = 200,
   showSearch = true,
+  error,
 }: SelectInputProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -97,7 +99,8 @@ export default function SelectInput({
           <SelectTrigger
             className={cn(
               "w-full px-4 py-2 pl-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed",
-              icon && "pl-10"
+              icon && "pl-10",
+              error && "border-red-500 focus:ring-red-500"
             )}
           >
             <SelectValue
@@ -107,7 +110,11 @@ export default function SelectInput({
               {selectedOption?.label || placeholder}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent className="max-h-[300px] overflow-y-auto">
+          <SelectContent
+            position="popper"
+            sideOffset={4}
+            className="max-h-[300px] overflow-y-auto"
+          >
             {showSearch && (
               <div className="sticky top-0 z-50 bg-white border-b border-gray-200 p-2 shadow-sm">
                 <div className="relative">
@@ -157,6 +164,7 @@ export default function SelectInput({
           </SelectContent>
         </Select>
       </div>
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 }

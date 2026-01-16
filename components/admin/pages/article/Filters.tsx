@@ -145,7 +145,6 @@ export default function ArticleFilters({
             value={categoryFilter}
             onChange={onCategoryFilterChange}
             options={categoryOptions}
-            side="bottom"
           />
           <DeleteSelectedButton
             selectedCount={selectedArticles.length}

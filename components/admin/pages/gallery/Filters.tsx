@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useEvents } from "@/hooks/event/useEvents";
 import { useGalleryCategories } from "@/hooks/gallery-category/useGalleryCategories";
+import { PeriodApi } from "@/use-cases/api/period";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";
@@ -15,6 +16,8 @@ interface GalleryFiltersProps {
   onEventFilterChange: (event: string) => void;
   categoryFilter: string;
   onCategoryFilterChange: (category: string) => void;
+  periodFilter: string;
+  onPeriodFilterChange: (period: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
 }
@@ -26,12 +29,39 @@ export default function GalleryFilters({
   onEventFilterChange,
   categoryFilter,
   onCategoryFilterChange,
+  periodFilter,
+  onPeriodFilterChange,
   selectedCount,
   onDeleteSelected,
 }: GalleryFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const { events, isLoading } = useEvents();
-  const { categories, isLoading: isCategoriesLoading } = useGalleryCategories();
+  const { events, isLoading: eventsLoading } = useEvents();
+  const { categories, isLoading: categoriesLoading } = useGalleryCategories();
+  const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
+  const [periodsLoading, setPeriodsLoading] = useState(false);
+
+  // Fetch periods on component mount
+  useEffect(() => {
+    const fetchPeriods = async () => {
+      try {
+        setPeriodsLoading(true);
+        const periodData = await PeriodApi.getPeriods();
+        const periodOptions = periodData.map((period) => ({
+          id: period.id,
+          name: period.name,
+        }));
+        setPeriods(periodOptions);
+      } catch (err) {
+        console.error("Error fetching periods:", err);
+        // Fallback to empty array
+        setPeriods([]);
+      } finally {
+        setPeriodsLoading(false);
+      }
+    };
+
+    fetchPeriods();
+  }, []);
 
   const eventOptions = [
     { value: "all", label: "All Events" },
@@ -46,6 +76,14 @@ export default function GalleryFilters({
     ...categories.map((category) => ({
       value: category.id,
       label: category.name,
+    })),
+  ];
+
+  const periodOptions = [
+    { value: "all", label: "All Period" },
+    ...periods.map((period) => ({
+      value: period.id,
+      label: period.name,
     })),
   ];
 
@@ -66,32 +104,28 @@ export default function GalleryFilters({
 
       {/* Advanced Filters */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
-          <div>
-            <SelectFilter
-              label="Event"
-              value={eventFilter}
-              onChange={onEventFilterChange}
-              options={eventOptions}
-            />
-            {isLoading && (
-              <p className="text-xs text-gray-500 mt-1">Loading events...</p>
-            )}
-          </div>
-          <div>
-            <SelectFilter
-              label="Category"
-              value={categoryFilter}
-              onChange={onCategoryFilterChange}
-              options={categoryOptions}
-              side="bottom"
-            />
-            {isCategoriesLoading && (
-              <p className="text-xs text-gray-500 mt-1">
-                Loading categories...
-              </p>
-            )}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+          <SelectFilter
+            label="Event"
+            value={eventFilter}
+            onChange={onEventFilterChange}
+            options={eventOptions}
+            disabled={eventsLoading}
+          />
+          <SelectFilter
+            label="Category"
+            value={categoryFilter}
+            onChange={onCategoryFilterChange}
+            options={categoryOptions}
+            disabled={categoriesLoading}
+          />
+          <SelectFilter
+            label="Period"
+            value={periodFilter}
+            onChange={onPeriodFilterChange}
+            options={periodOptions}
+            disabled={periodsLoading}
+          />
           <DeleteSelectedButton
             selectedCount={selectedCount}
             onClick={onDeleteSelected}

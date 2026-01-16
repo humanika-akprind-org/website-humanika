@@ -8,7 +8,8 @@ import type {
   UpdateGalleryInput,
 } from "@/types/gallery";
 import type { Event } from "@/types/event";
-import { FiImage } from "react-icons/fi";
+import type { Period } from "@/types/period";
+import { FiImage, FiCalendar } from "react-icons/fi";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import ImageUpload from "@/components/admin/ui/input/ImageUpload";
@@ -22,6 +23,7 @@ interface GalleryFormProps {
   loading?: boolean;
   accessToken?: string;
   events?: Event[];
+  periods?: Period[];
 }
 
 export default function GalleryForm({
@@ -29,6 +31,7 @@ export default function GalleryForm({
   onSubmit,
   accessToken,
   events: propEvents,
+  periods = [],
   loading = false,
 }: GalleryFormProps) {
   const router = useRouter();
@@ -44,6 +47,7 @@ export default function GalleryForm({
     galleryCategories,
     categoriesLoading,
     photoLoading,
+    errors,
     handleInputChange,
     handleFileChange,
     removeImage,
@@ -70,6 +74,7 @@ export default function GalleryForm({
                 placeholder="Enter gallery title"
                 required
                 icon={<FiImage className="text-gray-400" />}
+                error={errors.title}
               />
             </div>
 
@@ -89,6 +94,7 @@ export default function GalleryForm({
                 eventsLoading ? "Loading events..." : "Select an event"
               }
               icon={<FiImage className="text-gray-400" />}
+              error={errors.eventId}
             />
 
             <SelectInput
@@ -114,6 +120,24 @@ export default function GalleryForm({
               icon={<FiImage className="text-gray-400" />}
             />
 
+            <SelectInput
+              label="Period"
+              name="periodId"
+              value={formData.periodId || ""}
+              onChange={(value: string) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  periodId: value || undefined,
+                }))
+              }
+              options={periods.map((period) => ({
+                value: period.id,
+                label: period.name,
+              }))}
+              placeholder="Select a period (Optional)"
+              icon={<FiCalendar className="text-gray-400" />}
+            />
+
             <div className="md:col-span-2">
               <ImageUpload
                 label="Gallery Image"
@@ -124,6 +148,8 @@ export default function GalleryForm({
                 isLoading={isSubmitting}
                 photoLoading={photoLoading}
                 alt={formData.title || "Gallery image"}
+                required
+                error={errors.image}
               />
             </div>
           </div>

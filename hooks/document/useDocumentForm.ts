@@ -95,6 +95,7 @@ export function useDocumentForm({
     documentTypeId: initialDocumentTypeId,
     status: document?.status || Status.DRAFT,
     letterId: document?.letterId || "",
+    periodId: document?.periodId || "",
     documentFile: undefined as File | undefined,
   });
 
@@ -129,13 +130,17 @@ export function useDocumentForm({
     if (file) {
       // Validasi file
       if (file.size > 10 * 1024 * 1024) {
-        setError("File size must be less than 10MB");
+        setErrors((prev) => ({
+          ...prev,
+          document: "File size must be less than 10MB",
+        }));
         return;
       }
 
       setFormData((prev) => ({ ...prev, documentFile: file }));
       setExistingDocument(null); // Hide existing file display when new file is selected
       setError(null);
+      setErrors((prev) => ({ ...prev, document: "" }));
       setRemovedDocument(false); // Reset removed state when new file is selected
     }
   };
@@ -154,19 +159,29 @@ export function useDocumentForm({
     setIsLoadingState(true);
     setError(null);
 
+    // Validate required fields
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "Please enter document name";
+    }
+    if (!formData.documentFile && !existingDocument) {
+      newErrors.document = "Please upload a document file";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsLoadingState(false);
+      return;
+    }
+
+    // Check if access token is available
+    if (!(accessToken || fetchedAccessToken)) {
+      setError("Authentication required. Please log in to Google Drive.");
+      setIsLoadingState(false);
+      return;
+    }
+
     try {
-      // Validate required fields
-      if (!formData.name.trim()) {
-        throw new Error("Please enter document name");
-      }
-
-      // Check if access token is available
-      if (!(accessToken || fetchedAccessToken)) {
-        throw new Error(
-          "Authentication required. Please log in to Google Drive."
-        );
-      }
-
       // Handle document deletion if marked for removal
       let documentUrl: string | null | undefined = existingDocument;
 

@@ -3,6 +3,7 @@ import { User } from "./user";
 import { FinanceCategory } from "./finance-category";
 import { Approval } from "./approval";
 import { WorkProgram } from "./work";
+import { Period } from "./period";
 
 export interface Finance {
   id: string;
@@ -16,11 +17,13 @@ export interface Finance {
   proof?: string | null;
   categoryId?: string | null;
   workProgramId?: string | null;
+  periodId?: string | null;
   createdAt: Date;
   updatedAt: Date;
   // Relations
   category?: FinanceCategory | null;
   workProgram?: WorkProgram | null;
+  period?: Period | null;
   user: User;
   approvals?: Approval[];
 }
@@ -34,6 +37,7 @@ export interface CreateFinanceInput {
   type: FinanceType;
   proof?: string | null;
   workProgramId?: string | null;
+  periodId?: string | null;
 }
 
 export interface UpdateFinanceInput extends Partial<CreateFinanceInput> {
@@ -45,6 +49,7 @@ export interface FinanceFilter {
   status?: Status;
   categoryId?: string;
   workProgramId?: string;
+  periodId?: string;
   search?: string;
   startDate?: Date;
   endDate?: Date;

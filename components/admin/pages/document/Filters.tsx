@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DocumentType, Status, StatusApproval } from "@/types/enums";
+import { PeriodApi } from "@/use-cases/api/period";
 import SearchInput from "../../ui/input/SearchInput";
 import DeleteSelectedButton from "../../ui/button/DeleteSelectedButton";
 import SelectFilter from "../../ui/input/SelectFilter";
@@ -16,6 +17,8 @@ interface DocumentFiltersProps {
   onTypeFilterChange: (type: string) => void;
   userFilter: string;
   onUserFilterChange: (user: string) => void;
+  periodFilter: string;
+  onPeriodFilterChange: (period: string) => void;
   selectedCount: number;
   onDeleteSelected: () => void;
   showTypeFilter?: boolean;
@@ -31,6 +34,8 @@ export default function DocumentFilters({
   onStatusFilterChange,
   typeFilter,
   onTypeFilterChange,
+  periodFilter,
+  onPeriodFilterChange,
   selectedCount,
   onDeleteSelected,
   showTypeFilter = true,
@@ -39,6 +44,33 @@ export default function DocumentFilters({
   onApprovalStatusFilterChange = () => {},
 }: DocumentFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
+
+  // Fetch periods on component mount
+  useEffect(() => {
+    const fetchPeriods = async () => {
+      try {
+        const periodData = await PeriodApi.getPeriods();
+        const periodOptions = periodData.map((period) => ({
+          id: period.id,
+          name: period.name,
+        }));
+        setPeriods(periodOptions);
+      } catch (err) {
+        console.error("Error fetching periods:", err);
+      }
+    };
+
+    fetchPeriods();
+  }, []);
+
+  const periodOptions = [
+    { value: "all", label: "All Period" },
+    ...periods.map((period) => ({
+      value: period.id,
+      label: period.name,
+    })),
+  ];
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
@@ -57,7 +89,7 @@ export default function DocumentFilters({
 
       {/* Advanced Filters */}
       {isFilterOpen && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 pt-4 border-t border-gray-100">
           <SelectFilter
             label="Status"
             value={statusFilter}
@@ -107,6 +139,15 @@ export default function DocumentFilters({
               ]}
             />
           )}
+
+          <div>
+            <SelectFilter
+              label="Period"
+              value={periodFilter}
+              onChange={onPeriodFilterChange}
+              options={periodOptions}
+            />
+          </div>
 
           <div className="flex items-end">
             <DeleteSelectedButton

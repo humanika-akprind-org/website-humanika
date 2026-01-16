@@ -49,8 +49,9 @@ export default function PasswordInput({
           onChange={onChange}
           placeholder={placeholder}
           className={cn(
-            "w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10",
-            icon && "pl-10"
+            "w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent pr-10",
+            icon && "pl-10",
+            error && "border-red-500 focus:ring-red-500"
           )}
         />
         <button

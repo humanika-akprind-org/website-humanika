@@ -10,7 +10,8 @@ import type {
 import { FinanceType, Status } from "@/types/enums";
 import type { FinanceCategory } from "@/types/finance-category";
 import type { WorkProgram } from "@/types/work";
-import { FiBriefcase } from "react-icons/fi";
+import type { Period } from "@/types/period";
+import { FiBriefcase, FiCalendar } from "react-icons/fi";
 import TextEditor from "components/admin/ui/text-area/TextEditor";
 import TextInput from "components/admin/ui/input/TextInput";
 import SelectInput from "components/admin/ui/input/SelectInput";
@@ -31,6 +32,7 @@ interface FinanceFormProps {
   accessToken?: string;
   categories: FinanceCategory[];
   workPrograms: WorkProgram[];
+  periods?: Period[];
   isEditing?: boolean;
 }
 
@@ -41,6 +43,7 @@ export default function FinanceForm({
   accessToken,
   categories,
   workPrograms,
+  periods = [],
   isEditing = false,
 }: FinanceFormProps) {
   const router = useRouter();
@@ -171,6 +174,24 @@ export default function FinanceForm({
                 label: status,
               }))}
               icon={<FiBriefcase className="text-gray-400" />}
+            />
+
+            <SelectInput
+              label="Period"
+              name="periodId"
+              value={formData.periodId || ""}
+              onChange={(value: string) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  periodId: value || "",
+                }))
+              }
+              options={periods.map((period) => ({
+                value: period.id,
+                label: period.name,
+              }))}
+              placeholder="Select period (optional)"
+              icon={<FiCalendar className="text-gray-400" />}
             />
           </div>
 

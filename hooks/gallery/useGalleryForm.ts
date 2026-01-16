@@ -55,6 +55,7 @@ export interface GalleryFormData {
   title: string;
   eventId: string;
   categoryId?: string;
+  periodId?: string;
   imageFile?: File;
 }
 
@@ -96,6 +97,7 @@ export const useGalleryForm = (
     title: gallery?.title || "",
     eventId: gallery?.eventId || "",
     categoryId: gallery?.categoryId || "",
+    periodId: gallery?.periodId || "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -105,6 +107,7 @@ export const useGalleryForm = (
     gallery?.image
   );
   const [removedImage, setRemovedImage] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Initialize preview URL
   useEffect(() => {
@@ -128,6 +131,11 @@ export const useGalleryForm = (
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,6 +148,7 @@ export const useGalleryForm = (
 
       setFormData((prev) => ({ ...prev, imageFile: file }));
       setError(null);
+      setErrors((prev) => ({ ...prev, image: "" }));
 
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
@@ -158,20 +167,24 @@ export const useGalleryForm = (
   };
 
   const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+
     if (!formData.title.trim()) {
-      setError("Please enter gallery title");
-      return false;
+      newErrors.title = "Please enter gallery title";
+      isValid = false;
     }
     if (!formData.eventId) {
-      setError("Please select an event");
-      return false;
+      newErrors.eventId = "Please select an event";
+      isValid = false;
     }
     if (!formData.imageFile && !existingImage) {
-      setError("Please upload an image");
-      return false;
+      newErrors.image = "Please upload an image";
+      isValid = false;
     }
 
-    return true;
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -281,6 +294,7 @@ export const useGalleryForm = (
     categoriesLoading,
     photoLoading,
     accessToken: accessToken || fetchedAccessToken,
+    errors,
     handleInputChange,
     handleFileChange,
     removeImage,

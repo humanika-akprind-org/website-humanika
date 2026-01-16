@@ -298,6 +298,7 @@ model Document {
   // version        Int      @default(1) // Versi dokumen
   parentId       String?  @db.ObjectId // ID dokumen induk (untuk versioning)
   // isCurrent      Boolean  @default(true) // Apakah ini versi terbaru
+  periodId       String?  @db.ObjectId // ID periode dokumen (opsional)
   createdAt      DateTime @default(now()) // Waktu pembuatan dokumen
   updatedAt      DateTime @updatedAt // Waktu terakhir update
 
@@ -308,8 +309,9 @@ model Document {
   previousVersion Document?    @relation("DocumentVersions", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // Versi sebelumnya
   nextVersions    Document[]   @relation("DocumentVersions") // Versi selanjutnya
   approvals       Approval[]   @relation("DocumentApprovals") // Persetujuan untuk transaksi
+  period          Period?      @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode dokumen
 
-  @@index([documentTypeId, status, userId])
+  @@index([documentTypeId, status, userId, periodId])
   @@map("documents")
 }
 
@@ -333,14 +335,16 @@ model Gallery {
   image      String // Nama file gambar
   eventId    String   @db.ObjectId // ID kegiatan terkait
   categoryId String?  @db.ObjectId // ID kategori galeri
+  periodId   String?  @db.ObjectId // ID periode galeri (opsional)
   createdAt  DateTime @default(now()) // Waktu pembuatan galeri
   updatedAt  DateTime @updatedAt // Waktu terakhir update
 
   // Relations - Data yang terkait dengan galeri
   event    Event            @relation(fields: [eventId], references: [id], onDelete: Cascade) // Kegiatan terkait
   category GalleryCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull) // Kategori galeri
+  period   Period?          @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode galeri
 
-  @@index([eventId])
+  @@index([eventId, periodId])
   @@map("galleries")
 }
 
@@ -422,6 +426,7 @@ model Finance {
   proof         String? // URL file bukti transaksi
   categoryId    String?     @db.ObjectId // ID kategori keuangan
   workProgramId String?     @db.ObjectId // ID program kerja terkait (opsional)
+  periodId      String?     @db.ObjectId // ID periode transaksi (opsional)
   createdAt     DateTime    @default(now()) // Waktu pembuatan transaksi
   updatedAt     DateTime    @updatedAt // Waktu terakhir update
 
@@ -430,8 +435,9 @@ model Finance {
   workProgram WorkProgram?     @relation(fields: [workProgramId], references: [id], onDelete: SetNull) // Program kerja terkait (opsional)
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade) // Pengguna yang membuat transaksi
   approvals   Approval[]       @relation("FinanceApprovals") // Persetujuan untuk transaksi
+  period      Period?          @relation(fields: [periodId], references: [id], onDelete: SetNull) // Periode transaksi
 
-  @@index([date, type, status])
+  @@index([date, type, status, periodId])
   @@map("finances")
 }
 
