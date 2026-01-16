@@ -110,6 +110,106 @@ export const useStructureForm = (
     setRemovedStructureImage(true);
   };
 
+  // Helper function to process decree file upload
+  const processDecreeUpload = async (): Promise<{
+    decreeUrl: string | null | undefined;
+    error: Error | null;
+  }> => {
+    if (!formData.decreeFile) {
+      return { decreeUrl: existingDecree, error: null };
+    }
+
+    // Delete old decree from Google Drive if it exists and wasn't already removed
+    if (!removedDecree && structure?.decree) {
+      const fileId = getFileIdFromStructureImage(structure.decree);
+      if (fileId) {
+        try {
+          await deleteFile(fileId);
+        } catch (deleteError) {
+          console.warn("Failed to delete old decree:", deleteError);
+        }
+      }
+    }
+
+    const tempFileName = `temp_decree_${Date.now()}`;
+    const uploadedFileId = await uploadFile(
+      formData.decreeFile,
+      tempFileName,
+      structureFolderId
+    );
+
+    if (!uploadedFileId) {
+      return { decreeUrl: null, error: new Error("Failed to upload decree") };
+    }
+
+    const finalFileName = `decree_${formData.name}_${Date.now()}`;
+    const renameSuccess = await renameFile(uploadedFileId, finalFileName);
+
+    if (!renameSuccess) {
+      return { decreeUrl: null, error: new Error("Failed to rename decree") };
+    }
+
+    // Set public access for the decree (non-blocking)
+    setPublicAccess(uploadedFileId).catch((err) => {
+      console.warn("Failed to set public access for decree:", err);
+    });
+
+    return { decreeUrl: uploadedFileId, error: null };
+  };
+
+  // Helper function to process structure image upload
+  const processStructureImageUpload = async (): Promise<{
+    structureImageUrl: string | null | undefined;
+    error: Error | null;
+  }> => {
+    if (!formData.structureImage) {
+      return { structureImageUrl: existingStructureImage, error: null };
+    }
+
+    // Delete old structure image from Google Drive if it exists and wasn't already removed
+    if (!removedStructureImage && structure?.structure) {
+      const fileId = getFileIdFromStructureImage(structure.structure);
+      if (fileId) {
+        try {
+          await deleteFile(fileId);
+        } catch (deleteError) {
+          console.warn("Failed to delete old structure image:", deleteError);
+        }
+      }
+    }
+
+    const tempFileName = `temp_structure_${Date.now()}`;
+    const uploadedFileId = await uploadFile(
+      formData.structureImage,
+      tempFileName,
+      organizationalStructureFolderId
+    );
+
+    if (!uploadedFileId) {
+      return {
+        structureImageUrl: null,
+        error: new Error("Failed to upload structure image"),
+      };
+    }
+
+    const finalFileName = `structure_image_${formData.name}_${Date.now()}`;
+    const renameSuccess = await renameFile(uploadedFileId, finalFileName);
+
+    if (!renameSuccess) {
+      return {
+        structureImageUrl: null,
+        error: new Error("Failed to rename structure image"),
+      };
+    }
+
+    // Set public access for the structure image (non-blocking)
+    setPublicAccess(uploadedFileId).catch((err) => {
+      console.warn("Failed to set public access for structure image:", err);
+    });
+
+    return { structureImageUrl: uploadedFileId, error: null };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -127,9 +227,8 @@ export const useStructureForm = (
       let decreeUrl: string | null | undefined = existingDecree;
       let structureImageUrl: string | null | undefined = existingStructureImage;
 
-      // Handle decree deletion
+      // Handle decree deletion (sequential)
       if (removedDecree) {
-        // Delete from Google Drive and set decreeUrl to null
         if (structure?.decree) {
           const fileId = getFileIdFromStructureImage(structure.decree);
           if (fileId) {
@@ -137,16 +236,14 @@ export const useStructureForm = (
               await deleteFile(fileId);
             } catch (deleteError) {
               console.warn("Failed to delete decree:", deleteError);
-              // Continue with submission even if delete fails
             }
           }
         }
         decreeUrl = null;
       }
 
-      // Handle structure image deletion
+      // Handle structure image deletion (sequential)
       if (removedStructureImage) {
-        // Delete from Google Drive and set structureImageUrl to null
         if (structure?.structure) {
           const fileId = getFileIdFromStructureImage(structure.structure);
           if (fileId) {
@@ -154,101 +251,29 @@ export const useStructureForm = (
               await deleteFile(fileId);
             } catch (deleteError) {
               console.warn("Failed to delete structure image:", deleteError);
-              // Continue with submission even if delete fails
             }
           }
         }
         structureImageUrl = null;
       }
 
-      // Handle decree file upload
-      if (formData.decreeFile) {
-        // Delete old decree from Google Drive if it exists and wasn't already removed
-        if (!removedDecree && structure?.decree) {
-          const fileId = getFileIdFromStructureImage(structure.decree);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old decree:", deleteError);
-              // Continue with upload even if delete fails
-            }
-          }
-        }
+      // Process both uploads IN PARALLEL for better performance
+      const [decreeResult, structureImageResult] = await Promise.all([
+        processDecreeUpload(),
+        processStructureImageUpload(),
+      ]);
 
-        const tempFileName = `temp_${Date.now()}`;
-        const uploadedFileId = await uploadFile(
-          formData.decreeFile,
-          tempFileName,
-          structureFolderId
-        );
-
-        if (uploadedFileId) {
-          const finalFileName = `decree_${formData.name}_${Date.now()}`;
-          const renameSuccess = await renameFile(uploadedFileId, finalFileName);
-
-          if (renameSuccess) {
-            // Set public access for the decree
-            const publicAccessSuccess = await setPublicAccess(uploadedFileId);
-            if (!publicAccessSuccess) {
-              console.warn("Failed to set public access for decree");
-              // Continue with submission even if setting public access fails
-            }
-            decreeUrl = uploadedFileId;
-          } else {
-            throw new Error("Failed to rename decree");
-          }
-        } else {
-          throw new Error("Failed to upload decree");
-        }
+      // Handle errors from parallel operations
+      if (decreeResult.error) {
+        throw decreeResult.error;
+      }
+      if (structureImageResult.error) {
+        throw structureImageResult.error;
       }
 
-      // Handle structure image upload
-      if (formData.structureImage) {
-        // Delete old structure image from Google Drive if it exists and wasn't already removed
-        if (!removedStructureImage && structure?.structure) {
-          const fileId = getFileIdFromStructureImage(structure.structure);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn(
-                "Failed to delete old structure image:",
-                deleteError
-              );
-              // Continue with upload even if delete fails
-            }
-          }
-        }
-
-        const tempFileName = `temp_${Date.now()}`;
-        const uploadedFileId = await uploadFile(
-          formData.structureImage,
-          tempFileName,
-          organizationalStructureFolderId
-        );
-
-        if (uploadedFileId) {
-          const finalFileName = `structure_image_${
-            formData.name
-          }_${Date.now()}`;
-          const renameSuccess = await renameFile(uploadedFileId, finalFileName);
-
-          if (renameSuccess) {
-            // Set public access for the structure image
-            const publicAccessSuccess = await setPublicAccess(uploadedFileId);
-            if (!publicAccessSuccess) {
-              console.warn("Failed to set public access for structure image");
-              // Continue with submission even if setting public access fails
-            }
-            structureImageUrl = uploadedFileId;
-          } else {
-            throw new Error("Failed to rename structure image");
-          }
-        } else {
-          throw new Error("Failed to upload structure image");
-        }
-      }
+      // Update URLs with uploaded file IDs
+      decreeUrl = decreeResult.decreeUrl;
+      structureImageUrl = structureImageResult.structureImageUrl;
 
       // Prepare and submit data
       const { decreeFile: _, structureImage: __, ...dataToSend } = formData;
@@ -260,7 +285,7 @@ export const useStructureForm = (
 
       await onSubmit(submitData);
 
-      // If there was a file uploaded, run removePhoto logic to clean up form state
+      // Clean up form state
       if (formData.decreeFile) {
         removeDecree();
       }

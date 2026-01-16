@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { type UserRole, type Department, type Position } from "@prisma/client";
 import { getUsers, createUser } from "@/services/user/user.service";
+import { getCurrentUser } from "@/lib/auth-server";
 
 // GET - Get all users
 export async function GET(request: NextRequest) {
@@ -16,6 +17,9 @@ export async function GET(request: NextRequest) {
     const verifiedAccount = searchParams.get("verifiedAccount");
     const allUsers = searchParams.get("allUsers");
 
+    // Get current user to exclude from results
+    const currentUser = await getCurrentUser();
+
     const result = await getUsers({
       page,
       limit,
@@ -25,6 +29,7 @@ export async function GET(request: NextRequest) {
       isActive: isActive ? isActive === "true" : undefined,
       verifiedAccount: verifiedAccount ? verifiedAccount === "true" : undefined,
       allUsers: allUsers ? allUsers === "true" : undefined,
+      excludeUserId: currentUser?.id,
     });
 
     return NextResponse.json(result);

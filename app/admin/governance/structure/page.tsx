@@ -11,6 +11,7 @@ import ManagementHeader from "@/components/admin/ui/ManagementHeader";
 import AddButton from "@/components/admin/ui/button/AddButton";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import { useStructureManagement } from "@/hooks/structure/useStructureManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 import ImageView from "@/components/admin/ui/avatar/ImageView";
 
 export default function StructuresPage() {
@@ -42,6 +43,8 @@ export default function StructuresPage() {
     handleFilterChange,
   } = useStructureManagement();
 
+  const { canAdd, canDelete } = useResourcePermission("structure");
+
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
@@ -59,7 +62,9 @@ export default function StructuresPage() {
           title="Organizational Structures Management"
           description="Manage and organize your organizational structures"
         />
-        <AddButton onClick={handleAddStructure} text="Add Structure" />
+        {canAdd() && (
+          <AddButton onClick={handleAddStructure} text="Add Structure" />
+        )}
       </div>
 
       <StructureStats structures={structures} />
@@ -73,6 +78,7 @@ export default function StructuresPage() {
         onFilterChange={handleFilterChange}
         onSearchChange={setSearchTerm}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
 
       <StructureTable

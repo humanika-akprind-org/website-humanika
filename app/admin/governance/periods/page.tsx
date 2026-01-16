@@ -12,6 +12,7 @@ import AddButton from "@/components/admin/ui/button/AddButton";
 import ActiveChip from "@/components/admin/ui/chip/Active";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 export default function PeriodsPage() {
   const {
@@ -43,6 +44,8 @@ export default function PeriodsPage() {
     handleFilterChange,
   } = usePeriodManagement();
 
+  const { canAdd, canDelete } = useResourcePermission("periods");
+
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
@@ -60,7 +63,7 @@ export default function PeriodsPage() {
           title="Period Management"
           description="Manage all organization periods"
         />
-        <AddButton onClick={handleAddPeriod} text="Add Period" />
+        {canAdd() && <AddButton onClick={handleAddPeriod} text="Add Period" />}
       </div>
 
       <PeriodStats periods={periods} />
@@ -74,6 +77,7 @@ export default function PeriodsPage() {
         onStatusFilterChange={(status) => handleFilterChange({ status })}
         selectedCount={selectedPeriods.length}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
 
       <PeriodTable
@@ -84,6 +88,7 @@ export default function PeriodsPage() {
         onViewPeriod={handleViewPeriod}
         onEditPeriod={handleEditPeriod}
         onDelete={handleDelete}
+        onAddPeriod={handleAddPeriod}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}

@@ -17,6 +17,7 @@ import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
 import DateDisplay from "components/admin/ui/date/DateDisplay";
 import ImageView from "components/admin/ui/avatar/ImageView";
 import { useEventManagement } from "hooks/event/useEventManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 export default function EventsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -51,6 +52,8 @@ export default function EventsPage() {
     confirmDelete,
   } = useEventManagement();
 
+  const { canAdd, canDelete } = useResourcePermission("events");
+
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
@@ -68,7 +71,7 @@ export default function EventsPage() {
           title="Events"
           description="Manage events and their details"
         />
-        <AddButton onClick={handleAddEvent} text="Add Event" />
+        {canAdd() && <AddButton onClick={handleAddEvent} text="Add Event" />}
       </div>
 
       <EventStats events={events} />
@@ -90,6 +93,7 @@ export default function EventsPage() {
         onCategoryFilterChange={setCategoryFilter}
         selectedCount={selectedEvents.length}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
 
       <EventTable

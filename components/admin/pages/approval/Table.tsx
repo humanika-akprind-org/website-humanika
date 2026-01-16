@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { FiCheck, FiX, FiClock, FiEye, FiRotateCcw } from "react-icons/fi";
+import { Activity } from "lucide-react";
 import type { ApprovalWithRelations as Approval } from "@/types/approval";
 import SortIcon from "../../ui/SortIcon";
 import StatusApproval from "../../ui/chip/StatusApproval";
@@ -13,6 +14,7 @@ import DropdownMenu from "../../ui/dropdown/DropdownMenu";
 import ApprovalActionModal from "./ActionModal";
 import ViewModal from "../../ui/modal/ViewModal";
 import HtmlRenderer from "../../ui/HtmlRenderer";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface ApprovalTableProps {
   approvals: Approval[];
@@ -42,6 +44,7 @@ export default function ApprovalTable({
   onReturnApproval,
   onPageChange,
 }: ApprovalTableProps) {
+  const { canApproval } = useResourcePermission("approval");
   const [sortField, setSortField] = useState("createdAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
@@ -326,7 +329,7 @@ export default function ApprovalTable({
                     isLastItem={index === sortedApprovals.length - 1}
                     hasMultipleItems={sortedApprovals.length > 1}
                   >
-                    {approval.status === "PENDING" ? (
+                    {approval.status === "PENDING" && canApproval() ? (
                       <>
                         <DropdownMenuItem
                           onClick={() =>
@@ -364,13 +367,15 @@ export default function ApprovalTable({
                       </>
                     ) : (
                       <>
-                        <DropdownMenuItem
-                          onClick={() => onReturnApproval(approval.id)}
-                          color="purple"
-                        >
-                          <FiRotateCcw className="mr-2" size={14} />
-                          Return
-                        </DropdownMenuItem>
+                        {canApproval() && (
+                          <DropdownMenuItem
+                            onClick={() => onReturnApproval(approval.id)}
+                            color="purple"
+                          >
+                            <FiRotateCcw className="mr-2" size={14} />
+                            Return
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem
                           onClick={() => handleViewModal(approval)}
                           color="default"
@@ -390,7 +395,7 @@ export default function ApprovalTable({
 
       {sortedApprovals.length === 0 && (
         <EmptyState
-          icon={<FiCheck size={48} className="mx-auto" />}
+          icon={<Activity size={48} className="mx-auto" />}
           title="No Name approvals found"
           description="No Name approval requests at the moment"
         />

@@ -14,6 +14,7 @@ interface TaskFiltersProps {
   onFilterChange: (key: string, value: string) => void;
   onSearchChange: (term: string) => void;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 export default function TaskFilters({
@@ -23,6 +24,7 @@ export default function TaskFilters({
   onFilterChange,
   onSearchChange,
   onDeleteSelected,
+  canDelete,
 }: TaskFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -62,10 +64,12 @@ export default function TaskFilters({
               ...taskDepartmentOptions,
             ]}
           />
-          <DeleteSelectedButton
-            selectedCount={selectedTasks.length}
-            onClick={onDeleteSelected}
-          />
+          {canDelete && canDelete() && (
+            <DeleteSelectedButton
+              selectedCount={selectedTasks.length}
+              onClick={onDeleteSelected}
+            />
+          )}
         </div>
       )}
     </div>

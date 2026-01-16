@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiCalendar, FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { CalendarRange } from "lucide-react";
 import type { Event } from "@/types/event";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -13,6 +14,7 @@ import ThumbnailCell from "../../ui/ThumbnailCell";
 import StatusChip from "../../ui/chip/Status";
 import StatusApproval from "../../ui/chip/StatusApproval";
 import DepartmentChip from "../../ui/chip/Department";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface EventTableProps {
   events: Event[];
@@ -43,6 +45,7 @@ const EventTable: React.FC<EventTableProps> = ({
   onPageChange,
   onAddEvent,
 }) => {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("events");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -346,20 +349,24 @@ const EventTable: React.FC<EventTableProps> = ({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditEvent(event.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteEvent(event)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditEvent(event.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteEvent(event)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -370,10 +377,14 @@ const EventTable: React.FC<EventTableProps> = ({
 
       {sortedEvents.length === 0 && !loading && (
         <EmptyState
-          icon={<FiCalendar size={48} className="mx-auto" />}
+          icon={<CalendarRange size={48} className="mx-auto" />}
           title="No events found"
           description="Try adjusting your search or filter criteria"
-          actionButton={<AddButton onClick={handleAddEvent} text="Add Event" />}
+          actionButton={
+            canAdd() ? (
+              <AddButton onClick={handleAddEvent} text="Add Event" />
+            ) : null
+          }
         />
       )}
 

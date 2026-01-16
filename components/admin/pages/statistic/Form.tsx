@@ -3,8 +3,9 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { FiSave, FiX } from "react-icons/fi";
-import Button from "@/components/admin/ui/button/Button";
+import { FiSave } from "react-icons/fi";
+import SubmitButton from "@/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/components/ui/CancelButton";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 
@@ -239,25 +240,13 @@ export default function StatisticForm({
       </div>
 
       <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-        {onCancel && (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onCancel}
-            disabled={loading}
-            icon={<FiX size={16} />}
-          >
-            Cancel
-          </Button>
-        )}
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={loading}
-          icon={<FiSave size={16} />}
-        >
-          {loading ? "Saving..." : "Save Statistic"}
-        </Button>
+        {onCancel && <CancelButton onClick={onCancel} disabled={loading} />}
+        <SubmitButton
+          isSubmitting={loading}
+          text="Save Statistic"
+          loadingText="Saving..."
+          icon={<FiSave className="mr-2" />}
+        />
       </div>
     </form>
   );

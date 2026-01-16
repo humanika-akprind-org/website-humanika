@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiEye, FiTrash, FiImage } from "react-icons/fi";
+import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
+import { Images } from "lucide-react";
 import type { Gallery } from "@/types/gallery";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -10,6 +11,7 @@ import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import ThumbnailCell from "../../ui/ThumbnailCell";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface GalleryTableProps {
   galleries: Gallery[];
@@ -40,6 +42,7 @@ export default function GalleryTable({
   onPageChange,
   onAddGallery,
 }: GalleryTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("galleries");
   const [sortField, setSortField] = useState("title");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -208,20 +211,24 @@ export default function GalleryTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onEditGallery(gallery.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteGallery(gallery)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onEditGallery(gallery.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteGallery(gallery)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -232,10 +239,14 @@ export default function GalleryTable({
 
       {sortedGalleries.length === 0 && !loading && (
         <EmptyState
-          icon={<FiImage size={48} className="mx-auto" />}
+          icon={<Images size={48} className="mx-auto" />}
           title="No galleries found"
           description="Try adjusting your search or filter criteria"
-          actionButton={<AddButton onClick={onAddGallery} text="Add Gallery" />}
+          actionButton={
+            canAdd() ? (
+              <AddButton onClick={onAddGallery} text="Add Gallery" />
+            ) : null
+          }
         />
       )}
 

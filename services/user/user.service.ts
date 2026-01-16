@@ -14,6 +14,7 @@ export const getUsers = async (filter: {
   isActive?: boolean;
   verifiedAccount?: boolean;
   allUsers?: boolean;
+  excludeUserId?: string;
 }) => {
   const page = filter.page || 1;
   const limit = filter.limit || 10;
@@ -29,7 +30,13 @@ export const getUsers = async (filter: {
     department?: Department;
     isActive?: boolean;
     verifiedAccount?: boolean;
+    NOT?: { id: string };
   } = {};
+
+  // Exclude current user from results
+  if (filter.excludeUserId) {
+    where.NOT = { id: filter.excludeUserId };
+  }
 
   // Default to showing only verified accounts unless allUsers is true
   if (!filter.allUsers) {

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FiFileText, FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
+import { FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
+import { Network } from "lucide-react";
 import Image from "next/image";
 import type { OrganizationalStructure } from "@/types/structure";
 import StatusChip from "../../ui/chip/Status";
@@ -16,6 +17,7 @@ import {
   getGoogleDriveDirectUrl,
   getFileIdFromFile,
 } from "@/lib/google-drive/file-utils";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface StructureTableProps {
   structures: OrganizationalStructure[];
@@ -46,6 +48,7 @@ export default function StructureTable({
   onPageChange,
   onAddStructure,
 }: StructureTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("structure");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -179,11 +182,13 @@ export default function StructureTable({
     return (
       <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
         <EmptyState
-          icon={<FiFileText size={48} className="mx-auto" />}
+          icon={<Network size={48} className="mx-auto" />}
           title="No organizational structures found"
           description="Get started by creating your first organizational structure."
           actionButton={
-            <AddButton onClick={handleAddStructure} text="Add Structure" />
+            canAdd() ? (
+              <AddButton onClick={handleAddStructure} text="Add Structure" />
+            ) : null
           }
         />
       </div>
@@ -359,13 +364,15 @@ export default function StructureTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditStructure(structure.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditStructure(structure.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={() => handleDownloadDecree(structure)}
                       color="default"
@@ -380,13 +387,15 @@ export default function StructureTable({
                       <FiDownload className="mr-2" size={14} />
                       Download Image
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteStructure(structure)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteStructure(structure)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -397,11 +406,13 @@ export default function StructureTable({
 
       {sortedStructures.length === 0 && !loading && (
         <EmptyState
-          icon={<FiFileText size={48} className="mx-auto" />}
+          icon={<Network size={48} className="mx-auto" />}
           title="No structures found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={handleAddStructure} text="Add Structure" />
+            canAdd() ? (
+              <AddButton onClick={handleAddStructure} text="Add Structure" />
+            ) : null
           }
         />
       )}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiTrash, FiTag, FiEye } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { Tag } from "lucide-react";
 import type { FinanceCategory } from "@/types/finance-category";
 import { FinanceType } from "@/types/enums";
 import Checkbox from "../../../ui/checkbox/Checkbox";
@@ -12,6 +13,7 @@ import EmptyState from "../../../ui/EmptyState";
 import AddButton from "../../../ui/button/AddButton";
 import SortIcon from "../../../ui/SortIcon";
 import Pagination from "../../../ui/pagination/Pagination";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface FinanceCategoryTableProps {
   categories: FinanceCategory[];
@@ -42,6 +44,9 @@ const FinanceCategoryTable: React.FC<FinanceCategoryTableProps> = ({
   onPageChange,
   onAddCategory,
 }) => {
+  const { canAdd, canEdit, canDelete } = useResourcePermission(
+    "transaction-categories"
+  );
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -279,20 +284,24 @@ const FinanceCategoryTable: React.FC<FinanceCategoryTableProps> = ({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditCategory(category.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteCategory(category)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditCategory(category.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteCategory(category)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -303,11 +312,13 @@ const FinanceCategoryTable: React.FC<FinanceCategoryTableProps> = ({
 
       {sortedCategories.length === 0 && !loading && (
         <EmptyState
-          icon={<FiTag size={48} className="mx-auto" />}
+          icon={<Tag size={48} className="mx-auto" />}
           title="No categories found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={handleAddCategory} text="Add Category" />
+            canAdd() ? (
+              <AddButton onClick={handleAddCategory} text="Add Category" />
+            ) : null
           }
         />
       )}

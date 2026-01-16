@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { FiBriefcase, FiFolder } from "react-icons/fi";
+import { FiBriefcase, FiFolder, FiCalendar } from "react-icons/fi";
 import type {
   Document,
   CreateDocumentInput,
@@ -11,6 +11,7 @@ import type {
 import { Status } from "@/types/enums";
 import type { Event } from "@/types/event";
 import type { Letter } from "@/types/letter";
+import type { Period } from "@/types/period";
 import TextInput from "@/components/admin/ui/input/TextInput";
 import SelectInput from "@/components/admin/ui/input/SelectInput";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
@@ -28,6 +29,7 @@ interface DocumentFormProps {
   loading?: boolean;
   events: Event[];
   letters: Letter[];
+  periods?: Period[];
   fixedDocumentType?: string;
 }
 
@@ -35,6 +37,7 @@ export default function DocumentForm({
   document,
   onSubmit,
   onSubmitForApproval,
+  periods = [],
   fixedDocumentType,
 }: DocumentFormProps) {
   const router = useRouter();
@@ -149,6 +152,20 @@ export default function DocumentForm({
             icon={<FiBriefcase className="text-gray-400" />}
             disabled={isLoadingState}
           />
+
+          <SelectInput
+            label="Period"
+            name="periodId"
+            value={formData.periodId || ""}
+            onChange={(value) => handleSelectChange("periodId", value)}
+            options={periods.map((period) => ({
+              value: period.id,
+              label: period.name,
+            }))}
+            placeholder="Select period (optional)"
+            icon={<FiCalendar className="text-gray-400" />}
+            disabled={isLoadingState}
+          />
         </div>
 
         <FileUpload
@@ -165,8 +182,8 @@ export default function DocumentForm({
           fileLoading={fileLoading}
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
           helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
-          loadingText="Mengupload file..."
-          removeButtonText="Hapus File"
+          loadingText="Uploading file..."
+          removeButtonText="Delete File"
         />
 
         <div className="flex justify-end space-x-3 pt-4">
@@ -177,14 +194,8 @@ export default function DocumentForm({
 
           <SubmitButton
             isSubmitting={isLoadingState || fileLoading}
-            text={
-              onSubmitForApproval
-                ? "Simpan"
-                : document
-                ? "Update Document"
-                : "Create Document"
-            }
-            loadingText={onSubmitForApproval ? "Mengajukan..." : "Menyimpan..."}
+            text={onSubmitForApproval ? "Update Document" : "Create Document"}
+            loadingText="Saving..."
           />
         </div>
       </form>

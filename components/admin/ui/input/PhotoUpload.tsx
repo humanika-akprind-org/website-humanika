@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 import AccessTokenGuard from "./AccessTokenGuard";
 
 // Helper function to get preview URL from photo (file ID or URL)
@@ -35,6 +36,8 @@ interface PhotoUploadProps {
   alt?: string;
   showRemoveButton?: boolean;
   className?: string;
+  required?: boolean;
+  error?: string;
 }
 
 const PhotoUpload: React.FC<PhotoUploadProps> = ({
@@ -51,6 +54,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   alt = "Profile photo",
   showRemoveButton = true,
   className = "",
+  required = false,
+  error,
 }) => {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
@@ -59,6 +64,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   const handleImageError = (url: string) => {
     setImageErrors((prev) => new Set(prev).add(url));
   };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -79,9 +85,17 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   };
 
   return (
-    <AccessTokenGuard label={label} required={true}>
-      <div className={className}>
-        <div className="flex items-start space-x-4">
+    <AccessTokenGuard label={label} required={required}>
+      <div className={cn("relative", className)}>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label} {required && "*"}
+        </label>
+        <div
+          className={cn(
+            "flex items-start space-x-4 p-4 rounded-lg border-2 transition-colors",
+            error ? "border-red-300 bg-red-50" : "border-gray-200 bg-white"
+          )}
+        >
           <div className="flex flex-col items-center">
             <div className="flex-shrink-0">
               {(() => {
@@ -156,6 +170,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
             )}
           </div>
         </div>
+        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
       </div>
     </AccessTokenGuard>
   );

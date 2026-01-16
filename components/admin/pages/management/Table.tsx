@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEye, FiEdit, FiTrash, FiUser } from "react-icons/fi";
+import { FiEye, FiEdit, FiTrash } from "react-icons/fi";
+import { UserCog } from "lucide-react";
 import type { Management } from "@/types/management";
 import ManagementAvatar from "../../ui/avatar/ManagementAvatar";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -12,6 +13,7 @@ import Pagination from "../../ui/pagination/Pagination";
 import AddButton from "../../ui/button/AddButton";
 import EmptyState from "../../ui/EmptyState";
 import SortIcon from "../../ui/SortIcon";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface ManagementTableProps {
   managements: Management[];
@@ -43,6 +45,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
   onPageChange,
   onAddManagement,
 }) => {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("managements");
   const [sortField, setSortField] = useState("management");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -256,20 +259,24 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditManagement(management.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteManagement(management)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditManagement(management.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteManagement(management)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -280,11 +287,13 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
 
       {sortedManagements.length === 0 && !loading && (
         <EmptyState
-          icon={<FiUser size={48} className="mx-auto" />}
+          icon={<UserCog size={48} className="mx-auto" />}
           title="No managements found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={handleAddManagement} text="Add Management" />
+            canAdd() ? (
+              <AddButton onClick={handleAddManagement} text="Add Management" />
+            ) : null
           }
         />
       )}

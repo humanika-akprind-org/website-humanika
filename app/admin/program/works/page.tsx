@@ -15,6 +15,7 @@ import StatusApprovalChip from "@/components/admin/ui/chip/StatusApproval";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 import { useWorkManagement } from "@/hooks/work-program/useWorkManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 import ExportButtons from "@/components/admin/pages/work/export-button/ExportButtons";
 
 export default function WorkProgramPage() {
@@ -47,6 +48,8 @@ export default function WorkProgramPage() {
     handleFilterChange,
   } = useWorkManagement();
 
+  const { canAdd, canDelete } = useResourcePermission("works");
+
   // Get unique periods for export
   const uniquePeriods = Array.from(
     new Set(
@@ -73,7 +76,9 @@ export default function WorkProgramPage() {
         />
         <div className="flex gap-2">
           <ExportButtons workPrograms={workPrograms} periods={uniquePeriods} />
-          <AddButton onClick={handleAddProgram} text="Add Program" />
+          {canAdd() && (
+            <AddButton onClick={handleAddProgram} text="Add Program" />
+          )}
         </div>
       </div>
       <WorkStats workPrograms={workPrograms} />
@@ -85,6 +90,7 @@ export default function WorkProgramPage() {
         onFilterChange={handleFilterChange}
         onSearchChange={setSearchTerm}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
       <WorkTable
         workPrograms={workPrograms}

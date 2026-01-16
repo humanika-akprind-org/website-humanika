@@ -19,6 +19,7 @@ export default function ProposalsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [userFilter, setUserFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
 
   const {
     documents,
@@ -96,6 +97,8 @@ export default function ProposalsPage() {
           setUserFilter(value);
           setUserFilterHook(value);
         }}
+        periodFilter={periodFilter}
+        onPeriodFilterChange={setPeriodFilter}
         selectedCount={selectedDocuments.length}
         onDeleteSelected={() => handleDelete()}
         showTypeFilter={false}

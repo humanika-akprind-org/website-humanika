@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEye, FiEdit, FiTrash2, FiCalendar } from "react-icons/fi";
+import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
+import { CalendarClock } from "lucide-react";
 import type { Period } from "@/types/period";
 import ActiveChip from "../../ui/chip/Active";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -9,6 +10,8 @@ import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import Pagination from "../../ui/pagination/Pagination";
 import EmptyState from "../../ui/EmptyState";
 import SortIcon from "../../ui/SortIcon";
+import AddButton from "../../ui/button/AddButton";
+import { useResourcePermission } from "@/hooks/usePermission";
 interface PeriodTableProps {
   periods: Period[];
   selectedPeriods: string[];
@@ -17,6 +20,7 @@ interface PeriodTableProps {
   onViewPeriod: (period: Period) => void;
   onEditPeriod: (period: Period) => void;
   onDelete: (period?: Period) => void;
+  onAddPeriod: () => void;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -30,10 +34,12 @@ export default function PeriodTable({
   onViewPeriod,
   onEditPeriod,
   onDelete,
+  onAddPeriod,
   currentPage,
   totalPages,
   onPageChange,
 }: PeriodTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("periods");
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
   const [sortField, setSortField] = useState("name");
@@ -207,20 +213,24 @@ export default function PeriodTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onEditPeriod(period)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDelete(period)}
-                      color="red"
-                    >
-                      <FiTrash2 className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onEditPeriod(period)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDelete(period)}
+                        color="red"
+                      >
+                        <FiTrash2 className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -231,9 +241,14 @@ export default function PeriodTable({
 
       {sortedPeriods.length === 0 && (
         <EmptyState
-          icon={<FiCalendar size={48} className="mx-auto" />}
+          icon={<CalendarClock size={48} className="mx-auto" />}
           title="No periods found"
           description="Try adjusting your search or filter criteria"
+          actionButton={
+            canAdd() ? (
+              <AddButton onClick={onAddPeriod} text="Add Period" />
+            ) : null
+          }
         />
       )}
 

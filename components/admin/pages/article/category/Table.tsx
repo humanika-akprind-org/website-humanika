@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiTrash, FiFolder, FiEye } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { Tag } from "lucide-react";
 import type { ArticleCategory } from "@/types/article-category";
 import Checkbox from "../../../ui/checkbox/Checkbox";
 import DropdownMenu, {
@@ -11,6 +12,7 @@ import EmptyState from "../../../ui/EmptyState";
 import AddButton from "../../../ui/button/AddButton";
 import SortIcon from "../../../ui/SortIcon";
 import Pagination from "../../../ui/pagination/Pagination";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface ArticleCategoryTableProps {
   categories: ArticleCategory[];
@@ -41,6 +43,8 @@ const ArticleCategoryTable: React.FC<ArticleCategoryTableProps> = ({
   onPageChange,
   onAddCategory,
 }) => {
+  const { canAdd, canEdit, canDelete } =
+    useResourcePermission("article-categories");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -237,20 +241,24 @@ const ArticleCategoryTable: React.FC<ArticleCategoryTableProps> = ({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditCategory(category.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteCategory(category)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditCategory(category.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteCategory(category)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -261,11 +269,13 @@ const ArticleCategoryTable: React.FC<ArticleCategoryTableProps> = ({
 
       {sortedCategories.length === 0 && !loading && (
         <EmptyState
-          icon={<FiFolder size={48} className="mx-auto" />}
+          icon={<Tag size={48} className="mx-auto" />}
           title="No categories found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={handleAddCategory} text="Add Category" />
+            canAdd() ? (
+              <AddButton onClick={handleAddCategory} text="Add Category" />
+            ) : null
           }
         />
       )}

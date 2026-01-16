@@ -1,13 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  FiEdit,
-  FiTrash,
-  FiEye,
-  FiDownload,
-  FiDollarSign,
-} from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye, FiDownload } from "react-icons/fi";
+import { Wallet } from "lucide-react";
 import type { Finance } from "@/types/finance";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -18,6 +13,7 @@ import Pagination from "../../ui/pagination/Pagination";
 import StatusChip from "../../ui/chip/Status";
 import StatusApproval from "../../ui/chip/StatusApproval";
 import { getGoogleDriveDirectUrl } from "@/lib/google-drive/file-utils";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface FinanceTableProps {
   finances: Finance[];
@@ -48,6 +44,7 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
   onPageChange,
   onAddFinance,
 }) => {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("transactions");
   const [sortField, setSortField] = useState("date");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
@@ -318,13 +315,15 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditFinance(finance.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => handleEditFinance(finance.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={() => handleDownloadProof(finance)}
                       color="default"
@@ -332,13 +331,15 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                       <FiDownload className="mr-2" size={14} />
                       Download
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteFinance(finance)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteFinance(finance)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -349,11 +350,13 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
 
       {sortedFinances.length === 0 && !loading && (
         <EmptyState
-          icon={<FiDollarSign size={48} className="mx-auto" />}
+          icon={<Wallet size={48} className="mx-auto" />}
           title="No finances found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={handleAddFinance} text="Add Finance" />
+            canAdd() ? (
+              <AddButton onClick={handleAddFinance} text="Add Finance" />
+            ) : null
           }
         />
       )}

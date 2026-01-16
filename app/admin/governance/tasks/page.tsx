@@ -13,6 +13,7 @@ import DepartmentChip from "@/components/admin/ui/chip/Department";
 import StatusChip from "@/components/admin/ui/chip/Status";
 import DateDisplay from "@/components/admin/ui/date/DateDisplay";
 import { useTaskManagement } from "@/hooks/task/useTaskManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 import HtmlRenderer from "@/components/admin/ui/HtmlRenderer";
 
 export default function TasksPage() {
@@ -44,6 +45,8 @@ export default function TasksPage() {
     handleFilterChange,
   } = useTaskManagement();
 
+  const { canAdd, canDelete } = useResourcePermission("tasks");
+
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
@@ -61,7 +64,7 @@ export default function TasksPage() {
           title="Task Management"
           description="Manage all department tasks and assignments"
         />
-        <AddButton onClick={handleAddTask} text="Add Task" />
+        {canAdd() && <AddButton onClick={handleAddTask} text="Add Task" />}
       </div>
 
       <TaskStats tasks={tasks} />
@@ -75,6 +78,7 @@ export default function TasksPage() {
         onFilterChange={handleFilterChange}
         onSearchChange={setSearchTerm}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
       />
 
       <TaskTable

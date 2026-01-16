@@ -16,6 +16,7 @@ import StatusChip from "components/admin/ui/chip/Status";
 import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
 import DateDisplay from "components/admin/ui/date/DateDisplay";
 import { useLetterManagement } from "@/hooks/letter/useLetterManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 import type { LetterFilter } from "@/types/letter";
 
 export default function LettersPage() {
@@ -45,6 +46,8 @@ export default function LettersPage() {
     handleDelete,
     confirmDelete,
   } = useLetterManagement();
+
+  const { canAdd, canDelete } = useResourcePermission("letters");
 
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
@@ -77,7 +80,7 @@ export default function LettersPage() {
           title="Letters Management"
           description="Manage and organize your letters"
         />
-        <AddButton onClick={handleAddLetter} text="Add Letter" />
+        {canAdd() && <AddButton onClick={handleAddLetter} text="Add Letter" />}
       </div>
 
       <LetterStats letters={letters} />
@@ -89,6 +92,7 @@ export default function LettersPage() {
         isLoading={loading}
         selectedCount={selectedLetters.length}
         onDeleteSelected={handleDeleteSelected}
+        canDelete={canDelete}
       />
 
       <LetterTable

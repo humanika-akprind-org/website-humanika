@@ -14,6 +14,7 @@ interface LetterFiltersProps {
   isLoading?: boolean;
   selectedCount: number;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 export default function LetterFilters({
@@ -21,17 +22,16 @@ export default function LetterFilters({
   isLoading,
   selectedCount,
   onDeleteSelected,
+  canDelete,
 }: LetterFiltersProps) {
   const [filters, setFilters] = useState<LetterFilter>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<{ id: string; name: string }[]>([]);
-  const [loadingPeriods, setLoadingPeriods] = useState(true);
 
   // Fetch periods on component mount
   useEffect(() => {
     const fetchPeriods = async () => {
       try {
-        setLoadingPeriods(true);
         const periodData = await PeriodApi.getPeriods();
         const periodOptions = periodData.map((period) => ({
           id: period.id,
@@ -42,8 +42,6 @@ export default function LetterFilters({
         console.error("Error fetching periods:", err);
         // Fallback to empty array
         setPeriods([]);
-      } finally {
-        setLoadingPeriods(false);
       }
     };
 
@@ -168,15 +166,14 @@ export default function LetterFilters({
                 })),
               ]}
             />
-            {loadingPeriods && (
-              <p className="text-xs text-gray-500 mt-1">Loading periods...</p>
-            )}
           </div>
           <div className="flex items-end">
-            <DeleteSelectedButton
-              selectedCount={selectedCount}
-              onClick={onDeleteSelected}
-            />
+            {canDelete && canDelete() && (
+              <DeleteSelectedButton
+                selectedCount={selectedCount}
+                onClick={onDeleteSelected}
+              />
+            )}
           </div>
         </div>
       )}

@@ -23,6 +23,7 @@ export default function FinanceTransactionsPage() {
   const [workProgramFilter, setWorkProgramFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
 
   const {
     finances,
@@ -96,6 +97,8 @@ export default function FinanceTransactionsPage() {
         onCategoryFilterChange={setCategoryFilter}
         workProgramFilter={workProgramFilter}
         onWorkProgramFilterChange={setWorkProgramFilter}
+        periodFilter={periodFilter}
+        onPeriodFilterChange={setPeriodFilter}
         selectedCount={selectedFinances.length}
         onDeleteSelected={() => handleDelete()}
       />

@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
-import { FiCheckCircle, FiCheck } from "react-icons/fi";
+import { FiCheck } from "react-icons/fi";
+import { Users } from "lucide-react";
 import type { UserTableProps } from "@/types/user";
 import Avatar from "../../../ui/avatar/Avatar";
 import Role from "../../../ui/chip/Role";
@@ -13,6 +14,8 @@ import EmptyState from "../../../ui/EmptyState";
 import DropdownMenu, {
   DropdownMenuItem,
 } from "../../../ui/dropdown/DropdownMenu";
+import { useResourcePermission } from "@/hooks/usePermission";
+
 export default function UserTable({
   users,
   selectedUsers,
@@ -25,6 +28,7 @@ export default function UserTable({
   onPageChange,
   onVerifyUser,
 }: UserTableProps & { onVerifyUser: (userId: string) => void }) {
+  const { canEdit } = useResourcePermission("user-roles");
   const unverifiedUsers = users.filter((user) => !user.verifiedAccount);
 
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
@@ -127,13 +131,15 @@ export default function UserTable({
                     isLastItem={index === filteredUsers.length - 1}
                     hasMultipleItems={filteredUsers.length > 1}
                   >
-                    <DropdownMenuItem
-                      onClick={() => onVerifyUser(user.id)}
-                      color="green"
-                    >
-                      <FiCheck className="mr-2" size={14} />
-                      Verify Account
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onVerifyUser(user.id)}
+                        color="green"
+                      >
+                        <FiCheck className="mr-2" size={14} />
+                        Verify Account
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -144,7 +150,7 @@ export default function UserTable({
 
       {unverifiedUsers.length === 0 && !loading && (
         <EmptyState
-          icon={<FiCheckCircle size={48} className="mx-auto" />}
+          icon={<Users size={48} className="mx-auto" />}
           title="No unverified users found"
           description="All accounts are verified"
         />

@@ -4,6 +4,7 @@ import type { Event } from "./event";
 import { Letter } from "./letter";
 import { Approval } from "./approval";
 import { DocumentType } from "./document-type";
+import { Period } from "./period";
 
 export interface Document {
   type: any;
@@ -15,6 +16,8 @@ export interface Document {
   document?: string | null;
   userId: string;
   user: User;
+  periodId?: string | null;
+  period?: Period;
   createdAt: Date;
   updatedAt: Date;
   letter?: Letter | null;
@@ -29,6 +32,7 @@ export interface CreateDocumentInput {
   documentTypeId: string;
   status?: Status;
   document?: string | null;
+  periodId?: string;
 }
 
 export interface UpdateDocumentInput extends Partial<CreateDocumentInput> {
@@ -42,4 +46,5 @@ export interface DocumentFilter {
   letterId?: string;
   documentTypeId?: string;
   search?: string;
+  periodId?: string;
 }

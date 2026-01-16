@@ -16,6 +16,7 @@ interface WorkFiltersProps {
   onFilterChange: (key: string, value: string) => void;
   onSearchChange: (value: string) => void;
   onDeleteSelected: () => void;
+  canDelete?: () => boolean;
 }
 
 export default function WorkFilters({
@@ -25,6 +26,7 @@ export default function WorkFilters({
   onFilterChange,
   onSearchChange,
   onDeleteSelected,
+  canDelete,
 }: WorkFiltersProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [periods, setPeriods] = useState<Period[]>([]);
@@ -110,10 +112,12 @@ export default function WorkFilters({
             onChange={(value) => onFilterChange("isActive", value)}
             options={activeStatusOptions}
           />
-          <DeleteSelectedButton
-            selectedCount={selectedPrograms.length}
-            onClick={onDeleteSelected}
-          />
+          {canDelete && canDelete() && (
+            <DeleteSelectedButton
+              selectedCount={selectedPrograms.length}
+              onClick={onDeleteSelected}
+            />
+          )}
         </div>
       )}
     </div>

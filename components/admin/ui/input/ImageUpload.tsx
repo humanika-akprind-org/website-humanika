@@ -27,6 +27,8 @@ interface ImageUploadProps {
   aspect?: number;
   removeButtonText?: string;
   loadingText?: string;
+  required?: boolean;
+  error?: string;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -45,6 +47,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   aspect = 16 / 9,
   removeButtonText = "Hapus Thumbnail",
   loadingText = "Mengupload thumbnail...",
+  required = false,
+  error,
 }) => {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
@@ -150,7 +154,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <AccessTokenGuard label={label} required={true}>
       <div className={className}>
-        <div className="flex items-start space-x-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label} {required && "*"}
+        </label>
+        <div
+          className={`flex items-start space-x-4 p-4 rounded-lg border-2 ${
+            error ? "border-red-300 bg-red-50" : "border-gray-200"
+          }`}
+        >
           {(previewUrl || (existingPhoto && existingPhoto.trim() !== "")) && (
             <div className="flex flex-col items-center">
               <div className="flex-shrink-0">
@@ -270,6 +281,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             )}
           </div>
         </div>
+        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 
         {/* Crop Modal */}
         <ImageCropper

@@ -105,7 +105,7 @@ export default function TimeInput({
 
       <div
         className={`relative flex border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent ${
-          error ? "border-red-500" : ""
+          error ? "border-red-500 focus-within:ring-red-500" : ""
         }`}
       >
         <input

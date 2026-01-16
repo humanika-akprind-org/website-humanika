@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
+import { BarChart3 } from "lucide-react";
 import type { Statistic } from "@/types/statistic";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -9,6 +10,7 @@ import EmptyState from "../../ui/EmptyState";
 import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 interface StatisticTableProps {
   statistics: Statistic[];
@@ -39,6 +41,7 @@ export default function StatisticTable({
   onPageChange,
   onAddStatistic,
 }: StatisticTableProps) {
+  const { canAdd, canEdit, canDelete } = useResourcePermission("statistics");
   const [sortField, setSortField] = useState("activeMembers");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -239,20 +242,24 @@ export default function StatisticTable({
                       <FiEye className="mr-2" size={14} />
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onEditStatistic(statistic.id)}
-                      color="blue"
-                    >
-                      <FiEdit className="mr-2" size={14} />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDeleteStatistic(statistic)}
-                      color="red"
-                    >
-                      <FiTrash className="mr-2" size={14} />
-                      Delete
-                    </DropdownMenuItem>
+                    {canEdit() && (
+                      <DropdownMenuItem
+                        onClick={() => onEditStatistic(statistic.id)}
+                        color="blue"
+                      >
+                        <FiEdit className="mr-2" size={14} />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    {canDelete() && (
+                      <DropdownMenuItem
+                        onClick={() => onDeleteStatistic(statistic)}
+                        color="red"
+                      >
+                        <FiTrash className="mr-2" size={14} />
+                        Delete
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenu>
                 </td>
               </tr>
@@ -263,11 +270,13 @@ export default function StatisticTable({
 
       {sortedStatistics.length === 0 && !loading && (
         <EmptyState
-          icon={<FiTrash size={48} className="mx-auto" />}
+          icon={<BarChart3 size={48} className="mx-auto" />}
           title="No statistics found"
           description="Try adjusting your search or filter criteria"
           actionButton={
-            <AddButton onClick={onAddStatistic} text="Add Statistic" />
+            canAdd() ? (
+              <AddButton onClick={onAddStatistic} text="Add Statistic" />
+            ) : null
           }
         />
       )}

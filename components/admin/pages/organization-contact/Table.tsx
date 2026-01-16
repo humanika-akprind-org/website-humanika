@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
+import { Landmark } from "lucide-react";
 import type { OrganizationContact } from "@/types/organization-contact";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -252,7 +253,7 @@ export default function OrganizationContactTable({
 
       {sortedContacts.length === 0 && !loading && (
         <EmptyState
-          icon={<FiTrash size={48} className="mx-auto" />}
+          icon={<Landmark size={48} className="mx-auto" />}
           title="No organization contacts found"
           description="Try adjusting your search or filter criteria"
           actionButton={
