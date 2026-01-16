@@ -1,6 +1,7 @@
 "use client";
 
-import { FiTrendingUp, FiTrendingDown, FiDollarSign } from "react-icons/fi";
+import { FiTrendingUp, FiTrendingDown } from "react-icons/fi";
+import { Wallet } from "lucide-react";
 import type { Finance } from "@/types/finance";
 import { FinanceType } from "@/types/enums";
 import StatCard from "../../ui/card/StatCard";
@@ -31,7 +32,7 @@ export default function FinanceStats({ finances }: FinanceStatsProps) {
     {
       title: "Total Transactions",
       value: totalTransactions,
-      icon: FiDollarSign,
+      icon: Wallet,
       color: "blue",
     },
     {
