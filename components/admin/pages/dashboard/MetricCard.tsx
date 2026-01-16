@@ -16,6 +16,7 @@ interface MetricCardProps {
 }
 
 // Map icon names from page.tsx to actual Lucide component names
+// These names should match the sidebar icons from lucide-react
 const iconNameMap: Record<string, string> = {
   // Status icons
   close: "X",
@@ -23,10 +24,30 @@ const iconNameMap: Record<string, string> = {
   users: "Users",
   trendingUp: "TrendingUp",
   checkCircle: "CheckCircle",
-  // Main icons
-  dollarSign: "DollarSign",
+  check: "Check",
+  clock: "Clock",
+  alertCircle: "AlertCircle",
+  clipboardList: "ClipboardList",
+  // Main icons - using sidebar lucide-react imports
+  wallet: "Wallet",
   newspaper: "Newspaper",
-  calendar: "Calendar",
+  calendar: "CalendarClock", // From sidebar: CalendarClock
+  user: "User", // From sidebar
+  fileText: "FileText", // From sidebar
+  fileCheck: "BookCheck", // From sidebar
+  briefcase: "MonitorCog", // From sidebar: MonitorCog (work programs)
+  calendarDays: "CalendarRange", // From sidebar: CalendarRange (events)
+  mail: "FileText", // From sidebar: FileText (letters)
+  usersGroup: "Users", // From sidebar: Users
+  calendarPeriod: "CalendarClock", // From sidebar: CalendarClock (periods)
+  management: "UserCog", // From sidebar: UserCog (managements)
+  structure: "Network", // From sidebar: Network (structures)
+  task: "ClipboardList", // From sidebar: ClipboardList (tasks)
+  proposal: "BookText", // From sidebar: BookText (proposals)
+  report: "SquareLibrary", // From sidebar: SquareLibrary (documents)
+  gallery: "Images", // From sidebar: Images
+  briefcaseWork: "MonitorCog", // From sidebar: MonitorCog
+  activityLog: "Activity", // From sidebar: Activity
 };
 
 function getIconComponent(

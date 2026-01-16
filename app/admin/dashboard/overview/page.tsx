@@ -272,18 +272,18 @@ export default function OverviewPage() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
         <MetricCard
-          icon="calendar"
+          icon="calendarPeriod"
           color="orange"
           value={overview.totalPeriods}
           title="Periods"
-          statusIcon="check"
+          statusIcon="checkCircle"
           statusColor="green-500"
           statusText="Total periods"
           href="/admin/governance/periods"
         />
 
         <MetricCard
-          icon="user"
+          icon="management"
           color="purple"
           value={overview.totalManagements}
           title="Managements"
@@ -294,7 +294,7 @@ export default function OverviewPage() {
         />
 
         <MetricCard
-          icon="users"
+          icon="structure"
           color="cyan"
           value={overview.totalStructures}
           title="Organizational Structures"
@@ -305,11 +305,11 @@ export default function OverviewPage() {
         />
 
         <MetricCard
-          icon="fileText"
+          icon="task"
           color="lime"
           value={overview.totalTasks}
           title="Department Tasks"
-          statusIcon="fileText"
+          statusIcon="clipboardList"
           statusColor="orange-500"
           statusText="Total tasks"
           href="/admin/governance/tasks"
@@ -343,7 +343,7 @@ export default function OverviewPage() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
         <MetricCard
-          icon="briefcase"
+          icon="briefcaseWork"
           color="green"
           value={overview.totalWorkPrograms}
           title="Work Programs"
@@ -377,7 +377,7 @@ export default function OverviewPage() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
         <MetricCard
-          icon="fileText"
+          icon="proposal"
           color="emerald"
           value={overview.totalProposals}
           title="Proposals"
@@ -410,7 +410,7 @@ export default function OverviewPage() {
         />
 
         <MetricCard
-          icon="fileText"
+          icon="report"
           color="yellow"
           value={overview.totalDocuments}
           title="Documents"
@@ -441,7 +441,7 @@ export default function OverviewPage() {
         />
 
         <MetricCard
-          icon="image"
+          icon="gallery"
           color="teal"
           value={overview.galleryItems}
           title="Gallery Items"
@@ -460,7 +460,7 @@ export default function OverviewPage() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
         <MetricCard
-          icon="dollarSign"
+          icon="wallet"
           color="red"
           value={`Rp ${overview.totalBudget.toLocaleString()}`}
           title="Current Budget"

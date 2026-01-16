@@ -369,7 +369,7 @@ export default function DashboardPage() {
       {/* Finance Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <MetricCard
-          icon="dollarSign"
+          icon="wallet"
           color="green"
           value={`RP ${totalBalance.toLocaleString("id-ID")}`}
           title="Total Balance"
@@ -389,7 +389,7 @@ export default function DashboardPage() {
           valueSize="lg"
         />
         <MetricCard
-          icon="dollarSign"
+          icon="wallet"
           color="red"
           value={`RP ${totalExpense.toLocaleString("id-ID")}`}
           title="Total Expense"
