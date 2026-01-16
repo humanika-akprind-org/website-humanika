@@ -182,8 +182,8 @@ export default function DocumentForm({
           fileLoading={fileLoading}
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
           helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
-          loadingText="Mengupload file..."
-          removeButtonText="Hapus File"
+          loadingText="Uploading file..."
+          removeButtonText="Delete File"
         />
 
         <div className="flex justify-end space-x-3 pt-4">
@@ -194,14 +194,8 @@ export default function DocumentForm({
 
           <SubmitButton
             isSubmitting={isLoadingState || fileLoading}
-            text={
-              onSubmitForApproval
-                ? "Simpan"
-                : document
-                ? "Update Document"
-                : "Create Document"
-            }
-            loadingText={onSubmitForApproval ? "Mengajukan..." : "Menyimpan..."}
+            text={onSubmitForApproval ? "Update Document" : "Create Document"}
+            loadingText="Saving..."
           />
         </div>
       </form>

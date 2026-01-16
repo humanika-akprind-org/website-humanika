@@ -42,7 +42,7 @@ const DriveForm: React.FC<DriveFormProps> = ({
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-6">
-        {file ? "Edit File" : "Upload File Baru"}
+        {file ? "Edit File" : "Upload New File"}
       </h2>
 
       {error && (
@@ -76,7 +76,7 @@ const DriveForm: React.FC<DriveFormProps> = ({
               htmlFor="file-name"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Nama File
+              File Name
             </label>
             <div className="flex">
               <input
@@ -85,7 +85,7 @@ const DriveForm: React.FC<DriveFormProps> = ({
                 value={fileName}
                 onChange={handleFileNameChange}
                 className="flex-1 p-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Masukkan nama file"
+                placeholder="Enter file name"
                 required
               />
               {fileExtension && (
@@ -103,7 +103,7 @@ const DriveForm: React.FC<DriveFormProps> = ({
                   htmlFor="file-upload"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Pilih File
+                  Select File
                 </label>
                 <input
                   id="file-upload"
@@ -121,7 +121,7 @@ const DriveForm: React.FC<DriveFormProps> = ({
                 />
                 {selectedFile && (
                   <p className="mt-2 text-sm text-gray-600">
-                    File dipilih:{" "}
+                    Selected file:{" "}
                     <span className="font-medium">{selectedFile.name}</span> (
                     {Math.round(selectedFile.size / 1024)} KB)
                   </p>
@@ -133,7 +133,7 @@ const DriveForm: React.FC<DriveFormProps> = ({
                   htmlFor="folder-select"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Folder Tujuan
+                  Destination Folder
                 </label>
                 <select
                   id="folder-select"
@@ -159,7 +159,7 @@ const DriveForm: React.FC<DriveFormProps> = ({
               onClick={() => router.back()}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
             >
-              Batal
+              Cancel
             </button>
             <button
               type="submit"
@@ -192,10 +192,10 @@ const DriveForm: React.FC<DriveFormProps> = ({
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  {file ? "Menyimpan..." : "Mengupload..."}
+                  {file ? "Saving..." : "Uploading..."}
                 </span>
               ) : file ? (
-                "Simpan Perubahan"
+                "Save File"
               ) : (
                 "Upload File"
               )}

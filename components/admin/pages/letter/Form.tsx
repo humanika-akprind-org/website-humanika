@@ -276,8 +276,8 @@ export default function LetterForm({
           fileLoading={fileLoading}
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
           helpText="Upload letter file (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
-          loadingText="Mengupload file..."
-          removeButtonText="Hapus File"
+          loadingText="Uploading file..."
+          removeButtonText="Remove File"
         />
 
         {/* Form Actions */}
@@ -291,12 +291,12 @@ export default function LetterForm({
             isSubmitting={isLoadingState || fileLoading}
             text={
               onSubmitForApproval
-                ? "Ajukan Persetujuan"
+                ? "Submit for Approval"
                 : isEditing
                 ? "Update Letter"
                 : "Create Letter"
             }
-            loadingText={onSubmitForApproval ? "Mengajukan..." : "Menyimpan..."}
+            loadingText={onSubmitForApproval ? "Submitting..." : "Saving..."}
           />
         </div>
       </form>
