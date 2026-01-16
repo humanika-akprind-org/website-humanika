@@ -1,15 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  FiFileText,
-  FiEye,
-  FiEdit,
-  FiTrash,
-  FiClipboard,
-  FiTarget,
-  FiDownload,
-} from "react-icons/fi";
+import { FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
+import { FileText, BookText, BookCheck } from "lucide-react";
 import type { Letter } from "@/types/letter";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import StatusChip from "../../ui/chip/Status";
@@ -132,7 +125,7 @@ export default function LetterTable({
   const emptyStateProps = (() => {
     if (typeFilter === "proposal") {
       return {
-        icon: <FiClipboard size={48} className="mx-auto" />,
+        icon: <BookText size={48} className="mx-auto" />,
         title: "No proposals found",
         description: "Try adjusting your search or filter criteria",
         actionButton: (
@@ -141,7 +134,7 @@ export default function LetterTable({
       };
     } else if (typeFilter === "accountabilityreport") {
       return {
-        icon: <FiTarget size={48} className="mx-auto" />,
+        icon: <BookCheck size={48} className="mx-auto" />,
         title: "No accountability reports found",
         description: "Try adjusting your search or filter criteria",
         actionButton: (
@@ -150,7 +143,7 @@ export default function LetterTable({
       };
     } else {
       return {
-        icon: <FiFileText size={48} className="mx-auto" />,
+        icon: <FileText size={48} className="mx-auto" />,
         title: "No letters found",
         description: "Try adjusting your search or filter criteria",
         actionButton: <AddButton onClick={handleAddLetter} text="Add Letter" />,
@@ -301,7 +294,7 @@ export default function LetterTable({
                   {letter.letter && (
                     <div className="text-sm text-blue-600 mt-1">
                       <span className="inline-flex items-center">
-                        <FiFileText className="w-4 h-4 mr-1" />
+                        <FileText className="w-4 h-4 mr-1" />
                         Attached file
                       </span>
                     </div>

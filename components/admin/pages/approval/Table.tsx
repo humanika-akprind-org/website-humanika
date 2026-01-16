@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { FiCheck, FiX, FiClock, FiEye, FiRotateCcw } from "react-icons/fi";
+import { Activity } from "lucide-react";
 import type { ApprovalWithRelations as Approval } from "@/types/approval";
 import SortIcon from "../../ui/SortIcon";
 import StatusApproval from "../../ui/chip/StatusApproval";
@@ -390,7 +391,7 @@ export default function ApprovalTable({
 
       {sortedApprovals.length === 0 && (
         <EmptyState
-          icon={<FiCheck size={48} className="mx-auto" />}
+          icon={<Activity size={48} className="mx-auto" />}
           title="No Name approvals found"
           description="No Name approval requests at the moment"
         />

@@ -1,12 +1,5 @@
-import {
-  FiFileText,
-  FiEdit,
-  FiTrash,
-  FiEye,
-  FiDownload,
-  FiClipboard,
-  FiTarget,
-} from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye, FiDownload } from "react-icons/fi";
+import { SquareLibrary, BookText, BookCheck } from "lucide-react";
 import type { Document } from "@/types/document";
 
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -136,7 +129,7 @@ export default function DocumentTable({
   const emptyStateProps = (() => {
     if (typeFilter === "proposal") {
       return {
-        icon: <FiClipboard size={48} className="mx-auto" />,
+        icon: <BookText size={48} className="mx-auto" />,
         title: "No proposals found",
         description: "Try adjusting your search or filter criteria",
         actionButton: (
@@ -145,7 +138,7 @@ export default function DocumentTable({
       };
     } else if (typeFilter === "accountabilityreport") {
       return {
-        icon: <FiTarget size={48} className="mx-auto" />,
+        icon: <BookCheck size={48} className="mx-auto" />,
         title: "No accountability reports found",
         description: "Try adjusting your search or filter criteria",
         actionButton: (
@@ -154,7 +147,7 @@ export default function DocumentTable({
       };
     } else {
       return {
-        icon: <FiFileText size={48} className="mx-auto" />,
+        icon: <SquareLibrary size={48} className="mx-auto" />,
         title: "No documents found",
         description: "Try adjusting your search or filter criteria",
         actionButton: (

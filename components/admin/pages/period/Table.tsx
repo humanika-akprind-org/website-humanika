@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEye, FiEdit, FiTrash2, FiCalendar } from "react-icons/fi";
+import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
+import { CalendarClock } from "lucide-react";
 import type { Period } from "@/types/period";
 import ActiveChip from "../../ui/chip/Active";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -231,7 +232,7 @@ export default function PeriodTable({
 
       {sortedPeriods.length === 0 && (
         <EmptyState
-          icon={<FiCalendar size={48} className="mx-auto" />}
+          icon={<CalendarClock size={48} className="mx-auto" />}
           title="No periods found"
           description="Try adjusting your search or filter criteria"
         />

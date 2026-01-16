@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FiFileText, FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
+import { FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
+import { Network } from "lucide-react";
 import Image from "next/image";
 import type { OrganizationalStructure } from "@/types/structure";
 import StatusChip from "../../ui/chip/Status";
@@ -179,7 +180,7 @@ export default function StructureTable({
     return (
       <div className="bg-white rounded-xl shadow-sm overflow-visible border border-gray-100">
         <EmptyState
-          icon={<FiFileText size={48} className="mx-auto" />}
+          icon={<Network size={48} className="mx-auto" />}
           title="No organizational structures found"
           description="Get started by creating your first organizational structure."
           actionButton={
@@ -397,7 +398,7 @@ export default function StructureTable({
 
       {sortedStructures.length === 0 && !loading && (
         <EmptyState
-          icon={<FiFileText size={48} className="mx-auto" />}
+          icon={<Network size={48} className="mx-auto" />}
           title="No structures found"
           description="Try adjusting your search or filter criteria"
           actionButton={

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiCalendar, FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { Newspaper } from "lucide-react";
 import type { Article } from "@/types/article";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -277,7 +278,7 @@ const ArticleTable: React.FC<ArticleTableProps> = ({
 
       {sortedArticles.length === 0 && !loading && (
         <EmptyState
-          icon={<FiCalendar size={48} className="mx-auto" />}
+          icon={<Newspaper size={48} className="mx-auto" />}
           title="No articles found"
           description="Try adjusting your search or filter criteria"
           actionButton={

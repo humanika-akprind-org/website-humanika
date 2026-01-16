@@ -1,12 +1,6 @@
 import { useRef, useState } from "react";
-import {
-  FiEye,
-  FiEdit,
-  FiTrash,
-  FiLock,
-  FiUnlock,
-  FiUser,
-} from "react-icons/fi";
+import { FiEye, FiEdit, FiTrash, FiLock, FiUnlock } from "react-icons/fi";
+import { Users } from "lucide-react";
 import type { UserTableProps } from "@/types/user";
 import Avatar from "../../ui/avatar/Avatar";
 import Role from "../../ui/chip/Role";
@@ -278,7 +272,7 @@ export default function UserTable({
 
       {sortedUsers.length === 0 && !loading && (
         <EmptyState
-          icon={<FiUser size={48} className="mx-auto" />}
+          icon={<Users size={48} className="mx-auto" />}
           title="No users found"
           description="Try adjusting your search or filter criteria"
           actionButton={<AddButton onClick={onAddUser} text="Add User" />}

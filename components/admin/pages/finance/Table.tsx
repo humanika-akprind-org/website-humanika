@@ -1,13 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  FiEdit,
-  FiTrash,
-  FiEye,
-  FiDownload,
-  FiDollarSign,
-} from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye, FiDownload } from "react-icons/fi";
+import { Wallet } from "lucide-react";
 import type { Finance } from "@/types/finance";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -349,7 +344,7 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
 
       {sortedFinances.length === 0 && !loading && (
         <EmptyState
-          icon={<FiDollarSign size={48} className="mx-auto" />}
+          icon={<Wallet size={48} className="mx-auto" />}
           title="No finances found"
           description="Try adjusting your search or filter criteria"
           actionButton={

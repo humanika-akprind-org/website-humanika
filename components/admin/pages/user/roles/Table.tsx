@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
-import { FiCheckCircle, FiCheck } from "react-icons/fi";
+import { FiCheck } from "react-icons/fi";
+import { Users } from "lucide-react";
 import type { UserTableProps } from "@/types/user";
 import Avatar from "../../../ui/avatar/Avatar";
 import Role from "../../../ui/chip/Role";
@@ -144,7 +145,7 @@ export default function UserTable({
 
       {unverifiedUsers.length === 0 && !loading && (
         <EmptyState
-          icon={<FiCheckCircle size={48} className="mx-auto" />}
+          icon={<Users size={48} className="mx-auto" />}
           title="No unverified users found"
           description="All accounts are verified"
         />

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { FiEdit, FiTrash2, FiEye, FiTarget } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
+import { MonitorCog } from "lucide-react";
 import type { WorkProgram } from "@/types/work";
 import SortIcon from "../../ui/SortIcon";
 import StatusChip from "../../ui/chip/Status";
@@ -287,7 +288,7 @@ export default function WorkProgramTable({
 
       {sortedPrograms.length === 0 && (
         <EmptyState
-          icon={<FiTarget size={48} className="mx-auto" />}
+          icon={<MonitorCog size={48} className="mx-auto" />}
           title="No work programs found"
           description="Try adjusting your search or filter criteria"
           actionButton={<AddButton onClick={onAddProgram} text="Add Program" />}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiTrash, FiTag, FiEye } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { Tag } from "lucide-react";
 import type { FinanceCategory } from "@/types/finance-category";
 import { FinanceType } from "@/types/enums";
 import Checkbox from "../../../ui/checkbox/Checkbox";
@@ -303,7 +304,7 @@ const FinanceCategoryTable: React.FC<FinanceCategoryTableProps> = ({
 
       {sortedCategories.length === 0 && !loading && (
         <EmptyState
-          icon={<FiTag size={48} className="mx-auto" />}
+          icon={<Tag size={48} className="mx-auto" />}
           title="No categories found"
           description="Try adjusting your search or filter criteria"
           actionButton={

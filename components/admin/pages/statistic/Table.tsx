@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
+import { BarChart3 } from "lucide-react";
 import type { Statistic } from "@/types/statistic";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -263,7 +264,7 @@ export default function StatisticTable({
 
       {sortedStatistics.length === 0 && !loading && (
         <EmptyState
-          icon={<FiTrash size={48} className="mx-auto" />}
+          icon={<BarChart3 size={48} className="mx-auto" />}
           title="No statistics found"
           description="Try adjusting your search or filter criteria"
           actionButton={

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiEye, FiTrash, FiImage } from "react-icons/fi";
+import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
+import { Images } from "lucide-react";
 import type { Gallery } from "@/types/gallery";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -232,7 +233,7 @@ export default function GalleryTable({
 
       {sortedGalleries.length === 0 && !loading && (
         <EmptyState
-          icon={<FiImage size={48} className="mx-auto" />}
+          icon={<Images size={48} className="mx-auto" />}
           title="No galleries found"
           description="Try adjusting your search or filter criteria"
           actionButton={<AddButton onClick={onAddGallery} text="Add Gallery" />}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiCalendar, FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { CalendarRange } from "lucide-react";
 import type { Event } from "@/types/event";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -370,7 +371,7 @@ const EventTable: React.FC<EventTableProps> = ({
 
       {sortedEvents.length === 0 && !loading && (
         <EmptyState
-          icon={<FiCalendar size={48} className="mx-auto" />}
+          icon={<CalendarRange size={48} className="mx-auto" />}
           title="No events found"
           description="Try adjusting your search or filter criteria"
           actionButton={<AddButton onClick={handleAddEvent} text="Add Event" />}

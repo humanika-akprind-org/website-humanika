@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEye, FiEdit, FiTrash, FiUser } from "react-icons/fi";
+import { FiEye, FiEdit, FiTrash } from "react-icons/fi";
+import { UserCog } from "lucide-react";
 import type { Management } from "@/types/management";
 import ManagementAvatar from "../../ui/avatar/ManagementAvatar";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -280,7 +281,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
 
       {sortedManagements.length === 0 && !loading && (
         <EmptyState
-          icon={<FiUser size={48} className="mx-auto" />}
+          icon={<UserCog size={48} className="mx-auto" />}
           title="No managements found"
           description="Try adjusting your search or filter criteria"
           actionButton={
