@@ -24,13 +24,14 @@ interface DocumentFormProps {
   document?: Document;
   onSubmit: (data: CreateDocumentInput | UpdateDocumentInput) => Promise<void>;
   onSubmitForApproval?: (
-    data: CreateDocumentInput | UpdateDocumentInput
+    data: CreateDocumentInput | UpdateDocumentInput,
   ) => Promise<void>;
   loading?: boolean;
   events: Event[];
   letters: Letter[];
   periods?: Period[];
   fixedDocumentType?: string;
+  isEditing?: boolean;
 }
 
 export default function DocumentForm({
@@ -39,6 +40,7 @@ export default function DocumentForm({
   onSubmitForApproval,
   periods = [],
   fixedDocumentType,
+  isEditing = false,
 }: DocumentFormProps) {
   const router = useRouter();
 
@@ -194,7 +196,7 @@ export default function DocumentForm({
 
           <SubmitButton
             isSubmitting={isLoadingState || fileLoading}
-            text={onSubmitForApproval ? "Update Document" : "Create Document"}
+            text={isEditing ? "Update Document" : "Create Document"}
             loadingText="Saving..."
           />
         </div>

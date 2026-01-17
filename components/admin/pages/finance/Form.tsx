@@ -26,7 +26,7 @@ interface FinanceFormProps {
   finance?: Finance;
   onSubmit: (data: CreateFinanceInput | UpdateFinanceInput) => Promise<void>;
   onSubmitForApproval?: (
-    data: CreateFinanceInput | UpdateFinanceInput
+    data: CreateFinanceInput | UpdateFinanceInput,
   ) => Promise<void>;
   isLoading?: boolean;
   accessToken?: string;
@@ -232,20 +232,8 @@ export default function FinanceForm({
 
             <SubmitButton
               isSubmitting={isSubmitting || photoLoading}
-              text={
-                isEditing
-                  ? "Update Transaction"
-                  : onSubmitForApproval
-                  ? "Submit for Approval"
-                  : "Create Transaction"
-              }
-              loadingText={
-                isSubmitting
-                  ? onSubmitForApproval
-                    ? "Mengajukan..."
-                    : "Menyimpan..."
-                  : "Saving..."
-              }
+              text={isEditing ? "Update Transaction" : "Create Transaction"}
+              loadingText="Saving..."
             />
           </div>
         </form>

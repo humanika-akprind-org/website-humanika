@@ -51,6 +51,7 @@ export default function EditDocumentPage() {
           periods={periods}
           loading={combinedLoading}
           fixedDocumentType="accountabilityreport"
+          isEditing={false}
         />
       ) : null}
     </div>

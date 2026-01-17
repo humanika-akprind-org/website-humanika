@@ -28,7 +28,7 @@ interface LetterFormProps {
   letter?: Letter;
   onSubmit: (data: CreateLetterInput | UpdateLetterInput) => Promise<void>;
   onSubmitForApproval?: (
-    data: CreateLetterInput | UpdateLetterInput
+    data: CreateLetterInput | UpdateLetterInput,
   ) => Promise<void>;
   isLoading?: boolean;
   periods?: Period[];
@@ -160,7 +160,7 @@ export default function LetterForm({
                   .replace(/_/g, " ")
                   .toLowerCase()
                   .replace(/\b\w/g, (l) => l.toUpperCase()),
-              })
+              }),
             )}
             placeholder="Select classification"
             icon={<FiBriefcase className="text-gray-400" />}
@@ -289,14 +289,8 @@ export default function LetterForm({
 
           <SubmitButton
             isSubmitting={isLoadingState || fileLoading}
-            text={
-              onSubmitForApproval
-                ? "Submit for Approval"
-                : isEditing
-                ? "Update Letter"
-                : "Create Letter"
-            }
-            loadingText={onSubmitForApproval ? "Submitting..." : "Saving..."}
+            text={isEditing ? "Update Letter" : "Create Letter"}
+            loadingText="Saving..."
           />
         </div>
       </form>
