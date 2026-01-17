@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import GalleryStats from "@/components/admin/pages/gallery/Stats";
 import GalleryFilters from "@/components/admin/pages/gallery/Filters";
 import GalleryTable from "@/components/admin/pages/gallery/Table";
@@ -15,8 +14,6 @@ import ImageView from "components/admin/ui/avatar/ImageView";
 import { useGalleryManagement } from "hooks/gallery/useGalleryManagement";
 
 export default function GalleriesPage() {
-  const [periodFilter, setPeriodFilter] = useState("all");
-
   const {
     galleries,
     loading,
@@ -26,6 +23,7 @@ export default function GalleriesPage() {
     searchTerm,
     eventFilter,
     categoryFilter,
+    periodFilter,
     currentPage,
     totalPages,
     showDeleteModal,
@@ -34,6 +32,7 @@ export default function GalleriesPage() {
     setSearchTerm,
     setEventFilter,
     setCategoryFilter,
+    setPeriodFilter,
     setCurrentPage,
     setShowDeleteModal,
     setShowViewModal,
@@ -50,8 +49,8 @@ export default function GalleriesPage() {
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
-    ? { type: "success", message: success }
-    : null;
+      ? { type: "success", message: success }
+      : null;
 
   if (loading) {
     return <Loading />;

@@ -21,7 +21,7 @@ export function useFinanceManagement() {
   const [statusFilter] = useState("all");
   const [typeFilter] = useState("all");
   const [categoryFilter] = useState("all");
-  const [periodFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
   const [workProgramFilter, setWorkProgramFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -173,11 +173,13 @@ export function useFinanceManagement() {
     showDeleteModal,
     showViewModal,
     currentFinance,
+    periodFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
     setShowViewModal,
     setCurrentFinance,
+    setPeriodFilter,
     toggleFinanceSelection,
     toggleSelectAll,
     handleAddFinance,

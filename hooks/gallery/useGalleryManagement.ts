@@ -20,6 +20,7 @@ export function useGalleryManagement() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -39,7 +40,9 @@ export function useGalleryManagement() {
       .includes(debouncedSearchTerm.toLowerCase());
     const matchesEvent =
       eventFilter === "all" || gallery.event?.id === eventFilter;
-    return matchesSearch && matchesEvent;
+    const matchesPeriod =
+      periodFilter === "all" || gallery.event?.periodId === periodFilter;
+    return matchesSearch && matchesEvent && matchesPeriod;
   });
 
   useEffect(() => {
@@ -148,6 +151,7 @@ export function useGalleryManagement() {
     searchTerm,
     eventFilter,
     categoryFilter,
+    periodFilter,
     currentPage,
     totalPages,
     showDeleteModal,
@@ -156,6 +160,7 @@ export function useGalleryManagement() {
     setSearchTerm,
     setEventFilter,
     setCategoryFilter,
+    setPeriodFilter,
     setCurrentPage,
     setShowDeleteModal,
     setShowViewModal,

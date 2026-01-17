@@ -2,7 +2,7 @@ import GalleryForm from "@/components/admin/pages/gallery/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
 import type { UpdateGalleryInput } from "@/types/gallery";
-import type { Event } from "@/types/event";
+import type { Event, Period } from "@/types/event";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
@@ -18,7 +18,7 @@ async function EditGalleryPage({
   const { id } = await params;
 
   try {
-    const [events, gallery] = await Promise.all([
+    const [events, gallery, periods] = await Promise.all([
       prisma.event.findMany({
         include: {
           period: true,
@@ -41,6 +41,9 @@ async function EditGalleryPage({
       }),
       prisma.gallery.findUnique({
         where: { id: id },
+      }),
+      prisma.period.findMany({
+        orderBy: { startYear: "desc" },
       }),
     ]);
 
@@ -92,6 +95,7 @@ async function EditGalleryPage({
             gallery={gallery}
             accessToken={accessToken}
             events={events as unknown as Event[]}
+            periods={periods as unknown as Period[]}
             onSubmit={handleSubmit}
             loading={false}
           />

@@ -27,6 +27,7 @@ export default function AddDocumentPage() {
   const {
     events,
     letters,
+    periods,
     loading: formDataLoading,
     error: formDataError,
   } = useDocumentFormData();
@@ -37,7 +38,7 @@ export default function AddDocumentPage() {
   useEffect(() => {
     if (!documentTypesLoading && documentTypes.length > 0) {
       const proposalType = documentTypes.find(
-        (type) => type.name.toLowerCase().replace(/[\s\-]/g, "") === "proposal"
+        (type) => type.name.toLowerCase().replace(/[\s\-]/g, "") === "proposal",
       );
       if (!proposalType) {
         setShowWarningModal(true);
@@ -54,7 +55,7 @@ export default function AddDocumentPage() {
 
   // Check if PROPOSAL document type exists
   const proposalType = documentTypes.find(
-    (type) => type.name.toLowerCase().replace(/[\s\-]/g, "") === "proposal"
+    (type) => type.name.toLowerCase().replace(/[\s\-]/g, "") === "proposal",
   );
 
   return (
@@ -71,6 +72,7 @@ export default function AddDocumentPage() {
           onSubmitForApproval={createDocumentForApproval}
           events={events}
           letters={letters}
+          periods={periods}
           loading={combinedLoading}
           fixedDocumentType="proposal"
         />

@@ -18,6 +18,7 @@ export function useEventManagement() {
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [periodFilter, setPeriodFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -31,14 +32,19 @@ export function useEventManagement() {
   }, [events]);
 
   // Apply client-side filtering and pagination
-  const filteredEvents = allEvents.filter(
-    (event) =>
+  const filteredEvents = allEvents.filter((event) => {
+    const matchesSearch =
       event.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
       (event.description &&
         event.description
           .toLowerCase()
-          .includes(debouncedSearchTerm.toLowerCase())),
-  );
+          .includes(debouncedSearchTerm.toLowerCase()));
+
+    const matchesPeriod =
+      periodFilter === "all" || event.periodId === periodFilter;
+
+    return matchesSearch && matchesPeriod;
+  });
 
   useEffect(() => {
     setTotalPages(Math.ceil(filteredEvents.length / 10));
@@ -148,11 +154,13 @@ export function useEventManagement() {
     showDeleteModal,
     showViewModal,
     currentEvent,
+    periodFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
     setShowViewModal,
     setCurrentEvent,
+    setPeriodFilter,
     toggleEventSelection,
     toggleSelectAll,
     handleAddEvent,

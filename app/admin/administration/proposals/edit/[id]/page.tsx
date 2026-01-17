@@ -25,6 +25,7 @@ export default function EditDocumentPage() {
   const {
     events,
     letters,
+    periods,
     loading: formDataLoading,
     error: formDataError,
   } = useDocumentFormData();
@@ -47,6 +48,7 @@ export default function EditDocumentPage() {
           onSubmitForApproval={updateDocumentForApproval}
           events={events}
           letters={letters}
+          periods={periods}
           loading={combinedLoading}
           fixedDocumentType="proposal"
         />

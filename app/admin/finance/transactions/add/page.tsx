@@ -19,6 +19,7 @@ export default function AddFinancePage() {
   const {
     categories,
     workPrograms,
+    periods,
     loading: formDataLoading,
     error: formDataError,
   } = useFinanceFormData();
@@ -38,6 +39,7 @@ export default function AddFinancePage() {
         <FinanceForm
           categories={categories}
           workPrograms={workPrograms}
+          periods={periods}
           onSubmit={createFinance}
           onSubmitForApproval={createFinanceForApproval}
           isLoading={combinedLoading}

@@ -1,20 +1,25 @@
 import { useState, useEffect } from "react";
+import { getPeriods } from "@/use-cases/api/period";
+import type { Period } from "@/types/period";
 
 export function useDocumentFormData() {
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
   const [letters, setLetters] = useState([]);
+  const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [usersRes, eventsRes, lettersRes] = await Promise.allSettled([
-          fetch("/api/user?limit=50"),
-          fetch("/api/event"),
-          fetch("/api/letter"),
-        ]);
+        const [usersRes, eventsRes, lettersRes, periodsRes] =
+          await Promise.allSettled([
+            fetch("/api/user?limit=50"),
+            fetch("/api/event"),
+            fetch("/api/letter"),
+            getPeriods(),
+          ]);
 
         const usersData =
           usersRes.status === "fulfilled"
@@ -26,10 +31,13 @@ export function useDocumentFormData() {
           lettersRes.status === "fulfilled"
             ? await lettersRes.value.json()
             : [];
+        const periodsData =
+          periodsRes.status === "fulfilled" ? periodsRes.value : [];
 
         setUsers(usersData.users || []);
         setEvents(eventsData || []);
         setLetters(lettersData || []);
+        setPeriods(periodsData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -40,5 +48,5 @@ export function useDocumentFormData() {
     fetchData();
   }, []);
 
-  return { users, events, letters, loading, error };
+  return { users, events, letters, periods, loading, error };
 }

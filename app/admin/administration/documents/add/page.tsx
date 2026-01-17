@@ -20,6 +20,7 @@ export default function AddDocumentPage() {
   const {
     events,
     letters,
+    periods,
     loading: formDataLoading,
     error: formDataError,
   } = useDocumentFormData();
@@ -41,6 +42,7 @@ export default function AddDocumentPage() {
           onSubmitForApproval={createDocumentForApproval}
           events={events}
           letters={letters}
+          periods={periods}
           loading={combinedLoading}
         />
       )}

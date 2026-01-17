@@ -13,6 +13,7 @@ export default function AddGalleryPage() {
 
   const {
     events,
+    periods,
     loading: formDataLoading,
     error: formDataError,
   } = useGalleryFormData();
@@ -32,6 +33,7 @@ export default function AddGalleryPage() {
         <GalleryForm
           onSubmit={createGallery}
           events={events}
+          periods={periods}
           loading={combinedLoading}
         />
       )}

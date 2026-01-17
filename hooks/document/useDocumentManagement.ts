@@ -37,6 +37,7 @@ export function useDocumentManagement(
   const [typeFilter, setTypeFilter] = useState("all");
   const [userFilter, setUserFilter] = useState("all");
   const [approvalStatusFilter, setApprovalStatusFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
 
   // Store all documents for bulk operations
   useEffect(() => {
@@ -63,6 +64,8 @@ export function useDocumentManagement(
         document.approvals.some(
           (approval) => approval.status === approvalStatusFilter,
         ));
+    const matchesPeriod =
+      periodFilter === "all" || document.periodId === periodFilter;
     const notExcluded = !excludeTypes?.some(
       (excludeType) =>
         excludeType === document.type.toLowerCase().replace(/[\s\-]/g, ""),
@@ -74,6 +77,7 @@ export function useDocumentManagement(
       matchesType &&
       matchesUser &&
       matchesApprovalStatus &&
+      matchesPeriod &&
       notExcluded
     );
   });
@@ -192,6 +196,7 @@ export function useDocumentManagement(
     typeFilter,
     userFilter,
     approvalStatusFilter,
+    periodFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -201,6 +206,7 @@ export function useDocumentManagement(
     setTypeFilter,
     setUserFilter,
     setApprovalStatusFilter,
+    setPeriodFilter,
     toggleDocumentSelection,
     toggleSelectAll,
     handleAddDocument,
