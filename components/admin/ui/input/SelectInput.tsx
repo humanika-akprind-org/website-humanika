@@ -26,6 +26,10 @@ interface SelectInputProps {
   maxDisplayCount?: number;
   showSearch?: boolean;
   error?: string;
+  onSearch?: (query: string) => void;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
+  hasMore?: boolean;
 }
 
 export default function SelectInput({
@@ -42,6 +46,10 @@ export default function SelectInput({
   maxDisplayCount = 200,
   showSearch = true,
   error,
+  onSearch,
+  onLoadMore,
+  isLoadingMore = false,
+  hasMore = false,
 }: SelectInputProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -53,24 +61,36 @@ export default function SelectInput({
         : options.filter(
             (option) =>
               option.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              option.value.toLowerCase().includes(searchQuery.toLowerCase())
+              option.value.toLowerCase().includes(searchQuery.toLowerCase()),
           ),
-    [options, searchQuery]
+    [options, searchQuery],
   );
 
   // Get display options with limit
   const displayOptions = useMemo(
     () => filteredOptions.slice(0, maxDisplayCount),
-    [filteredOptions, maxDisplayCount]
+    [filteredOptions, maxDisplayCount],
   );
 
   // Check if there are more options hidden
   const hasMoreOptions = filteredOptions.length > maxDisplayCount;
 
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    if (onSearch) {
+      onSearch(query);
+    }
+  };
+
   // Handle clear search
   const handleClearSearch = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSearchQuery("");
+    if (onSearch) {
+      onSearch("");
+    }
   };
 
   // Get selected option label
@@ -100,7 +120,7 @@ export default function SelectInput({
             className={cn(
               "w-full px-4 py-2 pl-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed",
               icon && "pl-10",
-              error && "border-red-500 focus:ring-red-500"
+              error && "border-red-500 focus:ring-red-500",
             )}
           >
             <SelectValue
@@ -114,6 +134,18 @@ export default function SelectInput({
             position="popper"
             sideOffset={4}
             className="max-h-[300px] overflow-y-auto"
+            onScroll={(e) => {
+              const target = e.target as HTMLElement;
+              if (
+                target.scrollTop + target.clientHeight >=
+                  target.scrollHeight - 10 &&
+                onLoadMore &&
+                hasMore &&
+                !isLoadingMore
+              ) {
+                onLoadMore();
+              }
+            }}
           >
             {showSearch && (
               <div className="sticky top-0 z-50 bg-white border-b border-gray-200 p-2 shadow-sm">
@@ -123,7 +155,7 @@ export default function SelectInput({
                     type="text"
                     placeholder={searchPlaceholder}
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={handleSearchChange}
                     onKeyDown={(e) => e.stopPropagation()}
                     className="w-full pl-10 pr-8 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -145,7 +177,7 @@ export default function SelectInput({
                   value={option.value}
                   className={cn(
                     "hover:bg-gray-100 cursor-pointer",
-                    value === option.value && "bg-blue-50 text-blue-700"
+                    value === option.value && "bg-blue-50 text-blue-700",
                   )}
                 >
                   {option.label}
@@ -156,9 +188,15 @@ export default function SelectInput({
                 No results found
               </div>
             )}
-            {hasMoreOptions && (
+            {(hasMoreOptions || (onSearch && hasMore)) && (
               <div className="py-2 px-3 text-xs text-gray-400 bg-gray-50 border-t border-gray-100 sticky bottom-0">
-                Showing {maxDisplayCount} of {filteredOptions.length} options
+                {isLoadingMore
+                  ? "Loading more..."
+                  : onSearch
+                    ? hasMore
+                      ? "Scroll to load more"
+                      : "No more results"
+                    : `Showing ${maxDisplayCount} of ${filteredOptions.length} options`}
               </div>
             )}
           </SelectContent>

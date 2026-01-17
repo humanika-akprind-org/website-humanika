@@ -23,6 +23,10 @@ export const useManagementForm = (
   const [accessToken, setAccessToken] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [periods, setPeriods] = useState<Period[]>([]);
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [userPage, setUserPage] = useState(1);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [hasMoreUsers, setHasMoreUsers] = useState(true);
 
   const {
     uploadFile,
@@ -244,6 +248,53 @@ export const useManagementForm = (
     return null;
   };
 
+  // Search users function
+  const searchUsers = async (query: string) => {
+    setUserSearchQuery(query);
+    setUserPage(1);
+    setIsLoadingUsers(true);
+
+    try {
+      const response = await UserApi.getUsers({
+        search: query,
+        page: 1,
+        limit: 10,
+      });
+      setUsers(response.data?.users || []);
+      const totalLoaded = response.data?.users?.length || 0;
+      setHasMoreUsers(totalLoaded >= 10);
+    } catch (err) {
+      console.error("Error searching users:", err);
+      setUsers([]);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  // Load more users function
+  const loadMoreUsers = async () => {
+    if (isLoadingUsers || !hasMoreUsers) return;
+
+    const nextPage = userPage + 1;
+    setIsLoadingUsers(true);
+
+    try {
+      const response = await UserApi.getUsers({
+        search: userSearchQuery,
+        page: nextPage,
+        limit: 10,
+      });
+      const newUsers = response.data?.users || [];
+      setUsers((prev) => [...prev, ...newUsers]);
+      setUserPage(nextPage);
+      setHasMoreUsers(newUsers.length >= 10);
+    } catch (err) {
+      console.error("Error loading more users:", err);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
   return {
     formData,
     setFormData,
@@ -258,5 +309,9 @@ export const useManagementForm = (
     removePhoto,
     handleSubmit,
     handleFileChange,
+    loadMoreUsers,
+    searchUsers,
+    isLoadingUsers,
+    hasMoreUsers,
   };
 };

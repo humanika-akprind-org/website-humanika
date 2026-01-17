@@ -20,7 +20,7 @@ interface EventFormProps {
   event?: Event;
   onSubmit: (data: CreateEventInput | UpdateEventInput) => Promise<void>;
   onSubmitForApproval?: (
-    data: CreateEventInput | UpdateEventInput
+    data: CreateEventInput | UpdateEventInput,
   ) => Promise<void>;
   accessToken?: string;
   users: User[];
@@ -53,13 +53,17 @@ export default function EventForm({
     handleFileChange,
     removeThumbnail,
     handleSubmit,
+    loadMoreUsers,
+    searchUsers,
+    isLoadingUsers,
+    hasMoreUsers,
   } = useEventForm(
     event,
     onSubmit,
     onSubmitForApproval,
     accessToken,
     users,
-    periods
+    periods,
   );
 
   return (
@@ -149,6 +153,10 @@ export default function EventForm({
               }))}
               required
               icon={<FiUser className="text-gray-400" />}
+              onSearch={searchUsers}
+              onLoadMore={loadMoreUsers}
+              isLoadingMore={isLoadingUsers}
+              hasMore={hasMoreUsers}
             />
             <SelectInput
               label="Category"

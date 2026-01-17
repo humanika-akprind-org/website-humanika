@@ -15,6 +15,7 @@ import type { Period } from "@/types/period";
 import { useUserManagement } from "@/hooks/user/useUserManagement";
 import { usePeriodManagement } from "@/hooks/period/usePeriodManagement";
 import { getAccessTokenAction } from "@/lib/actions/accessToken";
+import { UserApi } from "@/use-cases/api/user";
 
 // Helper functions
 const isHtmlEmpty = (html: string): boolean => {
@@ -116,6 +117,12 @@ export const useEventForm = (
   });
   const { periods: fetchedPeriods, loading: periodsLoading } =
     usePeriodManagement();
+
+  // User pagination state
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [userPage, setUserPage] = useState(1);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [hasMoreUsers, setHasMoreUsers] = useState(true);
 
   const [formData, setFormData] = useState<EventFormData>({
     name: event?.name || "",
@@ -327,6 +334,47 @@ export const useEventForm = (
     }
   };
 
+  // Search users function
+  const searchUsers = async (query: string) => {
+    setUserSearchQuery(query);
+    setUserPage(1);
+    setIsLoadingUsers(true);
+
+    try {
+      await UserApi.getUsers({
+        search: query,
+        page: 1,
+        limit: 10,
+      });
+      setIsLoadingUsers(false);
+    } catch (err) {
+      console.error("Error searching users:", err);
+      setIsLoadingUsers(false);
+    }
+  };
+
+  // Load more users function
+  const loadMoreUsers = async () => {
+    if (isLoadingUsers || !hasMoreUsers) return;
+
+    const nextPage = userPage + 1;
+    setIsLoadingUsers(true);
+
+    try {
+      const response = await UserApi.getUsers({
+        search: userSearchQuery,
+        page: nextPage,
+        limit: 10,
+      });
+      setUserPage(nextPage);
+      setHasMoreUsers((response.data?.users?.length || 0) >= 10);
+      setIsLoadingUsers(false);
+    } catch (err) {
+      console.error("Error loading more users:", err);
+      setIsLoadingUsers(false);
+    }
+  };
+
   return {
     formData,
     setFormData,
@@ -349,5 +397,9 @@ export const useEventForm = (
     handleFileChange,
     removeThumbnail,
     handleSubmit,
+    loadMoreUsers,
+    searchUsers,
+    isLoadingUsers,
+    hasMoreUsers,
   };
 };
