@@ -36,7 +36,7 @@ const getPreviewUrl = (thumbnail: string | null | undefined): string | null => {
 };
 
 const isGoogleDriveThumbnail = (
-  thumbnail: string | null | undefined
+  thumbnail: string | null | undefined,
 ): boolean => {
   if (!thumbnail) return false;
   return (
@@ -46,7 +46,7 @@ const isGoogleDriveThumbnail = (
 };
 
 const getFileIdFromThumbnail = (
-  thumbnail: string | null | undefined
+  thumbnail: string | null | undefined,
 ): string | null => {
   if (!thumbnail) return null;
 
@@ -74,7 +74,7 @@ export const useArticleForm = (
   onSubmit?: (data: CreateArticleInput | UpdateArticleInput) => Promise<void>,
   accessToken?: string,
   periods?: Period[],
-  currentUser?: User | null
+  currentUser?: User | null,
 ) => {
   const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
 
@@ -139,7 +139,7 @@ export const useArticleForm = (
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
@@ -209,41 +209,24 @@ export const useArticleForm = (
     try {
       let thumbnailUrl: string | null | undefined = existingThumbnail;
 
+      // Store old file ID for deletion after successful upload
+      const oldFileId =
+        !removedThumbnail &&
+        article?.thumbnail &&
+        isGoogleDriveThumbnail(article.thumbnail)
+          ? getFileIdFromThumbnail(article.thumbnail)
+          : null;
+
       if (removedThumbnail) {
-        if (article?.thumbnail && isGoogleDriveThumbnail(article.thumbnail)) {
-          const fileId = getFileIdFromThumbnail(article.thumbnail);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete thumbnail:", deleteError);
-            }
-          }
-        }
         thumbnailUrl = null;
       }
 
       if (formData.thumbnailFile) {
-        if (
-          !removedThumbnail &&
-          article?.thumbnail &&
-          isGoogleDriveThumbnail(article.thumbnail)
-        ) {
-          const fileId = getFileIdFromThumbnail(article.thumbnail);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old thumbnail:", deleteError);
-            }
-          }
-        }
-
         const tempFileName = `temp_${Date.now()}`;
         const uploadedFileId = await uploadFile(
           formData.thumbnailFile,
           tempFileName,
-          articleFolderId
+          articleFolderId,
         );
 
         if (uploadedFileId) {
@@ -259,11 +242,34 @@ export const useArticleForm = (
             } else {
               thumbnailUrl = uploadedFileId;
             }
+
+            // Delete old thumbnail AFTER successful upload
+            if (oldFileId) {
+              setTimeout(() => {
+                deleteFile(oldFileId).catch((err) => {
+                  console.warn(
+                    "Failed to delete old thumbnail (non-critical):",
+                    err,
+                  );
+                });
+              }, 2000);
+            }
           } else {
-            thumbnailUrl = uploadedFileId;
+            // Clean up uploaded file if rename fails
+            await deleteFile(uploadedFileId).catch((err) => {
+              console.warn("Failed to clean up uploaded thumbnail:", err);
+            });
+            throw new Error("Failed to rename thumbnail");
           }
         } else {
           throw new Error("Failed to upload thumbnail");
+        }
+      } else if (removedThumbnail && oldFileId) {
+        // Delete old thumbnail if no new file uploaded
+        try {
+          await deleteFile(oldFileId);
+        } catch (deleteError) {
+          console.warn("Failed to delete thumbnail:", deleteError);
         }
       }
 

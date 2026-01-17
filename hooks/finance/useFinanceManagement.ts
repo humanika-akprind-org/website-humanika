@@ -13,6 +13,7 @@ import {
 export function useFinanceManagement() {
   const router = useRouter();
   const { finances, isLoading, error, refetch } = useFinances();
+  const [allFinances, setAllFinances] = useState<Finance[]>([]);
 
   const [selectedFinances, setSelectedFinances] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,8 +30,13 @@ export function useFinanceManagement() {
   const [currentFinance, setCurrentFinance] = useState<Finance | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Store all finances for bulk operations
+  useEffect(() => {
+    setAllFinances(finances);
+  }, [finances]);
+
   // Apply client-side filtering and pagination
-  const filteredFinances = finances.filter((finance) => {
+  const filteredFinances = allFinances.filter((finance) => {
     const matchesSearch =
       finance.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
       (finance.description &&
@@ -76,7 +82,7 @@ export function useFinanceManagement() {
   const toggleFinanceSelection = (id: string) => {
     if (selectedFinances.includes(id)) {
       setSelectedFinances(
-        selectedFinances.filter((financeId) => financeId !== id)
+        selectedFinances.filter((financeId) => financeId !== id),
       );
     } else {
       setSelectedFinances([...selectedFinances, id]);
@@ -130,8 +136,8 @@ export function useFinanceManagement() {
       } else if (selectedFinances.length > 0) {
         // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const financeId of selectedFinances) {
-          // Find the finance object to get the proof URL
-          const financeToDelete = finances.find((f) => f.id === financeId);
+          // Find the finance object to get the proof URL (use allFinances to ensure data is available)
+          const financeToDelete = allFinances.find((f) => f.id === financeId);
           if (
             financeToDelete?.proof &&
             isGoogleDriveFile(financeToDelete.proof)

@@ -48,7 +48,7 @@ const isGoogleDriveProof = (proof: string | null | undefined): boolean => {
 
 // Helper function to get file ID from proof (either URL or file ID)
 const getFileIdFromProof = (
-  proof: string | null | undefined
+  proof: string | null | undefined,
 ): string | null => {
   if (!proof) return null;
 
@@ -65,7 +65,7 @@ interface UseFinanceFormProps {
   finance?: Finance;
   onSubmit: (data: CreateFinanceInput | UpdateFinanceInput) => Promise<void>;
   onSubmitForApproval?: (
-    data: CreateFinanceInput | UpdateFinanceInput
+    data: CreateFinanceInput | UpdateFinanceInput,
   ) => Promise<void>;
   accessToken?: string;
   categories: FinanceCategory[];
@@ -121,7 +121,7 @@ export const useFinanceForm = ({
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingProof, setExistingProof] = useState<string | null | undefined>(
-    finance?.proof
+    finance?.proof,
   );
   const [removedProof, setRemovedProof] = useState(false);
 
@@ -146,7 +146,7 @@ export const useFinanceForm = ({
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -236,46 +236,23 @@ export const useFinanceForm = ({
       // Handle proof deletion if marked for removal
       let proofUrl: string | null | undefined = existingProof;
 
+      // Store old file ID for deletion after successful upload
+      const oldFileId =
+        !removedProof && finance?.proof && isGoogleDriveProof(finance.proof)
+          ? getFileIdFromProof(finance.proof)
+          : null;
+
       if (removedProof) {
-        // Delete from Google Drive and set proofUrl to null
-        if (finance?.proof && isGoogleDriveProof(finance.proof)) {
-          const fileId = getFileIdFromProof(finance.proof);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete proof:", deleteError);
-              // Continue with submission even if delete fails
-            }
-          }
-        }
         proofUrl = null;
       }
 
       if (formData.proofFile) {
-        // Delete old proof from Google Drive if it exists and wasn't already removed
-        if (
-          !removedProof &&
-          finance?.proof &&
-          isGoogleDriveProof(finance.proof)
-        ) {
-          const fileId = getFileIdFromProof(finance.proof);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old proof:", deleteError);
-              // Continue with upload even if delete fails
-            }
-          }
-        }
-
         // Upload with temporary filename first
         const tempFileName = `temp_${Date.now()}`;
         const uploadedFileId = await uploadFile(
           formData.proofFile,
           tempFileName,
-          financeFolderId
+          financeFolderId,
         );
 
         if (uploadedFileId) {
@@ -293,11 +270,34 @@ export const useFinanceForm = ({
             } else {
               throw new Error("Failed to set public access for proof");
             }
+
+            // Delete old proof AFTER successful upload
+            if (oldFileId) {
+              setTimeout(() => {
+                deleteFile(oldFileId).catch((err) => {
+                  console.warn(
+                    "Failed to delete old proof (non-critical):",
+                    err,
+                  );
+                });
+              }, 2000);
+            }
           } else {
+            // Clean up uploaded file if rename fails
+            await deleteFile(uploadedFileId).catch((err) => {
+              console.warn("Failed to clean up uploaded proof:", err);
+            });
             throw new Error("Failed to rename proof");
           }
         } else {
           throw new Error("Failed to upload proof");
+        }
+      } else if (removedProof && oldFileId) {
+        // Delete old proof if no new file uploaded
+        try {
+          await deleteFile(oldFileId);
+        } catch (deleteError) {
+          console.warn("Failed to delete proof:", deleteError);
         }
       }
 
@@ -325,7 +325,7 @@ export const useFinanceForm = ({
       setRemovedProof(false);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to save transaction"
+        err instanceof Error ? err.message : "Failed to save transaction",
       );
     } finally {
       setIsSubmitting(false);

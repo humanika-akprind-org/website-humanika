@@ -14,10 +14,13 @@ async function extractCreateStructureBody(request: NextRequest) {
 
 // Validation functions
 function validateCreateStructureInput(
-  body: CreateOrganizationalStructureInput
+  body: CreateOrganizationalStructureInput,
 ) {
-  if (!body.name || !body.periodId || !body.decree) {
-    return { isValid: false, error: "Missing required fields" };
+  if (!body.name || !body.periodId) {
+    return {
+      isValid: false,
+      error: "Missing required fields: name and period are required",
+    };
   }
   return { isValid: true };
 }
@@ -59,7 +62,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching organizational structures:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -85,14 +88,11 @@ export async function POST(request: NextRequest) {
 
     // 4. Response
     return NextResponse.json(structure, { status: 201 });
-
-    // 4. Response
-    return NextResponse.json(structure, { status: 201 });
   } catch (error) {
     console.error("Error creating organizational structure:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

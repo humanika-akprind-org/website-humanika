@@ -13,6 +13,7 @@ import {
 export function useEventManagement() {
   const router = useRouter();
   const { events, isLoading, error, refetch } = useEvents();
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
 
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,14 +25,19 @@ export function useEventManagement() {
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Store all events for bulk operations
+  useEffect(() => {
+    setAllEvents(events);
+  }, [events]);
+
   // Apply client-side filtering and pagination
-  const filteredEvents = events.filter(
+  const filteredEvents = allEvents.filter(
     (event) =>
       event.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
       (event.description &&
         event.description
           .toLowerCase()
-          .includes(debouncedSearchTerm.toLowerCase()))
+          .includes(debouncedSearchTerm.toLowerCase())),
   );
 
   useEffect(() => {
@@ -105,8 +111,8 @@ export function useEventManagement() {
       } else if (selectedEvents.length > 0) {
         // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const eventId of selectedEvents) {
-          // Find the event object to get the thumbnail URL
-          const eventToDelete = events.find((e) => e.id === eventId);
+          // Find the event object to get the thumbnail URL (use allEvents to ensure data is available)
+          const eventToDelete = allEvents.find((e) => e.id === eventId);
           if (
             eventToDelete?.thumbnail &&
             isGoogleDriveFile(eventToDelete.thumbnail)

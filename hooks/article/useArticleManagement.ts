@@ -13,6 +13,7 @@ export const useArticleManagement = () => {
   const router = useRouter();
 
   const [articles, setArticles] = useState<Article[]>([]);
+  const [allArticles, setAllArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -32,8 +33,10 @@ export const useArticleManagement = () => {
       setLoading(true);
       setError(null);
       const data = await getArticles();
-      setArticles(data || []);
-      setTotalPages(Math.ceil((data?.length || 0) / 10)); // Assuming 10 items per page
+      const articlesData = data || [];
+      setArticles(articlesData);
+      setAllArticles(articlesData);
+      setTotalPages(Math.ceil(articlesData.length / 10));
     } catch (err) {
       console.error("Error fetching articles:", err);
       setError("Failed to fetch articles");
@@ -50,7 +53,7 @@ export const useArticleManagement = () => {
     setSelectedArticles((prev) =>
       prev.includes(id)
         ? prev.filter((articleId) => articleId !== id)
-        : [...prev, id]
+        : [...prev, id],
     );
   }, []);
 
@@ -58,7 +61,7 @@ export const useArticleManagement = () => {
     setSelectedArticles((prev) =>
       prev.length === articles.length
         ? []
-        : articles.map((article) => article.id)
+        : articles.map((article) => article.id),
     );
   }, [articles]);
 
@@ -70,7 +73,7 @@ export const useArticleManagement = () => {
     (id: string) => {
       router.push(`/admin/content/articles/edit/${id}`);
     },
-    [router]
+    [router],
   );
 
   const handleViewArticle = useCallback((article: Article) => {
@@ -94,8 +97,8 @@ export const useArticleManagement = () => {
       if (selectedArticles.length > 0) {
         // Bulk delete: Delete files from Google Drive first, then delete database records
         for (const articleId of selectedArticles) {
-          // Find the article object to get the thumbnail URL
-          const articleToDelete = articles.find((a) => a.id === articleId);
+          // Find the article object to get the thumbnail URL (use allArticles to ensure data is available)
+          const articleToDelete = allArticles.find((a) => a.id === articleId);
           if (
             articleToDelete?.thumbnail &&
             isGoogleDriveFile(articleToDelete.thumbnail)

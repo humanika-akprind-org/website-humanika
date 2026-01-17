@@ -72,7 +72,7 @@ export function useUserManagement(options?: UseUserManagementOptions) {
             .includes(debouncedSearchTerm.toLowerCase()) ||
           user.username
             .toLowerCase()
-            .includes(debouncedSearchTerm.toLowerCase())
+            .includes(debouncedSearchTerm.toLowerCase()),
       );
     }
 
@@ -84,7 +84,7 @@ export function useUserManagement(options?: UseUserManagementOptions) {
     // Department filter
     if (filters.department && filters.department !== "all") {
       filtered = filtered.filter(
-        (user) => user.department === filters.department
+        (user) => user.department === filters.department,
       );
     }
 
@@ -96,7 +96,7 @@ export function useUserManagement(options?: UseUserManagementOptions) {
     // Active status filter
     if (filters.isActive && filters.isActive !== "all") {
       filtered = filtered.filter(
-        (user) => user.isActive === (filters.isActive === "true")
+        (user) => user.isActive === (filters.isActive === "true"),
       );
     }
 
