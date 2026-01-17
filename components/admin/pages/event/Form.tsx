@@ -20,7 +20,7 @@ interface EventFormProps {
   event?: Event;
   onSubmit: (data: CreateEventInput | UpdateEventInput) => Promise<void>;
   onSubmitForApproval?: (
-    data: CreateEventInput | UpdateEventInput
+    data: CreateEventInput | UpdateEventInput,
   ) => Promise<void>;
   accessToken?: string;
   users: User[];
@@ -53,14 +53,22 @@ export default function EventForm({
     handleFileChange,
     removeThumbnail,
     handleSubmit,
+    loadMoreUsers,
+    searchUsers,
+    isLoadingUsers,
+    hasMoreUsers,
+    searchedUsers,
   } = useEventForm(
     event,
     onSubmit,
     onSubmitForApproval,
     accessToken,
     users,
-    periods
+    periods,
   );
+
+  // Use searched users when available, otherwise fall back to original users
+  const displayUsers = searchedUsers.length > 0 ? searchedUsers : users;
 
   return (
     <>
@@ -143,12 +151,16 @@ export default function EventForm({
               onChange={(value: string) =>
                 setFormData((prev) => ({ ...prev, responsibleId: value }))
               }
-              options={(users || []).map((user) => ({
+              options={(displayUsers || []).map((user) => ({
                 value: user.id,
                 label: user.name,
               }))}
               required
               icon={<FiUser className="text-gray-400" />}
+              onSearch={searchUsers}
+              onLoadMore={loadMoreUsers}
+              isLoadingMore={isLoadingUsers}
+              hasMore={hasMoreUsers}
             />
             <SelectInput
               label="Category"

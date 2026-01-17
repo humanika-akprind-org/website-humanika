@@ -38,6 +38,7 @@ export default function LettersPage() {
     setCurrentLetter,
     setTypeFilter,
     setPriorityFilter,
+    setPeriodFilter,
     toggleLetterSelection,
     toggleSelectAll,
     handleAddLetter,
@@ -52,8 +53,8 @@ export default function LettersPage() {
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
-    ? { type: "success", message: success }
-    : null;
+      ? { type: "success", message: success }
+      : null;
 
   const handleFilterChange = (filter: LetterFilter) => {
     if (filter.type !== undefined) setTypeFilter(filter.type || "all");
@@ -61,6 +62,9 @@ export default function LettersPage() {
       setPriorityFilter(filter.priority || "all");
     }
     if (filter.search !== undefined) setSearchTerm(filter.search || "");
+    if (filter.periodId !== undefined) {
+      setPeriodFilter(filter.periodId || "all");
+    }
   };
 
   const handleDeleteSelected = () => {
@@ -210,7 +214,7 @@ export default function LettersPage() {
                       const latestApproval = currentLetter.approvals.sort(
                         (a, b) =>
                           new Date(b.updatedAt).getTime() -
-                          new Date(a.updatedAt).getTime()
+                          new Date(a.updatedAt).getTime(),
                       )[0];
                       return (
                         <StatusApprovalChip status={latestApproval.status} />

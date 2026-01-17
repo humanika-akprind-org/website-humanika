@@ -20,15 +20,19 @@ export async function GET(request: NextRequest) {
     // Get current user to exclude from results
     const currentUser = await getCurrentUser();
 
+    // When search is provided, automatically fetch all users without pagination
+    // This enables proper search functionality in select inputs
+    const shouldFetchAll = !!search || allUsers === "true";
+
     const result = await getUsers({
-      page,
-      limit,
+      page: shouldFetchAll ? undefined : page,
+      limit: shouldFetchAll ? undefined : limit,
       search: search || undefined,
       role: (role as UserRole) || undefined,
       department: (department as Department) || undefined,
       isActive: isActive ? isActive === "true" : undefined,
       verifiedAccount: verifiedAccount ? verifiedAccount === "true" : undefined,
-      allUsers: allUsers ? allUsers === "true" : undefined,
+      allUsers: shouldFetchAll,
       excludeUserId: currentUser?.id,
     });
 
@@ -37,7 +41,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -62,7 +66,7 @@ export async function POST(request: NextRequest) {
     if (!name || !email || !username || !password) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

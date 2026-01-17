@@ -40,7 +40,7 @@ export function useEditWorkProgram(workProgramId: string) {
   }, [workProgramId]);
 
   const handleSubmit = async (
-    data: CreateWorkProgramInput | UpdateWorkProgramInput
+    data: CreateWorkProgramInput | UpdateWorkProgramInput,
   ) => {
     try {
       setAlert(null);
@@ -60,7 +60,7 @@ export function useEditWorkProgram(workProgramId: string) {
   };
 
   const handleSubmitForApproval = async (
-    data: CreateWorkProgramInput | UpdateWorkProgramInput
+    data: CreateWorkProgramInput | UpdateWorkProgramInput,
   ) => {
     try {
       setAlert(null);
@@ -73,8 +73,7 @@ export function useEditWorkProgram(workProgramId: string) {
         message: "Work program submitted for approval successfully",
       });
       router.push("/admin/program/works");
-    } catch (error) {
-      console.error("Submit for approval error:", error);
+    } catch (_error) {
       setAlert({
         type: "error",
         message:

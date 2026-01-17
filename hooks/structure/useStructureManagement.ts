@@ -19,7 +19,7 @@ type StructureFiltersType = {
 export function useStructureManagement() {
   const router = useRouter();
   const [allStructures, setAllStructures] = useState<OrganizationalStructure[]>(
-    []
+    [],
   );
   const [structures, setStructures] = useState<OrganizationalStructure[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,15 +56,15 @@ export function useStructureManagement() {
         const periods: Period[] = Array.isArray(periodsResponse)
           ? periodsResponse
           : periodsResponse
-          ? [periodsResponse]
-          : [];
+            ? [periodsResponse]
+            : [];
 
         // Enhance structures with period data
         const enhancedStructures = structuresResponse.data.map(
           (structure: OrganizationalStructure) => ({
             ...structure,
             period: periods.find((period) => period.id === structure.periodId),
-          })
+          }),
         );
 
         setAllStructures(enhancedStructures);
@@ -92,21 +92,21 @@ export function useStructureManagement() {
             .includes(debouncedSearchTerm.toLowerCase()) ||
           structure.period?.name
             ?.toLowerCase()
-            .includes(debouncedSearchTerm.toLowerCase())
+            .includes(debouncedSearchTerm.toLowerCase()),
       );
     }
 
     // Status filter
     if (filters.status && filters.status !== "all") {
       filtered = filtered.filter(
-        (structure) => structure.status === filters.status
+        (structure) => structure.status === filters.status,
       );
     }
 
     // Period filter
     if (filters.periodId && filters.periodId !== "all") {
       filtered = filtered.filter(
-        (structure) => structure.periodId === filters.periodId
+        (structure) => structure.periodId === filters.periodId,
       );
     }
 
@@ -141,7 +141,7 @@ export function useStructureManagement() {
   const toggleStructureSelection = (id: string) => {
     if (selectedStructures.includes(id)) {
       setSelectedStructures(
-        selectedStructures.filter((structureId) => structureId !== id)
+        selectedStructures.filter((structureId) => structureId !== id),
       );
     } else {
       setSelectedStructures([...selectedStructures, id]);
@@ -185,7 +185,8 @@ export function useStructureManagement() {
       const accessToken = await getAccessTokenAction();
 
       if (currentStructure) {
-        // Single structure deletion: Delete file from Google Drive first, then delete database record
+        // Single structure deletion: Delete files from Google Drive first, then delete database record
+        // Delete decree file
         if (
           currentStructure.decree &&
           isGoogleDriveFile(currentStructure.decree)
@@ -195,8 +196,18 @@ export function useStructureManagement() {
             await deleteGoogleDriveFile(fileId, accessToken);
           }
         }
+        // Delete structure image file
+        if (
+          currentStructure.structure &&
+          isGoogleDriveFile(currentStructure.structure)
+        ) {
+          const fileId = getFileIdFromFile(currentStructure.structure);
+          if (fileId) {
+            await deleteGoogleDriveFile(fileId, accessToken);
+          }
+        }
         const response = await StructureApi.deleteStructure(
-          currentStructure.id
+          currentStructure.id,
         );
         if (response.error) {
           setError(response.error);
@@ -207,10 +218,11 @@ export function useStructureManagement() {
       } else if (selectedStructures.length > 0) {
         // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const structureId of selectedStructures) {
-          // Find the structure object to get the decree URL
-          const structureToDelete = structures.find(
-            (s) => s.id === structureId
+          // Find the structure object to get the decree and structure URLs
+          const structureToDelete = allStructures.find(
+            (s) => s.id === structureId,
           );
+          // Delete decree file
           if (
             structureToDelete?.decree &&
             isGoogleDriveFile(structureToDelete.decree)
@@ -220,10 +232,20 @@ export function useStructureManagement() {
               await deleteGoogleDriveFile(fileId, accessToken);
             }
           }
+          // Delete structure image file
+          if (
+            structureToDelete?.structure &&
+            isGoogleDriveFile(structureToDelete.structure)
+          ) {
+            const fileId = getFileIdFromFile(structureToDelete.structure);
+            if (fileId) {
+              await deleteGoogleDriveFile(fileId, accessToken);
+            }
+          }
           await StructureApi.deleteStructure(structureId);
         }
         setSuccess(
-          `${selectedStructures.length} structures deleted successfully`
+          `${selectedStructures.length} structures deleted successfully`,
         );
         setSelectedStructures([]);
         fetchAllStructures();
@@ -239,7 +261,7 @@ export function useStructureManagement() {
 
   const handleFilterChange = (
     key: keyof StructureFiltersType,
-    value: string
+    value: string,
   ) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);

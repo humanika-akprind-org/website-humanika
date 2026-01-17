@@ -27,6 +27,7 @@ export default function AddDocumentPage() {
   const {
     events,
     letters,
+    periods,
     loading: formDataLoading,
     error: formDataError,
   } = useDocumentFormData();
@@ -43,7 +44,7 @@ export default function AddDocumentPage() {
       const accountabilityReportType = documentTypes.find(
         (type) =>
           type.name.toLowerCase().replace(/[\s\-]/g, "") ===
-          "accountabilityreport"
+          "accountabilityreport",
       );
       if (!accountabilityReportType) {
         setShowWarningModal(true);
@@ -62,7 +63,7 @@ export default function AddDocumentPage() {
   // Check if ACCOUNTABILITY-REPORT document type exists
   const accountabilityReportType = documentTypes.find(
     (type) =>
-      type.name.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport"
+      type.name.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport",
   );
 
   return (
@@ -79,6 +80,7 @@ export default function AddDocumentPage() {
           onSubmitForApproval={createDocumentForApproval}
           events={events}
           letters={letters}
+          periods={periods}
           loading={combinedLoading}
           fixedDocumentType="accountabilityreport"
         />

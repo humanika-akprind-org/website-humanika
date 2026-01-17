@@ -43,6 +43,7 @@ export const getUsers = async (filter: {
     where.verifiedAccount = true;
   }
 
+  // Apply search filter
   if (filter.search) {
     where.OR = [
       { name: { contains: filter.search, mode: "insensitive" } },
@@ -67,10 +68,13 @@ export const getUsers = async (filter: {
     where.verifiedAccount = filter.verifiedAccount;
   }
 
+  // When allUsers is true or search is provided, return all users without pagination
+  const shouldPaginate = !filter.allUsers;
+
   const [users, total] = await Promise.all([
     prisma.user.findMany({
       where,
-      ...(filter.allUsers ? {} : { skip, take: limit }),
+      ...(shouldPaginate ? { skip, take: limit } : {}),
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -98,7 +102,7 @@ export const getUsers = async (filter: {
       page,
       limit,
       total,
-      pages: Math.ceil(total / limit),
+      pages: shouldPaginate ? Math.ceil(total / limit) : 1,
     },
   };
 };
@@ -217,7 +221,7 @@ export const updateUser = async (
     position?: Position;
     isActive?: boolean;
     verifiedAccount?: boolean;
-  }
+  },
 ) => {
   // Check if user exists
   const existingUser = await prisma.user.findUnique({
@@ -356,7 +360,7 @@ export const deleteUser = async (id: string) => {
 export const changePassword = async (
   userId: string,
   currentPassword: string,
-  newPassword: string
+  newPassword: string,
 ) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -373,7 +377,7 @@ export const changePassword = async (
 
   const isCurrentPasswordValid = await bcrypt.compare(
     currentPassword,
-    user.password
+    user.password,
   );
 
   if (!isCurrentPasswordValid) {
@@ -455,7 +459,7 @@ export const verifyUser = async (id: string) => {
 
 export const bulkSendVerificationEmails = async (
   userIds: string[],
-  _batchSize: number = 10
+  _batchSize: number = 10,
 ) => {
   if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
     throw new Error("userIds array is required");

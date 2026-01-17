@@ -47,7 +47,7 @@ export const useTaskForm = (
     const fetchData = async () => {
       try {
         const [usersResponse, workProgramsResponse] = await Promise.all([
-          UserApi.getUsers({ limit: 50 }),
+          UserApi.getUsers({ allUsers: true }),
           getWorkPrograms(),
         ]);
 

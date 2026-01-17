@@ -57,8 +57,8 @@ export default function EventsPage() {
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
-    ? { type: "success", message: success }
-    : null;
+      ? { type: "success", message: success }
+      : null;
 
   if (loading) {
     return <Loading />;
@@ -210,10 +210,10 @@ export default function EventsPage() {
                         new Date(
                           Math.min(
                             ...currentEvent.schedules.map((s) =>
-                              new Date(s.date).getTime()
-                            )
-                          )
-                        )
+                              new Date(s.date).getTime(),
+                            ),
+                          ),
+                        ),
                       )
                     : "No schedule set"}
                 </p>
@@ -233,10 +233,10 @@ export default function EventsPage() {
                         new Date(
                           Math.max(
                             ...currentEvent.schedules.map((s) =>
-                              new Date(s.date).getTime()
-                            )
-                          )
-                        )
+                              new Date(s.date).getTime(),
+                            ),
+                          ),
+                        ),
                       )
                     : "No schedule set"}
                 </p>
@@ -253,7 +253,7 @@ export default function EventsPage() {
                       const latestApproval = currentEvent.approvals.sort(
                         (a, b) =>
                           new Date(b.updatedAt).getTime() -
-                          new Date(a.updatedAt).getTime()
+                          new Date(a.updatedAt).getTime(),
                       )[0];
                       return (
                         <StatusApprovalChip status={latestApproval.status} />

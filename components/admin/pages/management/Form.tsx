@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Management, ManagementServerData } from "@/types/management";
 import { Department, Position } from "@/types/enums";
@@ -11,6 +11,20 @@ import SelectInput from "@/components/admin/ui/input/SelectInput";
 import SubmitButton from "@/components/admin/ui/button/SubmitButton";
 import PhotoUpload from "@/components/admin/ui/input/PhotoUpload";
 import CancelButton from "@/components/ui/CancelButton";
+
+// Mapping department to valid positions
+const DEPARTMENT_POSITIONS: Record<Department, Position[]> = {
+  [Department.BPH]: [
+    Position.KETUA_UMUM,
+    Position.WAKIL_KETUA_UMUM,
+    Position.SEKRETARIS,
+    Position.BENDAHARA,
+  ],
+  [Department.PSDM]: [Position.KEPALA_DEPARTEMEN, Position.STAFF_DEPARTEMEN],
+  [Department.LITBANG]: [Position.KEPALA_DEPARTEMEN, Position.STAFF_DEPARTEMEN],
+  [Department.KWU]: [Position.KEPALA_DEPARTEMEN, Position.STAFF_DEPARTEMEN],
+  [Department.INFOKOM]: [Position.KEPALA_DEPARTEMEN, Position.STAFF_DEPARTEMEN],
+};
 
 interface ManagementFormProps {
   management?: Management;
@@ -37,7 +51,24 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
     removePhoto,
     handleSubmit,
     handleFileChange,
+    loadMoreUsers,
+    searchUsers,
+    isLoadingUsers,
+    hasMoreUsers,
   } = useManagementForm(management, onSubmit);
+
+  const [filteredPositions, setFilteredPositions] = useState<Position[]>(
+    Object.values(Position),
+  );
+
+  // Update filtered positions when department changes
+  useEffect(() => {
+    if (formData.department && DEPARTMENT_POSITIONS[formData.department]) {
+      setFilteredPositions(DEPARTMENT_POSITIONS[formData.department]);
+      // Reset position when department changes
+      setFormData((prev) => ({ ...prev, position: "" as Position }));
+    }
+  }, [formData.department, setFormData]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -57,6 +88,10 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
             placeholder="Select User"
             required
             icon={<FiUser className="text-gray-400" />}
+            onSearch={searchUsers}
+            onLoadMore={loadMoreUsers}
+            isLoadingMore={isLoadingUsers}
+            hasMore={hasMoreUsers}
           />
 
           <SelectInput
@@ -101,7 +136,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
             onChange={(value: string) =>
               setFormData((prev) => ({ ...prev, position: value as Position }))
             }
-            options={Object.values(Position).map((pos) => ({
+            options={filteredPositions.map((pos) => ({
               value: pos,
               label: formatEnumValue(pos),
             }))}

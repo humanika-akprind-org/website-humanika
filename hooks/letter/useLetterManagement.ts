@@ -37,6 +37,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
   const [typeFilter, setTypeFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [classificationFilter, setClassificationFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
 
   const fetchLetters = useCallback(async () => {
     try {
@@ -93,9 +94,15 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
       const matchesClassification =
         classificationFilter === "all" ||
         letter.classification === classificationFilter;
+      const matchesPeriod =
+        periodFilter === "all" || letter.periodId === periodFilter;
 
       return (
-        matchesSearch && matchesType && matchesPriority && matchesClassification
+        matchesSearch &&
+        matchesType &&
+        matchesPriority &&
+        matchesClassification &&
+        matchesPeriod
       );
     });
     setFilteredLetters(filtered);
@@ -106,6 +113,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
     typeFilter,
     priorityFilter,
     classificationFilter,
+    periodFilter,
   ]);
 
   // Debounce search term
@@ -213,7 +221,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
           try {
             // Find the letter object to get the letter file and attachments
             const letterToDelete = letters.find(
-              (letter) => letter.id === letterId
+              (letter) => letter.id === letterId,
             );
 
             if (letterToDelete) {
@@ -308,6 +316,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
     typeFilter,
     priorityFilter,
     classificationFilter,
+    periodFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -316,6 +325,7 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
     setTypeFilter,
     setPriorityFilter,
     setClassificationFilter,
+    setPeriodFilter,
     toggleLetterSelection,
     toggleSelectAll,
     handleAddLetter,

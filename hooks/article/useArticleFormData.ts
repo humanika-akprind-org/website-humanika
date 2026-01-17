@@ -22,7 +22,7 @@ export function useArticleFormData(): {
       try {
         const [usersResponse, periodsResponse, currentUserResponse] =
           await Promise.all([
-            UserApi.getUsers({ limit: 50 }),
+            UserApi.getUsers({ allUsers: true }),
             PeriodApi.getPeriods(),
             fetch("/api/auth/me").then((res) => (res.ok ? res.json() : null)),
           ]);

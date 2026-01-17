@@ -23,7 +23,7 @@ interface UseLetterFormProps {
   accessToken?: string;
   onSubmit: (data: CreateLetterInput | UpdateLetterInput) => Promise<void>;
   onSubmitForApproval?: (
-    data: CreateLetterInput | UpdateLetterInput
+    data: CreateLetterInput | UpdateLetterInput,
   ) => Promise<void>;
 }
 
@@ -59,7 +59,15 @@ export function useLetterForm({
   const [formData, setFormData] = useState({
     regarding: letter?.regarding || "",
     number: letter?.number || "",
-    date: letter?.date ? new Date(letter.date).toISOString().split("T")[0] : "",
+    date: letter?.date
+      ? (() => {
+          const date = new Date(letter.date);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
+        })()
+      : "",
     type: letter?.type || LetterType.INCOMING,
     priority: letter?.priority || LetterPriority.NORMAL,
     classification: letter?.classification || undefined,
@@ -89,7 +97,7 @@ export function useLetterForm({
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -151,7 +159,7 @@ export function useLetterForm({
       // Check if access token is available
       if (!(accessToken || fetchedAccessToken)) {
         throw new Error(
-          "Authentication required. Please log in to Google Drive."
+          "Authentication required. Please log in to Google Drive.",
         );
       }
 
@@ -178,7 +186,7 @@ export function useLetterForm({
         const uploadedFileId = await uploadFile(
           formData.letterFile,
           tempFileName,
-          letterFolderId
+          letterFolderId,
         );
 
         if (uploadedFileId) {
@@ -229,7 +237,15 @@ export function useLetterForm({
       const submitData = {
         ...dataToSend,
         letter: letterUrl || undefined,
-        date: new Date(formData.date).toISOString(),
+        date: (() => {
+          // Parse YYYY-MM-DD format and create Date object without timezone issues
+          const parts = formData.date.split("-");
+          const year = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[2], 10);
+          // Create date at UTC midnight to avoid timezone shifts
+          return new Date(Date.UTC(year, month, day));
+        })(),
         periodId: formData.periodId || undefined,
         eventId: formData.eventId || undefined,
       };
@@ -257,7 +273,7 @@ export function useLetterForm({
 
   // Helper function to get file ID from letter (either URL or file ID)
   const getFileIdFromLetter = (
-    ltr: string | null | undefined
+    ltr: string | null | undefined,
   ): string | null => {
     if (!ltr) return null;
 

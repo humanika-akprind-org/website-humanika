@@ -56,8 +56,8 @@ export default function FinanceTransactionsPage() {
   const alert: { type: AlertType; message: string } | null = error
     ? { type: "error", message: error }
     : success
-    ? { type: "success", message: success }
-    : null;
+      ? { type: "success", message: success }
+      : null;
 
   if (loading) {
     return <Loading />;
@@ -220,7 +220,7 @@ export default function FinanceTransactionsPage() {
                       const latestApproval = currentFinance.approvals.sort(
                         (a, b) =>
                           new Date(b.updatedAt).getTime() -
-                          new Date(a.updatedAt).getTime()
+                          new Date(a.updatedAt).getTime(),
                       )[0];
                       return (
                         <StatusApprovalChip status={latestApproval.status} />

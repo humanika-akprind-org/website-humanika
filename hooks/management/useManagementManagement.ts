@@ -37,7 +37,7 @@ export function useManagementManagement() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [currentManagement, setCurrentManagement] = useState<Management | null>(
-    null
+    null,
   );
 
   const fetchAllManagements = useCallback(async () => {
@@ -65,7 +65,7 @@ export function useManagementManagement() {
             ...management,
             user: users.find((user) => user.id === management.userId),
             period: periods.find((period) => period.id === management.periodId),
-          })
+          }),
         );
 
         setAllManagements(enhancedManagements);
@@ -99,28 +99,28 @@ export function useManagementManagement() {
             .includes(debouncedSearchTerm.toLowerCase()) ||
           management.period?.name
             ?.toLowerCase()
-            .includes(debouncedSearchTerm.toLowerCase())
+            .includes(debouncedSearchTerm.toLowerCase()),
       );
     }
 
     // Department filter
     if (filters.department && filters.department !== "all") {
       filtered = filtered.filter(
-        (management) => management.department === filters.department
+        (management) => management.department === filters.department,
       );
     }
 
     // Position filter
     if (filters.position && filters.position !== "all") {
       filtered = filtered.filter(
-        (management) => management.position === filters.position
+        (management) => management.position === filters.position,
       );
     }
 
     // Period filter
     if (filters.periodId && filters.periodId !== "all") {
       filtered = filtered.filter(
-        (management) => management.periodId === filters.periodId
+        (management) => management.periodId === filters.periodId,
       );
     }
 
@@ -156,7 +156,7 @@ export function useManagementManagement() {
   const toggleManagementSelection = (id: string) => {
     if (selectedManagements.includes(id)) {
       setSelectedManagements(
-        selectedManagements.filter((managementId) => managementId !== id)
+        selectedManagements.filter((managementId) => managementId !== id),
       );
     } else {
       setSelectedManagements([...selectedManagements, id]);
@@ -216,9 +216,9 @@ export function useManagementManagement() {
       } else if (selectedManagements.length > 0) {
         // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const managementId of selectedManagements) {
-          // Find the management object to get the photo URL
-          const managementToDelete = managements.find(
-            (m) => m.id === managementId
+          // Find the management object to get the photo URL (use allManagements to ensure data is available)
+          const managementToDelete = allManagements.find(
+            (m) => m.id === managementId,
           );
           if (
             managementToDelete?.photo &&
@@ -232,7 +232,7 @@ export function useManagementManagement() {
           await ManagementApi.deleteManagement(managementId, "");
         }
         setSuccess(
-          `${selectedManagements.length} managements deleted successfully`
+          `${selectedManagements.length} managements deleted successfully`,
         );
         setSelectedManagements([]);
         fetchAllManagements();
@@ -248,7 +248,7 @@ export function useManagementManagement() {
 
   const handleFilterChange = (
     key: keyof ManagementFiltersType,
-    value: string
+    value: string,
   ) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);

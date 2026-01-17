@@ -80,7 +80,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         console.error("Error uploading cropped image:", error);
       }
     },
-    [onFileChange]
+    [onFileChange],
   );
 
   // Effect to handle cropped image upload
@@ -140,7 +140,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     if (file) {
       if (file.size > maxSize) {
         alert(
-          `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`
+          `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`,
         );
         return;
       }
@@ -152,11 +152,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   };
 
   return (
-    <AccessTokenGuard label={label} required={true}>
+    <AccessTokenGuard label={label} required={required}>
       <div className={className}>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label} {required && "*"}
-        </label>
         <div
           className={`flex items-start space-x-4 p-4 rounded-lg border-2 ${
             error ? "border-red-300 bg-red-50" : "border-gray-200"
@@ -190,7 +187,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                               console.error(
                                 "Image failed to load:",
                                 displayUrl,
-                                e
+                                e,
                               );
                             }}
                           />
@@ -205,7 +202,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                               console.error(
                                 "Image failed to load:",
                                 displayUrl,
-                                e
+                                e,
                               );
                             }}
                           />
@@ -238,7 +235,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   type="button"
                   onClick={() => {
                     const displayUrl = getPreviewUrl(
-                      previewUrl || existingPhoto
+                      previewUrl || existingPhoto,
                     );
                     if (displayUrl && isValidImageUrl(displayUrl)) {
                       setOriginalImage(displayUrl);

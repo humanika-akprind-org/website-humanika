@@ -22,8 +22,8 @@ export const useStructureForm = (
   onSubmit: (
     data:
       | CreateOrganizationalStructureInput
-      | UpdateOrganizationalStructureInput
-  ) => Promise<void>
+      | UpdateOrganizationalStructureInput,
+  ) => Promise<void>,
 ) => {
   const router = useRouter();
   const [periods, setPeriods] = useState<Period[]>([]);
@@ -119,23 +119,17 @@ export const useStructureForm = (
       return { decreeUrl: existingDecree, error: null };
     }
 
-    // Delete old decree from Google Drive if it exists and wasn't already removed
-    if (!removedDecree && structure?.decree) {
-      const fileId = getFileIdFromStructureImage(structure.decree);
-      if (fileId) {
-        try {
-          await deleteFile(fileId);
-        } catch (deleteError) {
-          console.warn("Failed to delete old decree:", deleteError);
-        }
-      }
-    }
+    // Store old file ID for potential cleanup
+    const oldFileId =
+      !removedDecree && structure?.decree
+        ? getFileIdFromStructureImage(structure.decree)
+        : null;
 
     const tempFileName = `temp_decree_${Date.now()}`;
     const uploadedFileId = await uploadFile(
       formData.decreeFile,
       tempFileName,
-      structureFolderId
+      structureFolderId,
     );
 
     if (!uploadedFileId) {
@@ -146,6 +140,10 @@ export const useStructureForm = (
     const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
     if (!renameSuccess) {
+      // Clean up uploaded file if rename fails
+      await deleteFile(uploadedFileId).catch((err) => {
+        console.warn("Failed to clean up uploaded decree file:", err);
+      });
       return { decreeUrl: null, error: new Error("Failed to rename decree") };
     }
 
@@ -153,6 +151,15 @@ export const useStructureForm = (
     setPublicAccess(uploadedFileId).catch((err) => {
       console.warn("Failed to set public access for decree:", err);
     });
+
+    // Delete old decree AFTER successful upload and rename
+    if (oldFileId) {
+      setTimeout(() => {
+        deleteFile(oldFileId).catch((err) => {
+          console.warn("Failed to delete old decree (non-critical):", err);
+        });
+      }, 2000); // Delay to ensure new file is fully processed
+    }
 
     return { decreeUrl: uploadedFileId, error: null };
   };
@@ -166,23 +173,17 @@ export const useStructureForm = (
       return { structureImageUrl: existingStructureImage, error: null };
     }
 
-    // Delete old structure image from Google Drive if it exists and wasn't already removed
-    if (!removedStructureImage && structure?.structure) {
-      const fileId = getFileIdFromStructureImage(structure.structure);
-      if (fileId) {
-        try {
-          await deleteFile(fileId);
-        } catch (deleteError) {
-          console.warn("Failed to delete old structure image:", deleteError);
-        }
-      }
-    }
+    // Store old file ID for potential cleanup
+    const oldFileId =
+      !removedStructureImage && structure?.structure
+        ? getFileIdFromStructureImage(structure.structure)
+        : null;
 
     const tempFileName = `temp_structure_${Date.now()}`;
     const uploadedFileId = await uploadFile(
       formData.structureImage,
       tempFileName,
-      organizationalStructureFolderId
+      organizationalStructureFolderId,
     );
 
     if (!uploadedFileId) {
@@ -196,6 +197,10 @@ export const useStructureForm = (
     const renameSuccess = await renameFile(uploadedFileId, finalFileName);
 
     if (!renameSuccess) {
+      // Clean up uploaded file if rename fails
+      await deleteFile(uploadedFileId).catch((err) => {
+        console.warn("Failed to clean up uploaded structure image file:", err);
+      });
       return {
         structureImageUrl: null,
         error: new Error("Failed to rename structure image"),
@@ -206,6 +211,18 @@ export const useStructureForm = (
     setPublicAccess(uploadedFileId).catch((err) => {
       console.warn("Failed to set public access for structure image:", err);
     });
+
+    // Delete old structure image AFTER successful upload and rename
+    if (oldFileId) {
+      setTimeout(() => {
+        deleteFile(oldFileId).catch((err) => {
+          console.warn(
+            "Failed to delete old structure image (non-critical):",
+            err,
+          );
+        });
+      }, 2000); // Delay to ensure new file is fully processed
+    }
 
     return { structureImageUrl: uploadedFileId, error: null };
   };
@@ -224,11 +241,21 @@ export const useStructureForm = (
         throw new Error("Please select a period");
       }
 
+      // Wait for access token if not ready
+      if (!accessToken) {
+        // Fetch token if not available
+        const token = await getAccessTokenAction();
+        if (!token) {
+          throw new Error("Authentication required. Please re-authenticate.");
+        }
+        setAccessToken(token);
+      }
+
       let decreeUrl: string | null | undefined = existingDecree;
       let structureImageUrl: string | null | undefined = existingStructureImage;
 
-      // Handle decree deletion (sequential)
-      if (removedDecree) {
+      // Handle decree deletion if no new file uploaded
+      if (removedDecree && !formData.decreeFile) {
         if (structure?.decree) {
           const fileId = getFileIdFromStructureImage(structure.decree);
           if (fileId) {
@@ -242,8 +269,8 @@ export const useStructureForm = (
         decreeUrl = null;
       }
 
-      // Handle structure image deletion (sequential)
-      if (removedStructureImage) {
+      // Handle structure image deletion if no new file uploaded
+      if (removedStructureImage && !formData.structureImage) {
         if (structure?.structure) {
           const fileId = getFileIdFromStructureImage(structure.structure);
           if (fileId) {
@@ -257,23 +284,24 @@ export const useStructureForm = (
         structureImageUrl = null;
       }
 
-      // Process both uploads IN PARALLEL for better performance
-      const [decreeResult, structureImageResult] = await Promise.all([
-        processDecreeUpload(),
-        processStructureImageUpload(),
-      ]);
-
-      // Handle errors from parallel operations
-      if (decreeResult.error) {
-        throw decreeResult.error;
-      }
-      if (structureImageResult.error) {
-        throw structureImageResult.error;
+      // Process uploads SEQUENTIALLY to avoid race conditions and ensure proper error handling
+      // First: Process decree upload
+      if (formData.decreeFile) {
+        const decreeResult = await processDecreeUpload();
+        if (decreeResult.error) {
+          throw decreeResult.error;
+        }
+        decreeUrl = decreeResult.decreeUrl;
       }
 
-      // Update URLs with uploaded file IDs
-      decreeUrl = decreeResult.decreeUrl;
-      structureImageUrl = structureImageResult.structureImageUrl;
+      // Second: Process structure image upload (only after decree succeeds)
+      if (formData.structureImage) {
+        const structureImageResult = await processStructureImageUpload();
+        if (structureImageResult.error) {
+          throw structureImageResult.error;
+        }
+        structureImageUrl = structureImageResult.structureImageUrl;
+      }
 
       // Prepare and submit data
       const { decreeFile: _, structureImage: __, ...dataToSend } = formData;
@@ -376,7 +404,7 @@ export const useStructureForm = (
 
   // Helper function to get file ID from structure image (either URL or file ID)
   const getFileIdFromStructureImage = (
-    structureImage: string | null | undefined
+    structureImage: string | null | undefined,
   ): string | null => {
     if (!structureImage) return null;
 

@@ -38,7 +38,7 @@ const isGoogleDriveImage = (image: string | null | undefined): boolean => {
 };
 
 const getFileIdFromImage = (
-  image: string | null | undefined
+  image: string | null | undefined,
 ): string | null => {
   if (!image) return null;
 
@@ -63,7 +63,7 @@ export const useGalleryForm = (
   gallery?: Gallery,
   onSubmit?: (data: CreateGalleryInput | UpdateGalleryInput) => Promise<void>,
   accessToken?: string,
-  propEvents?: Event[]
+  propEvents?: Event[],
 ) => {
   const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
 
@@ -104,7 +104,7 @@ export const useGalleryForm = (
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingImage, setExistingImage] = useState<string | null | undefined>(
-    gallery?.image
+    gallery?.image,
   );
   const [removedImage, setRemovedImage] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -127,7 +127,7 @@ export const useGalleryForm = (
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -202,41 +202,22 @@ export const useGalleryForm = (
     try {
       let imageUrl: string | null | undefined = existingImage;
 
+      // Store old file ID for deletion after successful upload
+      const oldFileId =
+        !removedImage && gallery?.image && isGoogleDriveImage(gallery.image)
+          ? getFileIdFromImage(gallery.image)
+          : null;
+
       if (removedImage) {
-        if (gallery?.image && isGoogleDriveImage(gallery.image)) {
-          const fileId = getFileIdFromImage(gallery.image);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete image:", deleteError);
-            }
-          }
-        }
         imageUrl = null;
       }
 
       if (formData.imageFile) {
-        if (
-          !removedImage &&
-          gallery?.image &&
-          isGoogleDriveImage(gallery.image)
-        ) {
-          const fileId = getFileIdFromImage(gallery.image);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old image:", deleteError);
-            }
-          }
-        }
-
         const tempFileName = `temp_${Date.now()}`;
         const uploadedFileId = await uploadFile(
           formData.imageFile,
           tempFileName,
-          galleryFolderId
+          galleryFolderId,
         );
 
         if (uploadedFileId) {
@@ -251,16 +232,36 @@ export const useGalleryForm = (
               imageUrl = uploadedFileId;
             } else {
               console.warn("Failed to set public access for image");
-              // Continue with submission even if setting public access fails
               imageUrl = uploadedFileId;
             }
+
+            // Delete old image AFTER successful upload
+            if (oldFileId) {
+              setTimeout(() => {
+                deleteFile(oldFileId).catch((err) => {
+                  console.warn(
+                    "Failed to delete old image (non-critical):",
+                    err,
+                  );
+                });
+              }, 2000);
+            }
           } else {
-            console.warn("Failed to rename image");
-            // Continue with submission even if rename fails
-            imageUrl = uploadedFileId;
+            // Clean up uploaded file if rename fails
+            await deleteFile(uploadedFileId).catch((err) => {
+              console.warn("Failed to clean up uploaded image:", err);
+            });
+            throw new Error("Failed to rename image");
           }
         } else {
           throw new Error("Failed to upload image");
+        }
+      } else if (removedImage && oldFileId) {
+        // Delete old image if no new file uploaded
+        try {
+          await deleteFile(oldFileId);
+        } catch (deleteError) {
+          console.warn("Failed to delete image:", deleteError);
         }
       }
 

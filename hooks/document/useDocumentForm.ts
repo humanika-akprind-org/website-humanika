@@ -20,7 +20,7 @@ import {
 
 const getFolderIdForDocumentType = (
   documentTypeName: string | undefined,
-  documentTypes: { id: string; name: string }[] | undefined
+  documentTypes: { id: string; name: string }[] | undefined,
 ): string => {
   if (!documentTypeName || !documentTypes) return documentFolderId;
 
@@ -38,7 +38,7 @@ interface UseDocumentFormProps {
   accessToken?: string;
   onSubmit: (data: CreateDocumentInput | UpdateDocumentInput) => Promise<void>;
   onSubmitForApproval?: (
-    data: CreateDocumentInput | UpdateDocumentInput
+    data: CreateDocumentInput | UpdateDocumentInput,
   ) => Promise<void>;
   fixedDocumentType?: string;
   documentTypes?: { id: string; name: string }[];
@@ -83,7 +83,7 @@ export function useDocumentForm({
         documentTypes.find(
           (type) =>
             type.name.toLowerCase().replace(/[\s\-]/g, "") ===
-            fixedDocumentType.toLowerCase().replace(/[\s\-]/g, "")
+            fixedDocumentType.toLowerCase().replace(/[\s\-]/g, ""),
         )?.id || ""
       );
     }
@@ -114,7 +114,7 @@ export function useDocumentForm({
   }, [fileError]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -185,17 +185,15 @@ export function useDocumentForm({
       // Handle document deletion if marked for removal
       let documentUrl: string | null | undefined = existingDocument;
 
+      // Store old file ID for deletion after successful upload
+      const oldFileId =
+        !removedDocument &&
+        document?.document &&
+        isGoogleDriveFile(document.document)
+          ? getFileIdFromFile(document.document)
+          : null;
+
       if (removedDocument) {
-        if (document?.document && isGoogleDriveFile(document.document)) {
-          const fileId = getFileIdFromFile(document.document);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete document:", deleteError);
-            }
-          }
-        }
         documentUrl = null;
       }
 
@@ -204,12 +202,12 @@ export function useDocumentForm({
         const tempFileName = `temp_${Date.now()}`;
         const folderId = getFolderIdForDocumentType(
           fixedDocumentType,
-          documentTypes
+          documentTypes,
         );
         const uploadedFileId = await uploadFile(
           formData.documentFile,
           tempFileName,
-          folderId
+          folderId,
         );
 
         if (uploadedFileId) {
@@ -224,32 +222,36 @@ export function useDocumentForm({
               documentUrl = uploadedFileId;
             } else {
               console.warn("Failed to set public access for document");
-              // Continue with submission even if setting public access fails
               documentUrl = uploadedFileId;
             }
-          } else {
-            console.warn("Failed to rename document");
-            // Continue with submission even if rename fails
-            documentUrl = uploadedFileId;
-          }
 
-          // Delete old document after successful upload
-          if (
-            !removedDocument &&
-            document?.document &&
-            isGoogleDriveFile(document.document)
-          ) {
-            const fileId = getFileIdFromFile(document.document);
-            if (fileId) {
-              try {
-                await deleteFile(fileId);
-              } catch (deleteError) {
-                console.warn("Failed to delete old document:", deleteError);
-              }
+            // Delete old document AFTER successful upload
+            if (oldFileId) {
+              setTimeout(() => {
+                deleteFile(oldFileId).catch((err) => {
+                  console.warn(
+                    "Failed to delete old document (non-critical):",
+                    err,
+                  );
+                });
+              }, 2000);
             }
+          } else {
+            // Clean up uploaded file if rename fails
+            await deleteFile(uploadedFileId).catch((err) => {
+              console.warn("Failed to clean up uploaded document:", err);
+            });
+            throw new Error("Failed to rename document");
           }
         } else {
           throw new Error("Failed to upload document");
+        }
+      } else if (removedDocument && oldFileId) {
+        // Delete old document if no new file uploaded
+        try {
+          await deleteFile(oldFileId);
+        } catch (deleteError) {
+          console.warn("Failed to delete document:", deleteError);
         }
       }
 
@@ -270,7 +272,7 @@ export function useDocumentForm({
             documentTypes?.find(
               (type) =>
                 type.name.toLowerCase().replace(/[\s\-]/g, "") ===
-                normalizedFixed
+                normalizedFixed,
             )?.id || "";
         }
       }

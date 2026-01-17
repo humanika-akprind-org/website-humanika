@@ -18,6 +18,7 @@ export default function EditFinancePage() {
   const {
     categories,
     workPrograms,
+    periods,
     loading: formDataLoading,
     error: formDataError,
   } = useFinanceFormData();
@@ -39,6 +40,7 @@ export default function EditFinancePage() {
           onSubmit={updateFinance}
           categories={categories}
           workPrograms={workPrograms}
+          periods={periods}
           isEditing={true}
         />
       ) : null}

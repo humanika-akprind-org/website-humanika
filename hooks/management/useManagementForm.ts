@@ -17,12 +17,16 @@ import type { AlertType } from "@/components/admin/ui/alert/Alert";
 
 export const useManagementForm = (
   management: Management | undefined,
-  onSubmit: (data: ManagementServerData) => Promise<void>
+  onSubmit: (data: ManagementServerData) => Promise<void>,
 ) => {
   const router = useRouter();
   const [accessToken, setAccessToken] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [periods, setPeriods] = useState<Period[]>([]);
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [userPage, setUserPage] = useState(1);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [hasMoreUsers, setHasMoreUsers] = useState(true);
 
   const {
     uploadFile,
@@ -49,7 +53,7 @@ export const useManagementForm = (
   } | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingPhoto, setExistingPhoto] = useState<string | null | undefined>(
-    management?.photo
+    management?.photo,
   );
   const [removedPhoto, setRemovedPhoto] = useState(false);
 
@@ -67,7 +71,7 @@ export const useManagementForm = (
     const fetchData = async () => {
       try {
         const [usersResponse, periodsResponse] = await Promise.all([
-          UserApi.getUsers({ limit: 50 }),
+          UserApi.getUsers({ allUsers: true }),
           PeriodApi.getPeriods(),
         ]);
 
@@ -117,43 +121,23 @@ export const useManagementForm = (
       // Upload photo first if provided
       let photoUrl: string | null | undefined = existingPhoto;
 
-      // Handle photo deletion if marked for removal
+      // Store old file ID for deletion after successful upload
+      const oldFileId =
+        !removedPhoto && management?.photo
+          ? getFileIdFromPhoto(management.photo)
+          : null;
+
       if (removedPhoto) {
-        // Delete from Google Drive and set photoUrl to null
-        if (management?.photo) {
-          const fileId = getFileIdFromPhoto(management.photo);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete photo:", deleteError);
-              // Continue with submission even if delete fails
-            }
-          }
-        }
         photoUrl = null;
       }
 
       if (formData.photoFile) {
-        // Delete old photo from Google Drive if it exists and wasn't already removed
-        if (!removedPhoto && management?.photo) {
-          const fileId = getFileIdFromPhoto(management.photo);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete old photo:", deleteError);
-              // Continue with upload even if delete fails
-            }
-          }
-        }
-
         // Upload with temporary filename first
         const tempFileName = `temp_${Date.now()}`;
         const uploadedFileId = await uploadFile(
           formData.photoFile,
           tempFileName,
-          photoManagementFolderId
+          photoManagementFolderId,
         );
 
         if (uploadedFileId) {
@@ -166,14 +150,36 @@ export const useManagementForm = (
             const publicAccessSuccess = await setPublicAccess(uploadedFileId);
             if (!publicAccessSuccess) {
               console.warn("Failed to set public access for photo");
-              // Continue with submission even if setting public access fails
             }
             photoUrl = uploadedFileId;
+
+            // Delete old photo AFTER successful upload
+            if (oldFileId) {
+              setTimeout(() => {
+                deleteFile(oldFileId).catch((err) => {
+                  console.warn(
+                    "Failed to delete old photo (non-critical):",
+                    err,
+                  );
+                });
+              }, 2000);
+            }
           } else {
+            // Clean up uploaded file if rename fails
+            await deleteFile(uploadedFileId).catch((err) => {
+              console.warn("Failed to clean up uploaded photo:", err);
+            });
             throw new Error("Failed to rename photo");
           }
         } else {
           throw new Error("Failed to upload photo");
+        }
+      } else if (removedPhoto && oldFileId) {
+        // Delete old photo if no new file uploaded
+        try {
+          await deleteFile(oldFileId);
+        } catch (deleteError) {
+          console.warn("Failed to delete photo:", deleteError);
         }
       }
 
@@ -229,7 +235,7 @@ export const useManagementForm = (
 
   // Helper function to get file ID from photo (either URL or file ID)
   const getFileIdFromPhoto = (
-    photo: string | null | undefined
+    photo: string | null | undefined,
   ): string | null => {
     if (!photo) return null;
 
@@ -240,6 +246,57 @@ export const useManagementForm = (
       return photo;
     }
     return null;
+  };
+
+  // Search users function - fetches all matching users without pagination
+  const searchUsers = async (query: string) => {
+    setUserSearchQuery(query);
+    setUserPage(1);
+    setIsLoadingUsers(true);
+
+    try {
+      const response = await UserApi.getUsers({
+        search: query,
+        page: 1,
+        allUsers: true, // Fetch all users without pagination for proper search
+      });
+      setUsers(response.data?.users || []);
+      setHasMoreUsers(false); // All users are loaded, no need for load more
+    } catch (err) {
+      console.error("Error searching users:", err);
+      setUsers([]);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  // Load more users function - for initial load without search
+  const loadMoreUsers = async () => {
+    if (isLoadingUsers || !hasMoreUsers) return;
+
+    const nextPage = userPage + 1;
+    setIsLoadingUsers(true);
+
+    try {
+      const response = await UserApi.getUsers({
+        search: userSearchQuery,
+        page: nextPage,
+        allUsers: true, // Load all users when searching
+      });
+      const newUsers = response.data?.users || [];
+      setUsers((prev) => {
+        // Prevent duplicates
+        const existingIds = new Set(prev.map((u) => u.id));
+        const uniqueNewUsers = newUsers.filter((u) => !existingIds.has(u.id));
+        return [...prev, ...uniqueNewUsers];
+      });
+      setUserPage(nextPage);
+      setHasMoreUsers(false); // All users are loaded
+    } catch (err) {
+      console.error("Error loading more users:", err);
+    } finally {
+      setIsLoadingUsers(false);
+    }
   };
 
   return {
@@ -256,5 +313,9 @@ export const useManagementForm = (
     removePhoto,
     handleSubmit,
     handleFileChange,
+    loadMoreUsers,
+    searchUsers,
+    isLoadingUsers,
+    hasMoreUsers,
   };
 };

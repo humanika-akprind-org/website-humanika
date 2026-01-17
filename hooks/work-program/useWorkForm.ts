@@ -39,7 +39,7 @@ export function useWorkForm({ workProgram, onSubmit }: UseWorkFormProps) {
     const fetchData = async () => {
       try {
         const [usersResponse, periodsResponse] = await Promise.all([
-          UserApi.getUsers({ limit: 50 }),
+          UserApi.getUsers({ allUsers: true }),
           getPeriods(),
         ]);
 

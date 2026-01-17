@@ -13,12 +13,14 @@ import {
 export function useGalleryManagement() {
   const router = useRouter();
   const { galleries, isLoading, error, refetch } = useGalleries();
+  const [allGalleries, setAllGalleries] = useState<Gallery[]>([]);
 
   const [selectedGalleries, setSelectedGalleries] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -26,14 +28,21 @@ export function useGalleryManagement() {
   const [currentGallery, setCurrentGallery] = useState<Gallery | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Store all galleries for bulk operations
+  useEffect(() => {
+    setAllGalleries(galleries);
+  }, [galleries]);
+
   // Apply client-side filtering and pagination
-  const filteredGalleries = galleries.filter((gallery) => {
+  const filteredGalleries = allGalleries.filter((gallery) => {
     const matchesSearch = gallery.title
       .toLowerCase()
       .includes(debouncedSearchTerm.toLowerCase());
     const matchesEvent =
       eventFilter === "all" || gallery.event?.id === eventFilter;
-    return matchesSearch && matchesEvent;
+    const matchesPeriod =
+      periodFilter === "all" || gallery.event?.periodId === periodFilter;
+    return matchesSearch && matchesEvent && matchesPeriod;
   });
 
   useEffect(() => {
@@ -52,7 +61,7 @@ export function useGalleryManagement() {
   const toggleGallerySelection = (id: string) => {
     if (selectedGalleries.includes(id)) {
       setSelectedGalleries(
-        selectedGalleries.filter((galleryId) => galleryId !== id)
+        selectedGalleries.filter((galleryId) => galleryId !== id),
       );
     } else {
       setSelectedGalleries([...selectedGalleries, id]);
@@ -106,8 +115,8 @@ export function useGalleryManagement() {
       } else if (selectedGalleries.length > 0) {
         // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const galleryId of selectedGalleries) {
-          // Find the gallery object to get the image URL
-          const galleryToDelete = galleries.find((g) => g.id === galleryId);
+          // Find the gallery object to get the image URL (use allGalleries to ensure data is available)
+          const galleryToDelete = allGalleries.find((g) => g.id === galleryId);
           if (
             galleryToDelete?.image &&
             isGoogleDriveFile(galleryToDelete.image)
@@ -121,7 +130,7 @@ export function useGalleryManagement() {
         }
         setSelectedGalleries([]);
         setSuccess(
-          `${selectedGalleries.length} galleries deleted successfully`
+          `${selectedGalleries.length} galleries deleted successfully`,
         );
         refetch();
       }
@@ -142,6 +151,7 @@ export function useGalleryManagement() {
     searchTerm,
     eventFilter,
     categoryFilter,
+    periodFilter,
     currentPage,
     totalPages,
     showDeleteModal,
@@ -150,6 +160,7 @@ export function useGalleryManagement() {
     setSearchTerm,
     setEventFilter,
     setCategoryFilter,
+    setPeriodFilter,
     setCurrentPage,
     setShowDeleteModal,
     setShowViewModal,

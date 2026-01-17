@@ -125,7 +125,7 @@ export const getLetter = async (id: string) => {
 
 export const createLetter = async (
   data: CreateLetterInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const letterData: Prisma.LetterCreateInput = {
     regarding: data.regarding,
@@ -143,6 +143,7 @@ export const createLetter = async (
 
   // Optional fields
   if (data.number) letterData.number = data.number;
+  if (data.classification) letterData.classification = data.classification;
   if (data.periodId) letterData.period = { connect: { id: data.periodId } };
   if (data.eventId) letterData.event = { connect: { id: data.eventId } };
 
@@ -227,7 +228,7 @@ export const createLetter = async (
 export const updateLetter = async (
   id: string,
   data: UpdateLetterInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Check if letter exists with approval
   const existingLetter = await prisma.letter.findUnique({
@@ -266,7 +267,7 @@ export const updateLetter = async (
   if (hasChanges) {
     const existingApproval = existingLetter.approvals.find(
       (approval) =>
-        approval.status === "APPROVED" || approval.status === "REJECTED"
+        approval.status === "APPROVED" || approval.status === "REJECTED",
     );
 
     if (existingApproval) {
@@ -285,6 +286,9 @@ export const updateLetter = async (
   const updateData: Prisma.LetterUpdateInput = {};
 
   if (data.number !== undefined) updateData.number = data.number;
+  if (data.classification !== undefined) {
+    updateData.classification = data.classification;
+  }
   if (data.regarding !== undefined) updateData.regarding = data.regarding;
   if (data.origin !== undefined) updateData.origin = data.origin;
   if (data.destination !== undefined) updateData.destination = data.destination;

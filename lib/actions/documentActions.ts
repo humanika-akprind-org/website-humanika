@@ -1,18 +1,18 @@
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
-  Document,
 } from "@/types/document";
 import { Status, ApprovalType } from "@/types/enums";
 import { StatusApproval } from "@/types/enums";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
+import type { Prisma } from "@prisma/client";
 
 export async function handleDocumentSubmit(
   data: CreateDocumentInput | UpdateDocumentInput,
   isEdit: boolean = false,
-  documentId?: string
+  documentId?: string,
 ) {
   "use server";
 
@@ -27,24 +27,26 @@ export async function handleDocumentSubmit(
     throw new Error("Missing required fields");
   }
 
-  // Prepare data to send
-  const submitData = {
+  // Prepare data to send (use Prisma types directly)
+  const submitData: Prisma.DocumentCreateInput | Prisma.DocumentUpdateInput = {
     name: documentData.name,
-    documentTypeId: documentData.documentTypeId,
+    documentType: { connect: { id: documentData.documentTypeId } },
     status: Status.DRAFT,
     document: documentData.document,
-    userId: user.id,
-    letterId: documentData.letterId,
+    user: { connect: { id: user.id } },
+    letter: documentData.letterId
+      ? { connect: { id: documentData.letterId } }
+      : undefined,
   };
 
   if (isEdit && documentId) {
     await prisma.document.update({
       where: { id: documentId },
-      data: submitData,
+      data: submitData as Prisma.DocumentUpdateInput,
     });
   } else {
     await prisma.document.create({
-      data: submitData,
+      data: submitData as Prisma.DocumentCreateInput,
     });
   }
 
@@ -54,7 +56,7 @@ export async function handleDocumentSubmit(
 export async function handleDocumentSubmitForApproval(
   data: CreateDocumentInput | UpdateDocumentInput,
   isEdit: boolean = false,
-  documentId?: string
+  documentId?: string,
 ) {
   "use server";
 
@@ -69,41 +71,27 @@ export async function handleDocumentSubmitForApproval(
     throw new Error("Missing required fields");
   }
 
-  // Prepare data to send
-  const submitData: Omit<
-    Document,
-    | "id"
-    | "user"
-    | "event"
-    | "letter"
-    | "version"
-    | "parentId"
-    | "isCurrent"
-    | "createdAt"
-    | "updatedAt"
-    | "previousVersion"
-    | "nextVersions"
-    | "approvals"
-    | "type"
-    | "documentType"
-  > = {
+  // Prepare data to send (use Prisma types directly)
+  const submitData: Prisma.DocumentCreateInput | Prisma.DocumentUpdateInput = {
     name: documentData.name,
-    documentTypeId: documentData.documentTypeId,
+    documentType: { connect: { id: documentData.documentTypeId } },
     status: Status.PENDING,
     document: documentData.document,
-    userId: user.id,
-    letterId: documentData.letterId,
+    user: { connect: { id: user.id } },
+    letter: documentData.letterId
+      ? { connect: { id: documentData.letterId } }
+      : undefined,
   };
 
   let document;
   if (isEdit && documentId) {
     document = await prisma.document.update({
       where: { id: documentId },
-      data: submitData,
+      data: submitData as Prisma.DocumentUpdateInput,
     });
   } else {
     document = await prisma.document.create({
-      data: submitData,
+      data: submitData as Prisma.DocumentCreateInput,
     });
   }
 

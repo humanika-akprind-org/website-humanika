@@ -17,11 +17,12 @@ interface UseDocumentManagementOptions {
 }
 
 export function useDocumentManagement(
-  options: UseDocumentManagementOptions = {}
+  options: UseDocumentManagementOptions = {},
 ) {
   const { addPath, editPath, excludeTypes } = options;
   const router = useRouter();
   const { documents, isLoading, error, fetchDocuments } = useDocuments();
+  const [allDocuments, setAllDocuments] = useState<Document[]>([]);
 
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,9 +37,15 @@ export function useDocumentManagement(
   const [typeFilter, setTypeFilter] = useState("all");
   const [userFilter, setUserFilter] = useState("all");
   const [approvalStatusFilter, setApprovalStatusFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
+
+  // Store all documents for bulk operations
+  useEffect(() => {
+    setAllDocuments(documents);
+  }, [documents]);
 
   // Apply client-side filtering and pagination
-  const filteredDocuments = documents.filter((document) => {
+  const filteredDocuments = allDocuments.filter((document) => {
     const matchesSearch =
       document.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
       (document.documentType?.name &&
@@ -55,11 +62,13 @@ export function useDocumentManagement(
       (document.approvals &&
         document.approvals.length > 0 &&
         document.approvals.some(
-          (approval) => approval.status === approvalStatusFilter
+          (approval) => approval.status === approvalStatusFilter,
         ));
+    const matchesPeriod =
+      periodFilter === "all" || document.periodId === periodFilter;
     const notExcluded = !excludeTypes?.some(
       (excludeType) =>
-        excludeType === document.type.toLowerCase().replace(/[\s\-]/g, "")
+        excludeType === document.type.toLowerCase().replace(/[\s\-]/g, ""),
     );
 
     return (
@@ -68,6 +77,7 @@ export function useDocumentManagement(
       matchesType &&
       matchesUser &&
       matchesApprovalStatus &&
+      matchesPeriod &&
       notExcluded
     );
   });
@@ -143,8 +153,8 @@ export function useDocumentManagement(
       } else if (selectedDocuments.length > 0) {
         // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const docId of selectedDocuments) {
-          // Find the document object to get the document URL
-          const docToDelete = documents.find((doc) => doc.id === docId);
+          // Find the document object to get the document URL (use allDocuments to ensure data is available)
+          const docToDelete = allDocuments.find((doc) => doc.id === docId);
           if (
             docToDelete?.document &&
             isGoogleDriveFile(docToDelete.document)
@@ -158,7 +168,7 @@ export function useDocumentManagement(
         }
         setSelectedDocuments([]);
         setSuccess(
-          `${selectedDocuments.length} documents deleted successfully`
+          `${selectedDocuments.length} documents deleted successfully`,
         );
         fetchDocuments();
       }
@@ -186,6 +196,7 @@ export function useDocumentManagement(
     typeFilter,
     userFilter,
     approvalStatusFilter,
+    periodFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -195,6 +206,7 @@ export function useDocumentManagement(
     setTypeFilter,
     setUserFilter,
     setApprovalStatusFilter,
+    setPeriodFilter,
     toggleDocumentSelection,
     toggleSelectAll,
     handleAddDocument,
