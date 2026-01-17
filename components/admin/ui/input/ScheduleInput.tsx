@@ -43,9 +43,22 @@ const formatDateForInput = (dateString: string): string => {
 };
 
 // Helper function to convert input value to ISO 8601 string
+// Handles "YYYY-MM-DD" format properly without timezone issues
 const formatDateFromInput = (inputValue: string): string => {
   if (!inputValue) return "";
-  return inputValue; // date input already provides valid date format
+  // Parse the date parts directly to avoid timezone issues
+  const parts = inputValue.split("-");
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // JavaScript months are 0-indexed
+    const day = parseInt(parts[2], 10);
+    // Create date in UTC to avoid timezone shifts
+    const date = new Date(Date.UTC(year, month, day));
+    return date.toISOString();
+  }
+  // Fallback for other formats
+  const date = new Date(inputValue);
+  return date.toISOString();
 };
 
 // Validation function to check if start time is before end time
@@ -220,8 +233,8 @@ function SortableScheduleItem({
         isDragging
           ? "shadow-lg"
           : isOutOfOrder
-          ? "border-red-500"
-          : "border-gray-200"
+            ? "border-red-500"
+            : "border-gray-200"
       }`}
     >
       <div className="flex items-start">
@@ -317,7 +330,7 @@ export default function ScheduleInput({
   const isDatesValid = useMemo(() => areDatesInOrder(schedules), [schedules]);
   const outOfOrderIndices = useMemo(
     () => getOutOfOrderIndices(schedules),
-    [schedules]
+    [schedules],
   );
 
   const sensors = useSensors(
@@ -328,7 +341,7 @@ export default function ScheduleInput({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleAddSchedule = () => {
@@ -465,14 +478,14 @@ export default function ScheduleInput({
   const isDateValid = (
     newDate: string,
     existingSchedules: ScheduleItem[],
-    currentEditIndex: number | null
+    currentEditIndex: number | null,
   ): boolean => {
     if (!newDate) return true;
 
     // Get dates of all existing schedules except the one being edited
     const existingDates = existingSchedules
       .map((schedule, index) =>
-        index !== currentEditIndex ? schedule.date : null
+        index !== currentEditIndex ? schedule.date : null,
       )
       .filter((date): date is string => date !== null);
 
@@ -578,6 +591,16 @@ export default function ScheduleInput({
       {editingIndex !== null && editingIndex === schedules.length && (
         <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
           <div className="space-y-3">
+            <div className="flex justify-center mb-2">
+              <button
+                type="button"
+                disabled={disabled || editingIndex !== null || !isDatesValid}
+                className="p-1.5 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 rounded cursor-grab active:cursor-grabbing"
+                title="Drag to reorder"
+              >
+                <GripHorizontal className="w-4 h-4" />
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <DateInput
                 label="Date"

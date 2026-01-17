@@ -107,7 +107,13 @@ export const useFinanceForm = ({
     description: finance?.description || "",
     amount: finance?.amount || 0,
     date: finance?.date
-      ? new Date(finance.date).toISOString().split("T")[0]
+      ? (() => {
+          const date = new Date(finance.date);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
+        })()
       : "",
     categoryId: finance?.categoryId || "",
     type: finance?.type || FinanceType.EXPENSE,
@@ -308,7 +314,15 @@ export const useFinanceForm = ({
       const submitData = {
         ...dataToSend,
         proof: proofUrl,
-        date: new Date(formData.date),
+        date: (() => {
+          // Parse YYYY-MM-DD format and create Date object without timezone issues
+          const parts = formData.date.split("-");
+          const year = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[2], 10);
+          // Create date at UTC midnight to avoid timezone shifts
+          return new Date(Date.UTC(year, month, day));
+        })(),
         workProgramId:
           formData.workProgramId && formData.workProgramId.trim() !== ""
             ? formData.workProgramId
