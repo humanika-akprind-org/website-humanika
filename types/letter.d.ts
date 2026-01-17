@@ -38,6 +38,7 @@ export interface CreateLetterInput {
   regarding: string;
   origin: string;
   destination: string;
+  classification?: LetterClassification;
   date: string | Date;
   type: LetterType;
   priority: LetterPriority;

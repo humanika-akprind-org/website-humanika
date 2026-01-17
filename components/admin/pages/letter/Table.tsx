@@ -10,6 +10,7 @@ import StatusApproval from "../../ui/chip/StatusApproval";
 import EmptyState from "../../ui/EmptyState";
 import TypeChip from "../../ui/chip/Type";
 import PriorityChip from "../../ui/chip/Priority";
+import ClassificationChip from "../../ui/chip/Classification";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
@@ -55,7 +56,7 @@ export default function LetterTable({
     ? letters.filter(
         (letter) =>
           letter.type?.toLowerCase().replace(/[\s\-]/g, "") ===
-          typeFilter.toLowerCase().replace(/[\s\-]/g, "")
+          typeFilter.toLowerCase().replace(/[\s\-]/g, ""),
       )
     : letters;
 
@@ -284,7 +285,7 @@ export default function LetterTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${letter.letter}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -312,7 +313,7 @@ export default function LetterTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${letter.letter}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -323,7 +324,7 @@ export default function LetterTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${letter.letter}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -334,25 +335,18 @@ export default function LetterTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${letter.letter}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
-                  <div className="text-sm text-gray-900">
-                    {letter.classification
-                      ? letter.classification
-                          .replace(/_/g, " ")
-                          .toLowerCase()
-                          .replace(/\b\w/g, (l: string) => l.toUpperCase())
-                      : "-"}
-                  </div>
+                  <ClassificationChip classification={letter.classification} />
                 </td>
                 <td
                   className="px-4 py-4 whitespace-nowrap"
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${letter.letter}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -363,7 +357,7 @@ export default function LetterTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${letter.letter}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -373,7 +367,7 @@ export default function LetterTable({
                         letter.approvals.sort(
                           (a, b) =>
                             new Date(b.updatedAt).getTime() -
-                            new Date(a.updatedAt).getTime()
+                            new Date(a.updatedAt).getTime(),
                         )[0].status
                       }
                     />

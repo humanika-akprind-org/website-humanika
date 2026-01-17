@@ -31,7 +31,6 @@ export default function LettersPage() {
     showDeleteModal,
     showViewModal,
     currentLetter,
-    periodFilter,
     setSearchTerm,
     setCurrentPage,
     setShowDeleteModal,
@@ -39,6 +38,7 @@ export default function LettersPage() {
     setCurrentLetter,
     setTypeFilter,
     setPriorityFilter,
+    setPeriodFilter,
     toggleLetterSelection,
     toggleSelectAll,
     handleAddLetter,
@@ -62,8 +62,9 @@ export default function LettersPage() {
       setPriorityFilter(filter.priority || "all");
     }
     if (filter.search !== undefined) setSearchTerm(filter.search || "");
-    if (filter.periodId !== undefined)
+    if (filter.periodId !== undefined) {
       setPeriodFilter(filter.periodId || "all");
+    }
   };
 
   const handleDeleteSelected = () => {
