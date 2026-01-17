@@ -14,7 +14,7 @@ export function useEventFormData() {
     const fetchData = async () => {
       try {
         const [usersResponse, periodsResponse] = await Promise.all([
-          UserApi.getUsers({ limit: 50 }),
+          UserApi.getUsers({ allUsers: true }),
           PeriodApi.getPeriods(),
         ]);
 

@@ -3,7 +3,12 @@ import { useRouter } from "next/navigation";
 import { UserApi } from "@/use-cases/api/user";
 import type { User, UserFilters as UserFiltersType } from "@/types/user";
 
-export function useUserManagement() {
+interface UseUserManagementOptions {
+  /** When true, returns all users without pagination (for select inputs) */
+  allData?: boolean;
+}
+
+export function useUserManagement(options?: UseUserManagementOptions) {
   const router = useRouter();
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -24,6 +29,7 @@ export function useUserManagement() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { allData = false } = options || {};
 
   const fetchAllUsers = useCallback(async () => {
     try {
@@ -47,6 +53,13 @@ export function useUserManagement() {
 
   // Apply client-side filtering and pagination
   useEffect(() => {
+    // When allData is true, return all users without pagination/filtering
+    if (allData) {
+      setUsers(allUsers);
+      setTotalPages(1);
+      return;
+    }
+
     let filtered = allUsers;
 
     // Search filter
@@ -102,6 +115,7 @@ export function useUserManagement() {
     filters.department,
     filters.position,
     filters.isActive,
+    allData,
   ]);
 
   useEffect(() => {

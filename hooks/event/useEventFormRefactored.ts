@@ -97,7 +97,9 @@ export const useEventForm = (
   const { categories: eventCategories, isLoading: categoriesLoading } =
     useEventCategories();
 
-  const { users: fetchedUsers, loading: usersLoading } = useUserManagement();
+  const { users: fetchedUsers, loading: usersLoading } = useUserManagement({
+    allData: true,
+  });
   const { periods: fetchedPeriods, loading: periodsLoading } =
     usePeriodManagement();
 

@@ -2,9 +2,234 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import * as FiIcons from "react-icons/fi";
 import { ArrowRight, Users, Code, Target, CheckCircle } from "lucide-react";
 import { useActivePeriodOrganizationContact } from "@/hooks/organization-contact/useOrganizationContacts";
 import { useActivePeriodStatistic } from "@/hooks/statistic/useStatistics";
+import type { MissionItem } from "@/types/organization-contact";
+
+// Icon mapping - map database icon names to react-icons/fi components
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  FiTarget: FiIcons.FiTarget,
+  FiStar: FiIcons.FiStar,
+  FiHeart: FiIcons.FiHeart,
+  FiAward: FiIcons.FiAward,
+  FiTrendingUp: FiIcons.FiTrendingUp,
+  FiZap: FiIcons.FiZap,
+  FiShield: FiIcons.FiShield,
+  FiUsers: FiIcons.FiUsers,
+  FiGlobe: FiIcons.FiGlobe,
+  FiHome: FiIcons.FiHome,
+  FiBriefcase: FiIcons.FiBriefcase,
+  FiEye: FiIcons.FiEye,
+  FiFlag: FiIcons.FiFlag,
+  FiBookmark: FiIcons.FiBookmark,
+  FiMapPin: FiIcons.FiMapPin,
+  FiPhone: FiIcons.FiPhone,
+  FiMail: FiIcons.FiMail,
+  FiClock: FiIcons.FiClock,
+  FiCalendar: FiIcons.FiCalendar,
+  FiActivity: FiIcons.FiActivity,
+  FiAlertCircle: FiIcons.FiAlertCircle,
+  FiAnchor: FiIcons.FiAnchor,
+  FiArchive: FiIcons.FiArchive,
+  FiBarChart: FiIcons.FiBarChart,
+  FiBattery: FiIcons.FiBattery,
+  FiBell: FiIcons.FiBell,
+  FiBox: FiIcons.FiBox,
+  FiCast: FiIcons.FiCast,
+  FiCheck: FiIcons.FiCheck,
+  FiCheckCircle: FiIcons.FiCheckCircle,
+  FiCheckSquare: FiIcons.FiCheckSquare,
+  FiCircle: FiIcons.FiCircle,
+  FiClipboard: FiIcons.FiClipboard,
+  FiCloud: FiIcons.FiCloud,
+  FiCode: FiIcons.FiCode,
+  FiCommand: FiIcons.FiCommand,
+  FiCompass: FiIcons.FiCompass,
+  FiCopy: FiIcons.FiCopy,
+  FiCpu: FiIcons.FiCpu,
+  FiCreditCard: FiIcons.FiCreditCard,
+  FiDatabase: FiIcons.FiDatabase,
+  FiDelete: FiIcons.FiDelete,
+  FiDisc: FiIcons.FiDisc,
+  FiDownload: FiIcons.FiDownload,
+  FiEdit: FiIcons.FiEdit,
+  FiExternalLink: FiIcons.FiExternalLink,
+  FiFacebook: FiIcons.FiFacebook,
+  FiFastForward: FiIcons.FiFastForward,
+  FiFeather: FiIcons.FiFeather,
+  FiFile: FiIcons.FiFile,
+  FiFileMinus: FiIcons.FiFileMinus,
+  FiFilePlus: FiIcons.FiFilePlus,
+  FiFileText: FiIcons.FiFileText,
+  FiFilm: FiIcons.FiFilm,
+  FiFilter: FiIcons.FiFilter,
+  FiFolder: FiIcons.FiFolder,
+  FiFolderMinus: FiIcons.FiFolderMinus,
+  FiFolderPlus: FiIcons.FiFolderPlus,
+  FiGift: FiIcons.FiGift,
+  FiGithub: FiIcons.FiGithub,
+  FiGitlab: FiIcons.FiGitlab,
+  FiGrid: FiIcons.FiGrid,
+  FiHash: FiIcons.FiHash,
+  FiHeadphones: FiIcons.FiHeadphones,
+  FiHelpCircle: FiIcons.FiHelpCircle,
+  FiHexagon: FiIcons.FiHexagon,
+  FiImage: FiIcons.FiImage,
+  FiInbox: FiIcons.FiInbox,
+  FiInfo: FiIcons.FiInfo,
+  FiInstagram: FiIcons.FiInstagram,
+  FiLayers: FiIcons.FiLayers,
+  FiLayout: FiIcons.FiLayout,
+  FiLifeBuoy: FiIcons.FiLifeBuoy,
+  FiLink: FiIcons.FiLink,
+  FiLinkedin: FiIcons.FiLinkedin,
+  FiList: FiIcons.FiList,
+  FiLoader: FiIcons.FiLoader,
+  FiLock: FiIcons.FiLock,
+  FiLogIn: FiIcons.FiLogIn,
+  FiLogOut: FiIcons.FiLogOut,
+  FiMap: FiIcons.FiMap,
+  FiMaximize: FiIcons.FiMaximize,
+  FiMaximize2: FiIcons.FiMaximize2,
+  FiMenu: FiIcons.FiMenu,
+  FiMessageCircle: FiIcons.FiMessageCircle,
+  FiMessageSquare: FiIcons.FiMessageSquare,
+  FiMic: FiIcons.FiMic,
+  FiMicOff: FiIcons.FiMicOff,
+  FiMinimize: FiIcons.FiMinimize,
+  FiMinimize2: FiIcons.FiMinimize2,
+  FiMinus: FiIcons.FiMinus,
+  FiMinusCircle: FiIcons.FiMinusCircle,
+  FiMinusSquare: FiIcons.FiMinusSquare,
+  FiMonitor: FiIcons.FiMonitor,
+  FiMoon: FiIcons.FiMoon,
+  FiMoreHorizontal: FiIcons.FiMoreHorizontal,
+  FiMoreVertical: FiIcons.FiMoreVertical,
+  FiMove: FiIcons.FiMove,
+  FiMusic: FiIcons.FiMusic,
+  FiNavigation: FiIcons.FiNavigation,
+  FiNavigation2: FiIcons.FiNavigation2,
+  FiOctagon: FiIcons.FiOctagon,
+  FiPackage: FiIcons.FiPackage,
+  FiPaperclip: FiIcons.FiPaperclip,
+  FiPause: FiIcons.FiPause,
+  FiPauseCircle: FiIcons.FiPauseCircle,
+  FiPenTool: FiIcons.FiPenTool,
+  FiPercent: FiIcons.FiPercent,
+  FiPieChart: FiIcons.FiPieChart,
+  FiPlay: FiIcons.FiPlay,
+  FiPlayCircle: FiIcons.FiPlayCircle,
+  FiPlus: FiIcons.FiPlus,
+  FiPlusCircle: FiIcons.FiPlusCircle,
+  FiPlusSquare: FiIcons.FiPlusSquare,
+  FiPower: FiIcons.FiPower,
+  FiPrinter: FiIcons.FiPrinter,
+  FiRadio: FiIcons.FiRadio,
+  FiRefreshCw: FiIcons.FiRefreshCw,
+  FiRepeat: FiIcons.FiRepeat,
+  FiRewind: FiIcons.FiRewind,
+  FiRotateCcw: FiIcons.FiRotateCcw,
+  FiRotateCw: FiIcons.FiRotateCw,
+  FiSave: FiIcons.FiSave,
+  FiScissors: FiIcons.FiScissors,
+  FiSearch: FiIcons.FiSearch,
+  FiSend: FiIcons.FiSend,
+  FiServer: FiIcons.FiServer,
+  FiSettings: FiIcons.FiSettings,
+  FiShare: FiIcons.FiShare,
+  FiShare2: FiIcons.FiShare2,
+  FiShieldOff: FiIcons.FiShieldOff,
+  FiShoppingBag: FiIcons.FiShoppingBag,
+  FiShoppingCart: FiIcons.FiShoppingCart,
+  FiShuffle: FiIcons.FiShuffle,
+  FiSidebar: FiIcons.FiSidebar,
+  FiSkipBack: FiIcons.FiSkipBack,
+  FiSkipForward: FiIcons.FiSkipForward,
+  FiSlack: FiIcons.FiSlack,
+  FiSliders: FiIcons.FiSliders,
+  FiSmartphone: FiIcons.FiSmartphone,
+  FiSmile: FiIcons.FiSmile,
+  FiSquare: FiIcons.FiSquare,
+  FiStopCircle: FiIcons.FiStopCircle,
+  FiSun: FiIcons.FiSun,
+  FiTablet: FiIcons.FiTablet,
+  FiTag: FiIcons.FiTag,
+  FiTerminal: FiIcons.FiTerminal,
+  FiThermometer: FiIcons.FiThermometer,
+  FiThumbsDown: FiIcons.FiThumbsDown,
+  FiThumbsUp: FiIcons.FiThumbsUp,
+  FiToggleLeft: FiIcons.FiToggleLeft,
+  FiToggleRight: FiIcons.FiToggleRight,
+  FiTrash: FiIcons.FiTrash,
+  FiTrash2: FiIcons.FiTrash2,
+  FiTriangle: FiIcons.FiTriangle,
+  FiTruck: FiIcons.FiTruck,
+  FiTv: FiIcons.FiTv,
+  FiTwitter: FiIcons.FiTwitter,
+  FiType: FiIcons.FiType,
+  FiUmbrella: FiIcons.FiUmbrella,
+  FiUnlock: FiIcons.FiUnlock,
+  FiUpload: FiIcons.FiUpload,
+  FiUser: FiIcons.FiUser,
+  FiUserCheck: FiIcons.FiUserCheck,
+  FiUserMinus: FiIcons.FiUserMinus,
+  FiUserPlus: FiIcons.FiUserPlus,
+  FiUserX: FiIcons.FiUserX,
+  FiVideo: FiIcons.FiVideo,
+  FiVideoOff: FiIcons.FiVideoOff,
+  FiVolume: FiIcons.FiVolume,
+  FiVolume2: FiIcons.FiVolume2,
+  FiVolumeX: FiIcons.FiVolumeX,
+  FiWatch: FiIcons.FiWatch,
+  FiWifi: FiIcons.FiWifi,
+  FiX: FiIcons.FiX,
+  FiXCircle: FiIcons.FiXCircle,
+  FiXSquare: FiIcons.FiXSquare,
+  FiYoutube: FiIcons.FiYoutube,
+  FiZoomIn: FiIcons.FiZoomIn,
+  FiZoomOut: FiIcons.FiZoomOut,
+};
+
+// Fallback icons when icon is not specified or not found
+const FALLBACK_ICONS: React.ComponentType<{ className?: string }>[] = [
+  FiIcons.FiTarget,
+  FiIcons.FiStar,
+  FiIcons.FiHeart,
+  FiIcons.FiAward,
+  FiIcons.FiTrendingUp,
+  FiIcons.FiZap,
+  FiIcons.FiShield,
+  FiIcons.FiUsers,
+];
+
+// Get icon component by name, with fallback
+function getIconByName(
+  iconName?: string
+): React.ComponentType<{ className?: string }> {
+  if (!iconName || !ICON_MAP[iconName]) {
+    return FALLBACK_ICONS[Math.floor(Math.random() * FALLBACK_ICONS.length)];
+  }
+  return ICON_MAP[iconName];
+}
+
+// Helper to render icon with proper styling
+function renderMissionIcon(
+  iconName?: string,
+  className: string = "w-5 h-5"
+): React.ReactNode {
+  const IconComponent = getIconByName(iconName);
+  return <IconComponent className={className} />;
+}
+
+interface ParsedMission {
+  number: string;
+  title: string;
+  description: string;
+  icon?: string;
+  iconNode: React.ReactNode;
+}
 
 export default function AboutSection() {
   const { organizationContact, isLoading: orgLoading } =
@@ -12,20 +237,73 @@ export default function AboutSection() {
   const { statistic, isLoading: statLoading } = useActivePeriodStatistic();
 
   // Handle mission array from database (stored as Json)
-  const missions = organizationContact?.mission
+  // Supports: string, string[], MissionItem[]
+  const rawMissions = organizationContact?.mission
     ? Array.isArray(organizationContact.mission)
-      ? organizationContact.mission.filter(
-          (m): m is string => typeof m === "string"
-        )
-      : typeof organizationContact.mission === "string"
-      ? organizationContact.mission.split("\n").filter((m) => m.trim())
-      : []
-    : [
+      ? organizationContact.mission
+      : [organizationContact.mission as string]
+    : [];
+
+  // Parse missions - support both old format and new format with icons
+  const missions: ParsedMission[] = rawMissions.map((missionItem, index) => {
+    // Check if it is the new MissionItem format with icon
+    if (
+      typeof missionItem === "object" &&
+      missionItem !== null &&
+      "title" in missionItem
+    ) {
+      const item = missionItem as MissionItem;
+      return {
+        number: String(index + 1).padStart(2, "0"),
+        title: item.title,
+        description: item.description,
+        icon: item.icon,
+        iconNode: renderMissionIcon(item.icon),
+      };
+    }
+
+    // Old format: "title - description" string or just string
+    const missionStr = missionItem as string;
+    const parts = missionStr.split(" - ");
+    return {
+      number: String(index + 1).padStart(2, "0"),
+      title: parts[0]?.trim() || "",
+      description: parts[1]?.trim() || parts[0]?.trim() || "",
+      icon: undefined,
+      iconNode: renderMissionIcon(),
+    };
+  });
+
+  // Default missions when no data available
+  const defaultMissions: ParsedMission[] = [
+    {
+      number: "01",
+      title: "Meningkatkan Kompetensi",
+      description:
         "Meningkatkan kompetensi anggota di bidang teknologi informasi",
-        "Menjalin kolaborasi dengan industri dan komunitas",
-        "Mengembangkan solusi inovatif untuk masalah sosial",
-        "Membangun ekosistem pembelajaran berkelanjutan",
-      ];
+      iconNode: renderMissionIcon("FiCode"),
+    },
+    {
+      number: "02",
+      title: "Kolaborasi",
+      description: "Menjalin kolaborasi dengan industri dan komunitas",
+      iconNode: renderMissionIcon("FiUsers"),
+    },
+    {
+      number: "03",
+      title: "Inovasi",
+      description: "Mengembangkan solusi inovatif untuk masalah sosial",
+      iconNode: renderMissionIcon("FiZap"),
+    },
+    {
+      number: "04",
+      title: "Ekosistem Pembelajaran",
+      description: "Membangun ekosistem pembelajaran berkelanjutan",
+      iconNode: renderMissionIcon("FiBook"),
+    },
+  ];
+
+  const displayMissions = missions.length > 0 ? missions : defaultMissions;
 
   return (
     <section className="py-20 bg-gradient-to-br from-grey-50 to-primary-50">
@@ -176,12 +454,21 @@ export default function AboutSection() {
                 </div>
               </div>
               <ul className="space-y-4">
-                {missions.map((mission, index) => (
+                {displayMissions.map((mission, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-primary-400/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                       <div className="w-2 h-2 bg-primary-300 rounded-full" />
                     </div>
-                    <span>{mission}</span>
+                    <div>
+                      <span className="font-semibold block">
+                        {mission.title}
+                      </span>
+                      {mission.description !== mission.title && (
+                        <span className="text-primary-200 text-sm">
+                          {mission.description}
+                        </span>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
