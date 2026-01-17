@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { Crop } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AccessTokenGuard from "./AccessTokenGuard";
+import ImageCropper from "./ImageCropper";
 
 // Helper function to get preview URL from photo (file ID or URL)
 const getPreviewUrl = (photo: string | null | undefined): string => {
@@ -58,6 +60,43 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   error,
 }) => {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+
+  // Function to handle cropped image upload
+  const handleCroppedImageUpload = useCallback(
+    async (croppedImg: string) => {
+      try {
+        // Convert base64/data URL to blob
+        const response = await fetch(croppedImg);
+        const blob = await response.blob();
+
+        // Create a File object from the blob
+        const file = new File([blob], "cropped-image.jpg", {
+          type: "image/jpeg",
+        });
+
+        // Call the parent's onFileChange with the cropped image file
+        onFileChange(file);
+      } catch (error) {
+        console.error("Error uploading cropped image:", error);
+      }
+    },
+    [onFileChange],
+  );
+
+  // Effect to handle cropped image upload
+  useEffect(() => {
+    if (croppedImage) {
+      handleCroppedImageUpload(croppedImage);
+    }
+  }, [croppedImage, handleCroppedImageUpload]);
+
+  // Effect to clear cropped image when preview URL changes
+  useEffect(() => {
+    setCroppedImage(null);
+  }, [previewUrl]);
 
   const hasImageError = (url: string) => imageErrors.has(url);
 
@@ -80,8 +119,18 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
         return;
       }
 
+      // Reset crop-related state when new file is selected
+      setCroppedImage(null);
+      setCropModalOpen(false);
+
       onFileChange(file);
     }
+  };
+
+  // Function to get the display URL (prioritizes cropped image)
+  const getDisplayUrl = (): string => {
+    const imageUrl = getPreviewUrl(previewUrl || existingPhoto);
+    return croppedImage || imageUrl;
   };
 
   return (
@@ -96,23 +145,33 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
         <div className="flex flex-col items-center">
           <div className="flex-shrink-0">
             {(() => {
-              // Get the image URL
-              const imageUrl = getPreviewUrl(previewUrl || existingPhoto);
-              const hasError = imageUrl ? hasImageError(imageUrl) : true;
+              // Get the display URL (prioritizes cropped image)
+              const displayUrl = getDisplayUrl();
+              const hasError = displayUrl ? hasImageError(displayUrl) : true;
 
               // Show image if URL exists and no error
-              if (imageUrl && !hasError) {
+              if (displayUrl && !hasError) {
                 return (
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden">
-                    <Image
-                      src={imageUrl}
-                      alt={alt}
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-cover rounded-full"
-                      onError={() => handleImageError(imageUrl)}
-                      unoptimized={true}
-                    />
+                    {displayUrl.startsWith("blob:") ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={displayUrl}
+                        alt={alt}
+                        className="w-full h-full object-cover rounded-full"
+                        onError={() => handleImageError(displayUrl)}
+                      />
+                    ) : (
+                      <Image
+                        src={displayUrl}
+                        alt={alt}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-cover rounded-full"
+                        onError={() => handleImageError(displayUrl)}
+                        unoptimized={true}
+                      />
+                    )}
                   </div>
                 );
               } else {
@@ -137,19 +196,43 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
               }
             })()}
           </div>
-          {showRemoveButton &&
-            (previewUrl || (existingPhoto && existingPhoto.trim() !== "")) && (
-              <div className="flex gap-2 mt-2">
+          {(previewUrl || existingPhoto || croppedImage) && (
+            <div className="flex gap-2 mt-2">
+              {(previewUrl || existingPhoto) && (
                 <button
                   type="button"
-                  onClick={onRemovePhoto}
-                  className="text-sm text-red-600 hover:text-red-800"
-                  disabled={isLoading}
+                  onClick={() => {
+                    const url = getPreviewUrl(previewUrl || existingPhoto);
+                    if (url) {
+                      setOriginalImage(url);
+                      setCropModalOpen(true);
+                    }
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                  disabled={isLoading || photoLoading}
                 >
-                  Hapus Foto
+                  <Crop className="w-4 h-4 inline mr-1" />
+                  Crop
                 </button>
-              </div>
-            )}
+              )}
+              {showRemoveButton &&
+                (previewUrl ||
+                  (existingPhoto && existingPhoto.trim() !== "") ||
+                  croppedImage) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCroppedImage(null);
+                      onRemovePhoto();
+                    }}
+                    className="text-sm text-red-600 hover:text-red-800"
+                    disabled={isLoading}
+                  >
+                    Hapus Foto
+                  </button>
+                )}
+            </div>
+          )}
         </div>
 
         <div className="flex-1">
@@ -167,6 +250,15 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
         </div>
       </div>
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+
+      {/* Crop Modal */}
+      <ImageCropper
+        isOpen={cropModalOpen}
+        onClose={() => setCropModalOpen(false)}
+        imageSrc={originalImage}
+        onCropComplete={(croppedImg) => setCroppedImage(croppedImg)}
+        aspect={1} // 1:1 aspect ratio for profile photo
+      />
     </AccessTokenGuard>
   );
 };
