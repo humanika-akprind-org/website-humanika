@@ -248,7 +248,7 @@ export const useManagementForm = (
     return null;
   };
 
-  // Search users function
+  // Search users function - fetches all matching users without pagination
   const searchUsers = async (query: string) => {
     setUserSearchQuery(query);
     setUserPage(1);
@@ -258,11 +258,10 @@ export const useManagementForm = (
       const response = await UserApi.getUsers({
         search: query,
         page: 1,
-        limit: 10,
+        allUsers: true, // Fetch all users without pagination for proper search
       });
       setUsers(response.data?.users || []);
-      const totalLoaded = response.data?.users?.length || 0;
-      setHasMoreUsers(totalLoaded >= 10);
+      setHasMoreUsers(false); // All users are loaded, no need for load more
     } catch (err) {
       console.error("Error searching users:", err);
       setUsers([]);
@@ -271,7 +270,7 @@ export const useManagementForm = (
     }
   };
 
-  // Load more users function
+  // Load more users function - for initial load without search
   const loadMoreUsers = async () => {
     if (isLoadingUsers || !hasMoreUsers) return;
 
@@ -282,12 +281,17 @@ export const useManagementForm = (
       const response = await UserApi.getUsers({
         search: userSearchQuery,
         page: nextPage,
-        limit: 10,
+        allUsers: true, // Load all users when searching
       });
       const newUsers = response.data?.users || [];
-      setUsers((prev) => [...prev, ...newUsers]);
+      setUsers((prev) => {
+        // Prevent duplicates
+        const existingIds = new Set(prev.map((u) => u.id));
+        const uniqueNewUsers = newUsers.filter((u) => !existingIds.has(u.id));
+        return [...prev, ...uniqueNewUsers];
+      });
       setUserPage(nextPage);
-      setHasMoreUsers(newUsers.length >= 10);
+      setHasMoreUsers(false); // All users are loaded
     } catch (err) {
       console.error("Error loading more users:", err);
     } finally {

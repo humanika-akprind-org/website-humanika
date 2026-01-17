@@ -123,6 +123,7 @@ export const useEventForm = (
   const [userPage, setUserPage] = useState(1);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [hasMoreUsers, setHasMoreUsers] = useState(true);
+  const [searchedUsers, setSearchedUsers] = useState<User[]>([]);
 
   const [formData, setFormData] = useState<EventFormData>({
     name: event?.name || "",
@@ -334,26 +335,29 @@ export const useEventForm = (
     }
   };
 
-  // Search users function
+  // Search users function - fetches all matching users without pagination
   const searchUsers = async (query: string) => {
     setUserSearchQuery(query);
     setUserPage(1);
     setIsLoadingUsers(true);
 
     try {
-      await UserApi.getUsers({
+      const response = await UserApi.getUsers({
         search: query,
         page: 1,
-        limit: 10,
+        allUsers: true, // Fetch all users without pagination for proper search
       });
-      setIsLoadingUsers(false);
+      setSearchedUsers(response.data?.users || []);
+      setHasMoreUsers(false); // All users are loaded, no need for load more
     } catch (err) {
       console.error("Error searching users:", err);
+      setSearchedUsers([]);
+    } finally {
       setIsLoadingUsers(false);
     }
   };
 
-  // Load more users function
+  // Load more users function - for initial load without search
   const loadMoreUsers = async () => {
     if (isLoadingUsers || !hasMoreUsers) return;
 
@@ -364,13 +368,20 @@ export const useEventForm = (
       const response = await UserApi.getUsers({
         search: userSearchQuery,
         page: nextPage,
-        limit: 10,
+        allUsers: true, // Load all users when searching
+      });
+      const newUsers = response.data?.users || [];
+      setSearchedUsers((prev) => {
+        // Prevent duplicates
+        const existingIds = new Set(prev.map((u) => u.id));
+        const uniqueNewUsers = newUsers.filter((u) => !existingIds.has(u.id));
+        return [...prev, ...uniqueNewUsers];
       });
       setUserPage(nextPage);
-      setHasMoreUsers((response.data?.users?.length || 0) >= 10);
-      setIsLoadingUsers(false);
+      setHasMoreUsers(false); // All users are loaded
     } catch (err) {
       console.error("Error loading more users:", err);
+    } finally {
       setIsLoadingUsers(false);
     }
   };
@@ -401,5 +412,6 @@ export const useEventForm = (
     searchUsers,
     isLoadingUsers,
     hasMoreUsers,
+    searchedUsers,
   };
 };

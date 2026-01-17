@@ -57,6 +57,7 @@ export default function EventForm({
     searchUsers,
     isLoadingUsers,
     hasMoreUsers,
+    searchedUsers,
   } = useEventForm(
     event,
     onSubmit,
@@ -65,6 +66,9 @@ export default function EventForm({
     users,
     periods,
   );
+
+  // Use searched users when available, otherwise fall back to original users
+  const displayUsers = searchedUsers.length > 0 ? searchedUsers : users;
 
   return (
     <>
@@ -147,7 +151,7 @@ export default function EventForm({
               onChange={(value: string) =>
                 setFormData((prev) => ({ ...prev, responsibleId: value }))
               }
-              options={(users || []).map((user) => ({
+              options={(displayUsers || []).map((user) => ({
                 value: user.id,
                 label: user.name,
               }))}
