@@ -235,16 +235,13 @@ export const useGalleryForm = (
               imageUrl = uploadedFileId;
             }
 
-            // Delete old image AFTER successful upload
+            // Delete old image IMMEDIATELY after successful upload
             if (oldFileId) {
-              setTimeout(() => {
-                deleteFile(oldFileId).catch((err) => {
-                  console.warn(
-                    "Failed to delete old image (non-critical):",
-                    err,
-                  );
-                });
-              }, 2000);
+              try {
+                await deleteFile(oldFileId);
+              } catch (err) {
+                console.warn("Failed to delete old image (non-critical):", err);
+              }
             }
           } else {
             // Clean up uploaded file if rename fails

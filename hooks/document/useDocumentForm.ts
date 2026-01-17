@@ -225,16 +225,16 @@ export function useDocumentForm({
               documentUrl = uploadedFileId;
             }
 
-            // Delete old document AFTER successful upload
+            // Delete old document IMMEDIATELY after successful upload
             if (oldFileId) {
-              setTimeout(() => {
-                deleteFile(oldFileId).catch((err) => {
-                  console.warn(
-                    "Failed to delete old document (non-critical):",
-                    err,
-                  );
-                });
-              }, 2000);
+              try {
+                await deleteFile(oldFileId);
+              } catch (err) {
+                console.warn(
+                  "Failed to delete old document (non-critical):",
+                  err,
+                );
+              }
             }
           } else {
             // Clean up uploaded file if rename fails

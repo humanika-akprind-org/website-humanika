@@ -277,16 +277,13 @@ export const useFinanceForm = ({
               throw new Error("Failed to set public access for proof");
             }
 
-            // Delete old proof AFTER successful upload
+            // Delete old proof IMMEDIATELY after successful upload
             if (oldFileId) {
-              setTimeout(() => {
-                deleteFile(oldFileId).catch((err) => {
-                  console.warn(
-                    "Failed to delete old proof (non-critical):",
-                    err,
-                  );
-                });
-              }, 2000);
+              try {
+                await deleteFile(oldFileId);
+              } catch (err) {
+                console.warn("Failed to delete old proof (non-critical):", err);
+              }
             }
           } else {
             // Clean up uploaded file if rename fails

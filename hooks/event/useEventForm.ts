@@ -280,16 +280,17 @@ export const useEventForm = (
               thumbnailUrl = uploadedFileId;
             }
 
-            // Delete old thumbnail AFTER successful upload
+            // Delete old thumbnail IMMEDIATELY after successful new upload
+            // This ensures the old file is removed when updating with a new thumbnail
             if (oldFileId) {
-              setTimeout(() => {
-                deleteFile(oldFileId).catch((err) => {
-                  console.warn(
-                    "Failed to delete old thumbnail (non-critical):",
-                    err,
-                  );
-                });
-              }, 2000);
+              try {
+                await deleteFile(oldFileId);
+              } catch (err) {
+                console.warn(
+                  "Failed to delete old thumbnail (non-critical):",
+                  err,
+                );
+              }
             }
           } else {
             // Clean up uploaded file if rename fails
@@ -302,7 +303,7 @@ export const useEventForm = (
           throw new Error("Failed to upload thumbnail");
         }
       } else if (removedThumbnail && oldFileId) {
-        // Delete old thumbnail if no new file uploaded
+        // Delete old thumbnail if no new file uploaded (user removed thumbnail)
         try {
           await deleteFile(oldFileId);
         } catch (deleteError) {

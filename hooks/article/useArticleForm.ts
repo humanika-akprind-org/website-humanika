@@ -243,16 +243,16 @@ export const useArticleForm = (
               thumbnailUrl = uploadedFileId;
             }
 
-            // Delete old thumbnail AFTER successful upload
+            // Delete old thumbnail IMMEDIATELY after successful upload
             if (oldFileId) {
-              setTimeout(() => {
-                deleteFile(oldFileId).catch((err) => {
-                  console.warn(
-                    "Failed to delete old thumbnail (non-critical):",
-                    err,
-                  );
-                });
-              }, 2000);
+              try {
+                await deleteFile(oldFileId);
+              } catch (err) {
+                console.warn(
+                  "Failed to delete old thumbnail (non-critical):",
+                  err,
+                );
+              }
             }
           } else {
             // Clean up uploaded file if rename fails

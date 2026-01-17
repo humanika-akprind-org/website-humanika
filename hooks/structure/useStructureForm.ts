@@ -152,13 +152,13 @@ export const useStructureForm = (
       console.warn("Failed to set public access for decree:", err);
     });
 
-    // Delete old decree AFTER successful upload and rename
+    // Delete old decree IMMEDIATELY after successful upload and rename
     if (oldFileId) {
-      setTimeout(() => {
-        deleteFile(oldFileId).catch((err) => {
-          console.warn("Failed to delete old decree (non-critical):", err);
-        });
-      }, 2000); // Delay to ensure new file is fully processed
+      try {
+        await deleteFile(oldFileId);
+      } catch (err) {
+        console.warn("Failed to delete old decree (non-critical):", err);
+      }
     }
 
     return { decreeUrl: uploadedFileId, error: null };
@@ -212,16 +212,16 @@ export const useStructureForm = (
       console.warn("Failed to set public access for structure image:", err);
     });
 
-    // Delete old structure image AFTER successful upload and rename
+    // Delete old structure image IMMEDIATELY after successful upload and rename
     if (oldFileId) {
-      setTimeout(() => {
-        deleteFile(oldFileId).catch((err) => {
-          console.warn(
-            "Failed to delete old structure image (non-critical):",
-            err,
-          );
-        });
-      }, 2000); // Delay to ensure new file is fully processed
+      try {
+        await deleteFile(oldFileId);
+      } catch (err) {
+        console.warn(
+          "Failed to delete old structure image (non-critical):",
+          err,
+        );
+      }
     }
 
     return { structureImageUrl: uploadedFileId, error: null };

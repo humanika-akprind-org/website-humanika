@@ -153,16 +153,13 @@ export const useManagementForm = (
             }
             photoUrl = uploadedFileId;
 
-            // Delete old photo AFTER successful upload
+            // Delete old photo IMMEDIATELY after successful upload
             if (oldFileId) {
-              setTimeout(() => {
-                deleteFile(oldFileId).catch((err) => {
-                  console.warn(
-                    "Failed to delete old photo (non-critical):",
-                    err,
-                  );
-                });
-              }, 2000);
+              try {
+                await deleteFile(oldFileId);
+              } catch (err) {
+                console.warn("Failed to delete old photo (non-critical):", err);
+              }
             }
           } else {
             // Clean up uploaded file if rename fails

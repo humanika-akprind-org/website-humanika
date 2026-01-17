@@ -210,18 +210,17 @@ export function useLetterForm({
             letterUrl = uploadedFileId;
           }
 
-          // Delete old letter after successful upload
-          if (
-            !removedLetter &&
-            letter?.letter &&
-            isGoogleDriveLetter(letter.letter)
-          ) {
-            const fileId = getFileIdFromLetter(letter.letter);
-            if (fileId) {
+          // Delete old letter IMMEDIATELY after successful upload
+          if (!removedLetter && letter?.letter) {
+            const oldFileId = getFileIdFromLetter(letter.letter);
+            if (oldFileId) {
               try {
-                await deleteFile(fileId);
-              } catch (deleteError) {
-                console.warn("Failed to delete old letter:", deleteError);
+                await deleteFile(oldFileId);
+              } catch (err) {
+                console.warn(
+                  "Failed to delete old letter (non-critical):",
+                  err,
+                );
               }
             }
           }
