@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { callApi } from "@/use-cases/api/google-drive";
-import { getAccessTokenAction } from "@/lib/actions/accessToken";
 
 export interface FileOwnerInfo {
   emailAddress?: string;
@@ -26,6 +25,8 @@ export function useFile(accessToken?: string): {
 } {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Use ref to track pending requests and prevent race conditions
+  const pendingRequests = useRef<Map<string, Promise<unknown>>>(new Map());
 
   const uploadFile = async (
     file: File,
@@ -271,49 +272,55 @@ export function useFile(accessToken?: string): {
     fileId: string,
     tokenParam?: string,
   ): Promise<FileOwnerInfo | null> => {
-    // Use provided token, or fetch it if not available
-    let token = tokenParam || accessToken;
-    if (!token) {
-      try {
-        token = await getAccessTokenAction();
-      } catch (err) {
-        console.error("Failed to fetch access token:", err);
-        setError("Access token is required for getting file details");
-        return null;
-      }
-    }
+    // Use provided token or the hook's access token
+    const token = tokenParam || accessToken;
 
-    // If still no token after fetching, return null
+    // Return null if no token - caller should handle this
     if (!token) {
-      setError("Access token is required for getting file details");
       return null;
     }
 
-    setIsLoading(true);
+    // Create a unique key for this request to deduplicate
+    const requestKey = `getFileDetails:${fileId}`;
+
+    // Check if there's already a pending request for this file
+    const existingRequest = pendingRequests.current.get(requestKey);
+    if (existingRequest) {
+      return existingRequest as Promise<FileOwnerInfo | null>;
+    }
+
     setError(null);
 
-    try {
-      const result = await callApi({
-        action: "get",
-        fileId,
-        accessToken: token,
-      });
+    const requestPromise = (async () => {
+      try {
+        const result = await callApi({
+          action: "get",
+          fileId,
+          accessToken: token,
+        });
 
-      if (result.success && result.file) {
-        const owners = result.file.owners || [];
-        const primaryOwner = owners[0];
-        return {
-          emailAddress: primaryOwner?.emailAddress,
-          displayName: primaryOwner?.displayName,
-        };
+        if (result.success && result.file) {
+          const owners = result.file.owners || [];
+          const primaryOwner = owners[0];
+          return {
+            emailAddress: primaryOwner?.emailAddress,
+            displayName: primaryOwner?.displayName,
+          } as FileOwnerInfo;
+        }
+        return null;
+      } catch (err) {
+        console.error("Get file details error:", err);
+        return null;
+      } finally {
+        // Remove from pending requests when done
+        pendingRequests.current.delete(requestKey);
       }
-      return null;
-    } catch (err) {
-      console.error("Get file details error:", err);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    })();
+
+    // Store the pending request
+    pendingRequests.current.set(requestKey, requestPromise);
+
+    return requestPromise;
   };
 
   return {

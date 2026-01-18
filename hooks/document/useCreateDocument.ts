@@ -5,14 +5,16 @@ import type {
   UpdateDocumentInput,
 } from "@/types/document";
 
-export function useCreateDocument() {
+export function useCreateDocument(
+  redirectPath: string = "/admin/administration/documents",
+) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, _setIsLoading] = useState(false);
 
   const createDocument = async (
-    data: CreateDocumentInput | UpdateDocumentInput
+    data: CreateDocumentInput | UpdateDocumentInput,
   ) => {
     setIsSubmitting(true);
     setError(null);
@@ -26,7 +28,7 @@ export function useCreateDocument() {
         }),
       });
       if (!response.ok) throw new Error("Failed to create document");
-      router.push("/admin/administration/documents");
+      router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -35,7 +37,7 @@ export function useCreateDocument() {
   };
 
   const createDocumentForApproval = async (
-    data: CreateDocumentInput | UpdateDocumentInput
+    data: CreateDocumentInput | UpdateDocumentInput,
   ) => {
     setIsSubmitting(true);
     setError(null);
@@ -52,7 +54,7 @@ export function useCreateDocument() {
         throw new Error("Failed to create document for approval");
       }
       // Assuming approval is handled in the API
-      router.push("/admin/administration/documents");
+      router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -61,7 +63,7 @@ export function useCreateDocument() {
   };
 
   const handleBack = () => {
-    router.push("/admin/administration/documents");
+    router.push(redirectPath);
   };
 
   return {
