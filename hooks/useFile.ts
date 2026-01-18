@@ -7,9 +7,10 @@ export function useFile(accessToken?: string): {
   uploadFile: (
     file: File,
     fileName: string,
-    folderId: string
+    folderId: string,
   ) => Promise<string | null>;
   deleteFile: (fileId: string) => Promise<boolean>;
+  trashFile: (fileId: string) => Promise<boolean>;
   renameFile: (fileId: string, newName: string) => Promise<boolean>;
   setPublicAccess: (fileId: string) => Promise<boolean>;
 } {
@@ -19,7 +20,7 @@ export function useFile(accessToken?: string): {
   const uploadFile = async (
     file: File,
     fileName: string,
-    folderId: string
+    folderId: string,
   ): Promise<string | null> => {
     if (!accessToken) {
       setError("Access token is required for file upload");
@@ -42,7 +43,7 @@ export function useFile(accessToken?: string): {
           action: "upload",
           accessToken,
         },
-        formData
+        formData,
       );
 
       if (result.success && result.file) {
@@ -54,7 +55,7 @@ export function useFile(accessToken?: string): {
     } catch (err) {
       console.error("Photo upload error:", err);
       setError(
-        err instanceof Error ? err.message : "Upload failed. Please try again."
+        err instanceof Error ? err.message : "Upload failed. Please try again.",
       );
       return null;
     } finally {
@@ -81,8 +82,64 @@ export function useFile(accessToken?: string): {
       return true;
     } catch (err) {
       console.error("Photo delete error:", err);
+
+      // If 403 error (not owner), try to trash instead
+      const statusCode =
+        typeof err === "object" && err !== null && "status" in err
+          ? (err as { status?: number }).status
+          : null;
+
+      if (statusCode === 403) {
+        console.log("Not file owner, trying to trash instead");
+
+        // Try to trash the file
+        try {
+          await callApi({
+            action: "trash",
+            fileId,
+            accessToken,
+          });
+          return true;
+        } catch (trashErr) {
+          console.error("Photo trash error:", trashErr);
+          setError(
+            trashErr instanceof Error
+              ? trashErr.message
+              : "Trash failed. Please try again.",
+          );
+          return false;
+        }
+      }
+
       setError(
-        err instanceof Error ? err.message : "Delete failed. Please try again."
+        err instanceof Error ? err.message : "Delete failed. Please try again.",
+      );
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const trashFile = async (fileId: string): Promise<boolean> => {
+    if (!accessToken) {
+      setError("Access token is required for file trash");
+      return false;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await callApi({
+        action: "trash",
+        fileId,
+        accessToken,
+      });
+      return true;
+    } catch (err) {
+      console.error("Photo trash error:", err);
+      setError(
+        err instanceof Error ? err.message : "Trash failed. Please try again.",
       );
       return false;
     } finally {
@@ -92,7 +149,7 @@ export function useFile(accessToken?: string): {
 
   const renameFile = async (
     fileId: string,
-    newName: string
+    newName: string,
   ): Promise<boolean> => {
     if (!accessToken) {
       setError("Access token is required for file rename");
@@ -113,7 +170,7 @@ export function useFile(accessToken?: string): {
     } catch (err) {
       console.error("Photo rename error:", err);
       setError(
-        err instanceof Error ? err.message : "Rename failed. Please try again."
+        err instanceof Error ? err.message : "Rename failed. Please try again.",
       );
       return false;
     } finally {
@@ -147,7 +204,7 @@ export function useFile(accessToken?: string): {
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to set public access. Please try again."
+          : "Failed to set public access. Please try again.",
       );
       return false;
     } finally {
@@ -160,6 +217,7 @@ export function useFile(accessToken?: string): {
     error,
     uploadFile,
     deleteFile,
+    trashFile,
     renameFile,
     setPublicAccess,
   };

@@ -223,6 +223,16 @@ export async function POST(request: NextRequest) {
         await drive.files.delete({ fileId });
         return NextResponse.json({ success: true });
 
+      case "trash":
+        if (!fileId) {
+          throw new Error("Missing file ID");
+        }
+        await drive.files.update({
+          fileId,
+          requestBody: { trashed: true },
+        });
+        return NextResponse.json({ success: true });
+
       case "getUrl":
         if (!fileId) {
           throw new Error("Missing file ID");
