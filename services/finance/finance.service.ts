@@ -123,7 +123,7 @@ export const getFinance = async (id: string) => {
 
 export const createFinance = async (
   data: CreateFinanceInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const financeData: Prisma.FinanceCreateInput = {
     name: data.name,
@@ -143,6 +143,10 @@ export const createFinance = async (
     financeData.workProgram = { connect: { id: data.workProgramId } };
   }
 
+  if (data.periodId) {
+    financeData.period = { connect: { id: data.periodId } };
+  }
+
   const finance = await prisma.finance.create({
     data: financeData,
     include: {
@@ -152,6 +156,7 @@ export const createFinance = async (
           name: true,
         },
       },
+      period: true,
       category: true,
       user: {
         select: {
@@ -218,7 +223,7 @@ export const createFinance = async (
 export const updateFinance = async (
   id: string,
   data: UpdateFinanceInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Check if finance exists
   const existingFinance = await prisma.finance.findUnique({
@@ -240,6 +245,9 @@ export const updateFinance = async (
   if (data.workProgramId !== undefined) {
     updateData.workProgramId = data.workProgramId;
   }
+  if (data.periodId !== undefined) {
+    updateData.periodId = data.periodId;
+  }
   if (data.proof !== undefined) updateData.proof = data.proof;
   if (data.status !== undefined) updateData.status = data.status;
 
@@ -253,6 +261,7 @@ export const updateFinance = async (
           name: true,
         },
       },
+      period: true,
       category: true,
       user: {
         select: {

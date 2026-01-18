@@ -136,7 +136,7 @@ export const getDocument = async (id: string) => {
 
 export const createDocument = async (
   data: CreateDocumentInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const documentData: Prisma.DocumentCreateInput = {
     name: data.name,
@@ -150,6 +150,11 @@ export const createDocument = async (
     documentData.letter = { connect: { id: data.letterId } };
   }
 
+  // Handle periodId
+  if (data.periodId) {
+    documentData.period = { connect: { id: data.periodId } };
+  }
+
   const document = await prisma.document.create({
     data: documentData,
     include: {
@@ -160,6 +165,7 @@ export const createDocument = async (
           email: true,
         },
       },
+      period: true,
       letter: {
         select: {
           id: true,
@@ -200,9 +206,9 @@ export const createDocument = async (
     "proposal"
       ? ApprovalType.DOCUMENT_PROPOSAL
       : document.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
-        "accountabilityreport"
-      ? ApprovalType.DOCUMENT_ACCOUNTABILITY_REPORT
-      : ApprovalType.DOCUMENT;
+          "accountabilityreport"
+        ? ApprovalType.DOCUMENT_ACCOUNTABILITY_REPORT
+        : ApprovalType.DOCUMENT;
 
   // Always create approval record with PENDING status
   await prisma.approval.create({
@@ -238,7 +244,7 @@ export const createDocument = async (
 export const updateDocument = async (
   id: string,
   data: UpdateDocumentInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Check if document exists with approval
   const existingDocument = await prisma.document.findUnique({
@@ -286,6 +292,11 @@ export const updateDocument = async (
   if (data.letterId !== undefined) updateData.letterId = data.letterId;
   if (data.documentTypeId) updateData.documentTypeId = data.documentTypeId;
   if (data.document !== undefined) updateData.document = data.document;
+  if (data.periodId !== undefined) {
+    updateData.period = data.periodId
+      ? { connect: { id: data.periodId } }
+      : { disconnect: true };
+  }
   if (data.status) updateData.status = data.status;
 
   // Handle status change to PENDING - create approval record
@@ -321,6 +332,7 @@ export const updateDocument = async (
           email: true,
         },
       },
+      period: true,
       letter: {
         select: {
           id: true,

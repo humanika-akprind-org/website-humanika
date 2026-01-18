@@ -59,7 +59,7 @@ export const getEvents = async (filter: {
     orConditions.push(
       { name: { contains: filter.search, mode: "insensitive" } },
       { description: { contains: filter.search, mode: "insensitive" } },
-      { goal: { contains: filter.search, mode: "insensitive" } }
+      { goal: { contains: filter.search, mode: "insensitive" } },
     );
   }
 
@@ -347,7 +347,7 @@ export const createEvent = async (data: CreateEventInput, user: UserWithId) => {
 export const updateEvent = async (
   id: string,
   data: UpdateEventInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Get existing event with approval
   const existingEvent = await prisma.event.findUnique({
@@ -367,6 +367,7 @@ export const updateEvent = async (
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/(^-|-$)/g, "")
       : undefined,
+    thumbnail: data.thumbnail,
     description: data.description,
     goal: data.goal,
     department: data.department,
@@ -387,6 +388,8 @@ export const updateEvent = async (
   // Check if there are changes to the event (excluding status)
   const hasChanges =
     (data.name !== undefined && data.name !== existingEvent.name) ||
+    (data.thumbnail !== undefined &&
+      data.thumbnail !== existingEvent.thumbnail) ||
     (data.description !== undefined &&
       data.description !== existingEvent.description) ||
     (data.goal !== undefined && data.goal !== existingEvent.goal) ||
@@ -482,12 +485,14 @@ export const updateEvent = async (
     metadata: {
       oldData: {
         name: existingEvent.name,
+        thumbnail: existingEvent.thumbnail,
         department: existingEvent.department,
         status: existingEvent.status,
         schedules: existingEvent.schedules,
       },
       newData: {
         name: event.name,
+        thumbnail: event.thumbnail,
         department: event.department,
         status: event.status,
         schedules: event.schedules,

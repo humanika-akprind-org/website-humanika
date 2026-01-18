@@ -1,14 +1,19 @@
 import GalleryForm from "@/components/admin/pages/gallery/Form";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
-import type { UpdateGalleryInput } from "@/types/gallery";
+import type { Gallery, UpdateGalleryInput } from "@/types/gallery";
 import type { Event } from "@/types/event";
 import type { Period } from "@/types/period";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth-server";
 import { redirect, notFound } from "next/navigation";
+import {
+  getGallery,
+  updateGallery,
+  getEventsForGalleryForm,
+  getPeriodsForForm,
+} from "@/services/gallery/gallery.service";
 
 async function EditGalleryPage({
   params,
@@ -20,37 +25,19 @@ async function EditGalleryPage({
 
   try {
     const [events, gallery, periods] = await Promise.all([
-      prisma.event.findMany({
-        include: {
-          period: true,
-          responsible: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              department: true,
-            },
-          },
-          workProgram: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.gallery.findUnique({
-        where: { id: id },
-      }),
-      prisma.period.findMany({
-        orderBy: { startYear: "desc" },
-      }),
+      getEventsForGalleryForm(),
+      getGallery(id),
+      getPeriodsForForm(),
     ]);
 
     if (!gallery) {
       notFound();
     }
+
+    // Cast to Gallery type to handle period null case
+    const galleryWithPeriod = gallery as unknown as Gallery & {
+      period?: Period | null;
+    };
 
     const handleSubmit = async (data: UpdateGalleryInput) => {
       "use server";
@@ -67,14 +54,19 @@ async function EditGalleryPage({
         throw new Error("Missing required fields");
       }
 
-      await prisma.gallery.update({
-        where: { id: (await params).id },
-        data: {
-          title: galleryData.title,
-          eventId: galleryData.eventId,
-          image: galleryData.image || "",
-        },
-      });
+      // Only update image if explicitly provided (new upload or removal)
+      const updateData: Record<string, unknown> = {
+        title: galleryData.title,
+        eventId: galleryData.eventId,
+        categoryId: galleryData.categoryId,
+        periodId: galleryData.periodId || null,
+      };
+
+      if (galleryData.image !== undefined) {
+        updateData.image = galleryData.image === null ? "" : galleryData.image;
+      }
+
+      await updateGallery(id, updateData as UpdateGalleryInput, user);
 
       redirect("/admin/content/galleries");
     };
@@ -93,7 +85,7 @@ async function EditGalleryPage({
             <h1 className="text-2xl font-bold text-gray-800">Edit Gallery</h1>
           </div>
           <GalleryForm
-            gallery={gallery}
+            gallery={galleryWithPeriod}
             accessToken={accessToken}
             events={events as unknown as Event[]}
             periods={periods as unknown as Period[]}

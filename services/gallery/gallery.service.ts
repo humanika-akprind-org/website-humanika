@@ -10,6 +10,7 @@ export type CreateGalleryInput = {
   title: string;
   eventId: string;
   categoryId?: string;
+  periodId?: string;
   image: string;
 };
 
@@ -17,6 +18,7 @@ export type UpdateGalleryInput = {
   title?: string;
   eventId?: string;
   categoryId?: string;
+  periodId?: string;
   image?: string;
 };
 
@@ -41,6 +43,7 @@ export const getGalleries = async (filter: {
     include: {
       event: true,
       category: true,
+      period: true,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -54,6 +57,7 @@ export const getGallery = async (id: string) => {
     include: {
       event: true,
       category: true,
+      period: true,
     },
   });
 
@@ -62,7 +66,7 @@ export const getGallery = async (id: string) => {
 
 export const createGallery = async (
   data: CreateGalleryInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const galleryData: Prisma.GalleryCreateInput = {
     title: data.title,
@@ -74,11 +78,16 @@ export const createGallery = async (
     galleryData.category = { connect: { id: data.categoryId } };
   }
 
+  if (data.periodId) {
+    galleryData.period = { connect: { id: data.periodId } };
+  }
+
   const gallery = await prisma.gallery.create({
     data: galleryData,
     include: {
       event: true,
       category: true,
+      period: true,
     },
   });
 
@@ -94,6 +103,7 @@ export const createGallery = async (
         title: gallery.title,
         eventId: gallery.eventId,
         categoryId: gallery.categoryId,
+        periodId: gallery.periodId,
         image: gallery.image,
       },
     },
@@ -105,7 +115,7 @@ export const createGallery = async (
 export const updateGallery = async (
   id: string,
   data: UpdateGalleryInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Check if gallery exists
   const existingGallery = await prisma.gallery.findUnique({
@@ -121,6 +131,7 @@ export const updateGallery = async (
   if (data.title !== undefined) updateData.title = data.title;
   if (data.eventId !== undefined) updateData.eventId = data.eventId;
   if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
+  if (data.periodId !== undefined) updateData.periodId = data.periodId;
   if (data.image !== undefined) updateData.image = data.image;
 
   const gallery = await prisma.gallery.update({
@@ -128,6 +139,8 @@ export const updateGallery = async (
     data: updateData,
     include: {
       event: true,
+      category: true,
+      period: true,
     },
   });
 
@@ -143,12 +156,14 @@ export const updateGallery = async (
         title: existingGallery.title,
         eventId: existingGallery.eventId,
         categoryId: existingGallery.categoryId,
+        periodId: existingGallery.periodId,
         image: existingGallery.image,
       },
       newData: {
         title: gallery.title,
         eventId: gallery.eventId,
         categoryId: gallery.categoryId,
+        periodId: gallery.periodId,
         image: gallery.image,
       },
     },
@@ -183,9 +198,38 @@ export const deleteGallery = async (id: string, user: UserWithId) => {
         title: existingGallery.title,
         eventId: existingGallery.eventId,
         categoryId: existingGallery.categoryId,
+        periodId: existingGallery.periodId,
         image: existingGallery.image,
       },
       newData: null,
     },
   });
 };
+
+// Helper functions for edit form
+export const getEventsForGalleryForm = async () =>
+  await prisma.event.findMany({
+    include: {
+      period: true,
+      responsible: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          department: true,
+        },
+      },
+      workProgram: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+export const getPeriodsForForm = async () =>
+  await prisma.period.findMany({
+    orderBy: { startYear: "desc" },
+  });
