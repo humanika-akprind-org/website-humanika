@@ -299,11 +299,18 @@ export function useLetterForm({
 
   // Function to get file owner when there's an existing letter
   const fetchFileOwner = useCallback(async () => {
+    // Wait for token to be available
+    const token = accessToken || fetchedAccessToken;
+    if (!token) {
+      // Token not yet available, will be fetched by useEffect when it becomes available
+      return;
+    }
+
     if (existingLetter && isGoogleDriveLetter(existingLetter)) {
       const fileId = getFileIdFromLetter(existingLetter);
       if (fileId) {
         try {
-          const ownerInfo = await getFileDetails(fileId);
+          const ownerInfo = await getFileDetails(fileId, token);
           if (ownerInfo?.emailAddress) {
             setOwnerEmail(ownerInfo.emailAddress);
           }
@@ -312,7 +319,7 @@ export function useLetterForm({
         }
       }
     }
-  }, [existingLetter, getFileDetails]);
+  }, [existingLetter, accessToken, fetchedAccessToken, getFileDetails]);
 
   // Fetch file owner on mount if there's an existing letter
   useEffect(() => {
@@ -320,6 +327,13 @@ export function useLetterForm({
       fetchFileOwner();
     }
   }, [existingLetter, fetchFileOwner]);
+
+  // Fetch file owner when token becomes available
+  useEffect(() => {
+    if (fetchedAccessToken && existingLetter) {
+      fetchFileOwner();
+    }
+  }, [fetchedAccessToken, fetchFileOwner, existingLetter]);
 
   // Helper function to get file ID from letter (either URL or file ID)
   const getFileIdFromLetter = (

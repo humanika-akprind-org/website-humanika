@@ -22,7 +22,7 @@ export default function AddDocumentPage() {
     isSubmitting,
     error,
     isLoading,
-  } = useCreateDocument();
+  } = useCreateDocument("/admin/administration/proposals");
 
   const {
     events,

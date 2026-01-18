@@ -32,7 +32,8 @@ export const getEvents = async (filter?: EventFilter): Promise<Event[]> => {
     throw new Error("Failed to fetch events");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData.data;
 };
 
 export const getEvent = async (id: string): Promise<Event> => {
@@ -102,7 +103,7 @@ export const createEvent = async (data: CreateEventInput): Promise<Event> => {
 
 export const updateEvent = async (
   id: string,
-  data: UpdateEventInput
+  data: UpdateEventInput,
 ): Promise<Event> => {
   const response = await fetch(`${API_URL}/event/${id}`, {
     method: "PUT",

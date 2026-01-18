@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type {
   OrganizationalStructure,
@@ -34,6 +34,7 @@ export const useStructureForm = (
     deleteFile,
     renameFile,
     setPublicAccess,
+    getFileDetails,
     isLoading: fileLoading,
     error: fileError,
   } = useFile(accessToken);
@@ -111,6 +112,54 @@ export const useStructureForm = (
       }
     }
   }, [fileError]);
+
+  // Function to get file owner when there's an existing file
+  const fetchFileOwner = useCallback(async () => {
+    // Wait for token to be available
+    if (!accessToken) {
+      return;
+    }
+
+    // Check decree file
+    if (existingDecree && existingDecree.includes("drive.google.com")) {
+      const fileId = getFileIdFromStructureImage(existingDecree);
+      if (fileId) {
+        try {
+          const ownerInfo = await getFileDetails(fileId, accessToken);
+          if (ownerInfo?.emailAddress) {
+            setOwnerEmail(ownerInfo.emailAddress);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch decree file owner:", err);
+        }
+      }
+    }
+
+    // Check structure image file
+    if (
+      existingStructureImage &&
+      existingStructureImage.includes("drive.google.com")
+    ) {
+      const fileId = getFileIdFromStructureImage(existingStructureImage);
+      if (fileId) {
+        try {
+          const ownerInfo = await getFileDetails(fileId, accessToken);
+          if (ownerInfo?.emailAddress) {
+            setOwnerEmail(ownerInfo.emailAddress);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch structure image owner:", err);
+        }
+      }
+    }
+  }, [existingDecree, existingStructureImage, accessToken, getFileDetails]);
+
+  // Fetch file owner when token becomes available
+  useEffect(() => {
+    if (accessToken && (existingDecree || existingStructureImage)) {
+      fetchFileOwner();
+    }
+  }, [accessToken, fetchFileOwner, existingDecree, existingStructureImage]);
 
   const removeDecree = () => {
     setFormData((prev) => ({ ...prev, decreeFile: undefined }));

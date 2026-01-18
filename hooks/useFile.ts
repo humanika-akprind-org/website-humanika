@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { callApi } from "@/use-cases/api/google-drive";
 
 export interface FileOwnerInfo {
@@ -18,10 +18,15 @@ export function useFile(accessToken?: string): {
   trashFile: (fileId: string) => Promise<boolean>;
   renameFile: (fileId: string, newName: string) => Promise<boolean>;
   setPublicAccess: (fileId: string) => Promise<boolean>;
-  getFileDetails: (fileId: string) => Promise<FileOwnerInfo | null>;
+  getFileDetails: (
+    fileId: string,
+    token?: string,
+  ) => Promise<FileOwnerInfo | null>;
 } {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Use ref to track pending requests and prevent race conditions
+  const pendingRequests = useRef<Map<string, Promise<unknown>>>(new Map());
 
   const uploadFile = async (
     file: File,
@@ -265,37 +270,57 @@ export function useFile(accessToken?: string): {
 
   const getFileDetails = async (
     fileId: string,
+    tokenParam?: string,
   ): Promise<FileOwnerInfo | null> => {
-    if (!accessToken) {
-      setError("Access token is required for getting file details");
+    // Use provided token or the hook's access token
+    const token = tokenParam || accessToken;
+
+    // Return null if no token - caller should handle this
+    if (!token) {
       return null;
     }
 
-    setIsLoading(true);
+    // Create a unique key for this request to deduplicate
+    const requestKey = `getFileDetails:${fileId}`;
+
+    // Check if there's already a pending request for this file
+    const existingRequest = pendingRequests.current.get(requestKey);
+    if (existingRequest) {
+      return existingRequest as Promise<FileOwnerInfo | null>;
+    }
+
     setError(null);
 
-    try {
-      const result = await callApi({
-        action: "get",
-        fileId,
-        accessToken,
-      });
+    const requestPromise = (async () => {
+      try {
+        const result = await callApi({
+          action: "get",
+          fileId,
+          accessToken: token,
+        });
 
-      if (result.success && result.file) {
-        const owners = result.file.owners || [];
-        const primaryOwner = owners[0];
-        return {
-          emailAddress: primaryOwner?.emailAddress,
-          displayName: primaryOwner?.displayName,
-        };
+        if (result.success && result.file) {
+          const owners = result.file.owners || [];
+          const primaryOwner = owners[0];
+          return {
+            emailAddress: primaryOwner?.emailAddress,
+            displayName: primaryOwner?.displayName,
+          } as FileOwnerInfo;
+        }
+        return null;
+      } catch (err) {
+        console.error("Get file details error:", err);
+        return null;
+      } finally {
+        // Remove from pending requests when done
+        pendingRequests.current.delete(requestKey);
       }
-      return null;
-    } catch (err) {
-      console.error("Get file details error:", err);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    })();
+
+    // Store the pending request
+    pendingRequests.current.set(requestKey, requestPromise);
+
+    return requestPromise;
   };
 
   return {

@@ -34,7 +34,8 @@ interface PhotoUploadProps {
   photoLoading: boolean;
   maxSize?: number; // in bytes, default 5MB
   accept?: string; // default "image/*"
-  helpText?: string;
+  helpText?: string; // default "Upload foto profil (max 5MB, format: JPG, PNG, GIF)"
+  loadingText?: string; // default "Mengupload foto..."
   alt?: string;
   showRemoveButton?: boolean;
   className?: string;
@@ -54,6 +55,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   maxSize = 5 * 1024 * 1024, // 5MB default
   accept = "image/*",
   helpText = "Upload foto profil (max 5MB, format: JPG, PNG, GIF)",
+  loadingText = "Mengupload foto...",
   alt = "Profile photo",
   showRemoveButton = true,
   className = "",
@@ -65,6 +67,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [sizeError, setSizeError] = useState<string | null>(null);
 
   // Function to handle cropped image upload
   const handleCroppedImageUpload = useCallback(
@@ -111,9 +114,13 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
     if (file) {
       // Validate file size
       if (file.size > maxSize) {
-        alert(`File size must be less than ${maxSize / (1024 * 1024)}MB`);
+        setSizeError(
+          `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`,
+        );
         return;
       }
+      // Clear size error when valid file is selected
+      setSizeError(null);
 
       // Validate file type
       if (!file.type.startsWith("image/")) {
@@ -140,7 +147,9 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
       <div
         className={cn(
           "flex items-start space-x-4 p-4 rounded-lg border-2 transition-colors",
-          error ? "border-red-300 bg-red-50" : "border-gray-200 bg-white",
+          error || sizeError
+            ? "border-red-300 bg-red-50"
+            : "border-gray-200 bg-white",
           className,
         )}
       >
@@ -245,18 +254,19 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
             className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             disabled={isLoading || photoLoading}
           />
-          <p className="text-sm text-gray-500 mt-1">{helpText}</p>
+          {helpText && <p className="text-sm text-gray-500 mt-1">{helpText}</p>}
           {photoLoading && (
-            <p className="text-sm text-blue-600 mt-1">Mengupload foto...</p>
-          )}
-          {ownerEmail && (
-            <p className="text-xs text-amber-600 mt-1">
-              Use email {ownerEmail} to edit this photo!
-            </p>
+            <p className="text-sm text-blue-600 mt-1">{loadingText}</p>
           )}
         </div>
       </div>
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {sizeError && <p className="text-red-500 text-xs mt-1">{sizeError}</p>}
+      {ownerEmail && (
+        <p className="text-amber-600 text-xs mt-1">
+          Use email {ownerEmail} to edit this photo!
+        </p>
+      )}
 
       {/* Crop Modal */}
       <ImageCropper

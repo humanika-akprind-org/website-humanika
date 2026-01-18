@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type {
   Document,
@@ -108,6 +108,8 @@ export function useDocumentForm({
   const [removedDocument, setRemovedDocument] = useState(false);
   const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Use ref to track if owner fetch is in progress to prevent race conditions
+  const ownerFetchInProgress = useRef<boolean>(false);
 
   useEffect(() => {
     if (fileError) {
@@ -338,27 +340,55 @@ export function useDocumentForm({
 
   // Function to get file owner when there's an existing document
   const fetchFileOwner = useCallback(async () => {
+    // Prevent concurrent fetches
+    if (ownerFetchInProgress.current) {
+      return;
+    }
+
+    // Wait for token to be available
+    const token = accessToken || fetchedAccessToken;
+    if (!token) {
+      // Token not yet available, will be fetched by useEffect when it becomes available
+      return;
+    }
+
     if (existingDocument && isGoogleDriveFile(existingDocument)) {
       const fileId = getFileIdFromFile(existingDocument);
       if (fileId) {
+        ownerFetchInProgress.current = true;
         try {
-          const ownerInfo = await getFileDetails(fileId);
+          const ownerInfo = await getFileDetails(fileId, token);
           if (ownerInfo?.emailAddress) {
             setOwnerEmail(ownerInfo.emailAddress);
           }
         } catch (err) {
           console.warn("Failed to fetch file owner:", err);
+        } finally {
+          ownerFetchInProgress.current = false;
         }
       }
     }
-  }, [existingDocument, getFileDetails]);
+  }, [existingDocument, accessToken, fetchedAccessToken, getFileDetails]);
 
   // Fetch file owner on mount if there's an existing document
   useEffect(() => {
-    if (existingDocument) {
+    // Only fetch if we haven't already fetched and have owner email
+    if (existingDocument && !ownerEmail && !ownerFetchInProgress.current) {
       fetchFileOwner();
     }
-  }, [existingDocument, fetchFileOwner]);
+  }, [existingDocument, ownerEmail, fetchFileOwner]);
+
+  // Fetch file owner when token becomes available
+  useEffect(() => {
+    if (
+      fetchedAccessToken &&
+      existingDocument &&
+      !ownerEmail &&
+      !ownerFetchInProgress.current
+    ) {
+      fetchFileOwner();
+    }
+  }, [fetchedAccessToken, existingDocument, ownerEmail, fetchFileOwner]);
 
   return {
     formData,

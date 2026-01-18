@@ -375,11 +375,18 @@ export const useEventForm = (
 
   // Function to get file owner when there's an existing thumbnail
   const fetchFileOwner = useCallback(async () => {
+    // Wait for token to be available
+    const token = accessToken || fetchedAccessToken;
+    if (!token) {
+      // Token not yet available, will be fetched by useEffect when it becomes available
+      return;
+    }
+
     if (existingThumbnail && isGoogleDriveThumbnail(existingThumbnail)) {
       const fileId = getFileIdFromThumbnail(existingThumbnail);
       if (fileId) {
         try {
-          const ownerInfo = await getFileDetails(fileId);
+          const ownerInfo = await getFileDetails(fileId, token);
           if (ownerInfo?.emailAddress) {
             setOwnerEmail(ownerInfo.emailAddress);
           }
@@ -388,7 +395,7 @@ export const useEventForm = (
         }
       }
     }
-  }, [existingThumbnail, getFileDetails]);
+  }, [existingThumbnail, accessToken, fetchedAccessToken, getFileDetails]);
 
   // Fetch file owner on mount if there's an existing thumbnail
   useEffect(() => {
@@ -396,6 +403,13 @@ export const useEventForm = (
       fetchFileOwner();
     }
   }, [existingThumbnail, fetchFileOwner]);
+
+  // Fetch file owner when token becomes available
+  useEffect(() => {
+    if (fetchedAccessToken && existingThumbnail) {
+      fetchFileOwner();
+    }
+  }, [fetchedAccessToken, fetchFileOwner, existingThumbnail]);
 
   // Search users function - fetches all matching users without pagination
   const searchUsers = async (query: string) => {

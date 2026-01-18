@@ -21,7 +21,7 @@ function extractEventQueryParams(request: NextRequest) {
 }
 
 async function extractCreateEventBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<CreateEventInput> {
   return await request.json();
 }
@@ -63,13 +63,20 @@ export async function GET(request: NextRequest) {
     // 3. Business logic
     const events = await getEvents(queryParams);
 
-    // 4. Response
-    return NextResponse.json(events);
+    // 4. Response - consistent format with period API
+    return NextResponse.json({
+      success: true,
+      data: events,
+    });
   } catch (error) {
     console.error("Error fetching events:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      {
+        success: false,
+        error: "Failed to fetch events",
+        message: (error as Error).message,
+      },
+      { status: 500 },
     );
   }
 }
@@ -99,7 +106,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating event:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

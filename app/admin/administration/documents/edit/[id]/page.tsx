@@ -50,7 +50,7 @@ export default function EditDocumentPage() {
           letters={letters}
           periods={periods}
           loading={combinedLoading}
-          isEditing={false}
+          isEditing={true}
         />
       ) : null}
     </div>

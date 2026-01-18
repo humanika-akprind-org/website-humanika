@@ -116,7 +116,11 @@ export function useDocumentManagement(
   };
 
   const handleEditDocument = (id: string) => {
-    router.push(editPath || `/admin/administration/documents/edit/${id}`);
+    if (editPath) {
+      router.push(editPath.replace("{id}", id));
+    } else {
+      router.push(`/admin/administration/documents/edit/${id}`);
+    }
   };
 
   const handleViewDocument = (document: Document) => {
