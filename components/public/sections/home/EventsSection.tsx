@@ -20,7 +20,7 @@ import CardSkeleton from "@/components/public/ui/skeleton/CardSkeleton";
 
 // Helper function to get the earliest schedule date from an event
 function getEarliestScheduleDate(
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): Date | null {
   if (!schedules || schedules.length === 0) return null;
   const dates = schedules.map((s) => new Date(s.date).getTime());
@@ -29,7 +29,7 @@ function getEarliestScheduleDate(
 
 // Helper function to get the time from the earliest schedule
 function getEarliestScheduleTime(
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): string {
   const earliest = getEarliestScheduleDate(schedules);
   if (!earliest) return "";
@@ -52,7 +52,8 @@ export default function EventsSection() {
         const res = await fetch("/api/event?status=PUBLISH", {
           cache: "no-store",
         });
-        const events: Event[] = await res.json();
+        const response = await res.json();
+        const events: Event[] = response.data || [];
         setAllEvents(events);
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -77,8 +78,8 @@ export default function EventsSection() {
     "all",
     ...Array.from(
       new Set(
-        allEvents.map((e) => e.department?.toString().toLowerCase() || "other")
-      )
+        allEvents.map((e) => e.department?.toString().toLowerCase() || "other"),
+      ),
     ),
   ];
 
@@ -88,7 +89,7 @@ export default function EventsSection() {
       ? upcomingEvents
       : upcomingEvents.filter(
           (event) =>
-            event.department?.toString().toLowerCase() === selectedCategory
+            event.department?.toString().toLowerCase() === selectedCategory,
         );
 
   // Sort by date (nearest first) - using earliest schedule date
@@ -260,7 +261,7 @@ export default function EventsSection() {
                 <div className="space-y-6">
                   {sortedEvents.slice(0, 4).map((event, index) => {
                     const earliestDate = getEarliestScheduleDate(
-                      event.schedules
+                      event.schedules,
                     );
                     return (
                       <motion.div
@@ -316,7 +317,7 @@ export default function EventsSection() {
                                     {event.description.length > 200
                                       ? `${event.description.substring(
                                           0,
-                                          200
+                                          200,
                                         )}...`
                                       : event.description}
                                   </p>
