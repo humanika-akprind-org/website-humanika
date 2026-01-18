@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { callApi } from "@/use-cases/api/google-drive";
+import { getAccessTokenAction } from "@/lib/actions/accessToken";
 
 export interface FileOwnerInfo {
   emailAddress?: string;
@@ -18,7 +19,10 @@ export function useFile(accessToken?: string): {
   trashFile: (fileId: string) => Promise<boolean>;
   renameFile: (fileId: string, newName: string) => Promise<boolean>;
   setPublicAccess: (fileId: string) => Promise<boolean>;
-  getFileDetails: (fileId: string) => Promise<FileOwnerInfo | null>;
+  getFileDetails: (
+    fileId: string,
+    token?: string,
+  ) => Promise<FileOwnerInfo | null>;
 } {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -265,8 +269,22 @@ export function useFile(accessToken?: string): {
 
   const getFileDetails = async (
     fileId: string,
+    tokenParam?: string,
   ): Promise<FileOwnerInfo | null> => {
-    if (!accessToken) {
+    // Use provided token, or fetch it if not available
+    let token = tokenParam || accessToken;
+    if (!token) {
+      try {
+        token = await getAccessTokenAction();
+      } catch (err) {
+        console.error("Failed to fetch access token:", err);
+        setError("Access token is required for getting file details");
+        return null;
+      }
+    }
+
+    // If still no token after fetching, return null
+    if (!token) {
       setError("Access token is required for getting file details");
       return null;
     }
@@ -278,7 +296,7 @@ export function useFile(accessToken?: string): {
       const result = await callApi({
         action: "get",
         fileId,
-        accessToken,
+        accessToken: token,
       });
 
       if (result.success && result.file) {

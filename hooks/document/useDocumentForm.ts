@@ -338,11 +338,18 @@ export function useDocumentForm({
 
   // Function to get file owner when there's an existing document
   const fetchFileOwner = useCallback(async () => {
+    // Wait for token to be available
+    const token = accessToken || fetchedAccessToken;
+    if (!token) {
+      // Token not yet available, will be fetched by useEffect when it becomes available
+      return;
+    }
+
     if (existingDocument && isGoogleDriveFile(existingDocument)) {
       const fileId = getFileIdFromFile(existingDocument);
       if (fileId) {
         try {
-          const ownerInfo = await getFileDetails(fileId);
+          const ownerInfo = await getFileDetails(fileId, token);
           if (ownerInfo?.emailAddress) {
             setOwnerEmail(ownerInfo.emailAddress);
           }
@@ -351,7 +358,7 @@ export function useDocumentForm({
         }
       }
     }
-  }, [existingDocument, getFileDetails]);
+  }, [existingDocument, accessToken, fetchedAccessToken, getFileDetails]);
 
   // Fetch file owner on mount if there's an existing document
   useEffect(() => {
@@ -359,6 +366,13 @@ export function useDocumentForm({
       fetchFileOwner();
     }
   }, [existingDocument, fetchFileOwner]);
+
+  // Fetch file owner when token becomes available
+  useEffect(() => {
+    if (fetchedAccessToken && existingDocument) {
+      fetchFileOwner();
+    }
+  }, [fetchedAccessToken, fetchFileOwner, existingDocument]);
 
   return {
     formData,

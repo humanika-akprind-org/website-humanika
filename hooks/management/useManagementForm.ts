@@ -119,11 +119,17 @@ export const useManagementForm = (
 
   // Function to fetch file owner when there's an existing photo
   const fetchFileOwner = useCallback(async () => {
+    // Wait for token to be available
+    if (!accessToken) {
+      // Token not yet available, will be fetched by useEffect when it becomes available
+      return;
+    }
+
     if (existingPhoto && isGoogleDrivePhoto(existingPhoto)) {
       const fileId = getFileIdFromPhoto(existingPhoto);
       if (fileId) {
         try {
-          const ownerInfo = await getFileDetails(fileId);
+          const ownerInfo = await getFileDetails(fileId, accessToken);
           if (ownerInfo?.emailAddress) {
             setOwnerEmail(ownerInfo.emailAddress);
           }
@@ -132,7 +138,7 @@ export const useManagementForm = (
         }
       }
     }
-  }, [existingPhoto, getFileDetails]);
+  }, [existingPhoto, accessToken, getFileDetails]);
 
   // Fetch file owner on mount if there's an existing photo
   useEffect(() => {
@@ -140,6 +146,13 @@ export const useManagementForm = (
       fetchFileOwner();
     }
   }, [existingPhoto, fetchFileOwner]);
+
+  // Fetch file owner when token becomes available
+  useEffect(() => {
+    if (accessToken && existingPhoto) {
+      fetchFileOwner();
+    }
+  }, [accessToken, existingPhoto, fetchFileOwner]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

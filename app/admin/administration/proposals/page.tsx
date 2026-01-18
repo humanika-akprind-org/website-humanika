@@ -53,7 +53,7 @@ export default function ProposalsPage() {
     confirmDelete,
   } = useDocumentManagement({
     addPath: "/admin/administration/proposals/add",
-    editPath: "/admin/administration/proposals/edit",
+    editPath: "/admin/administration/proposals/edit/{id}",
   });
 
   const alert: { type: AlertType; message: string } | null = error

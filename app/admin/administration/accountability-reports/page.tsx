@@ -53,7 +53,7 @@ export default function AccountabilityReportsPage() {
     confirmDelete,
   } = useDocumentManagement({
     addPath: "/admin/administration/accountability-reports/add",
-    editPath: "/admin/administration/accountability-reports/edit",
+    editPath: "/admin/administration/accountability-reports/edit/{id}",
   });
 
   const alert: { type: AlertType; message: string } | null = error

@@ -139,11 +139,18 @@ export const useGalleryForm = (
 
   // Function to get file owner when there's an existing image
   const fetchFileOwner = useCallback(async () => {
+    // Wait for token to be available
+    const token = accessToken || fetchedAccessToken;
+    if (!token) {
+      // Token not yet available, will be fetched by useEffect when it becomes available
+      return;
+    }
+
     if (existingImage && isGoogleDriveImage(existingImage)) {
       const fileId = getFileIdFromImage(existingImage);
       if (fileId) {
         try {
-          const ownerInfo = await getFileDetails(fileId);
+          const ownerInfo = await getFileDetails(fileId, token);
           if (ownerInfo?.emailAddress) {
             setOwnerEmail(ownerInfo.emailAddress);
           }
@@ -152,7 +159,7 @@ export const useGalleryForm = (
         }
       }
     }
-  }, [existingImage, getFileDetails]);
+  }, [existingImage, accessToken, fetchedAccessToken, getFileDetails]);
 
   // Fetch file owner on mount if there's an existing image
   useEffect(() => {
@@ -160,6 +167,13 @@ export const useGalleryForm = (
       fetchFileOwner();
     }
   }, [existingImage, fetchFileOwner]);
+
+  // Fetch file owner when token becomes available
+  useEffect(() => {
+    if (fetchedAccessToken && existingImage) {
+      fetchFileOwner();
+    }
+  }, [fetchedAccessToken, fetchFileOwner, existingImage]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
