@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type {
   Event,
   CreateEventInput,
@@ -93,6 +93,7 @@ export const useEventForm = (
     deleteFile,
     renameFile,
     setPublicAccess,
+    getFileDetails,
     isLoading: photoLoading,
     error: photoError,
   } = useFile(accessToken || fetchedAccessToken);
@@ -145,6 +146,7 @@ export const useEventForm = (
     string | null | undefined
   >(event?.thumbnail);
   const [removedThumbnail, setRemovedThumbnail] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
 
   // Initialize preview URL
   useEffect(() => {
@@ -158,6 +160,17 @@ export const useEventForm = (
   useEffect(() => {
     if (photoError) {
       setError(photoError);
+      // Check if it's a 403 error with owner email info
+      if (
+        photoError.includes("permission") ||
+        photoError.includes("Use email")
+      ) {
+        // Extract email from error message if present
+        const emailMatch = photoError.match(/Use email\s+(.+?)\s+to/);
+        if (emailMatch && emailMatch[1]) {
+          setOwnerEmail(emailMatch[1]);
+        }
+      }
     }
   }, [photoError]);
 
@@ -252,6 +265,7 @@ export const useEventForm = (
 
     setIsSubmitting(true);
     setError(null);
+    setOwnerEmail(null);
     console.log("Starting form submission");
 
     try {
@@ -264,6 +278,37 @@ export const useEventForm = (
         isGoogleDriveThumbnail(event.thumbnail)
           ? getFileIdFromThumbnail(event.thumbnail)
           : null;
+
+      // If user wants to remove the old thumbnail or replace it, check ownership first
+      if ((removedThumbnail || formData.thumbnailFile) && oldFileId) {
+        // Try to delete the old file first to check ownership
+        try {
+          await deleteFile(oldFileId);
+        } catch (err) {
+          // Check if it's a 403 error (not owner or insufficient permissions)
+          const errorMsg = err instanceof Error ? err.message : String(err);
+          const isPermissionError =
+            errorMsg.toLowerCase().includes("insufficient permissions") ||
+            errorMsg.toLowerCase().includes("permission") ||
+            errorMsg.includes("Use email");
+
+          if (isPermissionError) {
+            // Extract owner email from error object first, then from message
+            const errWithOwner = err as Error & { ownerEmail?: string };
+            const extractedEmail =
+              errWithOwner.ownerEmail ||
+              errorMsg.match(/Use email\s+(.+?)\s+to/)?.[1];
+            setOwnerEmail(extractedEmail || null);
+            throw new Error(
+              extractedEmail
+                ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this thumbnail.`
+                : errorMsg,
+            );
+          }
+          // For other errors, log but continue (non-critical)
+          console.warn("Failed to delete old thumbnail:", err);
+        }
+      }
 
       if (removedThumbnail) {
         thumbnailUrl = null;
@@ -291,19 +336,6 @@ export const useEventForm = (
               console.warn("Failed to set public access for thumbnail");
               thumbnailUrl = uploadedFileId;
             }
-
-            // Delete old thumbnail IMMEDIATELY after successful new upload
-            // This ensures the old file is removed when updating with a new thumbnail
-            if (oldFileId) {
-              try {
-                await deleteFile(oldFileId);
-              } catch (err) {
-                console.warn(
-                  "Failed to delete old thumbnail (non-critical):",
-                  err,
-                );
-              }
-            }
           } else {
             // Clean up uploaded file if rename fails
             await deleteFile(uploadedFileId).catch((err) => {
@@ -313,13 +345,6 @@ export const useEventForm = (
           }
         } else {
           throw new Error("Failed to upload thumbnail");
-        }
-      } else if (removedThumbnail && oldFileId) {
-        // Delete old thumbnail if no new file uploaded (user removed thumbnail)
-        try {
-          await deleteFile(oldFileId);
-        } catch (deleteError) {
-          console.warn("Failed to delete thumbnail:", deleteError);
         }
       }
 
@@ -347,6 +372,30 @@ export const useEventForm = (
       setIsSubmitting(false);
     }
   };
+
+  // Function to get file owner when there's an existing thumbnail
+  const fetchFileOwner = useCallback(async () => {
+    if (existingThumbnail && isGoogleDriveThumbnail(existingThumbnail)) {
+      const fileId = getFileIdFromThumbnail(existingThumbnail);
+      if (fileId) {
+        try {
+          const ownerInfo = await getFileDetails(fileId);
+          if (ownerInfo?.emailAddress) {
+            setOwnerEmail(ownerInfo.emailAddress);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch file owner:", err);
+        }
+      }
+    }
+  }, [existingThumbnail, getFileDetails]);
+
+  // Fetch file owner on mount if there's an existing thumbnail
+  useEffect(() => {
+    if (existingThumbnail) {
+      fetchFileOwner();
+    }
+  }, [existingThumbnail, fetchFileOwner]);
 
   // Search users function - fetches all matching users without pagination
   const searchUsers = async (query: string) => {
@@ -408,6 +457,7 @@ export const useEventForm = (
     previewUrl,
     existingThumbnail,
     removedThumbnail,
+    ownerEmail,
     workPrograms,
     workProgramsLoading,
     eventCategories,

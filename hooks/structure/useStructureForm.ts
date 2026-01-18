@@ -73,6 +73,7 @@ export const useStructureForm = (
   >(structure?.structure);
   const [removedDecree, setRemovedDecree] = useState(false);
   const [removedStructureImage, setRemovedStructureImage] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
 
   // Fetch access token
   useEffect(() => {
@@ -100,6 +101,14 @@ export const useStructureForm = (
   useEffect(() => {
     if (fileError) {
       setError(fileError);
+      // Check if it's a 403 error with owner email info
+      if (fileError.includes("permission") || fileError.includes("Use email")) {
+        // Extract email from error message if present
+        const emailMatch = fileError.match(/Use email\s+(.+?)\s+to/);
+        if (emailMatch && emailMatch[1]) {
+          setOwnerEmail(emailMatch[1]);
+        }
+      }
     }
   }, [fileError]);
 
@@ -116,6 +125,36 @@ export const useStructureForm = (
     setRemovedStructureImage(true);
   };
 
+  // Helper function to check file ownership and handle 403 errors
+  const checkFileOwnership = async (fileId: string): Promise<boolean> => {
+    try {
+      await deleteFile(fileId);
+      return true;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      const isPermissionError =
+        errorMsg.toLowerCase().includes("insufficient permissions") ||
+        errorMsg.toLowerCase().includes("permission") ||
+        errorMsg.includes("Use email");
+
+      if (isPermissionError) {
+        const errWithOwner = err as Error & { ownerEmail?: string };
+        const extractedEmail =
+          errWithOwner.ownerEmail ||
+          errorMsg.match(/Use email\s+(.+?)\s+to/)?.[1];
+        setOwnerEmail(extractedEmail || null);
+        throw new Error(
+          extractedEmail
+            ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this file.`
+            : errorMsg,
+        );
+      }
+      // For other errors, assume we can proceed (non-critical)
+      console.warn("Failed to check file ownership:", err);
+      return true;
+    }
+  };
+
   // Helper function to process decree file upload
   const processDecreeUpload = async (): Promise<{
     decreeUrl: string | null | undefined;
@@ -130,6 +169,15 @@ export const useStructureForm = (
       !removedDecree && structure?.decree
         ? getFileIdFromStructureImage(structure.decree)
         : null;
+
+    // Check ownership if old file exists
+    if (oldFileId) {
+      try {
+        await checkFileOwnership(oldFileId);
+      } catch (err) {
+        return { decreeUrl: null, error: err as Error };
+      }
+    }
 
     const tempFileName = `temp_decree_${Date.now()}`;
     const uploadedFileId = await uploadFile(
@@ -158,15 +206,6 @@ export const useStructureForm = (
       console.warn("Failed to set public access for decree:", err);
     });
 
-    // Delete old decree IMMEDIATELY after successful upload and rename
-    if (oldFileId) {
-      try {
-        await deleteFile(oldFileId);
-      } catch (err) {
-        console.warn("Failed to delete old decree (non-critical):", err);
-      }
-    }
-
     return { decreeUrl: uploadedFileId, error: null };
   };
 
@@ -184,6 +223,15 @@ export const useStructureForm = (
       !removedStructureImage && structure?.structure
         ? getFileIdFromStructureImage(structure.structure)
         : null;
+
+    // Check ownership if old file exists
+    if (oldFileId) {
+      try {
+        await checkFileOwnership(oldFileId);
+      } catch (err) {
+        return { structureImageUrl: null, error: err as Error };
+      }
+    }
 
     const tempFileName = `temp_structure_${Date.now()}`;
     const uploadedFileId = await uploadFile(
@@ -218,18 +266,6 @@ export const useStructureForm = (
       console.warn("Failed to set public access for structure image:", err);
     });
 
-    // Delete old structure image IMMEDIATELY after successful upload and rename
-    if (oldFileId) {
-      try {
-        await deleteFile(oldFileId);
-      } catch (err) {
-        console.warn(
-          "Failed to delete old structure image (non-critical):",
-          err,
-        );
-      }
-    }
-
     return { structureImageUrl: uploadedFileId, error: null };
   };
 
@@ -238,6 +274,7 @@ export const useStructureForm = (
     setIsLoading(true);
     setAlert(null);
     setErrors({});
+    setOwnerEmail(null);
 
     try {
       // Validate required fields
@@ -455,6 +492,7 @@ export const useStructureForm = (
     existingStructureImage,
     removedDecree,
     removedStructureImage,
+    ownerEmail,
     fileLoading,
     removeDecree,
     removeStructureImage,

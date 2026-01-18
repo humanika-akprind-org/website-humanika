@@ -48,6 +48,7 @@ export default function GalleryForm({
     categoriesLoading,
     photoLoading,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeImage,
@@ -152,6 +153,7 @@ export default function GalleryForm({
                 alt={formData.title || "Gallery image"}
                 required
                 error={errors.image}
+                ownerEmail={ownerEmail || undefined}
               />
             </div>
           </div>

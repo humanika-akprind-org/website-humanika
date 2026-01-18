@@ -50,6 +50,7 @@ export default function EventForm({
     eventCategories,
     photoLoading,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeThumbnail,
@@ -216,6 +217,7 @@ export default function EventForm({
                 photoLoading={photoLoading}
                 alt={formData.name || "Event thumbnail"}
                 error={errors.thumbnail}
+                ownerEmail={ownerEmail || undefined}
               />
             </div>
           </div>

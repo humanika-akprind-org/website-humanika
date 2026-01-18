@@ -29,6 +29,7 @@ interface ImageUploadProps {
   loadingText?: string;
   required?: boolean;
   error?: string;
+  ownerEmail?: string;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -49,6 +50,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   loadingText = "Mengupload thumbnail...",
   required = false,
   error,
+  ownerEmail,
 }) => {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
@@ -279,6 +281,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           </div>
         </div>
         {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+
+        {/* Owner email alert */}
+        {ownerEmail && (
+          <p className="text-amber-600 text-xs mt-1">
+            Use email {ownerEmail} to edit this thumbnail!
+          </p>
+        )}
 
         {/* Crop Modal */}
         <ImageCropper

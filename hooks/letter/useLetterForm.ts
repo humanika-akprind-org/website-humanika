@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type {
   Letter,
@@ -41,6 +41,7 @@ export function useLetterForm({
     deleteFile,
     renameFile,
     setPublicAccess,
+    getFileDetails,
     isLoading: fileLoading,
     error: fileError,
   } = useFile(accessToken || fetchedAccessToken);
@@ -86,11 +87,20 @@ export function useLetterForm({
     string | null | undefined
   >(letter?.letter);
   const [removedLetter, setRemovedLetter] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (fileError) {
       setError(fileError);
+      // Check if it's a 403 error with owner email info
+      if (fileError.includes("permission") || fileError.includes("Use email")) {
+        // Extract email from error message if present
+        const emailMatch = fileError.match(/Use email\s+(.+?)\s+to/);
+        if (emailMatch && emailMatch[1]) {
+          setOwnerEmail(emailMatch[1]);
+        }
+      }
     }
   }, [fileError]);
 
@@ -141,6 +151,7 @@ export function useLetterForm({
     e.preventDefault();
     setIsLoadingState(true);
     setError(null);
+    setOwnerEmail(null);
 
     try {
       // Validate required fields
@@ -170,17 +181,44 @@ export function useLetterForm({
       // Handle letter deletion if marked for removal
       let letterUrl: string | null | undefined = existingLetter;
 
-      if (removedLetter) {
-        if (letter?.letter && isGoogleDriveLetter(letter.letter)) {
-          const fileId = getFileIdFromLetter(letter.letter);
-          if (fileId) {
-            try {
-              await deleteFile(fileId);
-            } catch (deleteError) {
-              console.warn("Failed to delete letter:", deleteError);
-            }
+      // Store old file ID for deletion after successful upload
+      const oldFileId =
+        !removedLetter && letter?.letter && isGoogleDriveLetter(letter.letter)
+          ? getFileIdFromLetter(letter.letter)
+          : null;
+
+      // If user wants to remove the old letter or replace it, check ownership first
+      if ((removedLetter || formData.letterFile) && oldFileId) {
+        // Try to delete the old file first to check ownership
+        try {
+          await deleteFile(oldFileId);
+        } catch (err) {
+          // Check if it's a 403 error (not owner or insufficient permissions)
+          const errorMsg = err instanceof Error ? err.message : String(err);
+          const isPermissionError =
+            errorMsg.toLowerCase().includes("insufficient permissions") ||
+            errorMsg.toLowerCase().includes("permission") ||
+            errorMsg.includes("Use email");
+
+          if (isPermissionError) {
+            // Extract owner email from error object first, then from message
+            const errWithOwner = err as Error & { ownerEmail?: string };
+            const extractedEmail =
+              errWithOwner.ownerEmail ||
+              errorMsg.match(/Use email\s+(.+?)\s+to/)?.[1];
+            setOwnerEmail(extractedEmail || null);
+            throw new Error(
+              extractedEmail
+                ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this letter.`
+                : errorMsg,
+            );
           }
+          // For other errors, log but continue (non-critical)
+          console.warn("Failed to delete old letter:", err);
         }
+      }
+
+      if (removedLetter) {
         letterUrl = null;
       }
 
@@ -212,21 +250,6 @@ export function useLetterForm({
             console.warn("Failed to rename letter");
             // Continue with submission even if rename fails
             letterUrl = uploadedFileId;
-          }
-
-          // Delete old letter IMMEDIATELY after successful upload
-          if (!removedLetter && letter?.letter) {
-            const oldFileId = getFileIdFromLetter(letter.letter);
-            if (oldFileId) {
-              try {
-                await deleteFile(oldFileId);
-              } catch (err) {
-                console.warn(
-                  "Failed to delete old letter (non-critical):",
-                  err,
-                );
-              }
-            }
           }
         } else {
           throw new Error("Failed to upload letter");
@@ -274,6 +297,30 @@ export function useLetterForm({
     }
   };
 
+  // Function to get file owner when there's an existing letter
+  const fetchFileOwner = useCallback(async () => {
+    if (existingLetter && isGoogleDriveLetter(existingLetter)) {
+      const fileId = getFileIdFromLetter(existingLetter);
+      if (fileId) {
+        try {
+          const ownerInfo = await getFileDetails(fileId);
+          if (ownerInfo?.emailAddress) {
+            setOwnerEmail(ownerInfo.emailAddress);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch file owner:", err);
+        }
+      }
+    }
+  }, [existingLetter, getFileDetails]);
+
+  // Fetch file owner on mount if there's an existing letter
+  useEffect(() => {
+    if (existingLetter) {
+      fetchFileOwner();
+    }
+  }, [existingLetter, fetchFileOwner]);
+
   // Helper function to get file ID from letter (either URL or file ID)
   const getFileIdFromLetter = (
     ltr: string | null | undefined,
@@ -294,6 +341,7 @@ export function useLetterForm({
     isLoadingState,
     error,
     existingLetter,
+    ownerEmail,
     fileLoading,
     errors,
     accessToken: accessToken || fetchedAccessToken,

@@ -44,6 +44,7 @@ export default function StructureForm({
     existingStructureImage,
     fileLoading,
     errors,
+    ownerEmail,
     removeDecree,
     removeStructureImage,
     handleSubmit,
@@ -113,6 +114,7 @@ export default function StructureForm({
           removeButtonText="Hapus File"
           required
           error={errors.decreeFile}
+          ownerEmail={ownerEmail || undefined}
         />
 
         {/* Structure Image Upload */}
@@ -137,6 +139,7 @@ export default function StructureForm({
           removeButtonText="Remove Image"
           loadingText="Uploading image..."
           error={errors.structureImage}
+          ownerEmail={ownerEmail || undefined}
         />
 
         <div className="flex justify-end space-x-3 pt-4">

@@ -47,6 +47,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
     isLoading,
     previewUrl,
     existingPhoto,
+    ownerEmail,
     photoLoading,
     errors,
     removePhoto,
@@ -158,6 +159,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
           photoLoading={photoLoading}
           alt={management?.user?.name || "Management"}
           error={errors.photo}
+          ownerEmail={ownerEmail || undefined}
         />
 
         <div className="flex justify-end space-x-3 pt-4">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type {
   Document,
@@ -60,6 +60,7 @@ export function useDocumentForm({
     deleteFile,
     renameFile,
     setPublicAccess,
+    getFileDetails,
     isLoading: fileLoading,
     error: fileError,
   } = useFile(accessToken || fetchedAccessToken);
@@ -105,11 +106,20 @@ export function useDocumentForm({
     string | null | undefined
   >(document?.document);
   const [removedDocument, setRemovedDocument] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (fileError) {
       setError(fileError);
+      // Check if it's a 403 error with owner email info
+      if (fileError.includes("permission") || fileError.includes("Use email")) {
+        // Extract email from error message if present
+        const emailMatch = fileError.match(/Use email\s+(.+?)\s+to/);
+        if (emailMatch && emailMatch[1]) {
+          setOwnerEmail(emailMatch[1]);
+        }
+      }
     }
   }, [fileError]);
 
@@ -158,6 +168,7 @@ export function useDocumentForm({
     e.preventDefault();
     setIsLoadingState(true);
     setError(null);
+    setOwnerEmail(null);
 
     // Validate required fields
     const newErrors: Record<string, string> = {};
@@ -193,6 +204,37 @@ export function useDocumentForm({
           ? getFileIdFromFile(document.document)
           : null;
 
+      // If user wants to remove the old document or replace it, check ownership first
+      if ((removedDocument || formData.documentFile) && oldFileId) {
+        // Try to delete the old file first to check ownership
+        try {
+          await deleteFile(oldFileId);
+        } catch (err) {
+          // Check if it's a 403 error (not owner or insufficient permissions)
+          const errorMsg = err instanceof Error ? err.message : String(err);
+          const isPermissionError =
+            errorMsg.toLowerCase().includes("insufficient permissions") ||
+            errorMsg.toLowerCase().includes("permission") ||
+            errorMsg.includes("Use email");
+
+          if (isPermissionError) {
+            // Extract owner email from error object first, then from message
+            const errWithOwner = err as Error & { ownerEmail?: string };
+            const extractedEmail =
+              errWithOwner.ownerEmail ||
+              errorMsg.match(/Use email\s+(.+?)\s+to/)?.[1];
+            setOwnerEmail(extractedEmail || null);
+            throw new Error(
+              extractedEmail
+                ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this document.`
+                : errorMsg,
+            );
+          }
+          // For other errors, log but continue (non-critical)
+          console.warn("Failed to delete old document:", err);
+        }
+      }
+
       if (removedDocument) {
         documentUrl = null;
       }
@@ -224,18 +266,6 @@ export function useDocumentForm({
               console.warn("Failed to set public access for document");
               documentUrl = uploadedFileId;
             }
-
-            // Delete old document IMMEDIATELY after successful upload
-            if (oldFileId) {
-              try {
-                await deleteFile(oldFileId);
-              } catch (err) {
-                console.warn(
-                  "Failed to delete old document (non-critical):",
-                  err,
-                );
-              }
-            }
           } else {
             // Clean up uploaded file if rename fails
             await deleteFile(uploadedFileId).catch((err) => {
@@ -245,13 +275,6 @@ export function useDocumentForm({
           }
         } else {
           throw new Error("Failed to upload document");
-        }
-      } else if (removedDocument && oldFileId) {
-        // Delete old document if no new file uploaded
-        try {
-          await deleteFile(oldFileId);
-        } catch (deleteError) {
-          console.warn("Failed to delete document:", deleteError);
         }
       }
 
@@ -313,11 +336,36 @@ export function useDocumentForm({
     }
   };
 
+  // Function to get file owner when there's an existing document
+  const fetchFileOwner = useCallback(async () => {
+    if (existingDocument && isGoogleDriveFile(existingDocument)) {
+      const fileId = getFileIdFromFile(existingDocument);
+      if (fileId) {
+        try {
+          const ownerInfo = await getFileDetails(fileId);
+          if (ownerInfo?.emailAddress) {
+            setOwnerEmail(ownerInfo.emailAddress);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch file owner:", err);
+        }
+      }
+    }
+  }, [existingDocument, getFileDetails]);
+
+  // Fetch file owner on mount if there's an existing document
+  useEffect(() => {
+    if (existingDocument) {
+      fetchFileOwner();
+    }
+  }, [existingDocument, fetchFileOwner]);
+
   return {
     formData,
     isLoadingState,
     error,
     existingDocument,
+    ownerEmail,
     fileLoading,
     errors,
     accessToken: accessToken || fetchedAccessToken,

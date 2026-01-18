@@ -53,6 +53,7 @@ export default function LetterForm({
     existingLetter,
     fileLoading,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeLetter,
@@ -279,6 +280,7 @@ export default function LetterForm({
           loadingText="Uploading file..."
           removeButtonText="Remove File"
           error={errors.letter}
+          ownerEmail={ownerEmail || undefined}
         />
 
         {/* Form Actions */}

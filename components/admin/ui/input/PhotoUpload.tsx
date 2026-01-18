@@ -40,6 +40,7 @@ interface PhotoUploadProps {
   className?: string;
   required?: boolean;
   error?: string;
+  ownerEmail?: string;
 }
 
 const PhotoUpload: React.FC<PhotoUploadProps> = ({
@@ -58,6 +59,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   className = "",
   required = false,
   error,
+  ownerEmail,
 }) => {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [cropModalOpen, setCropModalOpen] = useState(false);
@@ -246,6 +248,11 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
           <p className="text-sm text-gray-500 mt-1">{helpText}</p>
           {photoLoading && (
             <p className="text-sm text-blue-600 mt-1">Mengupload foto...</p>
+          )}
+          {ownerEmail && (
+            <p className="text-xs text-amber-600 mt-1">
+              Use email {ownerEmail} to edit this photo!
+            </p>
           )}
         </div>
       </div>

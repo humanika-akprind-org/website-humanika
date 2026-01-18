@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type {
   Management,
@@ -33,6 +33,7 @@ export const useManagementForm = (
     deleteFile,
     renameFile,
     setPublicAccess,
+    getFileDetails,
     isLoading: photoLoading,
     error: photoError,
   } = useFile(accessToken);
@@ -57,6 +58,7 @@ export const useManagementForm = (
     management?.photo,
   );
   const [removedPhoto, setRemovedPhoto] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
 
   // Fetch access token
   useEffect(() => {
@@ -89,6 +91,17 @@ export const useManagementForm = (
   useEffect(() => {
     if (photoError) {
       setError(photoError);
+      // Check if it's a 403 error with owner email info
+      if (
+        photoError.includes("permission") ||
+        photoError.includes("Use email")
+      ) {
+        // Extract email from error message if present
+        const emailMatch = photoError.match(/Use email\s+(.+?)\s+to/);
+        if (emailMatch && emailMatch[1]) {
+          setOwnerEmail(emailMatch[1]);
+        }
+      }
     }
   }, [photoError]);
 
@@ -103,6 +116,30 @@ export const useManagementForm = (
     setPreviewUrl(null);
     setExistingPhoto(null);
   };
+
+  // Function to fetch file owner when there's an existing photo
+  const fetchFileOwner = useCallback(async () => {
+    if (existingPhoto && isGoogleDrivePhoto(existingPhoto)) {
+      const fileId = getFileIdFromPhoto(existingPhoto);
+      if (fileId) {
+        try {
+          const ownerInfo = await getFileDetails(fileId);
+          if (ownerInfo?.emailAddress) {
+            setOwnerEmail(ownerInfo.emailAddress);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch file owner:", err);
+        }
+      }
+    }
+  }, [existingPhoto, getFileDetails]);
+
+  // Fetch file owner on mount if there's an existing photo
+  useEffect(() => {
+    if (existingPhoto) {
+      fetchFileOwner();
+    }
+  }, [existingPhoto, fetchFileOwner]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -256,6 +293,12 @@ export const useManagementForm = (
     return null;
   };
 
+  // Helper function to check if photo is from Google Drive
+  const isGoogleDrivePhoto = (photo: string | null | undefined): boolean => {
+    if (!photo) return false;
+    return photo.includes("drive.google.com");
+  };
+
   // Search users function - fetches all matching users without pagination
   const searchUsers = async (query: string) => {
     setUserSearchQuery(query);
@@ -318,6 +361,7 @@ export const useManagementForm = (
     errors,
     previewUrl,
     existingPhoto,
+    ownerEmail,
     photoLoading,
     removePhoto,
     handleSubmit,

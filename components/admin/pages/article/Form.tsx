@@ -48,6 +48,7 @@ export default function ArticleForm({
     articleCategories,
     photoLoading,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeThumbnail,
@@ -144,6 +145,7 @@ export default function ArticleForm({
                 photoLoading={photoLoading}
                 alt={formData.title || "Article thumbnail"}
                 error={errors.thumbnail}
+                ownerEmail={ownerEmail || undefined}
               />
             </div>
           </div>

@@ -1,5 +1,5 @@
 // hooks/gallery/useGalleryForm.ts
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type {
   Gallery,
   CreateGalleryInput,
@@ -72,6 +72,7 @@ export const useGalleryForm = (
     deleteFile,
     renameFile,
     setPublicAccess,
+    getFileDetails,
     isLoading: photoLoading,
     error: photoError,
   } = useFile(accessToken || fetchedAccessToken);
@@ -108,6 +109,7 @@ export const useGalleryForm = (
   );
   const [removedImage, setRemovedImage] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
 
   // Initialize preview URL
   useEffect(() => {
@@ -121,8 +123,43 @@ export const useGalleryForm = (
   useEffect(() => {
     if (photoError) {
       setError(photoError);
+      // Check if it's a 403 error with owner email info
+      if (
+        photoError.includes("permission") ||
+        photoError.includes("Use email")
+      ) {
+        // Extract email from error message if present
+        const emailMatch = photoError.match(/Use email\s+(.+?)\s+to/);
+        if (emailMatch && emailMatch[1]) {
+          setOwnerEmail(emailMatch[1]);
+        }
+      }
     }
   }, [photoError]);
+
+  // Function to get file owner when there's an existing image
+  const fetchFileOwner = useCallback(async () => {
+    if (existingImage && isGoogleDriveImage(existingImage)) {
+      const fileId = getFileIdFromImage(existingImage);
+      if (fileId) {
+        try {
+          const ownerInfo = await getFileDetails(fileId);
+          if (ownerInfo?.emailAddress) {
+            setOwnerEmail(ownerInfo.emailAddress);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch file owner:", err);
+        }
+      }
+    }
+  }, [existingImage, getFileDetails]);
+
+  // Fetch file owner on mount if there's an existing image
+  useEffect(() => {
+    if (existingImage) {
+      fetchFileOwner();
+    }
+  }, [existingImage, fetchFileOwner]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -209,6 +246,37 @@ export const useGalleryForm = (
           ? getFileIdFromImage(gallery.image)
           : null;
 
+      // If user wants to remove the old image or replace it, check ownership first
+      if ((removedImage || formData.imageFile) && oldFileId) {
+        // Try to delete the old file first to check ownership
+        try {
+          await deleteFile(oldFileId);
+        } catch (err) {
+          // Check if it's a 403 error (not owner or insufficient permissions)
+          const errorMsg = err instanceof Error ? err.message : String(err);
+          const isPermissionError =
+            errorMsg.toLowerCase().includes("insufficient permissions") ||
+            errorMsg.toLowerCase().includes("permission") ||
+            errorMsg.includes("Use email");
+
+          if (isPermissionError) {
+            // Extract owner email from error object first, then from message
+            const errWithOwner = err as Error & { ownerEmail?: string };
+            const extractedEmail =
+              errWithOwner.ownerEmail ||
+              errorMsg.match(/Use email\s+(.+?)\s+to/)?.[1];
+            setOwnerEmail(extractedEmail || null);
+            throw new Error(
+              extractedEmail
+                ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this thumbnail.`
+                : errorMsg,
+            );
+          }
+          // For other errors, log but continue (non-critical)
+          console.warn("Failed to delete old image:", err);
+        }
+      }
+
       if (removedImage) {
         imageUrl = null;
       }
@@ -235,15 +303,6 @@ export const useGalleryForm = (
               console.warn("Failed to set public access for image");
               imageUrl = uploadedFileId;
             }
-
-            // Delete old image IMMEDIATELY after successful upload
-            if (oldFileId) {
-              try {
-                await deleteFile(oldFileId);
-              } catch (err) {
-                console.warn("Failed to delete old image (non-critical):", err);
-              }
-            }
           } else {
             // Clean up uploaded file if rename fails
             await deleteFile(uploadedFileId).catch((err) => {
@@ -253,13 +312,6 @@ export const useGalleryForm = (
           }
         } else {
           throw new Error("Failed to upload image");
-        }
-      } else if (removedImage && oldFileId) {
-        // Delete old image if no new file uploaded
-        try {
-          await deleteFile(oldFileId);
-        } catch (deleteError) {
-          console.warn("Failed to delete image:", deleteError);
         }
       }
 
@@ -294,6 +346,7 @@ export const useGalleryForm = (
     photoLoading,
     accessToken: accessToken || fetchedAccessToken,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeImage,

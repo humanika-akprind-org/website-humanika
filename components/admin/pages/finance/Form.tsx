@@ -56,6 +56,7 @@ export default function FinanceForm({
     existingProof,
     photoLoading,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeProof,
@@ -227,6 +228,7 @@ export default function FinanceForm({
               removeButtonText="Hapus Proof"
               loadingText="Mengupload proof..."
               error={errors.proof}
+              ownerEmail={ownerEmail || undefined}
             />
           </div>
 

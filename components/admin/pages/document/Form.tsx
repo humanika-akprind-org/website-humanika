@@ -54,6 +54,7 @@ export default function DocumentForm({
     existingDocument,
     fileLoading,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeDocument,
@@ -189,6 +190,7 @@ export default function DocumentForm({
           loadingText="Uploading file..."
           removeButtonText="Delete File"
           error={errors.document}
+          ownerEmail={ownerEmail || undefined}
         />
 
         <div className="flex justify-end space-x-3 pt-4">
