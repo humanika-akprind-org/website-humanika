@@ -22,7 +22,7 @@ interface StructureFormProps {
   onSubmit: (
     data:
       | CreateOrganizationalStructureInput
-      | UpdateOrganizationalStructureInput
+      | UpdateOrganizationalStructureInput,
   ) => Promise<void>;
   isEdit?: boolean;
 }
@@ -43,6 +43,7 @@ export default function StructureForm({
     existingDecree,
     existingStructureImage,
     fileLoading,
+    errors,
     removeDecree,
     removeStructureImage,
     handleSubmit,
@@ -63,6 +64,7 @@ export default function StructureForm({
             }
             placeholder="Enter structure name"
             required
+            error={errors.name}
           />
 
           <SelectInput
@@ -79,6 +81,7 @@ export default function StructureForm({
             placeholder="Pilih Periode"
             icon={<FiCalendar className="text-gray-400" />}
             required
+            error={errors.periodId}
           />
 
           <SelectInput
@@ -109,6 +112,7 @@ export default function StructureForm({
           loadingText="Uploading file..."
           removeButtonText="Hapus File"
           required
+          error={errors.decreeFile}
         />
 
         {/* Structure Image Upload */}
@@ -132,6 +136,7 @@ export default function StructureForm({
           aspect={3 / 4}
           removeButtonText="Remove Image"
           loadingText="Uploading image..."
+          error={errors.structureImage}
         />
 
         <div className="flex justify-end space-x-3 pt-4">

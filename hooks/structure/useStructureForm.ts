@@ -54,6 +54,12 @@ export const useStructureForm = (
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    periodId?: string;
+    decreeFile?: string;
+    structureImage?: string;
+  }>({});
   const [alert, setAlert] = useState<{
     type: AlertType;
     message: string;
@@ -231,14 +237,19 @@ export const useStructureForm = (
     e.preventDefault();
     setIsLoading(true);
     setAlert(null);
+    setErrors({});
 
     try {
       // Validate required fields
       if (!formData.name.trim()) {
-        throw new Error("Please enter structure name");
+        const fieldError = "Please enter structure name";
+        setErrors((prev) => ({ ...prev, name: fieldError }));
+        throw new Error(fieldError);
       }
       if (!formData.periodId) {
-        throw new Error("Please select a period");
+        const fieldError = "Please select a period";
+        setErrors((prev) => ({ ...prev, periodId: fieldError }));
+        throw new Error(fieldError);
       }
 
       // Wait for access token if not ready
@@ -344,7 +355,10 @@ export const useStructureForm = (
   const handleFileChange = (file: File) => {
     // Validate file size
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB");
+      setErrors((prev) => ({
+        ...prev,
+        decreeFile: "File size must be less than 10MB",
+      }));
       return;
     }
 
@@ -364,19 +378,25 @@ export const useStructureForm = (
     ];
 
     if (!allowedTypes.some((type) => file.type.includes(type.split("/")[1]))) {
-      setError("Please select a valid document file");
+      setErrors((prev) => ({
+        ...prev,
+        decreeFile: "Please select a valid document file",
+      }));
       return;
     }
 
     setFormData((prev) => ({ ...prev, decreeFile: file }));
-    setError(null);
+    setErrors((prev) => ({ ...prev, decreeFile: undefined }));
     setRemovedDecree(false);
   };
 
   const handleStructureImageChange = (file: File) => {
     // Validate file size
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB");
+      setErrors((prev) => ({
+        ...prev,
+        structureImage: "File size must be less than 10MB",
+      }));
       return;
     }
 
@@ -389,12 +409,16 @@ export const useStructureForm = (
     ];
 
     if (!allowedImageTypes.includes(file.type)) {
-      setError("Please select a valid image file (JPG, PNG, GIF, WEBP)");
+      setErrors((prev) => ({
+        ...prev,
+        structureImage:
+          "Please select a valid image file (JPG, PNG, GIF, WEBP)",
+      }));
       return;
     }
 
     setFormData((prev) => ({ ...prev, structureImage: file }));
-    setError(null);
+    setErrors((prev) => ({ ...prev, structureImage: undefined }));
     setRemovedStructureImage(false);
 
     // Create preview URL
@@ -424,6 +448,7 @@ export const useStructureForm = (
     accessToken,
     isLoading,
     error,
+    errors,
     alert,
     previewUrl,
     existingDecree,

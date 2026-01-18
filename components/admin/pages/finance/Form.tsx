@@ -55,6 +55,7 @@ export default function FinanceForm({
     previewUrl,
     existingProof,
     photoLoading,
+    errors,
     handleInputChange,
     handleFileChange,
     removeProof,
@@ -88,6 +89,7 @@ export default function FinanceForm({
               placeholder="Enter transaction name"
               required
               icon={<FiBriefcase className="text-gray-400" />}
+              error={errors.name}
             />
 
             <SelectInput
@@ -118,6 +120,7 @@ export default function FinanceForm({
               placeholder="0"
               required
               icon={<FiBriefcase className="text-gray-400" />}
+              error={errors.amount}
             />
 
             <DateInput
@@ -127,6 +130,7 @@ export default function FinanceForm({
                 setFormData((prev) => ({ ...prev, date: value }))
               }
               required
+              error={errors.date}
             />
 
             <SelectInput
@@ -142,6 +146,7 @@ export default function FinanceForm({
               }))}
               required
               icon={<FiBriefcase className="text-gray-400" />}
+              error={errors.categoryId}
             />
 
             <SelectInput
@@ -221,6 +226,7 @@ export default function FinanceForm({
               alt={formData.name || "Transaction proof"}
               removeButtonText="Hapus Proof"
               loadingText="Mengupload proof..."
+              error={errors.proof}
             />
           </div>
 

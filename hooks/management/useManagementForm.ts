@@ -47,6 +47,7 @@ export const useManagementForm = (
 
   const [isLoading, setIsLoading] = useState(false);
   const [_error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [alert, setAlert] = useState<{
     type: AlertType;
     message: string;
@@ -107,14 +108,17 @@ export const useManagementForm = (
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setErrors({});
     setAlert(null);
 
     try {
       // Validate required fields
       if (!formData.userId) {
+        setErrors((prev) => ({ ...prev, userId: "Please select a user" }));
         throw new Error("Please select a user");
       }
       if (!formData.periodId) {
+        setErrors((prev) => ({ ...prev, periodId: "Please select a period" }));
         throw new Error("Please select a period");
       }
 
@@ -212,17 +216,24 @@ export const useManagementForm = (
   const handleFileChange = (file: File) => {
     // Validasi file
     if (file.size > 5 * 1024 * 1024) {
-      setError("File size must be less than 5MB");
+      setErrors((prev) => ({
+        ...prev,
+        photo: "File size must be less than 5MB",
+      }));
       return;
     }
 
     if (!file.type.startsWith("image/")) {
-      setError("Please select an image file");
+      setErrors((prev) => ({
+        ...prev,
+        photo: "Please select an image file",
+      }));
       return;
     }
 
     setFormData((prev) => ({ ...prev, photoFile: file }));
     setError(null);
+    setErrors((prev) => ({ ...prev, photo: "" }));
     setRemovedPhoto(false); // Reset removed state when new file is selected
 
     // Create preview URL
@@ -304,6 +315,7 @@ export const useManagementForm = (
     accessToken,
     isLoading,
     alert,
+    errors,
     previewUrl,
     existingPhoto,
     photoLoading,

@@ -47,6 +47,7 @@ export default function ArticleForm({
     existingThumbnail,
     articleCategories,
     photoLoading,
+    errors,
     handleInputChange,
     handleFileChange,
     removeThumbnail,
@@ -66,6 +67,7 @@ export default function ArticleForm({
               placeholder="Enter article title"
               required
               icon={<FiBriefcase className="text-gray-400" />}
+              error={errors.title}
             />
 
             <SelectInput
@@ -99,6 +101,7 @@ export default function ArticleForm({
               }))}
               placeholder="Select a category (optional)"
               icon={<FiFolder className="text-gray-400" />}
+              error={errors.categoryId}
             />
 
             <SelectInput
@@ -140,6 +143,7 @@ export default function ArticleForm({
                 isLoading={isSubmitting}
                 photoLoading={photoLoading}
                 alt={formData.title || "Article thumbnail"}
+                error={errors.thumbnail}
               />
             </div>
           </div>

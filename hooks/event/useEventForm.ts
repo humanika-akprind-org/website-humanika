@@ -139,6 +139,7 @@ export const useEventForm = (
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState<
     string | null | undefined
@@ -173,17 +174,24 @@ export const useEventForm = (
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setError("File size must be less than 5MB");
+        setErrors((prev) => ({
+          ...prev,
+          thumbnail: "File size must be less than 5MB",
+        }));
         return;
       }
 
       if (!file.type.startsWith("image/")) {
-        setError("Please select an image file");
+        setErrors((prev) => ({
+          ...prev,
+          thumbnail: "Please select an image file",
+        }));
         return;
       }
 
       setFormData((prev) => ({ ...prev, thumbnailFile: file }));
       setError(null);
+      setErrors((prev) => ({ ...prev, thumbnail: "" }));
 
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
@@ -202,32 +210,36 @@ export const useEventForm = (
   };
 
   const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+
     if (!formData.name.trim()) {
-      setError("Please enter event name");
-      return false;
+      newErrors.name = "Please enter event name";
+      isValid = false;
     }
     if (isHtmlEmpty(formData.description)) {
-      setError("Please enter description");
-      return false;
+      newErrors.description = "Please enter description";
+      isValid = false;
     }
     if (!formData.goal.trim()) {
-      setError("Please enter goal");
-      return false;
+      newErrors.goal = "Please enter goal";
+      isValid = false;
     }
     if (!formData.periodId) {
-      setError("Please select a period");
-      return false;
+      newErrors.periodId = "Please select a period";
+      isValid = false;
     }
     if (!formData.responsibleId) {
-      setError("Please select responsible person");
-      return false;
+      newErrors.responsibleId = "Please select responsible person";
+      isValid = false;
     }
     if (!formData.schedules || formData.schedules.length === 0) {
-      setError("Please add at least one schedule");
-      return false;
+      newErrors.schedules = "Please add at least one schedule";
+      isValid = false;
     }
 
-    return true;
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -392,6 +404,7 @@ export const useEventForm = (
     setFormData,
     isSubmitting,
     error,
+    errors,
     previewUrl,
     existingThumbnail,
     removedThumbnail,

@@ -182,6 +182,14 @@ export const useGalleryForm = (
       newErrors.image = "Please upload an image";
       isValid = false;
     }
+    if (formData.categoryId === "") {
+      newErrors.categoryId = "Please select a category (optional field)";
+      isValid = false;
+    }
+    if (formData.periodId === "") {
+      newErrors.periodId = "Please select a period (optional field)";
+      isValid = false;
+    }
 
     setErrors(newErrors);
     return isValid;

@@ -118,6 +118,7 @@ export default function GalleryForm({
                   : "Select a category (Optional)"
               }
               icon={<FiImage className="text-gray-400" />}
+              error={errors.categoryId}
             />
 
             <SelectInput
@@ -136,6 +137,7 @@ export default function GalleryForm({
               }))}
               placeholder="Select a period (Optional)"
               icon={<FiCalendar className="text-gray-400" />}
+              error={errors.periodId}
             />
 
             <div className="md:col-span-2">

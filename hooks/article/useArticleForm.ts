@@ -115,6 +115,7 @@ export const useArticleForm = (
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState<
     string | null | undefined
@@ -154,17 +155,24 @@ export const useArticleForm = (
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setError("File size must be less than 5MB");
+        setErrors((prev) => ({
+          ...prev,
+          thumbnail: "File size must be less than 5MB",
+        }));
         return;
       }
 
       if (!file.type.startsWith("image/")) {
-        setError("Please select an image file");
+        setErrors((prev) => ({
+          ...prev,
+          thumbnail: "Please select an image file",
+        }));
         return;
       }
 
       setFormData((prev) => ({ ...prev, thumbnailFile: file }));
       setError(null);
+      setErrors((prev) => ({ ...prev, thumbnail: "" }));
 
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
@@ -183,20 +191,24 @@ export const useArticleForm = (
   };
 
   const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+
     if (!formData.title.trim()) {
-      setError("Please enter article title");
-      return false;
+      newErrors.title = "Please enter article title";
+      isValid = false;
     }
     if (isHtmlEmpty(formData.content)) {
-      setError("Please enter article content");
-      return false;
+      newErrors.content = "Please enter article content";
+      isValid = false;
     }
     if (!formData.categoryId) {
-      setError("Please select category");
-      return false;
+      newErrors.categoryId = "Please select category";
+      isValid = false;
     }
 
-    return true;
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -297,6 +309,7 @@ export const useArticleForm = (
     setFormData,
     isSubmitting,
     error,
+    errors,
     previewUrl,
     existingThumbnail,
     removedThumbnail,

@@ -113,13 +113,17 @@ export function useLetterForm({
     if (file) {
       // Validasi file
       if (file.size > 10 * 1024 * 1024) {
-        setError("File size must be less than 10MB");
+        setErrors((prev) => ({
+          ...prev,
+          letter: "File size must be less than 10MB",
+        }));
         return;
       }
 
       setFormData((prev) => ({ ...prev, letterFile: file }));
       setExistingLetter(null); // Hide existing file display when new file is selected
       setError(null);
+      setErrors((prev) => ({ ...prev, letter: "" }));
       setRemovedLetter(false); // Reset removed state when new file is selected
     }
   };
