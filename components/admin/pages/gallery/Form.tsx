@@ -66,18 +66,16 @@ export default function GalleryForm({
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="md:col-span-2">
-              <TextInput
-                label="Title"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                placeholder="Enter gallery title"
-                required
-                icon={<FiImage className="text-gray-400" />}
-                error={errors.title}
-              />
-            </div>
+            <TextInput
+              label="Title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="Enter gallery title"
+              required
+              icon={<FiImage className="text-gray-400" />}
+              error={errors.title}
+            />
 
             <SelectInput
               label="Event"

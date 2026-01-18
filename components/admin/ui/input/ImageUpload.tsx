@@ -16,7 +16,7 @@ interface ImageUploadProps {
   photoLoading: boolean;
   maxSize?: number; // in bytes, default 5MB
   accept?: string; // default "image/*"
-  helpText?: string;
+  helpText?: string; // default "Upload thumbnail (max 5MB, format: JPG, PNG, GIF)"
   alt?: string;
   showRemoveButton?: boolean;
   previewSize?: "small" | "medium" | "large"; // default "medium"
@@ -51,10 +51,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   required = false,
   error,
   ownerEmail,
+  helpText = "Upload thumbnail (max 5MB, format: JPG, PNG, GIF)",
 }) => {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [sizeError, setSizeError] = useState<string | null>(null);
 
   // Function to handle cropped image upload
   const handleCroppedImageUpload = useCallback(
@@ -141,11 +143,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > maxSize) {
-        alert(
+        setSizeError(
           `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`,
         );
         return;
       }
+      // Clear size error when valid file is selected
+      setSizeError(null);
       // Reset crop-related state when new file is selected
       setCroppedImage(null);
       setCropModalOpen(false);
@@ -158,7 +162,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       <div className={className}>
         <div
           className={`flex items-start space-x-4 p-4 rounded-lg border-2 ${
-            error ? "border-red-300 bg-red-50" : "border-gray-200"
+            error || sizeError ? "border-red-300 bg-red-50" : "border-gray-200"
           }`}
         >
           {(previewUrl || (existingPhoto && existingPhoto.trim() !== "")) && (
@@ -272,15 +276,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               disabled={isLoading || photoLoading}
             />
-            <p className="text-sm text-gray-500 mt-1">
-              Upload thumbnail (max 5MB, format: JPG, PNG, GIF)
-            </p>
+            {helpText && (
+              <p className="text-sm text-gray-500 mt-1">{helpText}</p>
+            )}
             {photoLoading && (
               <p className="text-sm text-blue-600 mt-1">{loadingText}</p>
             )}
           </div>
         </div>
         {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+        {sizeError && <p className="text-red-500 text-xs mt-1">{sizeError}</p>}
 
         {/* Owner email alert */}
         {ownerEmail && (
