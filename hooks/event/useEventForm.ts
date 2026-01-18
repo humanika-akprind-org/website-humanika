@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type {
   Event,
   CreateEventInput,
@@ -93,6 +93,7 @@ export const useEventForm = (
     deleteFile,
     renameFile,
     setPublicAccess,
+    getFileDetails,
     isLoading: photoLoading,
     error: photoError,
   } = useFile(accessToken || fetchedAccessToken);
@@ -139,11 +140,13 @@ export const useEventForm = (
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState<
     string | null | undefined
   >(event?.thumbnail);
   const [removedThumbnail, setRemovedThumbnail] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
 
   // Initialize preview URL
   useEffect(() => {
@@ -157,6 +160,17 @@ export const useEventForm = (
   useEffect(() => {
     if (photoError) {
       setError(photoError);
+      // Check if it's a 403 error with owner email info
+      if (
+        photoError.includes("permission") ||
+        photoError.includes("Use email")
+      ) {
+        // Extract email from error message if present
+        const emailMatch = photoError.match(/Use email\s+(.+?)\s+to/);
+        if (emailMatch && emailMatch[1]) {
+          setOwnerEmail(emailMatch[1]);
+        }
+      }
     }
   }, [photoError]);
 
@@ -173,17 +187,24 @@ export const useEventForm = (
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setError("File size must be less than 5MB");
+        setErrors((prev) => ({
+          ...prev,
+          thumbnail: "File size must be less than 5MB",
+        }));
         return;
       }
 
       if (!file.type.startsWith("image/")) {
-        setError("Please select an image file");
+        setErrors((prev) => ({
+          ...prev,
+          thumbnail: "Please select an image file",
+        }));
         return;
       }
 
       setFormData((prev) => ({ ...prev, thumbnailFile: file }));
       setError(null);
+      setErrors((prev) => ({ ...prev, thumbnail: "" }));
 
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
@@ -202,32 +223,36 @@ export const useEventForm = (
   };
 
   const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+
     if (!formData.name.trim()) {
-      setError("Please enter event name");
-      return false;
+      newErrors.name = "Please enter event name";
+      isValid = false;
     }
     if (isHtmlEmpty(formData.description)) {
-      setError("Please enter description");
-      return false;
+      newErrors.description = "Please enter description";
+      isValid = false;
     }
     if (!formData.goal.trim()) {
-      setError("Please enter goal");
-      return false;
+      newErrors.goal = "Please enter goal";
+      isValid = false;
     }
     if (!formData.periodId) {
-      setError("Please select a period");
-      return false;
+      newErrors.periodId = "Please select a period";
+      isValid = false;
     }
     if (!formData.responsibleId) {
-      setError("Please select responsible person");
-      return false;
+      newErrors.responsibleId = "Please select responsible person";
+      isValid = false;
     }
     if (!formData.schedules || formData.schedules.length === 0) {
-      setError("Please add at least one schedule");
-      return false;
+      newErrors.schedules = "Please add at least one schedule";
+      isValid = false;
     }
 
-    return true;
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -240,6 +265,7 @@ export const useEventForm = (
 
     setIsSubmitting(true);
     setError(null);
+    setOwnerEmail(null);
     console.log("Starting form submission");
 
     try {
@@ -252,6 +278,37 @@ export const useEventForm = (
         isGoogleDriveThumbnail(event.thumbnail)
           ? getFileIdFromThumbnail(event.thumbnail)
           : null;
+
+      // If user wants to remove the old thumbnail or replace it, check ownership first
+      if ((removedThumbnail || formData.thumbnailFile) && oldFileId) {
+        // Try to delete the old file first to check ownership
+        try {
+          await deleteFile(oldFileId);
+        } catch (err) {
+          // Check if it's a 403 error (not owner or insufficient permissions)
+          const errorMsg = err instanceof Error ? err.message : String(err);
+          const isPermissionError =
+            errorMsg.toLowerCase().includes("insufficient permissions") ||
+            errorMsg.toLowerCase().includes("permission") ||
+            errorMsg.includes("Use email");
+
+          if (isPermissionError) {
+            // Extract owner email from error object first, then from message
+            const errWithOwner = err as Error & { ownerEmail?: string };
+            const extractedEmail =
+              errWithOwner.ownerEmail ||
+              errorMsg.match(/Use email\s+(.+?)\s+to/)?.[1];
+            setOwnerEmail(extractedEmail || null);
+            throw new Error(
+              extractedEmail
+                ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this thumbnail.`
+                : errorMsg,
+            );
+          }
+          // For other errors, log but continue (non-critical)
+          console.warn("Failed to delete old thumbnail:", err);
+        }
+      }
 
       if (removedThumbnail) {
         thumbnailUrl = null;
@@ -279,18 +336,6 @@ export const useEventForm = (
               console.warn("Failed to set public access for thumbnail");
               thumbnailUrl = uploadedFileId;
             }
-
-            // Delete old thumbnail AFTER successful upload
-            if (oldFileId) {
-              setTimeout(() => {
-                deleteFile(oldFileId).catch((err) => {
-                  console.warn(
-                    "Failed to delete old thumbnail (non-critical):",
-                    err,
-                  );
-                });
-              }, 2000);
-            }
           } else {
             // Clean up uploaded file if rename fails
             await deleteFile(uploadedFileId).catch((err) => {
@@ -300,13 +345,6 @@ export const useEventForm = (
           }
         } else {
           throw new Error("Failed to upload thumbnail");
-        }
-      } else if (removedThumbnail && oldFileId) {
-        // Delete old thumbnail if no new file uploaded
-        try {
-          await deleteFile(oldFileId);
-        } catch (deleteError) {
-          console.warn("Failed to delete thumbnail:", deleteError);
         }
       }
 
@@ -334,6 +372,30 @@ export const useEventForm = (
       setIsSubmitting(false);
     }
   };
+
+  // Function to get file owner when there's an existing thumbnail
+  const fetchFileOwner = useCallback(async () => {
+    if (existingThumbnail && isGoogleDriveThumbnail(existingThumbnail)) {
+      const fileId = getFileIdFromThumbnail(existingThumbnail);
+      if (fileId) {
+        try {
+          const ownerInfo = await getFileDetails(fileId);
+          if (ownerInfo?.emailAddress) {
+            setOwnerEmail(ownerInfo.emailAddress);
+          }
+        } catch (err) {
+          console.warn("Failed to fetch file owner:", err);
+        }
+      }
+    }
+  }, [existingThumbnail, getFileDetails]);
+
+  // Fetch file owner on mount if there's an existing thumbnail
+  useEffect(() => {
+    if (existingThumbnail) {
+      fetchFileOwner();
+    }
+  }, [existingThumbnail, fetchFileOwner]);
 
   // Search users function - fetches all matching users without pagination
   const searchUsers = async (query: string) => {
@@ -391,9 +453,11 @@ export const useEventForm = (
     setFormData,
     isSubmitting,
     error,
+    errors,
     previewUrl,
     existingThumbnail,
     removedThumbnail,
+    ownerEmail,
     workPrograms,
     workProgramsLoading,
     eventCategories,

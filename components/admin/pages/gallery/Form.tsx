@@ -48,6 +48,7 @@ export default function GalleryForm({
     categoriesLoading,
     photoLoading,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeImage,
@@ -118,6 +119,7 @@ export default function GalleryForm({
                   : "Select a category (Optional)"
               }
               icon={<FiImage className="text-gray-400" />}
+              error={errors.categoryId}
             />
 
             <SelectInput
@@ -136,6 +138,7 @@ export default function GalleryForm({
               }))}
               placeholder="Select a period (Optional)"
               icon={<FiCalendar className="text-gray-400" />}
+              error={errors.periodId}
             />
 
             <div className="md:col-span-2">
@@ -150,6 +153,7 @@ export default function GalleryForm({
                 alt={formData.title || "Gallery image"}
                 required
                 error={errors.image}
+                ownerEmail={ownerEmail || undefined}
               />
             </div>
           </div>

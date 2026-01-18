@@ -49,6 +49,8 @@ export default function EventForm({
     workPrograms,
     eventCategories,
     photoLoading,
+    errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeThumbnail,
@@ -84,6 +86,7 @@ export default function EventForm({
                 placeholder="Enter event name"
                 required
                 icon={<FiBriefcase className="text-gray-400" />}
+                error={errors.name}
               />
               <small className="text-gray-500">
                 Event name must be unique because it is used as a slug.
@@ -129,6 +132,7 @@ export default function EventForm({
               }))}
               required
               icon={<FiBriefcase className="text-gray-400" />}
+              error={errors.periodId}
             />
             <SelectInput
               label="Work Program"
@@ -161,6 +165,7 @@ export default function EventForm({
               onLoadMore={loadMoreUsers}
               isLoadingMore={isLoadingUsers}
               hasMore={hasMoreUsers}
+              error={errors.responsibleId}
             />
             <SelectInput
               label="Category"
@@ -198,6 +203,7 @@ export default function EventForm({
                 placeholder="Enter event goal"
                 required
                 icon={<FiBriefcase className="text-gray-400" />}
+                error={errors.goal}
               />
             </div>
             <div className="md:col-span-2">
@@ -210,6 +216,8 @@ export default function EventForm({
                 isLoading={isSubmitting}
                 photoLoading={photoLoading}
                 alt={formData.name || "Event thumbnail"}
+                error={errors.thumbnail}
+                ownerEmail={ownerEmail || undefined}
               />
             </div>
           </div>

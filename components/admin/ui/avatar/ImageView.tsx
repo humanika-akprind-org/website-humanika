@@ -20,9 +20,9 @@ export default function ImageView({
 }: ImageViewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Default size values
-  const defaultWidth = 192;
-  const defaultHeight = 192;
+  // Default size values - use responsive defaults based on context
+  const defaultWidth = 450;
+  const defaultHeight = 800;
   const customWidth = size?.width || defaultWidth;
   const customHeight = size?.height || defaultHeight;
 
@@ -78,21 +78,27 @@ export default function ImageView({
 
   return (
     <>
-      <div
-        className="flex-shrink-0 rounded-lg overflow-hidden mx-auto"
-        style={{ width: customWidth, height: customHeight }}
-      >
-        <Image
-          src={processedImageUrl}
-          alt={alt}
-          width={customWidth}
-          height={customHeight}
-          className="w-full h-full rounded-lg object-contain cursor-pointer"
-          onClick={handleImageClick}
-          onError={(e) => {
-            console.error("Image failed to load:", processedImageUrl, e);
+      <div className="w-full flex justify-center items-center p-2">
+        <div
+          className="rounded-lg overflow-hidden mx-auto"
+          style={{
+            width: "100%",
+            maxWidth: customWidth,
+            maxHeight: "85vh",
           }}
-        />
+        >
+          <Image
+            src={processedImageUrl}
+            alt={alt}
+            width={customWidth}
+            height={customHeight}
+            className="w-full h-auto max-h-[85vh] object-contain cursor-pointer"
+            onClick={handleImageClick}
+            onError={(e) => {
+              console.error("Image failed to load:", processedImageUrl, e);
+            }}
+          />
+        </div>
       </div>
 
       <ViewModal
@@ -104,14 +110,14 @@ export default function ImageView({
           <Image
             src={processedImageUrl}
             alt={`${alt} - enlarged`}
-            width={600}
-            height={400}
+            width={450}
+            height={800}
             className="max-w-full max-h-full object-contain rounded-lg"
             onError={(e) => {
               console.error(
                 "Image failed to load in modal:",
                 processedImageUrl,
-                e
+                e,
               );
             }}
           />

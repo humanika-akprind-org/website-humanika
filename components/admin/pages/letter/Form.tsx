@@ -53,6 +53,7 @@ export default function LetterForm({
     existingLetter,
     fileLoading,
     errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeLetter,
@@ -278,6 +279,8 @@ export default function LetterForm({
           helpText="Upload letter file (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
           loadingText="Uploading file..."
           removeButtonText="Remove File"
+          error={errors.letter}
+          ownerEmail={ownerEmail || undefined}
         />
 
         {/* Form Actions */}

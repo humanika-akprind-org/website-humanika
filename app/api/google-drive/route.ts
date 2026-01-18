@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         success: false,
         message: "Access token is required",
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
         success: false,
         message,
       },
-      { status: statusCode }
+      { status: statusCode },
     );
   }
 }
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
             success: false,
             message: "Access token is required",
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
 
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
                 refreshError.message === "No refresh token available"
               ) {
                 throw new Error(
-                  "Authentication expired. Please re-authenticate with Google."
+                  "Authentication expired. Please re-authenticate with Google.",
                 );
               }
               throw refreshError;
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
           success: false,
           message: "Access token is required",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -222,6 +222,37 @@ export async function POST(request: NextRequest) {
         }
         await drive.files.delete({ fileId });
         return NextResponse.json({ success: true });
+
+      case "trash":
+        if (!fileId) {
+          throw new Error("Missing file ID");
+        }
+        await drive.files.update({
+          fileId,
+          requestBody: { trashed: true },
+        });
+        return NextResponse.json({ success: true });
+
+      case "get":
+        if (!fileId) {
+          throw new Error("Missing file ID");
+        }
+        // Get file details including owner email
+        const { data: fileData } = await drive.files.get({
+          fileId,
+          fields: "id,name,owners",
+        });
+        return NextResponse.json({
+          success: true,
+          file: {
+            id: fileData.id,
+            name: fileData.name,
+            owners: fileData.owners?.map((owner) => ({
+              emailAddress: owner.emailAddress,
+              displayName: owner.displayName,
+            })),
+          },
+        });
 
       case "getUrl":
         if (!fileId) {
@@ -312,7 +343,7 @@ export async function POST(request: NextRequest) {
         message,
         details,
       },
-      { status: statusCode }
+      { status: statusCode },
     );
   }
 }

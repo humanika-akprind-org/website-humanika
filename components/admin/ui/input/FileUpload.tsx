@@ -17,6 +17,7 @@ interface FileUploadProps {
   required?: boolean;
   removeButtonText?: string;
   error?: string;
+  ownerEmail?: string;
 }
 
 export default function FileUpload({
@@ -32,6 +33,7 @@ export default function FileUpload({
   required = false,
   removeButtonText = "Remove File",
   error,
+  ownerEmail,
 }: FileUploadProps) {
   return (
     <AccessTokenGuard label={label} required={required}>
@@ -78,6 +80,11 @@ export default function FileUpload({
         </div>
       </div>
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {ownerEmail && (
+        <p className="text-amber-600 text-xs mt-1">
+          Use email {ownerEmail} to edit this file!
+        </p>
+      )}
     </AccessTokenGuard>
   );
 }

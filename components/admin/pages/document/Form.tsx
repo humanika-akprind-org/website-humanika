@@ -53,6 +53,8 @@ export default function DocumentForm({
     error,
     existingDocument,
     fileLoading,
+    errors,
+    ownerEmail,
     handleInputChange,
     handleFileChange,
     removeDocument,
@@ -120,6 +122,7 @@ export default function DocumentForm({
             placeholder={documentPlaceholder}
             required
             icon={<FiBriefcase className="text-gray-400" />}
+            error={errors.name}
             disabled={isLoadingState}
           />
 
@@ -186,6 +189,8 @@ export default function DocumentForm({
           helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
           loadingText="Uploading file..."
           removeButtonText="Delete File"
+          error={errors.document}
+          ownerEmail={ownerEmail || undefined}
         />
 
         <div className="flex justify-end space-x-3 pt-4">

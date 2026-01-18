@@ -19,7 +19,6 @@ interface LetterFiltersProps {
 
 export default function LetterFilters({
   onFilter,
-  isLoading,
   selectedCount,
   onDeleteSelected,
   canDelete,
@@ -50,7 +49,7 @@ export default function LetterFilters({
 
   const handleFilterChange = <K extends keyof LetterFilter>(
     key: K,
-    value: LetterFilter[K] | undefined
+    value: LetterFilter[K] | undefined,
   ) => {
     const newFilters = { ...filters };
     if (value === "" || value === undefined) {
@@ -62,13 +61,6 @@ export default function LetterFilters({
     onFilter(newFilters);
   };
 
-  const clearFilters = () => {
-    setFilters({});
-    onFilter({});
-  };
-
-  const activeFiltersCount = Object.keys(filters).length;
-
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
@@ -78,22 +70,10 @@ export default function LetterFilters({
           onChange={(value) => handleFilterChange("search", value)}
         />
 
-        <div className="flex items-center gap-3">
-          <FilterButton
-            isOpen={isFilterOpen}
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-          />
-
-          {activeFiltersCount > 0 && (
-            <button
-              onClick={clearFilters}
-              className="inline-flex items-center px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              disabled={isLoading}
-            >
-              Clear Filters
-            </button>
-          )}
-        </div>
+        <FilterButton
+          isOpen={isFilterOpen}
+          onClick={() => setIsFilterOpen(!isFilterOpen)}
+        />
       </div>
 
       {/* Advanced Filters */}
@@ -138,7 +118,7 @@ export default function LetterFilters({
             onChange={(value) =>
               handleFilterChange(
                 "classification",
-                value as LetterClassification
+                value as LetterClassification,
               )
             }
             options={[

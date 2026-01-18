@@ -5,7 +5,13 @@ export interface ApiResponse {
 }
 
 export interface ApiCallParams {
-  action: "getUrl" | "delete" | "upload" | "rename" | "setPublicAccess";
+  action:
+    | "getUrl"
+    | "delete"
+    | "trash"
+    | "upload"
+    | "rename"
+    | "setPublicAccess";
   fileId?: string;
   accessToken: string;
   file?: File;

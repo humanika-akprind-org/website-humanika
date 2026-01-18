@@ -47,7 +47,9 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
     isLoading,
     previewUrl,
     existingPhoto,
+    ownerEmail,
     photoLoading,
+    errors,
     removePhoto,
     handleSubmit,
     handleFileChange,
@@ -92,6 +94,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
             onLoadMore={loadMoreUsers}
             isLoadingMore={isLoadingUsers}
             hasMore={hasMoreUsers}
+            error={errors.userId}
           />
 
           <SelectInput
@@ -108,6 +111,7 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
             placeholder="Select Period"
             required
             icon={<FiCalendar className="text-gray-400" />}
+            error={errors.periodId}
           />
 
           <SelectInput
@@ -154,6 +158,8 @@ const ManagementForm: React.FC<ManagementFormProps> = ({
           isLoading={isLoading}
           photoLoading={photoLoading}
           alt={management?.user?.name || "Management"}
+          error={errors.photo}
+          ownerEmail={ownerEmail || undefined}
         />
 
         <div className="flex justify-end space-x-3 pt-4">

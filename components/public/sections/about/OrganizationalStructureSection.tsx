@@ -90,7 +90,8 @@ export default function OrganizationalStructureSection() {
                   {latestStructure.name}
                 </h3>
                 <p className="text-grey-600">
-                  Periode {new Date(latestStructure.createdAt).getFullYear()}
+                  Periode {latestStructure.period?.startYear} -{" "}
+                  {latestStructure.period?.endYear}
                 </p>
               </div>
               <Link
@@ -102,13 +103,15 @@ export default function OrganizationalStructureSection() {
               </Link>
             </div>
 
-            <div className="border-2 border-dashed border-grey-200 rounded-xl p-8 bg-grey-50 flex justify-center items-center">
-              <StructureAvatar
-                imageUrl={latestStructure.structure}
-                alt={latestStructure.name}
-                size={{ width: 1600, height: 900 }}
-                modalTitle={`Struktur Organisasi ${latestStructure.name}`}
-              />
+            <div className="border-2 border-dashed border-grey-200 rounded-xl p-4 md:p-8 bg-grey-50 flex justify-center items-center overflow-hidden">
+              <div className="w-full max-w-6xl">
+                <StructureAvatar
+                  imageUrl={latestStructure.structure}
+                  alt={latestStructure.name}
+                  modalTitle={`Struktur Organisasi ${latestStructure.name}`}
+                  size={{ width: 1200, height: 800 }}
+                />
+              </div>
             </div>
           </div>
         )}

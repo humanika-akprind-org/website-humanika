@@ -54,6 +54,12 @@ export const useStructureForm = (
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    periodId?: string;
+    decreeFile?: string;
+    structureImage?: string;
+  }>({});
   const [alert, setAlert] = useState<{
     type: AlertType;
     message: string;
@@ -67,6 +73,7 @@ export const useStructureForm = (
   >(structure?.structure);
   const [removedDecree, setRemovedDecree] = useState(false);
   const [removedStructureImage, setRemovedStructureImage] = useState(false);
+  const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
 
   // Fetch access token
   useEffect(() => {
@@ -94,6 +101,14 @@ export const useStructureForm = (
   useEffect(() => {
     if (fileError) {
       setError(fileError);
+      // Check if it's a 403 error with owner email info
+      if (fileError.includes("permission") || fileError.includes("Use email")) {
+        // Extract email from error message if present
+        const emailMatch = fileError.match(/Use email\s+(.+?)\s+to/);
+        if (emailMatch && emailMatch[1]) {
+          setOwnerEmail(emailMatch[1]);
+        }
+      }
     }
   }, [fileError]);
 
@@ -110,6 +125,36 @@ export const useStructureForm = (
     setRemovedStructureImage(true);
   };
 
+  // Helper function to check file ownership and handle 403 errors
+  const checkFileOwnership = async (fileId: string): Promise<boolean> => {
+    try {
+      await deleteFile(fileId);
+      return true;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      const isPermissionError =
+        errorMsg.toLowerCase().includes("insufficient permissions") ||
+        errorMsg.toLowerCase().includes("permission") ||
+        errorMsg.includes("Use email");
+
+      if (isPermissionError) {
+        const errWithOwner = err as Error & { ownerEmail?: string };
+        const extractedEmail =
+          errWithOwner.ownerEmail ||
+          errorMsg.match(/Use email\s+(.+?)\s+to/)?.[1];
+        setOwnerEmail(extractedEmail || null);
+        throw new Error(
+          extractedEmail
+            ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this file.`
+            : errorMsg,
+        );
+      }
+      // For other errors, assume we can proceed (non-critical)
+      console.warn("Failed to check file ownership:", err);
+      return true;
+    }
+  };
+
   // Helper function to process decree file upload
   const processDecreeUpload = async (): Promise<{
     decreeUrl: string | null | undefined;
@@ -124,6 +169,15 @@ export const useStructureForm = (
       !removedDecree && structure?.decree
         ? getFileIdFromStructureImage(structure.decree)
         : null;
+
+    // Check ownership if old file exists
+    if (oldFileId) {
+      try {
+        await checkFileOwnership(oldFileId);
+      } catch (err) {
+        return { decreeUrl: null, error: err as Error };
+      }
+    }
 
     const tempFileName = `temp_decree_${Date.now()}`;
     const uploadedFileId = await uploadFile(
@@ -152,15 +206,6 @@ export const useStructureForm = (
       console.warn("Failed to set public access for decree:", err);
     });
 
-    // Delete old decree AFTER successful upload and rename
-    if (oldFileId) {
-      setTimeout(() => {
-        deleteFile(oldFileId).catch((err) => {
-          console.warn("Failed to delete old decree (non-critical):", err);
-        });
-      }, 2000); // Delay to ensure new file is fully processed
-    }
-
     return { decreeUrl: uploadedFileId, error: null };
   };
 
@@ -178,6 +223,15 @@ export const useStructureForm = (
       !removedStructureImage && structure?.structure
         ? getFileIdFromStructureImage(structure.structure)
         : null;
+
+    // Check ownership if old file exists
+    if (oldFileId) {
+      try {
+        await checkFileOwnership(oldFileId);
+      } catch (err) {
+        return { structureImageUrl: null, error: err as Error };
+      }
+    }
 
     const tempFileName = `temp_structure_${Date.now()}`;
     const uploadedFileId = await uploadFile(
@@ -212,18 +266,6 @@ export const useStructureForm = (
       console.warn("Failed to set public access for structure image:", err);
     });
 
-    // Delete old structure image AFTER successful upload and rename
-    if (oldFileId) {
-      setTimeout(() => {
-        deleteFile(oldFileId).catch((err) => {
-          console.warn(
-            "Failed to delete old structure image (non-critical):",
-            err,
-          );
-        });
-      }, 2000); // Delay to ensure new file is fully processed
-    }
-
     return { structureImageUrl: uploadedFileId, error: null };
   };
 
@@ -231,14 +273,20 @@ export const useStructureForm = (
     e.preventDefault();
     setIsLoading(true);
     setAlert(null);
+    setErrors({});
+    setOwnerEmail(null);
 
     try {
       // Validate required fields
       if (!formData.name.trim()) {
-        throw new Error("Please enter structure name");
+        const fieldError = "Please enter structure name";
+        setErrors((prev) => ({ ...prev, name: fieldError }));
+        throw new Error(fieldError);
       }
       if (!formData.periodId) {
-        throw new Error("Please select a period");
+        const fieldError = "Please select a period";
+        setErrors((prev) => ({ ...prev, periodId: fieldError }));
+        throw new Error(fieldError);
       }
 
       // Wait for access token if not ready
@@ -344,7 +392,10 @@ export const useStructureForm = (
   const handleFileChange = (file: File) => {
     // Validate file size
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB");
+      setErrors((prev) => ({
+        ...prev,
+        decreeFile: "File size must be less than 10MB",
+      }));
       return;
     }
 
@@ -364,19 +415,25 @@ export const useStructureForm = (
     ];
 
     if (!allowedTypes.some((type) => file.type.includes(type.split("/")[1]))) {
-      setError("Please select a valid document file");
+      setErrors((prev) => ({
+        ...prev,
+        decreeFile: "Please select a valid document file",
+      }));
       return;
     }
 
     setFormData((prev) => ({ ...prev, decreeFile: file }));
-    setError(null);
+    setErrors((prev) => ({ ...prev, decreeFile: undefined }));
     setRemovedDecree(false);
   };
 
   const handleStructureImageChange = (file: File) => {
     // Validate file size
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB");
+      setErrors((prev) => ({
+        ...prev,
+        structureImage: "File size must be less than 10MB",
+      }));
       return;
     }
 
@@ -389,12 +446,16 @@ export const useStructureForm = (
     ];
 
     if (!allowedImageTypes.includes(file.type)) {
-      setError("Please select a valid image file (JPG, PNG, GIF, WEBP)");
+      setErrors((prev) => ({
+        ...prev,
+        structureImage:
+          "Please select a valid image file (JPG, PNG, GIF, WEBP)",
+      }));
       return;
     }
 
     setFormData((prev) => ({ ...prev, structureImage: file }));
-    setError(null);
+    setErrors((prev) => ({ ...prev, structureImage: undefined }));
     setRemovedStructureImage(false);
 
     // Create preview URL
@@ -424,12 +485,14 @@ export const useStructureForm = (
     accessToken,
     isLoading,
     error,
+    errors,
     alert,
     previewUrl,
     existingDecree,
     existingStructureImage,
     removedDecree,
     removedStructureImage,
+    ownerEmail,
     fileLoading,
     removeDecree,
     removeStructureImage,
