@@ -44,7 +44,7 @@ export interface Event {
   department: Department;
   periodId: string;
   period: Period;
-  schedules: ScheduleItem[];
+  schedules: ScheduleItem[]; // JSON field cast to array
   status: Status;
   workProgramId?: string | null;
   workProgram?: WorkProgram | null;
