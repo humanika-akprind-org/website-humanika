@@ -10,7 +10,7 @@ interface FeaturedPastEventsProps {
 
 // Helper function to get the latest schedule date from an event
 function getLatestScheduleDate(
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): Date | null {
   if (!schedules || schedules.length === 0) return null;
   const dates = schedules.map((s) => new Date(s.date).getTime());
@@ -57,6 +57,7 @@ export default function FeaturedPastEvents({
             <PastEventCard
               key={event.id}
               id={event.id}
+              slug={event.slug}
               title={event.name}
               date={latestDate ? latestDate.toISOString() : ""}
               image={event.thumbnail || undefined}

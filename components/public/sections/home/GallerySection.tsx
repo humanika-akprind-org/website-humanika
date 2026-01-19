@@ -24,7 +24,7 @@ import GalleryGridSkeleton from "@/components/public/ui/skeleton/GalleryGridSkel
 
 // Helper function to get the earliest schedule date from an event
 function getEarliestScheduleDate(
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): Date | null {
   if (!schedules || schedules.length === 0) return null;
   const dates = schedules.map((s) => new Date(s.date).getTime());
@@ -50,12 +50,12 @@ export default function GallerySection() {
         // Filter galleries to only include those from published events
         const publishedEventIds = eventsData.map((event) => event.id);
         const filteredGalleries = galleriesData.filter((gallery) =>
-          publishedEventIds.includes(gallery.eventId)
+          publishedEventIds.includes(gallery.eventId),
         );
         setGalleries(filteredGalleries.slice(0, 12)); // Limit to 12 for preview
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Failed to load gallery data"
+          err instanceof Error ? err.message : "Failed to load gallery data",
         );
       } finally {
         setLoading(false);
@@ -65,10 +65,13 @@ export default function GallerySection() {
   }, []);
 
   // Group galleries by eventId and count them
-  const galleryCounts = galleries.reduce((acc, gallery) => {
-    acc[gallery.eventId] = (acc[gallery.eventId] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const galleryCounts = galleries.reduce(
+    (acc, gallery) => {
+      acc[gallery.eventId] = (acc[gallery.eventId] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   // Prepare albums data with additional info
   const albums = events
@@ -81,6 +84,7 @@ export default function GallerySection() {
         cover: getPreviewUrl(event.thumbnail),
         lastUpdated: event.updatedAt,
         eventName: event.name,
+        eventSlug: event.slug,
         category: event.department?.toString() || "General",
         date: eventDate || new Date(),
         year: eventDate ? eventDate.getFullYear().toString() : "Unknown",
