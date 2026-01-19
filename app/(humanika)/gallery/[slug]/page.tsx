@@ -30,22 +30,7 @@ export default function GalleryDetail() {
     formattedDate,
   } = useGalleryDetail(slugParam);
 
-  const handleDownloadAll = () => {
-    alert("Fitur download semua foto akan segera tersedia!");
-  };
-
-  const handleShare = () => {
-    navigator
-      .share?.({
-        title: album?.title || "",
-        text: `Lihat album foto ${album?.title || ""} dari HUMANIKA`,
-        url: window.location.href,
-      })
-      .catch(() => {
-        navigator.clipboard.writeText(window.location.href);
-        alert("Link berhasil disalin!");
-      });
-  };
+  // Share functionality is handled internally by ShareButton component
 
   if (loading) {
     return <GalleryDetailLoadingState />;
@@ -64,11 +49,9 @@ export default function GalleryDetail() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       <GalleryDetailHeroSection
-        event={event}
         album={album}
+        galleries={galleries}
         formattedDate={formattedDate}
-        onDownloadAll={handleDownloadAll}
-        onShare={handleShare}
       />
 
       {/* Main Content */}

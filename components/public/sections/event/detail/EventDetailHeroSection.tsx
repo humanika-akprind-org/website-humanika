@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation";
 import {
   Calendar,
   Tag,
-  Share2,
   Bookmark,
   ArrowLeft,
   Trophy,
@@ -17,19 +16,18 @@ import {
 } from "lucide-react";
 import type { Event, ScheduleItem } from "@/types/event";
 import { getEventStatus } from "lib/eventDetailUtils";
+import ShareButton from "@/components/public/ui/ShareButton";
 
 interface EventDetailHeroSectionProps {
   event: Event;
   isBookmarked: boolean;
   onBookmarkToggle: () => void;
-  onShare: () => void;
 }
 
 export default function EventDetailHeroSection({
   event,
   isBookmarked,
   onBookmarkToggle,
-  onShare,
 }: EventDetailHeroSectionProps) {
   const router = useRouter();
   const [showAllSchedules, setShowAllSchedules] = useState(false);
@@ -38,7 +36,7 @@ export default function EventDetailHeroSection({
   const hasSchedules = event.schedules && event.schedules.length > 0;
 
   const { isPastEvent, isUpcomingEvent } = getEventStatus(
-    event.schedules || []
+    event.schedules || [],
   );
 
   // Maximum schedules to show before collapsing
@@ -73,7 +71,7 @@ export default function EventDetailHeroSection({
    */
   const sortedSchedules = hasSchedules
     ? [...event.schedules].sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
       )
     : [];
 
@@ -85,7 +83,7 @@ export default function EventDetailHeroSection({
   const hasMoreSchedules = sortedSchedules.length > MAX_VISIBLE_SCHEDULES;
 
   return (
-    <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
+    <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-visible">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -262,13 +260,7 @@ export default function EventDetailHeroSection({
               <span>{isBookmarked ? "Disimpan" : "Simpan"}</span>
             </button>
 
-            <button
-              onClick={onShare}
-              className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>Bagikan</span>
-            </button>
+            <ShareButton title={event.name} />
           </div>
         </div>
       </div>

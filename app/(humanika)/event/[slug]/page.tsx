@@ -9,7 +9,6 @@ import EventSections from "@/components/public/sections/event/EventSections";
 import EventDetailLoadingState from "@/components/public/pages/event/EventDetailLoadingState";
 import EventErrorState from "@/components/public/pages/event/EventErrorState";
 import EventNotFoundState from "@/components/public/pages/event/EventNotFoundState";
-import { handleShare } from "lib/eventDetailUtils";
 
 /**
  * Event detail page component
@@ -54,9 +53,6 @@ export default function EventDetail() {
         event={event}
         isBookmarked={isBookmarked}
         onBookmarkToggle={() => setIsBookmarked(!isBookmarked)}
-        onShare={() =>
-          handleShare(event.name, event.description, window.location.href)
-        }
       />
 
       <EventDetailContentSection event={event} />
