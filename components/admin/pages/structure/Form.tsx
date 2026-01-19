@@ -16,6 +16,10 @@ import CancelButton from "@/components/ui/CancelButton";
 import ImageUpload from "@/components/admin/ui/input/ImageUpload";
 import FileUpload from "@/components/admin/ui/input/FileUpload";
 import { FiBriefcase, FiCalendar } from "react-icons/fi";
+import {
+  getGoogleDrivePreviewUrl,
+  getFileIdFromFile,
+} from "@/lib/google-drive/file-utils";
 
 interface StructureFormProps {
   structure?: OrganizationalStructure;
@@ -103,7 +107,13 @@ export default function StructureForm({
 
         <FileUpload
           label="Decree File (SK)"
+          previewUrl={getGoogleDrivePreviewUrl(existingDecree)}
           existingFile={existingDecree}
+          fileId={
+            isEdit
+              ? (getFileIdFromFile(existingDecree) ?? undefined)
+              : undefined
+          }
           onRemoveFile={removeDecree}
           onFileChange={handleFileChange}
           isLoading={isLoading}
@@ -115,6 +125,9 @@ export default function StructureForm({
           required
           error={errors.decreeFile}
           ownerEmail={ownerEmail || undefined}
+          previewWidth={80}
+          previewHeight={80}
+          alt="Decree file preview"
         />
 
         {/* Structure Image Upload */}

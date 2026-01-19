@@ -21,6 +21,10 @@ import FileUpload from "components/admin/ui/input/FileUpload";
 import SubmitButton from "components/admin/ui/button/SubmitButton";
 import CancelButton from "components/ui/CancelButton";
 import { useFinanceForm } from "@/hooks/finance/useFinanceForm";
+import {
+  getGoogleDrivePreviewUrl,
+  getFileIdFromFile,
+} from "@/lib/google-drive/file-utils";
 
 interface FinanceFormProps {
   finance?: Finance;
@@ -217,7 +221,13 @@ export default function FinanceForm({
           <div className="mb-6">
             <FileUpload
               label="Document File"
+              previewUrl={getGoogleDrivePreviewUrl(existingDocument)}
               existingFile={existingDocument}
+              fileId={
+                isEditing
+                  ? (getFileIdFromFile(existingDocument) ?? undefined)
+                  : undefined
+              }
               onRemoveFile={removeDocument}
               onFileChange={(file) => {
                 const syntheticEvent = {
@@ -233,6 +243,9 @@ export default function FinanceForm({
               removeButtonText="Delete File"
               error={errors.document}
               ownerEmail={ownerEmail || undefined}
+              previewWidth={80}
+              previewHeight={80}
+              alt="Document preview"
             />
           </div>
 

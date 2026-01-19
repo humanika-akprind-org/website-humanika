@@ -23,6 +23,10 @@ import CancelButton from "@/components/ui/CancelButton";
 import FileUpload from "@/components/admin/ui/input/FileUpload";
 import { useLetterForm } from "@/hooks/letter/useLetterForm";
 import TextEditor from "@/components/admin/ui/text-area/TextEditor";
+import {
+  getGoogleDrivePreviewUrl,
+  getFileIdFromFile,
+} from "@/lib/google-drive/file-utils";
 
 interface LetterFormProps {
   letter?: Letter;
@@ -265,7 +269,13 @@ export default function LetterForm({
         {/* Letter File */}
         <FileUpload
           label="Letter File"
+          previewUrl={getGoogleDrivePreviewUrl(existingLetter)}
           existingFile={existingLetter}
+          fileId={
+            isEditing
+              ? (getFileIdFromFile(existingLetter) ?? undefined)
+              : undefined
+          }
           onRemoveFile={removeLetter}
           onFileChange={(file) => {
             const syntheticEvent = {
@@ -281,6 +291,9 @@ export default function LetterForm({
           removeButtonText="Remove File"
           error={errors.letter}
           ownerEmail={ownerEmail || undefined}
+          previewWidth={80}
+          previewHeight={80}
+          alt="Letter file preview"
         />
 
         {/* Form Actions */}
