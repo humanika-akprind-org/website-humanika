@@ -84,10 +84,6 @@ export const ArticleList = ({ articles }: ArticleListProps) => (
                 </div>
               </div>
 
-              <h3 className="text-xl font-bold text-grey-900 mb-3 group-hover:text-primary-600 transition-colors">
-                {article.title}
-              </h3>
-
               <p className="text-grey-600 mb-4 line-clamp-2">
                 {truncatedContent}
               </p>

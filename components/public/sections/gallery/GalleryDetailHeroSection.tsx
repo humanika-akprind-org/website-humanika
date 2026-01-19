@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   Camera,
   Download,
-  Share2,
   ImageIcon,
   Calendar,
   Loader2,
@@ -17,12 +16,12 @@ import {
 import type { Gallery } from "@/types/gallery";
 import type { AlbumData } from "@/hooks/gallery/useGalleryDetail";
 import JSZip from "jszip";
+import ShareButton from "@/components/public/ui/ShareButton";
 
 interface GalleryDetailHeroSectionProps {
   album: AlbumData;
   galleries: Gallery[];
   formattedDate: string;
-  onShare: () => void;
 }
 
 // Helper function to get the actual image URL from Google Drive file ID
@@ -65,7 +64,6 @@ const MAX_VISIBLE_SCHEDULES = 3;
 export default function GalleryDetailHeroSection({
   album,
   galleries,
-  onShare,
 }: GalleryDetailHeroSectionProps) {
   const router = useRouter();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -137,7 +135,7 @@ export default function GalleryDetailHeroSection({
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
+    <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-visible">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />
@@ -295,13 +293,7 @@ export default function GalleryDetailHeroSection({
               </span>
             </button>
 
-            <button
-              onClick={onShare}
-              className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>Bagikan Album</span>
-            </button>
+            <ShareButton title={album.title} />
           </div>
         </div>
       </div>
