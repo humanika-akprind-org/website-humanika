@@ -19,7 +19,7 @@ function extractFinanceQueryParams(request: NextRequest) {
 }
 
 async function extractCreateFinanceBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<CreateFinanceInput> {
   return await request.json();
 }
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching finances:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating finance:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -11,52 +11,43 @@ import { getAccessTokenAction } from "@/lib/actions/accessToken";
 import type { FinanceCategory } from "@/types/finance-category";
 import { type WorkProgram } from "@/types/work";
 
-// Helper function to check if HTML content is empty
-const isHtmlEmpty = (html: string): boolean => {
-  const text = html.replace(/<[^>]*>/g, "").trim();
-  return text.length === 0;
-};
+// Helper function to get preview URL from file (file ID or URL)
+const getPreviewUrl = (file: string | null | undefined): string | null => {
+  if (!file) return null;
 
-// Helper function to get preview URL from proof (file ID or URL)
-const getPreviewUrl = (proof: string | null | undefined): string | null => {
-  if (!proof) return null;
-
-  if (proof.includes("drive.google.com")) {
+  if (file.includes("drive.google.com")) {
     // It's a full Google Drive URL, convert to direct image URL
-    const fileIdMatch = proof.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    const fileIdMatch = file.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
     if (fileIdMatch) {
       return `/api/drive-image?fileId=${fileIdMatch[1]}`;
     }
-    return proof;
-  } else if (proof.match(/^[a-zA-Z0-9_-]+$/)) {
+    return file;
+  } else if (file.match(/^[a-zA-Z0-9_-]+$/)) {
     // It's a Google Drive file ID, construct direct URL
-    return `/api/drive-image?fileId=${proof}`;
+    return `/api/drive-image?fileId=${file}`;
   } else {
     // It's a direct URL or other format
-    return proof;
+    return file;
   }
 };
 
-// Helper function to check if proof is from Google Drive (either URL or file ID)
-const isGoogleDriveProof = (proof: string | null | undefined): boolean => {
-  if (!proof) return false;
+// Helper function to check if file is from Google Drive (either URL or file ID)
+const isGoogleDriveFile = (file: string | null | undefined): boolean => {
+  if (!file) return false;
   return (
-    proof.includes("drive.google.com") ||
-    proof.match(/^[a-zA-Z0-9_-]+$/) !== null
+    file.includes("drive.google.com") || file.match(/^[a-zA-Z0-9_-]+$/) !== null
   );
 };
 
-// Helper function to get file ID from proof (either URL or file ID)
-const getFileIdFromProof = (
-  proof: string | null | undefined,
-): string | null => {
-  if (!proof) return null;
+// Helper function to get file ID from file (either URL or file ID)
+const getFileIdFromFile = (file: string | null | undefined): string | null => {
+  if (!file) return null;
 
-  if (proof.includes("drive.google.com")) {
-    const fileIdMatch = proof.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (file.includes("drive.google.com")) {
+    const fileIdMatch = file.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
     return fileIdMatch ? fileIdMatch[1] : null;
-  } else if (proof.match(/^[a-zA-Z0-9_-]+$/)) {
-    return proof;
+  } else if (file.match(/^[a-zA-Z0-9_-]+$/)) {
+    return file;
   }
   return null;
 };
@@ -121,16 +112,16 @@ export const useFinanceForm = ({
     workProgramId: finance?.workProgramId || "",
     periodId: finance?.periodId || "",
     status: finance?.status || Status.DRAFT,
-    proofFile: undefined as File | undefined,
+    file: undefined as File | undefined,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [existingProof, setExistingProof] = useState<string | null | undefined>(
+  const [existingFile, setExistingFile] = useState<string | null | undefined>(
     finance?.proof,
   );
-  const [removedProof, setRemovedProof] = useState(false);
+  const [removedFile, setRemovedFile] = useState(false);
   const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -140,10 +131,10 @@ export const useFinanceForm = ({
     setPreviewUrl(getPreviewUrl(finance?.proof));
   }, [finance?.proof]);
 
-  // Update preview URL when existingProof changes
+  // Update preview URL when existingFile changes
   useEffect(() => {
-    setPreviewUrl(getPreviewUrl(existingProof));
-  }, [existingProof]);
+    setPreviewUrl(getPreviewUrl(existingFile));
+  }, [existingFile]);
 
   useEffect(() => {
     if (photoError) {
@@ -178,45 +169,45 @@ export const useFinanceForm = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    handleFileSelect(file);
+  };
+
+  const handleFileSelect = (file: File | null | undefined) => {
     if (file) {
       // Validasi file
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({
           ...prev,
-          proof: "File size must be less than 5MB",
+          file: "File size must be less than 5MB",
         }));
         return;
       }
 
-      if (!file.type.startsWith("image/")) {
-        setErrors((prev) => ({
-          ...prev,
-          proof: "Please select an image file",
-        }));
-        return;
-      }
-
-      setFormData((prev) => ({ ...prev, proofFile: file }));
+      setFormData((prev) => ({ ...prev, file: file }));
       setError(null);
-      setErrors((prev) => ({ ...prev, proof: "" }));
+      setErrors((prev) => ({ ...prev, file: "" }));
 
-      // Create preview URL
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      setRemovedProof(false); // Reset removed state when new file is selected
+      // Create preview URL for images
+      if (file.type.startsWith("image/")) {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      } else {
+        setPreviewUrl(null);
+      }
+      setRemovedFile(false); // Reset removed state when new file is selected
     }
   };
 
-  const removeProof = () => {
-    if (isGoogleDriveProof(existingProof)) {
-      // Mark proof as removed for deletion during form submission
-      setRemovedProof(true);
+  const removeFile = () => {
+    if (isGoogleDriveFile(existingFile)) {
+      // Mark file as removed for deletion during form submission
+      setRemovedFile(true);
     }
 
     // Clear form state
-    setFormData((prev) => ({ ...prev, proofFile: undefined }));
+    setFormData((prev) => ({ ...prev, file: undefined }));
     setPreviewUrl(null);
-    setExistingProof(null);
+    setExistingFile(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -230,10 +221,7 @@ export const useFinanceForm = ({
     if (!formData.name.trim()) {
       newErrors.name = "Please enter transaction name";
     }
-    if (isHtmlEmpty(formData.description)) {
-      newErrors.description = "Please enter description";
-    }
-    if (formData.amount <= 0) {
+    if (!formData.amount || formData.amount <= 0) {
       newErrors.amount = "Amount must be greater than 0";
     }
     if (!formData.categoryId) {
@@ -242,8 +230,8 @@ export const useFinanceForm = ({
     if (!formData.date) {
       newErrors.date = "Please select date";
     }
-    if (!formData.proofFile && !existingProof) {
-      newErrors.proof = "Please upload a proof image";
+    if (!formData.file && !existingFile) {
+      newErrors.file = "Please upload a file";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -253,17 +241,17 @@ export const useFinanceForm = ({
     }
 
     try {
-      // Handle proof deletion if marked for removal
-      let proofUrl: string | null | undefined = existingProof;
+      // Handle file deletion if marked for removal
+      let fileUrl: string | null | undefined = existingFile;
 
       // Store old file ID for deletion after successful upload
       const oldFileId =
-        !removedProof && finance?.proof && isGoogleDriveProof(finance.proof)
-          ? getFileIdFromProof(finance.proof)
+        !removedFile && finance?.proof && isGoogleDriveFile(finance.proof)
+          ? getFileIdFromFile(finance.proof)
           : null;
 
-      // If user wants to remove the old proof or replace it, check ownership first
-      if ((removedProof || formData.proofFile) && oldFileId) {
+      // If user wants to remove the old file or replace it, check ownership first
+      if ((removedFile || formData.file) && oldFileId) {
         // Try to delete the old file first to check ownership
         try {
           await deleteFile(oldFileId);
@@ -284,31 +272,31 @@ export const useFinanceForm = ({
             setOwnerEmail(extractedEmail || null);
             throw new Error(
               extractedEmail
-                ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this proof.`
+                ? `You don't have permission to modify this file. Use email ${extractedEmail} to edit or delete this file.`
                 : errorMsg,
             );
           }
           // For other errors, log but continue (non-critical)
-          console.warn("Failed to delete old proof:", err);
+          console.warn("Failed to delete old file:", err);
         }
       }
 
-      if (removedProof) {
-        proofUrl = null;
+      if (removedFile) {
+        fileUrl = null;
       }
 
-      if (formData.proofFile) {
+      if (formData.file) {
         // Upload with temporary filename first
         const tempFileName = `temp_${Date.now()}`;
         const uploadedFileId = await uploadFile(
-          formData.proofFile,
+          formData.file,
           tempFileName,
           financeFolderId,
         );
 
         if (uploadedFileId) {
           // Rename the file using the renameFile hook
-          const finalFileName = `finance-proof-${formData.name
+          const finalFileName = `finance-file-${formData.name
             .replace(/\s+/g, "-")
             .toLowerCase()}-${Date.now()}`;
           const renameSuccess = await renameFile(uploadedFileId, finalFileName);
@@ -317,29 +305,29 @@ export const useFinanceForm = ({
             // Set the file to public access
             const publicAccessSuccess = await setPublicAccess(uploadedFileId);
             if (publicAccessSuccess) {
-              proofUrl = uploadedFileId;
+              fileUrl = uploadedFileId;
             } else {
-              throw new Error("Failed to set public access for proof");
+              throw new Error("Failed to set public access for file");
             }
           } else {
             // Clean up uploaded file if rename fails
             await deleteFile(uploadedFileId).catch((err) => {
-              console.warn("Failed to clean up uploaded proof:", err);
+              console.warn("Failed to clean up uploaded file:", err);
             });
-            throw new Error("Failed to rename proof");
+            throw new Error("Failed to rename file");
           }
         } else {
-          throw new Error("Failed to upload proof");
+          throw new Error("Failed to upload file");
         }
       }
 
-      // Submit form data with proof URL (exclude proofFile for server action)
-      const { proofFile: _, ...dataToSend } = formData;
+      // Submit form data with file URL (exclude file for server action)
+      const { file: _, ...dataToSend } = formData;
 
       // Prepare data to send
       const submitData = {
         ...dataToSend,
-        proof: proofUrl,
+        proof: fileUrl,
         date: (() => {
           // Parse YYYY-MM-DD format and create Date object without timezone issues
           const parts = formData.date.split("-");
@@ -362,7 +350,7 @@ export const useFinanceForm = ({
       }
 
       // Reset form state after successful submission
-      setRemovedProof(false);
+      setRemovedFile(false);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to save transaction",
@@ -372,7 +360,7 @@ export const useFinanceForm = ({
     }
   };
 
-  // Function to get file owner when there's an existing proof
+  // Function to get file owner when there's an existing file
   const fetchFileOwner = useCallback(async () => {
     // Wait for token to be available
     const token = accessToken || fetchedAccessToken;
@@ -381,8 +369,8 @@ export const useFinanceForm = ({
       return;
     }
 
-    if (existingProof && isGoogleDriveProof(existingProof)) {
-      const fileId = getFileIdFromProof(existingProof);
+    if (existingFile && isGoogleDriveFile(existingFile)) {
+      const fileId = getFileIdFromFile(existingFile);
       if (fileId) {
         try {
           const ownerInfo = await getFileDetails(fileId, token);
@@ -394,21 +382,21 @@ export const useFinanceForm = ({
         }
       }
     }
-  }, [existingProof, accessToken, fetchedAccessToken, getFileDetails]);
+  }, [existingFile, accessToken, fetchedAccessToken, getFileDetails]);
 
-  // Fetch file owner on mount if there's an existing proof
+  // Fetch file owner on mount if there's an existing file
   useEffect(() => {
-    if (existingProof) {
+    if (existingFile) {
       fetchFileOwner();
     }
-  }, [existingProof, fetchFileOwner]);
+  }, [existingFile, fetchFileOwner]);
 
   // Fetch file owner when token becomes available
   useEffect(() => {
-    if (fetchedAccessToken && existingProof) {
+    if (fetchedAccessToken && existingFile) {
       fetchFileOwner();
     }
-  }, [fetchedAccessToken, fetchFileOwner, existingProof]);
+  }, [fetchedAccessToken, fetchFileOwner, existingFile]);
 
   return {
     formData,
@@ -416,13 +404,14 @@ export const useFinanceForm = ({
     isSubmitting,
     error,
     previewUrl,
-    existingProof,
+    existingFile,
     ownerEmail,
     photoLoading,
     errors,
     handleInputChange,
     handleFileChange,
-    removeProof,
+    handleFileSelect,
+    removeFile,
     handleSubmit,
   };
 };
