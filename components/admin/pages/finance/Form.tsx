@@ -50,15 +50,15 @@ export default function FinanceForm({
   const {
     formData,
     setFormData,
-    isSubmitting,
+    isLoadingState,
     error,
-    existingFile,
-    photoLoading,
+    existingDocument,
+    fileLoading,
     errors,
     ownerEmail,
     handleInputChange,
-    handleFileSelect,
-    removeFile,
+    handleFileChange,
+    removeDocument,
     handleSubmit,
   } = useFinanceForm({
     finance,
@@ -209,22 +209,29 @@ export default function FinanceForm({
               onChange={(data) =>
                 setFormData((prev) => ({ ...prev, description: data }))
               }
-              disabled={isSubmitting}
+              disabled={isLoadingState}
               height="200px"
             />
           </div>
 
           <div className="mb-6">
             <FileUpload
-              label="File"
-              existingFile={existingFile}
-              onFileChange={handleFileSelect}
-              onRemoveFile={removeFile}
-              isLoading={isSubmitting}
-              fileLoading={photoLoading}
-              removeButtonText="Hapus File"
-              loadingText="Mengupload file..."
-              error={errors.file}
+              label="Document File"
+              existingFile={existingDocument}
+              onRemoveFile={removeDocument}
+              onFileChange={(file) => {
+                const syntheticEvent = {
+                  target: { files: [file] as unknown as FileList },
+                } as unknown as React.ChangeEvent<HTMLInputElement>;
+                handleFileChange(syntheticEvent);
+              }}
+              isLoading={isLoadingState}
+              fileLoading={fileLoading}
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
+              helpText="Upload document (max 5MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
+              loadingText="Uploading file..."
+              removeButtonText="Delete File"
+              error={errors.document}
               ownerEmail={ownerEmail || undefined}
             />
           </div>
@@ -232,11 +239,11 @@ export default function FinanceForm({
           <div className="flex justify-end space-x-3">
             <CancelButton
               onClick={() => router.back()}
-              disabled={isSubmitting}
+              disabled={isLoadingState}
             />
 
             <SubmitButton
-              isSubmitting={isSubmitting || photoLoading}
+              isSubmitting={isLoadingState || fileLoading}
               text={isEditing ? "Update Transaction" : "Create Transaction"}
               loadingText="Saving..."
             />

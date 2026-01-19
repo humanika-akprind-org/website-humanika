@@ -35,7 +35,7 @@ export const useGalleryDetail = (slug: string): UseGalleryDetailReturn => {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [galleryCounts, setGalleryCounts] = useState<Record<string, number>>(
-    {}
+    {},
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,35 +51,38 @@ export const useGalleryDetail = (slug: string): UseGalleryDetailReturn => {
         ]);
 
         // Group all galleries by eventId and count them
-        const galleryCounts = allGalleriesData.reduce(
+        const galleryCountsMap = allGalleriesData.reduce(
           (acc: Record<string, number>, gallery: Gallery) => {
             acc[gallery.eventId] = (acc[gallery.eventId] || 0) + 1;
             return acc;
           },
-          {}
+          {},
         );
 
+        // Filter for related events:
+        // 1. Not the current event
+        // 2. Has at least one gallery photo
+        // 3. Published status
         const relatedEventsData = eventsData
-          .filter(
-            (e: Event) =>
-              e.id !== eventData.id &&
-              (galleryCounts[e.id] || 0) > 0 &&
-              e.category?.id === eventData.category?.id
-          )
+          .filter((e: Event) => {
+            if (e.id === eventData.id) return false;
+            if ((galleryCountsMap[e.id] || 0) === 0) return false;
+            return true;
+          })
           .slice(0, 4);
 
         // Filter galleries for current event only
         const currentEventGalleries = allGalleriesData.filter(
-          (gallery: Gallery) => gallery.eventId === eventData.id
+          (gallery: Gallery) => gallery.eventId === eventData.id,
         );
 
         setEvent(eventData);
         setGalleries(currentEventGalleries);
-        setGalleryCounts(galleryCounts);
+        setGalleryCounts(galleryCountsMap);
         setRelatedEvents(relatedEventsData);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Failed to load gallery data"
+          err instanceof Error ? err.message : "Failed to load gallery data",
         );
       } finally {
         setLoading(false);
@@ -97,8 +100,8 @@ export const useGalleryDetail = (slug: string): UseGalleryDetailReturn => {
           event.schedules && event.schedules.length > 0
             ? new Date(
                 Math.min(
-                  ...event.schedules.map((s) => new Date(s.date).getTime())
-                )
+                  ...event.schedules.map((s) => new Date(s.date).getTime()),
+                ),
               )
             : new Date(event.createdAt),
         description: event.description,

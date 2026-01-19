@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ChevronRight, FolderOpen } from "lucide-react";
 import AlbumGrid from "@/components/public/pages/card/album/AlbumGrid";
-import { getPreviewUrl } from "@/lib/gallery-utils";
+import { transformEventsToAlbums } from "@/lib/gallery-utils";
 import type { Event } from "@/types/event";
 
 interface GalleryDetailRelatedAlbumsSectionProps {
@@ -17,20 +17,8 @@ export default function GalleryDetailRelatedAlbumsSection({
 }: GalleryDetailRelatedAlbumsSectionProps) {
   const router = useRouter();
 
-  const albums = relatedEvents.map((event) => ({
-    id: event.id,
-    title: event.name,
-    count: galleryCounts[event.id] || 0,
-    cover: getPreviewUrl(event.thumbnail),
-    lastUpdated:
-      event.schedules && event.schedules.length > 0
-        ? new Date(
-            Math.min(...event.schedules.map((s) => new Date(s.date).getTime()))
-          )
-        : new Date(event.createdAt),
-    eventName: event.name,
-    category: event.category?.name,
-  }));
+  // Transform events to albums format using the utility function
+  const albums = transformEventsToAlbums(relatedEvents, galleryCounts);
 
   return (
     <motion.section
@@ -68,7 +56,7 @@ export default function GalleryDetailRelatedAlbumsSection({
                 Tidak Ada Album Terkait
               </h3>
               <p className="text-grey-600">
-                belum ada album lain dalam kategori yang sama. Jelajahi album
+                Belum ada album terkait dalam kategori yang sama. Jelajahi album
                 lainnya dari HUMANIKA!
               </p>
             </div>

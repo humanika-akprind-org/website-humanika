@@ -104,6 +104,40 @@ export default function DocumentForm({
   const documentLabel = getDynamicLabel(fixedDocumentType);
   const documentPlaceholder = getDynamicPlaceholder(fixedDocumentType);
 
+  // Helper function to get preview URL from document (file ID or URL)
+  const getPreviewUrl = (doc: string | null | undefined): string => {
+    if (!doc) return "";
+
+    if (doc.includes("drive.google.com")) {
+      const fileIdMatch = doc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
+      }
+      return doc;
+    } else if (doc.match(/^[a-zA-Z0-9_-]+$/)) {
+      return `/api/drive-image?fileId=${doc}`;
+    } else {
+      return doc;
+    }
+  };
+
+  // Helper function to get file ID from document
+  const getFileId = (doc: string | null | undefined): string | undefined => {
+    if (!doc) return undefined;
+
+    if (doc.includes("drive.google.com")) {
+      const fileIdMatch = doc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return fileIdMatch[1];
+      }
+      return undefined;
+    } else if (doc.match(/^[a-zA-Z0-9_-]+$/)) {
+      return doc;
+    } else {
+      return undefined;
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       {error && (
@@ -192,7 +226,9 @@ export default function DocumentForm({
 
         <FileUpload
           label="Document File"
+          previewUrl={getPreviewUrl(existingDocument)}
           existingFile={existingDocument}
+          fileId={isEditing ? getFileId(existingDocument) : undefined}
           onRemoveFile={removeDocument}
           onFileChange={(file) => {
             const syntheticEvent = {
@@ -203,11 +239,14 @@ export default function DocumentForm({
           isLoading={isLoadingState}
           fileLoading={fileLoading}
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
-          helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
+          helpText="Upload document (max 5MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
           loadingText="Uploading file..."
           removeButtonText="Delete File"
           error={errors.document}
           ownerEmail={ownerEmail || undefined}
+          previewWidth={80}
+          previewHeight={80}
+          alt="Document preview"
         />
 
         <div className="flex justify-end space-x-3 pt-4">

@@ -276,7 +276,7 @@ export default function LetterForm({
           isLoading={isLoadingState}
           fileLoading={fileLoading}
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
-          helpText="Upload letter file (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
+          helpText="Upload letter file (max 5MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
           loadingText="Uploading file..."
           removeButtonText="Remove File"
           error={errors.letter}
