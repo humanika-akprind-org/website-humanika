@@ -30,10 +30,6 @@ export default function GalleryDetail() {
     formattedDate,
   } = useGalleryDetail(slugParam);
 
-  const handleDownloadAll = () => {
-    alert("Fitur download semua foto akan segera tersedia!");
-  };
-
   const handleShare = () => {
     navigator
       .share?.({
@@ -64,10 +60,9 @@ export default function GalleryDetail() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
       <GalleryDetailHeroSection
-        event={event}
         album={album}
+        galleries={galleries}
         formattedDate={formattedDate}
-        onDownloadAll={handleDownloadAll}
         onShare={handleShare}
       />
 

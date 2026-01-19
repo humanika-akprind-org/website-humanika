@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -7,25 +7,85 @@ import {
   Share2,
   ImageIcon,
   Calendar,
+  Loader2,
 } from "lucide-react";
-import type { Event } from "@/types/event";
+import type { Gallery } from "@/types/gallery";
 import type { AlbumData } from "@/hooks/gallery/useGalleryDetail";
+import JSZip from "jszip";
 
 interface GalleryDetailHeroSectionProps {
-  event: Event;
   album: AlbumData;
+  galleries: Gallery[];
   formattedDate: string;
-  onDownloadAll: () => void;
   onShare: () => void;
 }
 
+// Helper function to get the actual image URL from Google Drive file ID
+const getImageUrl = (fileId: string) =>
+  `/api/drive-image?fileId=${fileId}&size=large`;
+
 export default function GalleryDetailHeroSection({
   album,
+  galleries,
   formattedDate,
-  onDownloadAll,
   onShare,
 }: GalleryDetailHeroSectionProps) {
   const router = useRouter();
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadAll = async () => {
+    if (!galleries || galleries.length === 0) return;
+
+    setIsDownloading(true);
+
+    try {
+      const zip = new JSZip();
+      const folderName = album.title.replace(/[^a-zA-Z0-9]/g, "_");
+      const folder = zip.folder(folderName) || zip;
+
+      // Fetch all images in parallel
+      const imagePromises = galleries.map(async (gallery, index) => {
+        try {
+          // Use the Google Drive image API endpoint
+          const imageUrl = getImageUrl(gallery.image);
+          const response = await fetch(imageUrl);
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const blob = await response.blob();
+
+          // Generate filename with index and original title
+          const filename = `${String(index + 1).padStart(3, "0")}_${gallery.title.replace(/[^a-zA-Z0-9]/g, "_") || "photo"}.jpg`;
+
+          folder.file(filename, blob);
+        } catch (error) {
+          console.error("Failed to fetch image:", gallery.image, error);
+        }
+      });
+
+      await Promise.all(imagePromises);
+
+      // Generate and download the ZIP file
+      const content = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(content);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${folderName}_photos.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // Call the original onDownloadAll callback if provided
+    } catch (error) {
+      console.error("Failed to create ZIP file:", error);
+      alert("Gagal mengunduh foto. Silakan coba lagi.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
@@ -88,11 +148,20 @@ export default function GalleryDetailHeroSection({
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-4">
             <button
-              onClick={onDownloadAll}
-              className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors"
+              onClick={handleDownloadAll}
+              disabled={isDownloading || galleries.length === 0}
+              className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Download className="w-4 h-4" />
-              <span>Download Semua</span>
+              {isDownloading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              <span>
+                {isDownloading
+                  ? `Mengunduh ${galleries.length} foto...`
+                  : "Download Semua"}
+              </span>
             </button>
 
             <button
