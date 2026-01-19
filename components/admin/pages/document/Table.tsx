@@ -28,6 +28,8 @@ interface DocumentTableProps {
   onPageChange: (page: number) => void;
   onAddDocument: () => void;
   typeFilter?: string;
+  canDelete?: () => boolean;
+  excludeTypes?: string[];
 }
 
 export default function DocumentTable({
@@ -44,19 +46,32 @@ export default function DocumentTable({
   onPageChange,
   onAddDocument,
   typeFilter,
+  canDelete: canDeleteProp,
+  excludeTypes = [],
 }: DocumentTableProps) {
-  const { canAdd, canEdit, canDelete } = useResourcePermission("documents");
+  const {
+    canAdd,
+    canEdit,
+    canDelete: canDeleteDefault,
+  } = useResourcePermission("documents");
+  const canDelete = canDeleteProp || canDeleteDefault;
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  // Filter documents by type if typeFilter is provided
-  const filteredDocuments = typeFilter
-    ? documents.filter(
-        (doc) =>
-          doc.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
-          typeFilter.toLowerCase().replace(/[\s\-]/g, "")
-      )
-    : documents;
+  // Filter documents by type if typeFilter is provided, and exclude specific types if excludeTypes is provided
+  const filteredDocuments = documents.filter((doc) => {
+    const matchesType =
+      !typeFilter ||
+      doc.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
+        typeFilter.toLowerCase().replace(/[\s\-]/g, "");
+
+    const notExcluded = !excludeTypes.some(
+      (excludeType: string) =>
+        excludeType === doc.type?.toLowerCase().replace(/[\s\-]/g, ""),
+    );
+
+    return matchesType && notExcluded;
+  });
 
   // Sort documents
   const sortedDocuments = [...filteredDocuments].sort((a, b) => {
@@ -119,7 +134,7 @@ export default function DocumentTable({
     if (document.document) {
       const downloadUrl = getGoogleDriveDirectUrl(
         document.document,
-        "download"
+        "download",
       );
       if (downloadUrl) {
         window.open(downloadUrl, "_blank");
@@ -254,7 +269,7 @@ export default function DocumentTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${document.document}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -265,7 +280,7 @@ export default function DocumentTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${document.document}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -279,7 +294,7 @@ export default function DocumentTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${document.document}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -290,7 +305,7 @@ export default function DocumentTable({
                   onClick={() => {
                     window.open(
                       `https://drive.google.com/file/d/${document.document}/view`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
                 >
@@ -300,7 +315,7 @@ export default function DocumentTable({
                         ? document.approvals.sort(
                             (a, b) =>
                               new Date(b.updatedAt).getTime() -
-                              new Date(a.updatedAt).getTime()
+                              new Date(a.updatedAt).getTime(),
                           )[0].status
                         : "PENDING"
                     }

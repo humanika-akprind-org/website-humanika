@@ -14,12 +14,15 @@ import StatusChip from "components/admin/ui/chip/Status";
 import StatusApprovalChip from "components/admin/ui/chip/StatusApproval";
 import DateDisplay from "components/admin/ui/date/DateDisplay";
 import { useDocumentManagement } from "@/hooks/document/useDocumentManagement";
+import { useResourcePermission } from "@/hooks/usePermission";
 
 export default function ProposalsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [userFilter, setUserFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("all");
+
+  const { canDelete } = useResourcePermission("proposals");
 
   const {
     documents,
@@ -105,6 +108,7 @@ export default function ProposalsPage() {
         }}
         selectedCount={selectedDocuments.length}
         onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
         showTypeFilter={false}
         showApprovalStatusFilter={true}
         approvalStatusFilter={approvalStatusFilter}
@@ -125,6 +129,7 @@ export default function ProposalsPage() {
         onPageChange={setCurrentPage}
         onAddDocument={handleAddDocument}
         typeFilter="proposal"
+        canDelete={canDelete}
       />
 
       <DeleteModal
