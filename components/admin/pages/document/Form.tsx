@@ -52,6 +52,7 @@ export default function DocumentForm({
     isLoadingState,
     error,
     existingDocument,
+    fileNotFound,
     fileLoading,
     errors,
     ownerEmail,
@@ -112,6 +113,16 @@ export default function DocumentForm({
         </div>
       )}
 
+      {fileNotFound && (
+        <div className="mb-6 p-4 bg-amber-50 text-amber-700 rounded-lg border border-amber-100">
+          <h3 className="font-medium">File Not Found</h3>
+          <p className="text-sm">
+            The file associated with this document is no longer available in
+            Google Drive. Please upload a new file to replace it.
+          </p>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <TextInput
@@ -132,10 +143,16 @@ export default function DocumentForm({
               name="documentTypeId"
               value={formData.documentTypeId}
               onChange={(value) => handleSelectChange("documentTypeId", value)}
-              options={documentTypes.map((type) => ({
-                value: type.id,
-                label: type.name,
-              }))}
+              options={documentTypes
+                .filter(
+                  (type) =>
+                    type.name.toLowerCase() !== "proposal" &&
+                    type.name.toLowerCase() !== "accountability report",
+                )
+                .map((type) => ({
+                  value: type.id,
+                  label: type.name,
+                }))}
               placeholder="Select type"
               required
               icon={<FiFolder className="text-gray-400" />}

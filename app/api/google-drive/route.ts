@@ -251,22 +251,40 @@ export async function POST(request: NextRequest) {
         if (!fileId) {
           throw new Error("Missing file ID");
         }
-        // Get file details including owner email
-        const { data: fileData } = await drive.files.get({
-          fileId,
-          fields: "id,name,owners",
-        });
-        return NextResponse.json({
-          success: true,
-          file: {
-            id: fileData.id,
-            name: fileData.name,
-            owners: fileData.owners?.map((owner) => ({
-              emailAddress: owner.emailAddress,
-              displayName: owner.displayName,
-            })),
-          },
-        });
+        try {
+          // Get file details including owner email
+          const { data: fileData } = await drive.files.get({
+            fileId,
+            fields: "id,name,owners",
+          });
+          return NextResponse.json({
+            success: true,
+            file: {
+              id: fileData.id,
+              name: fileData.name,
+              owners: fileData.owners?.map((owner) => ({
+                emailAddress: owner.emailAddress,
+                displayName: owner.displayName,
+              })),
+            },
+          });
+        } catch (getError) {
+          // Handle 404 error - file not found
+          const err = getError as { response?: { status?: number } };
+          if (err.response?.status === 404) {
+            return NextResponse.json(
+              {
+                success: false,
+                message:
+                  "File not found in Google Drive. The file may have been deleted or moved.",
+                notFound: true,
+                fileId,
+              },
+              { status: 404 },
+            );
+          }
+          throw getError;
+        }
 
       case "getUrl":
         if (!fileId) {

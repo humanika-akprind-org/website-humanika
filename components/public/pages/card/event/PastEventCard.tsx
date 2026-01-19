@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 
 interface PastEventCardProps {
   id: string;
+  slug?: string;
   title: string;
   date: Date | string;
   image?: string;
@@ -37,6 +38,7 @@ function getPreviewUrl(image: string | null | undefined): string {
 
 export default function PastEventCard({
   id,
+  slug,
   title,
   date,
   image,
@@ -49,6 +51,8 @@ export default function PastEventCard({
     month: "long",
     year: "numeric",
   });
+
+  const href = slug ? `/gallery/${slug}` : `/gallery/${id}`;
 
   return (
     <motion.div
@@ -131,7 +135,7 @@ export default function PastEventCard({
         )}
 
         {/* View Documentation Button */}
-        <Link href={`/gallery/${id}`}>
+        <Link href={href}>
           <button className="group/btn w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-grey-50 to-grey-100 text-grey-700 rounded-lg hover:from-primary-50 hover:to-primary-100 hover:text-primary-700 transition-all duration-300 font-medium border border-grey-200 hover:border-primary-200">
             <span>Lihat Dokumentasi</span>
             <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />

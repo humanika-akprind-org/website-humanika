@@ -37,7 +37,11 @@ export default function TopEventsSection({ albums }: TopEventsSectionProps) {
         {topAlbums.map((album) => (
           <Link
             key={album.id}
-            href={`/gallery/${album.id}`}
+            href={
+              album.eventSlug
+                ? `/gallery/${album.eventSlug}`
+                : `/gallery/${album.id}`
+            }
             className="group bg-white rounded-2xl shadow-lg hover:shadow-xl overflow-hidden border border-grey-200"
           >
             <div className="relative h-48 bg-gradient-to-br from-primary-50 to-primary-100">
