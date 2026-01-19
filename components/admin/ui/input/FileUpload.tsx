@@ -284,6 +284,12 @@ export default function FileUpload({
     null,
   );
 
+  // Track if a new file has been uploaded
+  const [hasNewFile, setHasNewFile] = useState(false);
+
+  // Track uploaded file for icon detection
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
   // Use prop preview URL if provided and non-empty, otherwise use internal state
   const previewUrl =
     propPreviewUrl && propPreviewUrl.trim() !== ""
@@ -321,9 +327,10 @@ export default function FileUpload({
     setCroppedImage(null);
   }, [previewUrl]);
 
-  // Reset preview when existingFile changes
+  // Reset hasNewFile when existingFile changes
   useEffect(() => {
     if (existingFile && existingFile.trim() !== "") {
+      setHasNewFile(false);
       const isImg = isImageFile(existingFile);
       setIsImage(isImg);
       if (isImg) {
@@ -349,6 +356,8 @@ export default function FileUpload({
       setSizeError(null);
       setCroppedImage(null);
       setCropModalOpen(false);
+      setHasNewFile(true);
+      setUploadedFile(file);
       onFileChange(file);
 
       // Set preview for images
@@ -366,9 +375,94 @@ export default function FileUpload({
     }
   };
 
-  // Get file icon for non-image files
-  const fileIconInfo = existingFile ? getFileIconInfo(existingFile) : null;
-  const FileIcon = fileIconInfo?.icon || FiFile;
+  // Get file icon info - prioritize existing file, then use internal preview for new uploads
+  const getFileIcon = () => {
+    // If we have an uploaded file (new upload), determine icon from file type
+    if (uploadedFile) {
+      const fileType = uploadedFile.type;
+      const fileName = uploadedFile.name.toLowerCase();
+
+      if (fileType.startsWith("image/")) {
+        return {
+          Icon: FiImage,
+          bgColor: "bg-green-100",
+          color: "text-green-600",
+        };
+      }
+
+      if (fileType === "application/pdf" || fileName.endsWith(".pdf")) {
+        return {
+          Icon: FiFileMinus,
+          bgColor: "bg-red-100",
+          color: "text-red-600",
+        };
+      }
+
+      if (
+        fileType.includes("word") ||
+        fileName.endsWith(".doc") ||
+        fileName.endsWith(".docx")
+      ) {
+        return {
+          Icon: FiFileText,
+          bgColor: "bg-blue-100",
+          color: "text-blue-600",
+        };
+      }
+
+      if (
+        fileType.includes("excel") ||
+        fileType.includes("spreadsheet") ||
+        fileName.endsWith(".xls") ||
+        fileName.endsWith(".xlsx")
+      ) {
+        return {
+          Icon: FiTable,
+          bgColor: "bg-green-100",
+          color: "text-green-600",
+        };
+      }
+
+      if (
+        fileType.includes("powerpoint") ||
+        fileType.includes("presentation") ||
+        fileName.endsWith(".ppt") ||
+        fileName.endsWith(".pptx")
+      ) {
+        return {
+          Icon: FiFile,
+          bgColor: "bg-orange-100",
+          color: "text-orange-600",
+        };
+      }
+
+      // Default for unknown file types
+      return {
+        Icon: FiFile,
+        bgColor: "bg-gray-100",
+        color: "text-gray-600",
+      };
+    }
+
+    // If we have an existing file, use its info
+    if (existingFile && existingFile.trim() !== "") {
+      const iconInfo = getFileIconInfo(existingFile);
+      return {
+        Icon: iconInfo.icon,
+        bgColor: iconInfo.bgColor,
+        color: iconInfo.color,
+      };
+    }
+
+    // Default icon
+    return {
+      Icon: FiFile,
+      bgColor: "bg-gray-100",
+      color: "text-gray-600",
+    };
+  };
+
+  const fileIcon = getFileIcon();
 
   // Helper function to get display URL (prioritize cropped image)
   const getDisplayUrl = () => {
@@ -384,7 +478,9 @@ export default function FileUpload({
             error || sizeError ? "border-red-300 bg-red-50" : "border-gray-200"
           }`}
         >
-          {(previewUrl || (existingFile && existingFile.trim() !== "")) && (
+          {(previewUrl ||
+            (existingFile && existingFile.trim() !== "") ||
+            hasNewFile) && (
             <div className="flex flex-col items-center">
               <div className="flex-shrink-0">
                 {(() => {
@@ -439,13 +535,15 @@ export default function FileUpload({
                     // Show file type icon
                     return (
                       <div
-                        className="bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200"
+                        className={`rounded-full flex items-center justify-center border-2 border-gray-200 ${fileIcon.bgColor}`}
                         style={{
                           width: previewWidth,
                           height: previewHeight,
                         }}
                       >
-                        <FileIcon className="w-8 h-8 text-gray-500" />
+                        <fileIcon.Icon
+                          className={`w-8 h-8 ${fileIcon.color}`}
+                        />
                       </div>
                     );
                   }
@@ -473,6 +571,8 @@ export default function FileUpload({
                   type="button"
                   onClick={() => {
                     setCroppedImage(null);
+                    setHasNewFile(false);
+                    setUploadedFile(null);
                     onRemoveFile?.();
                   }}
                   className="text-sm text-red-600 hover:text-red-800"
