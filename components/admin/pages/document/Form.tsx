@@ -19,6 +19,14 @@ import CancelButton from "@/components/ui/CancelButton";
 import FileUpload from "@/components/admin/ui/input/FileUpload";
 import { useDocumentForm } from "@/hooks/document/useDocumentForm";
 import { useDocumentTypes } from "@/hooks/document-type/useDocumentTypes";
+import {
+  getDynamicLabel,
+  getDynamicPlaceholder,
+} from "@/lib/document/document-utils";
+import {
+  getGoogleDrivePreviewUrl,
+  getFileIdFromFile,
+} from "@/lib/google-drive/file-utils";
 
 interface DocumentFormProps {
   document?: Document;
@@ -83,60 +91,8 @@ export default function DocumentForm({
     normalizedFixed === "accountabilityreport";
 
   // Dynamic label and placeholder based on fixedDocumentType
-  const getDynamicLabel = (type?: string) => {
-    if (!type) return "Document Name";
-    if (type.toLowerCase() === "proposal") return "Proposal Name";
-    if (type.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport") {
-      return "Accountability Report Name";
-    }
-    return "Document Name";
-  };
-
-  const getDynamicPlaceholder = (type?: string) => {
-    if (!type) return "Enter document name";
-    if (type.toLowerCase() === "proposal") return "Enter proposal name";
-    if (type.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport") {
-      return "Enter accountability report name";
-    }
-    return "Enter document name";
-  };
-
   const documentLabel = getDynamicLabel(fixedDocumentType);
   const documentPlaceholder = getDynamicPlaceholder(fixedDocumentType);
-
-  // Helper function to get preview URL from document (file ID or URL)
-  const getPreviewUrl = (doc: string | null | undefined): string => {
-    if (!doc) return "";
-
-    if (doc.includes("drive.google.com")) {
-      const fileIdMatch = doc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (fileIdMatch) {
-        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
-      }
-      return doc;
-    } else if (doc.match(/^[a-zA-Z0-9_-]+$/)) {
-      return `/api/drive-image?fileId=${doc}`;
-    } else {
-      return doc;
-    }
-  };
-
-  // Helper function to get file ID from document
-  const getFileId = (doc: string | null | undefined): string | undefined => {
-    if (!doc) return undefined;
-
-    if (doc.includes("drive.google.com")) {
-      const fileIdMatch = doc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (fileIdMatch) {
-        return fileIdMatch[1];
-      }
-      return undefined;
-    } else if (doc.match(/^[a-zA-Z0-9_-]+$/)) {
-      return doc;
-    } else {
-      return undefined;
-    }
-  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -226,9 +182,13 @@ export default function DocumentForm({
 
         <FileUpload
           label="Document File"
-          previewUrl={getPreviewUrl(existingDocument)}
+          previewUrl={getGoogleDrivePreviewUrl(existingDocument)}
           existingFile={existingDocument}
-          fileId={isEditing ? getFileId(existingDocument) : undefined}
+          fileId={
+            isEditing
+              ? (getFileIdFromFile(existingDocument) ?? undefined)
+              : undefined
+          }
           onRemoveFile={removeDocument}
           onFileChange={(file) => {
             const syntheticEvent = {
