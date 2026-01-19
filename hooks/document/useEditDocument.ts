@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { UpdateDocumentInput, Document } from "@/types/document";
 
-export function useEditDocument(id: string) {
+interface UseEditDocumentProps {
+  redirectPath?: string;
+}
+
+export function useEditDocument(id: string, props: UseEditDocumentProps = {}) {
   const router = useRouter();
+  const { redirectPath = "/admin/administration/documents" } = props;
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +41,7 @@ export function useEditDocument(id: string) {
         body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed to update document");
-      router.push("/admin/administration/documents");
+      router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -56,7 +61,7 @@ export function useEditDocument(id: string) {
       if (!response.ok) {
         throw new Error("Failed to update document for approval");
       }
-      router.push("/admin/administration/documents");
+      router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -65,7 +70,7 @@ export function useEditDocument(id: string) {
   };
 
   const handleBack = () => {
-    router.push("/admin/administration/documents");
+    router.push(redirectPath);
   };
 
   return {
