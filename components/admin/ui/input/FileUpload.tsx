@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { Crop } from "lucide-react";
 import AccessTokenGuard from "./AccessTokenGuard";
+import ImageCropper from "./ImageCropper";
 import {
   FiFile,
   FiFileText,
@@ -26,6 +28,11 @@ interface FileUploadProps {
   error?: string;
   ownerEmail?: string;
   maxSize?: number; // in bytes, default 5MB
+  // Crop related props
+  enableCrop?: boolean; // default true
+  aspect?: number; // default 16/9
+  showCropButton?: boolean; // default true
+  cropButtonText?: string; // default "Crop Image"
 }
 
 // Helper type for file icon info
@@ -94,10 +101,51 @@ export default function FileUpload({
   error,
   ownerEmail,
   maxSize = 5 * 1024 * 1024, // 5MB default
+  enableCrop = true,
+  aspect = 16 / 9,
+  showCropButton = true,
+  cropButtonText = "Crop Image",
 }: FileUploadProps) {
   const [sizeError, setSizeError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isImage, setIsImage] = useState(false);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
+
+  // Function to handle cropped image upload
+  const handleCroppedImageUpload = useCallback(
+    async (croppedImg: string) => {
+      try {
+        // Convert base64/data URL to blob
+        const response = await fetch(croppedImg);
+        const blob = await response.blob();
+
+        // Create a File object from the blob
+        const file = new File([blob], "cropped-image.jpg", {
+          type: "image/jpeg",
+        });
+
+        // Call the parent's onFileChange with the cropped image
+        onFileChange(file);
+      } catch (error) {
+        console.error("Error uploading cropped image:", error);
+      }
+    },
+    [onFileChange],
+  );
+
+  // Effect to handle cropped image upload
+  useEffect(() => {
+    if (croppedImage) {
+      handleCroppedImageUpload(croppedImage);
+    }
+  }, [croppedImage, handleCroppedImageUpload]);
+
+  // Effect to clear cropped image when preview URL changes
+  useEffect(() => {
+    setCroppedImage(null);
+  }, [previewUrl]);
 
   // Reset preview when existingFile changes
   useEffect(() => {
@@ -126,6 +174,9 @@ export default function FileUpload({
       }
       // Clear size error when valid file is selected
       setSizeError(null);
+      // Reset crop-related state when new file is selected
+      setCroppedImage(null);
+      setCropModalOpen(false);
       onFileChange(file);
 
       // Set preview for images
@@ -147,6 +198,12 @@ export default function FileUpload({
   const fileIconInfo = existingFile ? getFileIconInfo(existingFile) : null;
   const FileIcon = fileIconInfo?.icon || FiFile;
 
+  // Helper function to get display URL (prioritize cropped image)
+  const getDisplayUrl = () => {
+    if (croppedImage) return croppedImage;
+    return previewUrl;
+  };
+
   return (
     <AccessTokenGuard label={label} required={required}>
       <div
@@ -157,19 +214,19 @@ export default function FileUpload({
         {existingFile && existingFile.trim() !== "" && (
           <div className="flex flex-col items-center">
             <div className="flex-shrink-0">
-              {isImage && previewUrl ? (
+              {isImage && getDisplayUrl() ? (
                 // Image preview
                 <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200">
-                  {previewUrl.startsWith("blob:") ? (
+                  {getDisplayUrl()!.startsWith("blob:") ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={previewUrl}
+                      src={getDisplayUrl()!}
                       alt="File preview"
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <Image
-                      src={previewUrl}
+                      src={getDisplayUrl()!}
                       alt="File preview"
                       width={64}
                       height={64}
@@ -188,9 +245,29 @@ export default function FileUpload({
               )}
             </div>
             <div className="flex gap-2 mt-2">
+              {enableCrop && isImage && showCropButton && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const displayUrl = getDisplayUrl();
+                    if (displayUrl) {
+                      setOriginalImage(displayUrl);
+                      setCropModalOpen(true);
+                    }
+                  }}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                  disabled={isLoading || !getDisplayUrl()}
+                >
+                  <Crop className="w-4 h-4 inline mr-1" />
+                  {cropButtonText}
+                </button>
+              )}
               <button
                 type="button"
-                onClick={onRemoveFile}
+                onClick={() => {
+                  setCroppedImage(null);
+                  onRemoveFile?.();
+                }}
                 className="text-sm text-red-600 hover:text-red-800"
                 disabled={isLoading}
               >
@@ -221,6 +298,15 @@ export default function FileUpload({
           Use email {ownerEmail} to edit this file!
         </p>
       )}
+
+      {/* Crop Modal */}
+      <ImageCropper
+        isOpen={cropModalOpen}
+        onClose={() => setCropModalOpen(false)}
+        imageSrc={originalImage}
+        onCropComplete={(croppedImg) => setCroppedImage(croppedImg)}
+        aspect={aspect}
+      />
     </AccessTokenGuard>
   );
 }
