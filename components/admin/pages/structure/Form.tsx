@@ -109,7 +109,7 @@ export default function StructureForm({
           isLoading={isLoading}
           fileLoading={fileLoading}
           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-          helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, JPG, PNG)"
+          helpText="Upload document (max 5MB, format: PDF, DOC, DOCX, JPG, PNG)"
           loadingText="Uploading file..."
           removeButtonText="Hapus File"
           required

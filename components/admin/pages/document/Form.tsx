@@ -203,7 +203,7 @@ export default function DocumentForm({
           isLoading={isLoadingState}
           fileLoading={fileLoading}
           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
-          helpText="Upload document (max 10MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
+          helpText="Upload document (max 5MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
           loadingText="Uploading file..."
           removeButtonText="Delete File"
           error={errors.document}

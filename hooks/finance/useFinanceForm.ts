@@ -79,8 +79,8 @@ export const useFinanceForm = ({
     renameFile,
     setPublicAccess,
     getFileDetails,
-    isLoading: photoLoading,
-    error: photoError,
+    isLoading: fileLoading,
+    error: fileError,
   } = useFile(accessToken || fetchedAccessToken);
 
   // Fetch access token if not provided
@@ -115,13 +115,13 @@ export const useFinanceForm = ({
     file: undefined as File | undefined,
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingState, setIsLoadingState] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [existingFile, setExistingFile] = useState<string | null | undefined>(
-    finance?.proof,
-  );
-  const [removedFile, setRemovedFile] = useState(false);
+  const [existingDocument, setExistingDocument] = useState<
+    string | null | undefined
+  >(finance?.proof);
+  const [removedDocument, setRemovedDocument] = useState(false);
   const [ownerEmail, setOwnerEmail] = useState<string | null>(null);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -131,27 +131,24 @@ export const useFinanceForm = ({
     setPreviewUrl(getPreviewUrl(finance?.proof));
   }, [finance?.proof]);
 
-  // Update preview URL when existingFile changes
+  // Update preview URL when existingDocument changes
   useEffect(() => {
-    setPreviewUrl(getPreviewUrl(existingFile));
-  }, [existingFile]);
+    setPreviewUrl(getPreviewUrl(existingDocument));
+  }, [existingDocument]);
 
   useEffect(() => {
-    if (photoError) {
-      setError(photoError);
+    if (fileError) {
+      setError(fileError);
       // Check if it's a 403 error with owner email info
-      if (
-        photoError.includes("permission") ||
-        photoError.includes("Use email")
-      ) {
+      if (fileError.includes("permission") || fileError.includes("Use email")) {
         // Extract email from error message if present
-        const emailMatch = photoError.match(/Use email\s+(.+?)\s+to/);
+        const emailMatch = fileError.match(/Use email\s+(.+?)\s+to/);
         if (emailMatch && emailMatch[1]) {
           setOwnerEmail(emailMatch[1]);
         }
       }
     }
-  }, [photoError]);
+  }, [fileError]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -178,14 +175,14 @@ export const useFinanceForm = ({
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({
           ...prev,
-          file: "File size must be less than 5MB",
+          document: "File size must be less than 5MB",
         }));
         return;
       }
 
       setFormData((prev) => ({ ...prev, file: file }));
       setError(null);
-      setErrors((prev) => ({ ...prev, file: "" }));
+      setErrors((prev) => ({ ...prev, document: "" }));
 
       // Create preview URL for images
       if (file.type.startsWith("image/")) {
@@ -194,25 +191,25 @@ export const useFinanceForm = ({
       } else {
         setPreviewUrl(null);
       }
-      setRemovedFile(false); // Reset removed state when new file is selected
+      setRemovedDocument(false); // Reset removed state when new file is selected
     }
   };
 
-  const removeFile = () => {
-    if (isGoogleDriveFile(existingFile)) {
+  const removeDocument = () => {
+    if (isGoogleDriveFile(existingDocument)) {
       // Mark file as removed for deletion during form submission
-      setRemovedFile(true);
+      setRemovedDocument(true);
     }
 
     // Clear form state
     setFormData((prev) => ({ ...prev, file: undefined }));
     setPreviewUrl(null);
-    setExistingFile(null);
+    setExistingDocument(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsLoadingState(true);
     setError(null);
     setOwnerEmail(null);
 
@@ -230,28 +227,28 @@ export const useFinanceForm = ({
     if (!formData.date) {
       newErrors.date = "Please select date";
     }
-    if (!formData.file && !existingFile) {
-      newErrors.file = "Please upload a file";
+    if (!formData.file && !existingDocument) {
+      newErrors.document = "Please upload a file";
     }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      setIsSubmitting(false);
+      setIsLoadingState(false);
       return;
     }
 
     try {
       // Handle file deletion if marked for removal
-      let fileUrl: string | null | undefined = existingFile;
+      let fileUrl: string | null | undefined = existingDocument;
 
       // Store old file ID for deletion after successful upload
       const oldFileId =
-        !removedFile && finance?.proof && isGoogleDriveFile(finance.proof)
+        !removedDocument && finance?.proof && isGoogleDriveFile(finance.proof)
           ? getFileIdFromFile(finance.proof)
           : null;
 
       // If user wants to remove the old file or replace it, check ownership first
-      if ((removedFile || formData.file) && oldFileId) {
+      if ((removedDocument || formData.file) && oldFileId) {
         // Try to delete the old file first to check ownership
         try {
           await deleteFile(oldFileId);
@@ -281,7 +278,7 @@ export const useFinanceForm = ({
         }
       }
 
-      if (removedFile) {
+      if (removedDocument) {
         fileUrl = null;
       }
 
@@ -350,13 +347,13 @@ export const useFinanceForm = ({
       }
 
       // Reset form state after successful submission
-      setRemovedFile(false);
+      setRemovedDocument(false);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to save transaction",
       );
     } finally {
-      setIsSubmitting(false);
+      setIsLoadingState(false);
     }
   };
 
@@ -369,8 +366,8 @@ export const useFinanceForm = ({
       return;
     }
 
-    if (existingFile && isGoogleDriveFile(existingFile)) {
-      const fileId = getFileIdFromFile(existingFile);
+    if (existingDocument && isGoogleDriveFile(existingDocument)) {
+      const fileId = getFileIdFromFile(existingDocument);
       if (fileId) {
         try {
           const ownerInfo = await getFileDetails(fileId, token);
@@ -382,36 +379,36 @@ export const useFinanceForm = ({
         }
       }
     }
-  }, [existingFile, accessToken, fetchedAccessToken, getFileDetails]);
+  }, [existingDocument, accessToken, fetchedAccessToken, getFileDetails]);
 
   // Fetch file owner on mount if there's an existing file
   useEffect(() => {
-    if (existingFile) {
+    if (existingDocument) {
       fetchFileOwner();
     }
-  }, [existingFile, fetchFileOwner]);
+  }, [existingDocument, fetchFileOwner]);
 
   // Fetch file owner when token becomes available
   useEffect(() => {
-    if (fetchedAccessToken && existingFile) {
+    if (fetchedAccessToken && existingDocument) {
       fetchFileOwner();
     }
-  }, [fetchedAccessToken, fetchFileOwner, existingFile]);
+  }, [fetchedAccessToken, fetchFileOwner, existingDocument]);
 
   return {
     formData,
     setFormData,
-    isSubmitting,
+    isLoadingState,
     error,
     previewUrl,
-    existingFile,
+    existingDocument,
     ownerEmail,
-    photoLoading,
+    fileLoading,
     errors,
     handleInputChange,
     handleFileChange,
     handleFileSelect,
-    removeFile,
+    removeDocument,
     handleSubmit,
   };
 };
