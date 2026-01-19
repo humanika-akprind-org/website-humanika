@@ -104,6 +104,23 @@ export default function DocumentForm({
   const documentLabel = getDynamicLabel(fixedDocumentType);
   const documentPlaceholder = getDynamicPlaceholder(fixedDocumentType);
 
+  // Helper function to get preview URL from document (file ID or URL)
+  const getPreviewUrl = (doc: string | null | undefined): string => {
+    if (!doc) return "";
+
+    if (doc.includes("drive.google.com")) {
+      const fileIdMatch = doc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return `/api/drive-image?fileId=${fileIdMatch[1]}`;
+      }
+      return doc;
+    } else if (doc.match(/^[a-zA-Z0-9_-]+$/)) {
+      return `/api/drive-image?fileId=${doc}`;
+    } else {
+      return doc;
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       {error && (
@@ -192,6 +209,7 @@ export default function DocumentForm({
 
         <FileUpload
           label="Document File"
+          previewUrl={getPreviewUrl(existingDocument)}
           existingFile={existingDocument}
           onRemoveFile={removeDocument}
           onFileChange={(file) => {
@@ -208,6 +226,9 @@ export default function DocumentForm({
           removeButtonText="Delete File"
           error={errors.document}
           ownerEmail={ownerEmail || undefined}
+          previewWidth={80}
+          previewHeight={80}
+          alt="Document preview"
         />
 
         <div className="flex justify-end space-x-3 pt-4">
