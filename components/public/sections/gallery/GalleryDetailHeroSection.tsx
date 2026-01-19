@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -9,7 +8,6 @@ import {
   ImageIcon,
   Calendar,
 } from "lucide-react";
-import { getPreviewUrl } from "@/lib/gallery-utils";
 import type { Event } from "@/types/event";
 import type { AlbumData } from "@/hooks/gallery/useGalleryDetail";
 
@@ -22,7 +20,6 @@ interface GalleryDetailHeroSectionProps {
 }
 
 export default function GalleryDetailHeroSection({
-  event,
   album,
   formattedDate,
   onDownloadAll,
@@ -32,19 +29,6 @@ export default function GalleryDetailHeroSection({
 
   return (
     <section className="relative bg-gradient-to-br from-primary-800 to-primary-900 via-primary-800 text-white overflow-hidden">
-      {/* Background Image */}
-      {event?.thumbnail && (
-        <div className="absolute inset-0">
-          <Image
-            src={getPreviewUrl(event.thumbnail)}
-            alt={event.name}
-            fill
-            style={{ objectFit: "cover" }}
-            className="opacity-20"
-            priority
-          />
-        </div>
-      )}
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary-700 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 animate-pulse" />

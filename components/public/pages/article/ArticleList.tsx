@@ -8,6 +8,23 @@ import {
   truncateContent,
 } from "../../../../hooks/article/utils";
 
+// Helper function to get preview URL from image (file ID or URL)
+function getPreviewUrl(image: string | null | undefined): string {
+  if (!image) return "";
+
+  if (image.includes("drive.google.com")) {
+    const fileIdMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch) {
+      return `/api/drive-image?fileId=${fileIdMatch[1]}`;
+    }
+    return image;
+  } else if (image.match(/^[a-zA-Z0-9_-]+$/)) {
+    return `/api/drive-image?fileId=${image}`;
+  } else {
+    return image;
+  }
+}
+
 interface ArticleListProps {
   articles: Article[];
 }
@@ -35,7 +52,7 @@ export const ArticleList = ({ articles }: ArticleListProps) => (
             <div className="md:w-64 lg:w-80 h-48 md:h-auto bg-grey-100 relative overflow-hidden">
               {article.thumbnail ? (
                 <Image
-                  src={article.thumbnail}
+                  src={getPreviewUrl(article.thumbnail)}
                   alt={article.title}
                   width={320}
                   height={192}
@@ -83,9 +100,6 @@ export const ArticleList = ({ articles }: ArticleListProps) => (
                         {article.author?.name?.charAt(0) || "?"}
                       </span>
                     </div>
-                    <span className="text-sm text-grey-700">
-                      {article.author?.name || "Anonim"}
-                    </span>
                   </div>
                 </div>
                 <span className="text-primary-600 font-medium group-hover:text-primary-700 transition-colors">
