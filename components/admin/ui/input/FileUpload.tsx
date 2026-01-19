@@ -28,6 +28,7 @@ interface FileUploadProps {
   removeButtonText?: string;
   error?: string;
   ownerEmail?: string;
+  fileId?: string;
   maxSize?: number;
   // Crop related props
   enableCrop?: boolean;
@@ -278,6 +279,7 @@ export default function FileUpload({
   removeButtonText = "Delete File",
   error,
   ownerEmail,
+  fileId,
   maxSize = 5 * 1024 * 1024,
   enableCrop = true,
   aspect = 16 / 9,
@@ -492,9 +494,17 @@ export default function FileUpload({
     <AccessTokenGuard label={label} required={required}>
       <div className={className}>
         <div
-          className={`flex items-start space-x-4 p-4 rounded-lg border-2 ${
+          className={`flex items-start space-x-4 p-4 rounded-lg border-2 cursor-pointer ${
             error || sizeError ? "border-red-300 bg-red-50" : "border-gray-200"
           }`}
+          onClick={() => {
+            if (fileId) {
+              window.open(
+                `https://drive.google.com/file/d/${fileId}/view`,
+                "_blank",
+              );
+            }
+          }}
         >
           {(previewUrl ||
             (existingFile && existingFile.trim() !== "") ||

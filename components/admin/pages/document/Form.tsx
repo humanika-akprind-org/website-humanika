@@ -121,6 +121,23 @@ export default function DocumentForm({
     }
   };
 
+  // Helper function to get file ID from document
+  const getFileId = (doc: string | null | undefined): string | undefined => {
+    if (!doc) return undefined;
+
+    if (doc.includes("drive.google.com")) {
+      const fileIdMatch = doc.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch) {
+        return fileIdMatch[1];
+      }
+      return undefined;
+    } else if (doc.match(/^[a-zA-Z0-9_-]+$/)) {
+      return doc;
+    } else {
+      return undefined;
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       {error && (
@@ -211,6 +228,7 @@ export default function DocumentForm({
           label="Document File"
           previewUrl={getPreviewUrl(existingDocument)}
           existingFile={existingDocument}
+          fileId={isEditing ? getFileId(existingDocument) : undefined}
           onRemoveFile={removeDocument}
           onFileChange={(file) => {
             const syntheticEvent = {
