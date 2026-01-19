@@ -62,20 +62,11 @@ export const useGalleryDetail = (slug: string): UseGalleryDetailReturn => {
         // Filter for related events:
         // 1. Not the current event
         // 2. Has at least one gallery photo
-        // 3. Same category as current event (if current event has a category)
-        //    OR events without category (as fallback) when current event has a category
+        // 3. Published status
         const relatedEventsData = eventsData
           .filter((e: Event) => {
             if (e.id === eventData.id) return false;
             if ((galleryCountsMap[e.id] || 0) === 0) return false;
-
-            // If current event has a category
-            if (eventData.categoryId) {
-              // Show events with same category OR events without category
-              return !e.categoryId || e.categoryId === eventData.categoryId;
-            }
-
-            // If current event has no category, show all other events
             return true;
           })
           .slice(0, 4);
