@@ -55,7 +55,20 @@ const getFileExtension = (filename: string): string => {
   if (filename.includes("drive.google.com")) {
     const fileIdMatch = filename.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
     if (fileIdMatch) {
+      // Try to find extension in URL path or query params
+      const pathMatch = filename.match(/\/([^\/?]+)\.([a-zA-Z0-9]+)(?:\?|$)/);
+      if (pathMatch) {
+        return pathMatch[2].toLowerCase();
+      }
+
+      // Check query parameters for export format (e.g., ?export=download&format=pdf)
+      const formatMatch = filename.match(/[?&]format=([a-zA-Z0-9]+)/);
+      if (formatMatch) {
+        return formatMatch[1].toLowerCase();
+      }
+
       // For Google Drive, we can't determine extension from URL
+      // Return empty string, the caller should handle this case
       return "";
     }
   }
@@ -290,6 +303,9 @@ export default function FileUpload({
   // Track uploaded file for icon detection
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
+  // Track if image failed to load (for fallback to icon)
+  const [imageLoadError, setImageLoadError] = useState(false);
+
   // Use prop preview URL if provided and non-empty, otherwise use internal state
   const previewUrl =
     propPreviewUrl && propPreviewUrl.trim() !== ""
@@ -327,10 +343,11 @@ export default function FileUpload({
     setCroppedImage(null);
   }, [previewUrl]);
 
-  // Reset hasNewFile when existingFile changes
+  // Reset hasNewFile and imageLoadError when existingFile changes
   useEffect(() => {
     if (existingFile && existingFile.trim() !== "") {
       setHasNewFile(false);
+      setImageLoadError(false);
       const isImg = isImageFile(existingFile);
       setIsImage(isImg);
       if (isImg) {
@@ -358,6 +375,7 @@ export default function FileUpload({
       setCropModalOpen(false);
       setHasNewFile(true);
       setUploadedFile(file);
+      setImageLoadError(false);
       onFileChange(file);
 
       // Set preview for images
@@ -487,8 +505,12 @@ export default function FileUpload({
                   // Prioritize cropped image, then preview URL, then existing file
                   const displayUrl = getDisplayUrl();
 
-                  // Check if we have a valid image URL
-                  if (displayUrl && isValidImageUrl(displayUrl)) {
+                  // Check if we have a valid image URL and image loaded successfully
+                  if (
+                    displayUrl &&
+                    isValidImageUrl(displayUrl) &&
+                    !imageLoadError
+                  ) {
                     return (
                       <div
                         className="bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-200 overflow-hidden"
@@ -504,13 +526,7 @@ export default function FileUpload({
                             src={displayUrl}
                             alt={alt}
                             className="w-full h-full object-cover"
-                            onError={(e) => {
-                              console.error(
-                                "Image failed to load:",
-                                displayUrl,
-                                e,
-                              );
-                            }}
+                            onError={() => setImageLoadError(true)}
                           />
                         ) : (
                           <Image
@@ -520,19 +536,13 @@ export default function FileUpload({
                             height={previewHeight}
                             className="w-full h-full object-cover"
                             unoptimized
-                            onError={(e) => {
-                              console.error(
-                                "Image failed to load:",
-                                displayUrl,
-                                e,
-                              );
-                            }}
+                            onError={() => setImageLoadError(true)}
                           />
                         )}
                       </div>
                     );
                   } else {
-                    // Show file type icon
+                    // Show file type icon (fallback when image fails to load)
                     return (
                       <div
                         className={`rounded-full flex items-center justify-center border-2 border-gray-200 ${fileIcon.bgColor}`}
