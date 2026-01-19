@@ -27,9 +27,18 @@ export default function Stats({
       doc.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
         typeFilter.toLowerCase().replace(/[\s\-]/g, "");
 
+    // Normalize document type name for exclusion check
+    const normalizedDocTypeName = doc.documentType?.name
+      ?.toLowerCase()
+      .replace(/[\s\-]/g, "");
+    const normalizedDocType = doc.type
+      ? doc.type.toLowerCase().replace(/[\s\-]/g, "")
+      : "";
+
     const notExcluded = !excludeTypes.some(
       (excludeType: string) =>
-        excludeType === doc.type?.toLowerCase().replace(/[\s\-]/g, ""),
+        excludeType === normalizedDocTypeName ||
+        excludeType === normalizedDocType,
     );
 
     return matchesType && notExcluded;

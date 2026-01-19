@@ -108,6 +108,8 @@ export function useDocumentForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   // Use ref to track if owner fetch is in progress to prevent race conditions
   const ownerFetchInProgress = useRef<boolean>(false);
+  // Track if file was not found in Google Drive (separate from general errors)
+  const [fileNotFound, setFileNotFound] = useState(false);
 
   useEffect(() => {
     if (fileError) {
@@ -175,7 +177,8 @@ export function useDocumentForm({
     if (!formData.name.trim()) {
       newErrors.name = "Please enter document name";
     }
-    if (!formData.documentFile && !existingDocument) {
+    // Only require a file if there is no existing document and fileNotFound is false
+    if (!formData.documentFile && !existingDocument && !fileNotFound) {
       newErrors.document = "Please upload a document file";
     }
 
@@ -230,13 +233,30 @@ export function useDocumentForm({
                 : errorMsg,
             );
           }
-          // For other errors, log but continue (non-critical)
-          console.warn("Failed to delete old document:", err);
+          // For 404 errors (file already deleted), log but continue
+          const errWithStatus = err as Error & {
+            status?: number;
+            notFound?: boolean;
+          };
+          if (errWithStatus.status === 404 || errWithStatus.notFound) {
+            console.warn("File already deleted from Google Drive:", oldFileId);
+            // Continue - file is already gone
+          } else {
+            // For other errors, log but continue (non-critical)
+            console.warn("Failed to delete old document:", err);
+          }
         }
       }
 
       if (removedDocument) {
         documentUrl = null;
+      }
+
+      // If file was not found in Google Drive, we need to require a new file upload
+      if (fileNotFound && !formData.documentFile) {
+        throw new Error(
+          "The original file is no longer available in Google Drive. Please upload a new file to replace it.",
+        );
       }
 
       if (formData.documentFile) {
@@ -347,7 +367,27 @@ export function useDocumentForm({
             setOwnerEmail(ownerInfo.emailAddress);
           }
         } catch (err) {
-          console.warn("Failed to fetch file owner:", err);
+          // Check if it's a 404 error - file not found in Google Drive
+          const errWithStatus = err as Error & {
+            status?: number;
+            notFound?: boolean;
+          };
+          const errorMsg = err instanceof Error ? err.message : String(err);
+
+          if (
+            errWithStatus.status === 404 ||
+            errWithStatus.notFound ||
+            errorMsg.includes("not found")
+          ) {
+            // File doesn't exist in Google Drive anymore
+            console.warn("File not found in Google Drive:", fileId);
+            // Set a special state to indicate file is missing (separate from general error)
+            setOwnerEmail(null);
+            setFileNotFound(true);
+            // Do NOT set main error here - we don't want to block form submission
+          } else {
+            console.warn("Failed to fetch file owner:", err);
+          }
         } finally {
           ownerFetchInProgress.current = false;
         }
@@ -383,6 +423,7 @@ export function useDocumentForm({
     ownerEmail,
     fileLoading,
     errors,
+    fileNotFound,
     accessToken: accessToken || fetchedAccessToken,
     handleInputChange,
     handleFileChange,

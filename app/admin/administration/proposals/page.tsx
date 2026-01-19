@@ -130,6 +130,7 @@ export default function ProposalsPage() {
         onAddDocument={handleAddDocument}
         typeFilter="proposal"
         canDelete={canDelete}
+        showStatusApproval={true}
       />
 
       <DeleteModal

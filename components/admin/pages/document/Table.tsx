@@ -30,6 +30,7 @@ interface DocumentTableProps {
   typeFilter?: string;
   canDelete?: () => boolean;
   excludeTypes?: string[];
+  showStatusApproval?: boolean;
 }
 
 export default function DocumentTable({
@@ -48,6 +49,7 @@ export default function DocumentTable({
   typeFilter,
   canDelete: canDeleteProp,
   excludeTypes = [],
+  showStatusApproval = false,
 }: DocumentTableProps) {
   const {
     canAdd,
@@ -65,9 +67,18 @@ export default function DocumentTable({
       doc.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
         typeFilter.toLowerCase().replace(/[\s\-]/g, "");
 
+    // Normalize document type name for exclusion check
+    const normalizedDocTypeName = doc.documentType?.name
+      ?.toLowerCase()
+      .replace(/[\s\-]/g, "");
+    const normalizedDocType = doc.type
+      ? doc.type.toLowerCase().replace(/[\s\-]/g, "")
+      : "";
+
     const notExcluded = !excludeTypes.some(
       (excludeType: string) =>
-        excludeType === doc.type?.toLowerCase().replace(/[\s\-]/g, ""),
+        excludeType === normalizedDocTypeName ||
+        excludeType === normalizedDocType,
     );
 
     return matchesType && notExcluded;
@@ -85,10 +96,6 @@ export default function DocumentTable({
       case "type":
         aValue = a.documentType?.name?.toLowerCase() || "";
         bValue = b.documentType?.name?.toLowerCase() || "";
-        break;
-      case "status":
-        aValue = a.status.toLowerCase();
-        bValue = b.status.toLowerCase();
         break;
 
       default:
@@ -222,27 +229,31 @@ export default function DocumentTable({
                   />
                 </div>
               </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("status")}
-              >
-                <div className="flex items-center">
-                  Status
-                  <SortIcon
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                    field="status"
-                    iconType="arrow"
-                  />
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Approval
-              </th>
+              {showStatusApproval && (
+                <>
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    onClick={() => handleSort("status")}
+                  >
+                    <div className="flex items-center">
+                      Status
+                      <SortIcon
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                        field="status"
+                        iconType="arrow"
+                      />
+                    </div>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Approval
+                  </th>
+                </>
+              )}
               <th
                 scope="col"
                 className="pl-4 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -289,38 +300,42 @@ export default function DocumentTable({
                     .toLowerCase()
                     .replace(/\b\w/g, (l) => l.toUpperCase())}
                 </td>
-                <td
-                  className="px-4 py-4 whitespace-nowrap"
-                  onClick={() => {
-                    window.open(
-                      `https://drive.google.com/file/d/${document.document}/view`,
-                      "_blank",
-                    );
-                  }}
-                >
-                  <StatusChip status={document.status} />
-                </td>
-                <td
-                  className="px-4 py-4 whitespace-nowrap"
-                  onClick={() => {
-                    window.open(
-                      `https://drive.google.com/file/d/${document.document}/view`,
-                      "_blank",
-                    );
-                  }}
-                >
-                  <StatusApproval
-                    status={
-                      document.approvals && document.approvals.length > 0
-                        ? document.approvals.sort(
-                            (a, b) =>
-                              new Date(b.updatedAt).getTime() -
-                              new Date(a.updatedAt).getTime(),
-                          )[0].status
-                        : "PENDING"
-                    }
-                  />
-                </td>
+                {showStatusApproval && (
+                  <>
+                    <td
+                      className="px-4 py-4 whitespace-nowrap"
+                      onClick={() => {
+                        window.open(
+                          `https://drive.google.com/file/d/${document.document}/view`,
+                          "_blank",
+                        );
+                      }}
+                    >
+                      <StatusChip status={document.status} />
+                    </td>
+                    <td
+                      className="px-4 py-4 whitespace-nowrap"
+                      onClick={() => {
+                        window.open(
+                          `https://drive.google.com/file/d/${document.document}/view`,
+                          "_blank",
+                        );
+                      }}
+                    >
+                      <StatusApproval
+                        status={
+                          document.approvals && document.approvals.length > 0
+                            ? document.approvals.sort(
+                                (a, b) =>
+                                  new Date(b.updatedAt).getTime() -
+                                  new Date(a.updatedAt).getTime(),
+                              )[0].status
+                            : "PENDING"
+                        }
+                      />
+                    </td>
+                  </>
+                )}
 
                 <td className="pl-4 pr-6 py-4 whitespace-nowrap">
                   <DropdownMenu

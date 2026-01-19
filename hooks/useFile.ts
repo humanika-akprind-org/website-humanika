@@ -100,6 +100,19 @@ export function useFile(accessToken?: string): {
           ? (err as { status?: number }).status
           : null;
       const errorMessage = err instanceof Error ? err.message : String(err);
+      const errWithNotFound = err as Error & { notFound?: boolean };
+
+      // Check if it's a 404 error - file already deleted from Google Drive
+      const is404Error =
+        statusCode === 404 ||
+        errorMessage.toLowerCase().includes("not found") ||
+        errWithNotFound.notFound;
+
+      if (is404Error) {
+        // File already doesn't exist in Google Drive - this is fine, treat as success
+        console.warn("File already deleted from Google Drive:", fileId);
+        return true;
+      }
 
       // Check if it's a 403 error (not owner or insufficient permissions)
       const is403Error =
@@ -141,6 +154,24 @@ export function useFile(accessToken?: string): {
           console.error("Photo trash error:", trashErr);
           const trashErrorMessage =
             trashErr instanceof Error ? trashErr.message : String(trashErr);
+          const trashErrWithNotFound = trashErr as Error & {
+            notFound?: boolean;
+          };
+
+          // Check if trash also failed due to file not found
+          const isTrash404 =
+            (typeof trashErr === "object" &&
+              trashErr !== null &&
+              "status" in trashErr &&
+              (trashErr as { status?: number }).status === 404) ||
+            trashErrorMessage.toLowerCase().includes("not found") ||
+            trashErrWithNotFound.notFound;
+
+          if (isTrash404) {
+            // File already doesn't exist - treat as success
+            console.warn("File already deleted from Google Drive:", fileId);
+            return true;
+          }
 
           // Check if trash also failed due to permissions
           const isTrash403 =
@@ -307,9 +338,47 @@ export function useFile(accessToken?: string): {
             displayName: primaryOwner?.displayName,
           } as FileOwnerInfo;
         }
+
+        // Handle file not found (404)
+        if (result.notFound) {
+          const notFoundError = new Error(
+            result.message || "File not found in Google Drive",
+          );
+          (
+            notFoundError as Error & { notFound?: boolean; status?: number }
+          ).notFound = true;
+          (
+            notFoundError as Error & { notFound?: boolean; status?: number }
+          ).status = 404;
+          throw notFoundError;
+        }
+
         return null;
       } catch (err) {
         console.error("Get file details error:", err);
+
+        // Re-throw 404 errors so caller can handle them specifically
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        const errWithStatus = err as Error & {
+          status?: number;
+          notFound?: boolean;
+        };
+
+        if (
+          errWithStatus.status === 404 ||
+          errWithStatus.notFound ||
+          errorMsg.includes("not found")
+        ) {
+          const notFoundError = new Error(
+            "File not found in Google Drive. The file may have been deleted or moved.",
+          );
+          (
+            notFoundError as Error & { notFound?: boolean; status?: number }
+          ).notFound = true;
+          (notFoundError as Error & { status?: number }).status = 404;
+          throw notFoundError;
+        }
+
         return null;
       } finally {
         // Remove from pending requests when done

@@ -200,26 +200,32 @@ export const createDocument = async (
       : undefined,
   };
 
-  // Determine entityType based on documentType
-  const entityType =
-    document.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
-    "proposal"
-      ? ApprovalType.DOCUMENT_PROPOSAL
-      : document.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
-          "accountabilityreport"
-        ? ApprovalType.DOCUMENT_ACCOUNTABILITY_REPORT
-        : ApprovalType.DOCUMENT;
+  // Only create approval record for proposals and accountability reports
+  // Regular documents do not require approval
+  const normalizedDocType =
+    document.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") || "";
+  const requiresApproval =
+    normalizedDocType === "proposal" ||
+    normalizedDocType === "accountabilityreport";
 
-  // Always create approval record with PENDING status
-  await prisma.approval.create({
-    data: {
-      entityType,
-      entityId: document.id,
-      userId: user.id,
-      status: "PENDING",
-      note: "Document created and pending approval",
-    },
-  });
+  if (requiresApproval) {
+    // Determine entityType based on documentType
+    const entityType =
+      normalizedDocType === "proposal"
+        ? ApprovalType.DOCUMENT_PROPOSAL
+        : ApprovalType.DOCUMENT_ACCOUNTABILITY_REPORT;
+
+    // Create approval record with PENDING status
+    await prisma.approval.create({
+      data: {
+        entityType,
+        entityId: document.id,
+        userId: user.id,
+        status: "PENDING",
+        note: "Document created and pending approval",
+      },
+    });
+  }
 
   // Log activity
   await logActivity({
@@ -289,8 +295,14 @@ export const updateDocument = async (
   }
 
   if (data.name !== undefined) updateData.name = data.name;
-  if (data.letterId !== undefined) updateData.letterId = data.letterId;
-  if (data.documentTypeId) updateData.documentTypeId = data.documentTypeId;
+  if (data.letterId !== undefined) {
+    updateData.letter = data.letterId
+      ? { connect: { id: data.letterId } }
+      : { disconnect: true };
+  }
+  if (data.documentTypeId && data.documentTypeId !== "") {
+    updateData.documentType = { connect: { id: data.documentTypeId } };
+  }
   if (data.document !== undefined) updateData.document = data.document;
   if (data.periodId !== undefined) {
     updateData.period = data.periodId
@@ -299,26 +311,47 @@ export const updateDocument = async (
   }
   if (data.status) updateData.status = data.status;
 
-  // Handle status change to PENDING - create approval record
+  // Handle status change to PENDING - create approval record only for proposals and accountability reports
+  // Regular documents do not require approval
   if (data.status === "PENDING") {
-    // Determine entityType based on documentType
-    const entityType =
+    // Check if this is a proposal or accountability report
+    const normalizedDocType =
       existingDocument.documentType?.name
         ?.toLowerCase()
-        .replace(/[\s\-]/g, "") === "proposal"
-        ? ApprovalType.DOCUMENT_PROPOSAL
-        : ApprovalType.DOCUMENT;
+        .replace(/[\s\-]/g, "") || "";
+    const requiresApproval =
+      normalizedDocType === "proposal" ||
+      normalizedDocType === "accountabilityreport";
 
-    // Create approval record for the document
-    await prisma.approval.create({
-      data: {
-        entityType,
-        entityId: id,
-        userId: user.id, // Current user submitting for approval
-        status: "PENDING",
-        note: "Document submitted for approval",
-      },
-    });
+    // Only process approval for documents that require it
+    if (requiresApproval) {
+      const existingApproval =
+        existingDocument.approvals && existingDocument.approvals.length > 0
+          ? existingDocument.approvals[0]
+          : null;
+
+      if (!existingApproval) {
+        // Determine entityType based on documentType
+        const entityType =
+          normalizedDocType === "proposal"
+            ? ApprovalType.DOCUMENT_PROPOSAL
+            : ApprovalType.DOCUMENT_ACCOUNTABILITY_REPORT;
+
+        // Create approval record for the document
+        await prisma.approval.create({
+          data: {
+            entityType,
+            entityId: id,
+            userId: user.id, // Current user submitting for approval
+            status: "PENDING",
+            note: "Document submitted for approval",
+          },
+        });
+      }
+      // If an approval already exists, the existing one will be used
+      // (it was already updated to PENDING above if it was APPROVED/REJECTED)
+    }
+    // For regular documents, no approval is created - they stay as PENDING without approval record
   }
 
   const document = await prisma.document.update({

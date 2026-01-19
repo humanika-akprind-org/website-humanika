@@ -130,6 +130,7 @@ export default function AccountabilityReportsPage() {
         onAddDocument={handleAddDocument}
         typeFilter="accountabilityreport"
         canDelete={canDelete}
+        showStatusApproval={true}
       />
 
       <DeleteModal
