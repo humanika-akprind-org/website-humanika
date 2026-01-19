@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ChevronDown } from "lucide-react";
+import { ChevronDown, Cloudy, CloudOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 
@@ -63,12 +63,11 @@ export default function GoogleDriveStatus({
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="inline-flex items-center gap-3 text-green-600 text-sm font-medium hover:bg-gray-100 rounded-lg px-2 py-1 transition-colors"
+          className="inline-flex items-center gap-3 text-green-600 text-sm font-medium hover:bg-gray-100 rounded-lg px-2 py-1 transition-colors h-[34px]"
         >
-          <span className="text-gray-500">{userEmail}</span>
+          <Cloudy className="h-4 w-4" />
+          {userEmail}
           <ChevronDown className="h-4 w-4" />
-          <CheckCircle2 className="h-4 w-4" />
-          Drive Connected
         </button>
 
         {isDropdownOpen && (
@@ -94,7 +93,7 @@ export default function GoogleDriveStatus({
       size="sm"
       className="gap-2"
     >
-      Connect Drive
+      <CloudOff className="h-4 w-4" /> Connect Drive
     </Button>
   );
 }
