@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import AccessTokenGuard from "./AccessTokenGuard";
 import { FiFile } from "react-icons/fi";
 
@@ -12,12 +12,13 @@ interface FileUploadProps {
   isLoading?: boolean;
   fileLoading?: boolean;
   accept?: string;
-  helpText?: string;
+  helpText?: string; // default "Upload file (max 5MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX)"
   loadingText?: string;
   required?: boolean;
   removeButtonText?: string;
   error?: string;
   ownerEmail?: string;
+  maxSize?: number; // in bytes, default 5MB
 }
 
 export default function FileUpload({
@@ -28,18 +29,36 @@ export default function FileUpload({
   isLoading = false,
   fileLoading = false,
   accept,
-  helpText,
+  helpText = "Upload file (max 5MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX)",
   loadingText = "Uploading file...",
   required = false,
   removeButtonText = "Remove File",
   error,
   ownerEmail,
+  maxSize = 5 * 1024 * 1024, // 5MB default
 }: FileUploadProps) {
+  const [sizeError, setSizeError] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > maxSize) {
+        setSizeError(
+          `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`,
+        );
+        return;
+      }
+      // Clear size error when valid file is selected
+      setSizeError(null);
+      onFileChange(file);
+    }
+  };
+
   return (
     <AccessTokenGuard label={label} required={required}>
       <div
         className={`flex items-start space-x-4 p-4 rounded-lg border-2 ${
-          error ? "border-red-300 bg-red-50" : "border-gray-200"
+          error || sizeError ? "border-red-300 bg-red-50" : "border-gray-200"
         }`}
       >
         {existingFile && existingFile.trim() !== "" && (
@@ -66,10 +85,7 @@ export default function FileUpload({
           <input
             type="file"
             accept={accept}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) onFileChange(file);
-            }}
+            onChange={handleFileChange}
             className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             disabled={isLoading || fileLoading}
           />
@@ -80,6 +96,7 @@ export default function FileUpload({
         </div>
       </div>
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {sizeError && <p className="text-red-500 text-xs mt-1">{sizeError}</p>}
       {ownerEmail && (
         <p className="text-amber-600 text-xs mt-1">
           Use email {ownerEmail} to edit this file!
