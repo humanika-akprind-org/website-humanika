@@ -3,7 +3,10 @@ import AuthProvider from "@/components/admin/auth/AuthProvider";
 import Sidebar from "@/components/admin/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import "./admin.css";
-import { getGoogleAccessToken } from "@/lib/google-drive/google-oauth";
+import {
+  getGoogleAccessToken,
+  getGoogleUserEmail,
+} from "@/lib/google-drive/google-oauth";
 import AuthGuard from "@/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/components/admin/layout/UserInfo";
 import { geistSans, geistMono } from "@/app/ui/fonts";
@@ -27,6 +30,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const accessToken = await getGoogleAccessToken();
+  const userEmail = accessToken ? await getGoogleUserEmail(accessToken) : "";
 
   return (
     <html lang="en">
@@ -47,7 +51,10 @@ export default async function RootLayout({
                     Organizational Admin
                   </h1>
                   <div className="flex items-center space-x-4 ml-auto">
-                    <GoogleDriveStatus accessToken={accessToken} />
+                    <GoogleDriveStatus
+                      accessToken={accessToken}
+                      userEmail={userEmail}
+                    />
                     <UserInfo />
                   </div>
                 </div>
