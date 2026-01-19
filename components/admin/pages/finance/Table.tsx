@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiEdit, FiTrash, FiEye, FiDownload } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye, FiDownload, FiFile } from "react-icons/fi";
 import { Wallet } from "lucide-react";
 import type { Finance } from "@/types/finance";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -185,7 +185,7 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                Proof
+                File
               </th>
               <th
                 scope="col"
@@ -269,13 +269,11 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                   <div className="flex items-center">
                     {finance.proof ? (
                       <>
-                        <FiDownload className="text-gray-400" size={16} />
-                        <span className="ml-2 text-sm text-gray-600">
-                          Proof
-                        </span>
+                        <FiFile className="text-gray-400" size={16} />
+                        <span className="ml-2 text-sm text-gray-600">File</span>
                       </>
                     ) : (
-                      <span className="text-sm text-gray-400">No proof</span>
+                      <span className="text-sm text-gray-400">No file</span>
                     )}
                   </div>
                 </td>
@@ -296,7 +294,7 @@ const FinanceTable: React.FC<FinanceTableProps> = ({
                         ? finance.approvals.sort(
                             (a, b) =>
                               new Date(b.createdAt).getTime() -
-                              new Date(a.createdAt).getTime()
+                              new Date(a.createdAt).getTime(),
                           )[0].status
                         : "PENDING"
                     }

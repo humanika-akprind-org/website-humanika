@@ -17,7 +17,7 @@ import TextInput from "components/admin/ui/input/TextInput";
 import SelectInput from "components/admin/ui/input/SelectInput";
 import CurrencyInput from "components/admin/ui/input/CurrencyInput";
 import DateInput from "components/admin/ui/date/DateInput";
-import ImageUpload from "components/admin/ui/input/ImageUpload";
+import FileUpload from "components/admin/ui/input/FileUpload";
 import SubmitButton from "components/admin/ui/button/SubmitButton";
 import CancelButton from "components/ui/CancelButton";
 import { useFinanceForm } from "@/hooks/finance/useFinanceForm";
@@ -52,14 +52,13 @@ export default function FinanceForm({
     setFormData,
     isSubmitting,
     error,
-    previewUrl,
-    existingProof,
+    existingFile,
     photoLoading,
     errors,
     ownerEmail,
     handleInputChange,
-    handleFileChange,
-    removeProof,
+    handleFileSelect,
+    removeFile,
     handleSubmit,
   } = useFinanceForm({
     finance,
@@ -203,7 +202,7 @@ export default function FinanceForm({
 
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description *
+              Description
             </label>
             <TextEditor
               value={formData.description}
@@ -216,18 +215,16 @@ export default function FinanceForm({
           </div>
 
           <div className="mb-6">
-            <ImageUpload
-              label="Proof"
-              previewUrl={previewUrl}
-              existingPhoto={existingProof}
-              onFileChange={handleFileChange}
-              onRemovePhoto={removeProof}
+            <FileUpload
+              label="File"
+              existingFile={existingFile}
+              onFileChange={handleFileSelect}
+              onRemoveFile={removeFile}
               isLoading={isSubmitting}
-              photoLoading={photoLoading}
-              alt={formData.name || "Transaction proof"}
-              removeButtonText="Hapus Proof"
-              loadingText="Mengupload proof..."
-              error={errors.proof}
+              fileLoading={photoLoading}
+              removeButtonText="Hapus File"
+              loadingText="Mengupload file..."
+              error={errors.file}
               ownerEmail={ownerEmail || undefined}
             />
           </div>

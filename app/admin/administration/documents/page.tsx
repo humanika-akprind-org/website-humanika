@@ -78,7 +78,10 @@ export default function DocumentsPage() {
         )}
       </div>
 
-      <DocumentStats documents={documents} />
+      <DocumentStats
+        documents={documents}
+        excludeTypes={["proposal", "accountabilityreport"]}
+      />
 
       {alert && <Alert type={alert.type} message={alert.message} />}
 
@@ -123,6 +126,7 @@ export default function DocumentsPage() {
         onDeleteDocument={handleDelete}
         onPageChange={setCurrentPage}
         onAddDocument={handleAddDocument}
+        excludeTypes={["proposal", "accountabilityreport"]}
       />
 
       <DeleteModal

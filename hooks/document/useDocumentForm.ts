@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
 import type {
   Document,
   CreateDocumentInput,
@@ -52,7 +51,6 @@ export function useDocumentForm({
   fixedDocumentType,
   documentTypes,
 }: UseDocumentFormProps) {
-  const router = useRouter();
   const [fetchedAccessToken, setFetchedAccessToken] = useState<string>("");
 
   const {
@@ -316,21 +314,8 @@ export function useDocumentForm({
         await onSubmit(submitData);
       }
 
-      // Reset form state after successful submission
-      setRemovedDocument(false);
-
-      let redirectPath = "/admin/administration/documents";
-      if (fixedDocumentType) {
-        const normalized = fixedDocumentType
-          .toLowerCase()
-          .replace(/[\s\-]/g, "");
-        if (normalized === "proposal") {
-          redirectPath = "/admin/administration/proposals";
-        } else if (normalized === "accountabilityreport") {
-          redirectPath = "/admin/administration/accountability-reports";
-        }
-      }
-      router.push(redirectPath);
+      // Note: Redirect is already handled by onSubmit/onSubmitForApproval
+      // setRemovedDocument(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save document");
     } finally {

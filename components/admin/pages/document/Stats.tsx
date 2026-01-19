@@ -13,16 +13,27 @@ import StatCard from "../../ui/card/StatCard";
 interface StatsProps {
   documents: Document[];
   typeFilter?: string;
+  excludeTypes?: string[];
 }
 
-export default function Stats({ documents, typeFilter }: StatsProps) {
-  const filteredDocuments = typeFilter
-    ? documents.filter(
-        (doc) =>
-          doc.documentType?.name.toLowerCase().replace(/[\s\-]/g, "") ===
-          typeFilter
-      )
-    : documents;
+export default function Stats({
+  documents,
+  typeFilter,
+  excludeTypes = [],
+}: StatsProps) {
+  const filteredDocuments = documents.filter((doc) => {
+    const matchesType =
+      !typeFilter ||
+      doc.documentType?.name?.toLowerCase().replace(/[\s\-]/g, "") ===
+        typeFilter.toLowerCase().replace(/[\s\-]/g, "");
+
+    const notExcluded = !excludeTypes.some(
+      (excludeType: string) =>
+        excludeType === doc.type?.toLowerCase().replace(/[\s\-]/g, ""),
+    );
+
+    return matchesType && notExcluded;
+  });
 
   const stats = [
     {

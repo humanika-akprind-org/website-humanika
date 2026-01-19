@@ -26,7 +26,7 @@ export interface EventStats {
  * Helper function to get the latest date from schedules
  */
 const getLatestScheduleDate = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): Date | null => {
   if (!schedules || schedules.length === 0) return null;
   const dates = schedules.map((s) => new Date(s.date));
@@ -37,7 +37,7 @@ const getLatestScheduleDate = (
  * Helper function to get the earliest date from schedules
  */
 const getEarliestScheduleDate = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): Date | null => {
   if (!schedules || schedules.length === 0) return null;
   const dates = schedules.map((s) => new Date(s.date));
@@ -56,7 +56,8 @@ export function useEventData() {
       const res = await fetch("/api/event?status=PUBLISH", {
         cache: "no-store",
       });
-      const events: Event[] = await res.json();
+      const response = await res.json();
+      const events: Event[] = response.data || [];
       setAllEvents(events);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -166,7 +167,7 @@ export function useFilteredEvents(allEvents: Event[], filters: EventFilters) {
             .includes(filters.searchQuery.toLowerCase()) ||
           event.description
             ?.toLowerCase()
-            .includes(filters.searchQuery.toLowerCase())
+            .includes(filters.searchQuery.toLowerCase()),
       );
     }
 
@@ -175,7 +176,7 @@ export function useFilteredEvents(allEvents: Event[], filters: EventFilters) {
       filtered = filtered.filter(
         (event) =>
           event.category?.name?.toLowerCase().replace(/\s+/g, "-") ===
-          filters.selectedCategory.toLowerCase()
+          filters.selectedCategory.toLowerCase(),
       );
     }
 
@@ -216,7 +217,7 @@ export function useFilteredEvents(allEvents: Event[], filters: EventFilters) {
             .includes(filters.searchQuery.toLowerCase()) ||
           event.description
             ?.toLowerCase()
-            .includes(filters.searchQuery.toLowerCase())
+            .includes(filters.searchQuery.toLowerCase()),
       );
     }
 
@@ -224,7 +225,7 @@ export function useFilteredEvents(allEvents: Event[], filters: EventFilters) {
       totalFiltered = totalFiltered.filter(
         (event) =>
           event.category?.name?.toLowerCase().replace(/\s+/g, "-") ===
-          filters.selectedCategory.toLowerCase()
+          filters.selectedCategory.toLowerCase(),
       );
     }
 

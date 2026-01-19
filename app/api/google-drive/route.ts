@@ -5,6 +5,9 @@ import { Readable } from "stream";
 
 export const dynamic = "force-dynamic"; // Required for Next.js API routes
 
+// Maximum file size limit (5MB)
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const accessToken = searchParams.get("accessToken");
@@ -106,6 +109,17 @@ export async function POST(request: NextRequest) {
 
       if (action !== "upload" || !file) {
         throw new Error("Invalid upload request");
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `File size exceeds the maximum limit of 5MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+          },
+          { status: 400 },
+        );
       }
 
       const drive = google.drive({
