@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Download, Maximize2, Share2, Calendar, Clock } from "lucide-react";
+import { Download, Maximize2, Calendar, Clock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -113,24 +113,6 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
     document.body.removeChild(link);
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: currentGallery.title,
-          text: `Lihat foto "${currentGallery.title}" dari HUMANIKA Gallery`,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.log("Error sharing:", error);
-      }
-    } else {
-      // Fallback: Copy to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link disalin ke clipboard!");
-    }
-  };
-
   const handleRelatedGalleryClick = (relatedGallery: Gallery) => {
     setCurrentGallery(relatedGallery);
     setImageError(false);
@@ -166,19 +148,6 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
 
             {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-            {/* Quick Actions Overlay */}
-            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleShare();
-                }}
-                className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
-              >
-                <Share2 className="w-4 h-4 text-grey-700" />
-              </button>
-            </div>
 
             {/* Preview Icon */}
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -336,14 +305,6 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
                       >
                         <Download className="w-4 h-4 mr-2" />
                         Download
-                      </Button>
-                      <Button
-                        onClick={handleShare}
-                        className="flex-1 min-w-[120px]"
-                        variant="outline"
-                      >
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Bagikan
                       </Button>
                     </div>
                   </div>

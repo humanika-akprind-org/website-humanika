@@ -45,7 +45,7 @@ export const ArticleList = ({ articles }: ArticleListProps) => (
           className="group bg-white rounded-2xl shadow-lg hover:shadow-xl border border-grey-200 overflow-hidden"
         >
           <Link
-            href={`/article/${article.id}`}
+            href={`/article/${article.slug}`}
             className="flex flex-col md:flex-row"
           >
             {/* Thumbnail */}
@@ -84,20 +84,15 @@ export const ArticleList = ({ articles }: ArticleListProps) => (
                 </div>
               </div>
 
+              <h3 className="text-xl font-bold text-grey-900 mb-3 group-hover:text-primary-600 transition-colors">
+                {article.title}
+              </h3>
+
               <p className="text-grey-600 mb-4 line-clamp-2">
                 {truncatedContent}
               </p>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-semibold text-primary-600">
-                        {article.author?.name?.charAt(0) || "?"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+              <div className="flex items-center justify-end">
                 <span className="text-primary-600 font-medium group-hover:text-primary-700 transition-colors">
                   Baca selengkapnya →
                 </span>
