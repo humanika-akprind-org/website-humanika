@@ -17,6 +17,16 @@ export interface AlbumData {
     createdAt: Date;
   }[];
   thumbnail: string | null | undefined;
+  category?: {
+    id: string;
+    name: string;
+  } | null;
+  schedules?: {
+    date: string;
+    time?: string;
+    location?: string;
+    notes?: string;
+  }[];
 }
 
 export interface UseGalleryDetailReturn {
@@ -112,6 +122,10 @@ export const useGalleryDetail = (slug: string): UseGalleryDetailReturn => {
           createdAt: new Date(gallery.createdAt),
         })),
         thumbnail: event.thumbnail,
+        category: event.category
+          ? { id: event.category.id, name: event.category.name }
+          : null,
+        schedules: event.schedules,
       }
     : null;
 

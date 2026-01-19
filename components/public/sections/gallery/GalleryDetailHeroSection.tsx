@@ -8,6 +8,11 @@ import {
   ImageIcon,
   Calendar,
   Loader2,
+  Clock,
+  MapPin,
+  FileText,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import type { Gallery } from "@/types/gallery";
 import type { AlbumData } from "@/hooks/gallery/useGalleryDetail";
@@ -24,14 +29,58 @@ interface GalleryDetailHeroSectionProps {
 const getImageUrl = (fileId: string) =>
   `/api/drive-image?fileId=${fileId}&size=large`;
 
+// Helper to format schedule data
+const formatFullSchedule = (schedule: {
+  date: string;
+  time?: string;
+  location?: string;
+  notes?: string;
+}) => {
+  const dateObj = new Date(schedule.date);
+  const formattedDate = dateObj.toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const time = schedule.time
+    ? schedule.time
+    : dateObj.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+  return {
+    date: formattedDate,
+    time: time,
+    location: schedule.location,
+    notes: schedule.notes,
+  };
+};
+
+// Maximum number of schedules to show initially
+const MAX_VISIBLE_SCHEDULES = 3;
+
 export default function GalleryDetailHeroSection({
   album,
   galleries,
-  formattedDate,
   onShare,
 }: GalleryDetailHeroSectionProps) {
   const router = useRouter();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showAllSchedules, setShowAllSchedules] = useState(false);
+
+  // Get schedules from album data (or use empty array as fallback)
+  const schedules = album.schedules || [];
+  const sortedSchedules = [...schedules].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+  );
+  const hasSchedules = sortedSchedules.length > 0;
+  const hasMoreSchedules = sortedSchedules.length > MAX_VISIBLE_SCHEDULES;
+  const displayedSchedules = showAllSchedules
+    ? sortedSchedules
+    : sortedSchedules.slice(0, MAX_VISIBLE_SCHEDULES);
 
   const handleDownloadAll = async () => {
     if (!galleries || galleries.length === 0) return;
@@ -136,12 +185,94 @@ export default function GalleryDetailHeroSection({
 
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <Calendar className="w-6 h-6" />
+                <Camera className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-sm text-primary-200/80">Tanggal</p>
-                <p className="font-medium">{formattedDate}</p>
+                <p className="text-sm text-primary-200/80">Kategori</p>
+                <p className="font-medium">{album.category?.name || "Umum"}</p>
               </div>
+            </div>
+          </div>
+
+          {/* Meta Information */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Schedule Items - Horizontal Row */}
+            <div className="md:col-span-2 lg:col-span-3">
+              {/* All Schedules */}
+              {hasSchedules ? (
+                <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  {displayedSchedules.map((schedule, index) => {
+                    const { date, time, location, notes } =
+                      formatFullSchedule(schedule);
+                    return (
+                      <div
+                        key={index}
+                        className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-colors min-w-[200px] max-w-[240px] flex-shrink-0"
+                      >
+                        {/* Date */}
+                        <div className="flex items-center gap-3 mb-2">
+                          <Calendar className="w-4 h-4 text-primary-200/80 flex-shrink-0 mt-0.5" />
+                          <span className="font-medium text-sm">{date}</span>
+                        </div>
+
+                        {/* Time */}
+                        {time && (
+                          <div className="flex items-center gap-3 mb-2 ml-7">
+                            <Clock className="w-4 h-4 text-primary-200/80 flex-shrink-0 mt-0.5" />
+                            <span className="text-sm">{time}</span>
+                          </div>
+                        )}
+
+                        {/* Location */}
+                        {location && (
+                          <div className="flex items-center gap-3 mb-2 ml-7">
+                            <MapPin className="w-4 h-4 text-primary-200/80 flex-shrink-0 mt-0.5" />
+                            <span className="text-sm">{location}</span>
+                          </div>
+                        )}
+
+                        {/* Notes */}
+                        {notes && (
+                          <div className="flex items-start gap-3 ml-7">
+                            <FileText className="w-4 h-4 text-primary-200/80 flex-shrink-0 mt-0.5" />
+                            <span className="text-primary-200/90 text-sm">
+                              {notes}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {/* Show More / Show Less Button */}
+                  {hasMoreSchedules && (
+                    <button
+                      onClick={() => setShowAllSchedules(!showAllSchedules)}
+                      className="flex items-center gap-2 text-sm text-primary-200/80 hover:text-white transition-colors self-center"
+                    >
+                      {showAllSchedules ? (
+                        <>
+                          <ChevronUp className="w-4 h-4" />
+                          <span>Tampilkan lebih sedikit</span>
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="w-4 h-4" />
+                          <span>
+                            Tampilkan{" "}
+                            {sortedSchedules.length - MAX_VISIBLE_SCHEDULES}{" "}
+                            jadwal lainnya
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <p className="text-primary-200/80">
+                  Jadwal akan segera ditambahkan
+                </p>
+              )}
             </div>
           </div>
 
