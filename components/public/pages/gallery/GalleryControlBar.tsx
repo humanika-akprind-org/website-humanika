@@ -11,6 +11,13 @@ import {
 } from "lucide-react";
 import type { Event } from "@/types/event";
 import { SORT_OPTIONS, VIEW_MODE_OPTIONS, ANIMATION_DELAYS } from "./constants";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const iconMap = {
   Calendar,
@@ -85,49 +92,48 @@ export default function GalleryControlBar({
                 />
 
                 {/* Year Filter */}
-                <select
-                  value={selectedYear}
-                  onChange={(e) => onYearChange(e.target.value)}
-                  className="px-3 py-2 bg-grey-100 text-grey-700 rounded-lg text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 max-w-[120px] md:max-w-none flex-shrink-0"
-                >
-                  <option value="all">Semua Tahun</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year === "all" ? "Semua Tahun" : year}
-                    </option>
-                  ))}
-                </select>
+                <Select value={selectedYear} onValueChange={onYearChange}>
+                  <SelectTrigger className="w-[120px] md:w-[140px] px-3 py-2 bg-grey-100 text-grey-700 rounded-lg text-xs md:text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 border-transparent hover:bg-grey-200 data-[placeholder]:text-grey-400 [&>span]:line-clamp-1">
+                    <SelectValue placeholder="Semua Tahun" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-grey-200 shadow-lg rounded-lg">
+                    <SelectItem value="all">Semua Tahun</SelectItem>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
                 {/* Event Filter */}
-                <select
-                  value={selectedEvent}
-                  onChange={(e) => onEventChange(e.target.value)}
-                  className="px-3 py-2 bg-grey-100 text-grey-700 rounded-lg text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 max-w-[140px] md:max-w-none flex-shrink-0"
-                >
-                  <option value="all">Semua Event</option>
-                  {events.map((event) => (
-                    <option key={event.id} value={event.id}>
-                      {event.name}
-                    </option>
-                  ))}
-                </select>
+                <Select value={selectedEvent} onValueChange={onEventChange}>
+                  <SelectTrigger className="w-[140px] md:w-[180px] px-3 py-2 bg-grey-100 text-grey-700 rounded-lg text-xs md:text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 border-transparent hover:bg-grey-200 data-[placeholder]:text-grey-400 [&>span]:line-clamp-1">
+                    <SelectValue placeholder="Semua Event" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-grey-200 shadow-lg rounded-lg max-h-[300px]">
+                    <SelectItem value="all">Semua Event</SelectItem>
+                    {events.map((event) => (
+                      <SelectItem key={event.id} value={event.id}>
+                        {event.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
                 {/* View Mode */}
-                <select
-                  value={viewMode}
-                  onChange={(e) =>
-                    onViewModeChange(
-                      e.target.value as "albums" | "photos" | "both",
-                    )
-                  }
-                  className="px-3 py-2 bg-grey-100 text-grey-700 rounded-lg text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 flex-shrink-0"
-                >
-                  {VIEW_MODE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <Select value={viewMode} onValueChange={onViewModeChange}>
+                  <SelectTrigger className="w-[110px] md:w-[130px] px-3 py-2 bg-grey-100 text-grey-700 rounded-lg text-xs md:text-sm font-medium focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 border-transparent hover:bg-grey-200 data-[placeholder]:text-grey-400 [&>span]:line-clamp-1">
+                    <SelectValue placeholder="Tampilan" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-grey-200 shadow-lg rounded-lg">
+                    {VIEW_MODE_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
