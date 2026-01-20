@@ -183,8 +183,8 @@ export default function ShareButton({
         <div
           ref={dropdownRef}
           className="md:absolute md:bottom-full md:left-1/2 md:transform md:-translate-x-1/2 md:mb-2 md:w-72 
-                   md:bg-white md:rounded-xl md:shadow-2xl md:overflow-hidden md:z-50
-                   fixed inset-0 md:inset-auto z-[60] flex items-center justify-center"
+                   md:bg-white md:rounded-xl md:shadow-2xl md:overflow-hidden md:z-[9999]
+                   fixed inset-0 md:inset-auto z-[9999] flex items-center justify-center"
         >
           <div className="w-full max-w-sm mx-4 md:mx-0 bg-white md:bg-transparent md:rounded-none md:shadow-none rounded-t-xl">
             {/* Header */}
