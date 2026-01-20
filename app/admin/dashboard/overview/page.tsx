@@ -38,7 +38,7 @@ import LoadingOverview from "@/components/admin/pages/dashboard/LoadingOverview"
 
 // Helper function to get the earliest schedule date from an event
 function getEarliestScheduleDate(
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): Date | null {
   if (!schedules || schedules.length === 0) return null;
   const dates = schedules.map((s) => new Date(s.date).getTime());
@@ -144,29 +144,29 @@ export default function OverviewPage() {
           .filter((finance: Finance) => finance.type === "INCOME")
           .reduce(
             (sum: number, finance: Finance) => sum + (finance.amount || 0),
-            0
+            0,
           );
         const totalExpense = finances
           .filter((finance: Finance) => finance.type === "EXPENSE")
           .reduce(
             (sum: number, finance: Finance) => sum + (finance.amount || 0),
-            0
+            0,
           );
         const totalBudget = totalIncome - totalExpense;
 
         // Calculate published articles
         const publishedArticles = articles.filter(
-          (article: Article) => article.status === Status.PUBLISH
+          (article: Article) => article.status === Status.PUBLISH,
         ).length;
 
         // Calculate active programs
         const activePrograms = workPrograms.filter(
-          (wp: WorkProgram) => wp.status === Status.PUBLISH
+          (wp: WorkProgram) => wp.status === Status.PUBLISH,
         ).length;
 
         // Calculate pending documents (documents with pending status)
         const pendingDocuments = documents.filter(
-          (doc: Document) => doc.status === Status.PENDING
+          (doc: Document) => doc.status === Status.PENDING,
         ).length;
 
         // Get pending approvals count
@@ -181,7 +181,7 @@ export default function OverviewPage() {
         const recentActivities = activities
           .sort(
             (a: ActivityLog, b: ActivityLog) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
           )
           .slice(0, 3);
 
@@ -193,10 +193,10 @@ export default function OverviewPage() {
 
         // Calculate proposals and accountability reports from documents
         const totalProposals = documents.filter(
-          (doc: Document) => doc.documentType?.name === "PROPOSAL"
+          (doc: Document) => doc.documentType?.name === "PROPOSAL",
         ).length;
         const totalAccountabilityReports = documents.filter(
-          (doc: Document) => doc.documentType?.name === "LPJ"
+          (doc: Document) => doc.documentType?.name === "LPJ",
         ).length;
 
         setOverview({

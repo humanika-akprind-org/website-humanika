@@ -18,6 +18,9 @@ export async function GET() {
       "https://www.googleapis.com/auth/drive.file",
       "https://www.googleapis.com/auth/drive.appdata",
       "https://www.googleapis.com/auth/drive.photos.readonly",
+      // Profile
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
     ];
 
     const state = crypto.randomBytes(16).toString("hex");
@@ -50,7 +53,7 @@ export async function GET() {
         error: "Failed to initiate OAuth flow",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

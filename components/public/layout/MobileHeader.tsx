@@ -211,7 +211,7 @@ export function MobileHeaderClient({ currentUser }: MobileHeaderClientProps) {
                 <li className="col-span-2 border-t border-blue-700 pt-2 mt-2">
                   <Link
                     href="/auth/register"
-                    className="block text-center px-4 py-2 bg-transparent border border-yellow-500 text-white rounded-full hover:border-white hover:bg-white hover:text-blue-800 transition-all duration-300"
+                    className="block text-center px-4 py-2 bg-transparent border border-white text-white rounded-full hover:border-white hover:bg-white hover:text-blue-800 transition-all duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Daftar

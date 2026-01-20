@@ -165,10 +165,10 @@ export default function EventDetailHeroSection({
           {/* Meta Information */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Schedule Items - Horizontal Row */}
-            <div className="md:col-span-2 lg:col-span-3">
+            <div className="md:col-span-2 lg:col-span-3 overflow-hidden">
               {/* All Schedules */}
               {hasSchedules ? (
-                <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2">
+                <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                   {displayedSchedules.map((schedule, index) => {
                     const { date, time, location, notes } =
                       formatFullSchedule(schedule);
@@ -245,7 +245,7 @@ export default function EventDetailHeroSection({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 relative z-20">
             <button
               onClick={onBookmarkToggle}
               className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 font-medium ${
