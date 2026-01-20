@@ -4,6 +4,7 @@
 
 body {
   background-color: #101828;
+  overflow-x: hidden;
 }
 
 /* debug */

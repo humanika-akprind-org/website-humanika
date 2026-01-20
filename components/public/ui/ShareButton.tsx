@@ -178,83 +178,87 @@ export default function ShareButton({
         <span>Bagikan Album</span>
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu - Desktop dropdown / Mobile modal */}
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute top-full right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl overflow-hidden z-50"
+          className="md:absolute md:bottom-full md:left-1/2 md:transform md:-translate-x-1/2 md:mb-2 md:w-72 
+                   md:bg-white md:rounded-xl md:shadow-2xl md:overflow-hidden md:z-50
+                   fixed inset-0 md:inset-auto z-[60] flex items-center justify-center"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
-            <span className="font-semibold text-gray-800">
-              Bagikan ke media sosial
-            </span>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-            >
-              <X className="w-4 h-4 text-gray-500" />
-            </button>
-          </div>
-
-          {/* Social Media Buttons */}
-          <div className="p-4 grid grid-cols-3 gap-3">
-            {shareOptions.map((option) => (
+          <div className="w-full max-w-sm mx-4 md:mx-0 bg-white md:bg-transparent md:rounded-none md:shadow-none rounded-t-xl">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
+              <span className="font-semibold text-gray-800">
+                Bagikan ke media sosial
+              </span>
               <button
-                key={option.name}
-                onClick={option.action}
-                className={`flex flex-col items-center gap-2 p-3 rounded-lg ${option.color} text-white transition-all hover:scale-105 active:scale-95`}
+                onClick={() => setIsOpen(false)}
+                className="p-1 hover:bg-gray-200 rounded-full transition-colors"
               >
-                {option.icon}
-                <span className="text-xs font-medium">{option.name}</span>
+                <X className="w-4 h-4 text-gray-500" />
               </button>
-            ))}
-          </div>
+            </div>
 
-          {/* Divider */}
-          <div className="border-t px-4 py-2">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">atau</span>
+            {/* Social Media Buttons */}
+            <div className="p-4 grid grid-cols-3 gap-3">
+              {shareOptions.map((option) => (
+                <button
+                  key={option.name}
+                  onClick={option.action}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-lg ${option.color} text-white transition-all hover:scale-105 active:scale-95`}
+                >
+                  {option.icon}
+                  <span className="text-xs font-medium">{option.name}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Divider */}
+            <div className="border-t px-4 py-2">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-500">atau</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Copy Link */}
-          <div className="p-4">
-            <button
-              onClick={copyToClipboard}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
-            >
-              {copied ? (
-                <>
-                  <div className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center">
-                    <Check className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-medium text-gray-800">Tersalin!</p>
-                    <p className="text-sm text-gray-500">
-                      Tautan telah disalin
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="w-10 h-10 bg-gray-300 group-hover:bg-gray-400 rounded-full flex items-center justify-center transition-colors">
-                    <Link className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-medium text-gray-800">Salin Tautan</p>
-                    <p className="text-sm text-gray-500 truncate max-w-[150px]">
-                      {shareUrl}
-                    </p>
-                  </div>
-                </>
-              )}
-            </button>
+            {/* Copy Link */}
+            <div className="p-4">
+              <button
+                onClick={copyToClipboard}
+                className="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
+              >
+                {copied ? (
+                  <>
+                    <div className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center">
+                      <Check className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium text-gray-800">Tersalin!</p>
+                      <p className="text-sm text-gray-500">
+                        Tautan telah disalin
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-10 h-10 bg-gray-300 group-hover:bg-gray-400 rounded-full flex items-center justify-center transition-colors">
+                      <Link className="w-5 h-5 text-gray-600" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium text-gray-800">Salin Tautan</p>
+                      <p className="text-sm text-gray-500 truncate max-w-[150px]">
+                        {shareUrl}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

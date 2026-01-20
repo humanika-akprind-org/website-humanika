@@ -34,7 +34,7 @@ export default function EventSections({
           </p>
         </div>
         <button
-          onClick={() => router.push("/events")}
+          onClick={() => router.push("/event")}
           className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium"
         >
           <Calendar className="w-4 h-4" />
@@ -64,7 +64,7 @@ export default function EventSections({
               </p>
             </div>
             <button
-              onClick={() => router.push("/events")}
+              onClick={() => router.push("/event")}
               className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
             >
               <span>Lihat Semua</span>
@@ -106,7 +106,7 @@ export default function EventSections({
               </p>
             </div>
             <button
-              onClick={() => router.push("/events")}
+              onClick={() => router.push("/event")}
               className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
             >
               <span>Lihat Semua</span>
@@ -121,7 +121,7 @@ export default function EventSections({
                   key={relatedEvent.id}
                   event={relatedEvent}
                   truncatedDescription={truncateDescription(
-                    relatedEvent.description
+                    relatedEvent.description,
                   )}
                   index={index}
                 />

@@ -48,7 +48,7 @@ export default function EventDetail() {
 
   // Main content
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-grey-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-grey-50 overflow-x-hidden">
       <EventDetailHeroSection
         event={event}
         isBookmarked={isBookmarked}
