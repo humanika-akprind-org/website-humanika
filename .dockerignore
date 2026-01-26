@@ -1,0 +1,37 @@
+# MariaDB data
+mariadb-data/
+
+# Logs
+logs/
+docker/log/**/*.log
+docker/log/**/*.old
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Node modules
+node_modules/
+
+# Next.js build
+.next/
+out/
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+

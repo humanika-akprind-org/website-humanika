@@ -1,0 +1,104 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: humanika-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://root:rootpassword@db:3306/humanika
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=http://localhost:3000
+      - MONGODB_URI=mysql://root:rootpassword@db:3306/humanika
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - db
+      - log
+    networks:
+      - humanika-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: mariadb:10.11
+    container_name: humanika-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=humanika
+      - MYSQL_CHARSET=utf8mb4
+      - MYSQL_COLLATE=utf8mb4_unicode_ci
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    networks:
+      - humanika-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  log:
+    image: alpine:latest
+    container_name: humanika-log
+    restart: unless-stopped
+    volumes:
+      - app-logs:/var/log/app
+      - mysql-logs:/var/log/mysql
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "=== Humanika Application Log Container ===" &&
+        echo "Monitoring logs from app and database..." &&
+        while true; do
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] Log container is running...";
+          sleep 60;
+        done
+    networks:
+      - humanika-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: humanika-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=db
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - PMA_DATABASE=humanika
+    depends_on:
+      - db
+    networks:
+      - humanika-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mariadb-data:
+  app-logs:
+  mysql-logs:
+
+networks:
+  humanika-network:
+    driver: bridge
