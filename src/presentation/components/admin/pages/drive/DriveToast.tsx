@@ -2,7 +2,7 @@
 
 import React from "react";
 import { CheckCircle, XCircle, Info } from "lucide-react";
-import type { DriveToastProps } from "@/types/google-drive";
+import type { DriveToastProps } from "@/src/domain/value-objects/google-drive";
 
 const DriveToast: React.FC<DriveToastProps> = ({ toast }) => {
   if (!toast) return null;
@@ -13,8 +13,8 @@ const DriveToast: React.FC<DriveToastProps> = ({ toast }) => {
         toast.type === "success"
           ? "bg-green-500 text-white"
           : toast.type === "error"
-          ? "bg-red-500 text-white"
-          : "bg-blue-500 text-white"
+            ? "bg-red-500 text-white"
+            : "bg-blue-500 text-white"
       }`}
       role="alert"
     >

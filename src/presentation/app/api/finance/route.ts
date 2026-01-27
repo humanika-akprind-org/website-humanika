@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateFinanceInput } from "@/types/finance";
-import type { FinanceType, Status } from "@/types/enums";
+import type { CreateFinanceInput } from "@/src/domain/entities/finance";
+import type { FinanceType, Status } from "@/src/domain/enums/enums";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getFinances,

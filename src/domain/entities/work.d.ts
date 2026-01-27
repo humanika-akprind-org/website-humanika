@@ -1,4 +1,4 @@
-import { Department, Status, UserRole, Position } from "./enums";
+import { Department, Status, UserRole, Position } from "../enums/enums";
 import { User } from "./user";
 import { Period } from "./period";
 import { Approval } from "./approval";

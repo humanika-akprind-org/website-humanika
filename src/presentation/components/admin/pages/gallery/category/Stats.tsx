@@ -1,5 +1,5 @@
 import { FiTag, FiFileText } from "react-icons/fi";
-import type { GalleryCategory } from "@/types/gallery-category";
+import type { GalleryCategory } from "@/src/domain/value-objects/gallery-category";
 import StatCard from "../../../ui/card/StatCard";
 
 interface GalleryCategoryStatsProps {
@@ -11,7 +11,7 @@ export default function GalleryCategoryStats({
 }: GalleryCategoryStatsProps) {
   const totalCategories = categories.length;
   const categoriesWithDescription = categories.filter(
-    (category) => category.description && category.description.trim() !== ""
+    (category) => category.description && category.description.trim() !== "",
   ).length;
 
   const stats = [

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Department, Status } from "@/types/enums";
+import { Department, Status } from "@/src/domain/enums/enums";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
-} from "@/types/task";
+} from "@/src/domain/entities/task";
 import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
-import type { User } from "@/types/user";
-import type { WorkProgram } from "@/types/work";
+import type { User } from "@/src/domain/entities/user";
+import type { WorkProgram } from "@/src/domain/entities/work";
 import { UserApi } from "@/src/presentation/use-cases/api/user";
 import { getWorkPrograms } from "@/src/presentation/use-cases/api/work";
 

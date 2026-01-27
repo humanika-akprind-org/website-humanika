@@ -3,7 +3,7 @@ import type {
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
   FinanceCategoryFilter,
-} from "@/types/finance-category";
+} from "@/src/domain/value-objects/finance-category";
 import { apiUrl } from "@/src/presentation/lib/config/config";
 
 const API_URL = apiUrl;

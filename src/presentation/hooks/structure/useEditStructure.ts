@@ -4,7 +4,7 @@ import { StructureApi } from "@/src/presentation/use-cases/api/structure";
 import type {
   OrganizationalStructure,
   UpdateOrganizationalStructureInput,
-} from "@/types/structure";
+} from "@/src/domain/entities/structure";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

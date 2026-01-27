@@ -5,8 +5,8 @@ import {
   deleteWorkProgram,
   deleteWorkPrograms,
 } from "@/src/presentation/use-cases/api/work";
-import type { WorkProgram } from "@/types/work";
-import { type Department, type Status } from "@/types/enums";
+import type { WorkProgram } from "@/src/domain/entities/work";
+import { type Department, type Status } from "@/src/domain/enums/enums";
 
 export function useWorkManagement() {
   const router = useRouter();

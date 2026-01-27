@@ -1,8 +1,8 @@
 "use client";
 
 import { FiTag, FiTrendingUp, FiTrendingDown } from "react-icons/fi";
-import type { FinanceCategory } from "@/types/finance-category";
-import { FinanceType } from "@/types/enums";
+import type { FinanceCategory } from "@/src/domain/value-objects/finance-category";
+import { FinanceType } from "@/src/domain/enums/enums";
 import StatCard from "../../../ui/card/StatCard";
 
 interface FinanceCategoryStatsProps {
@@ -22,7 +22,7 @@ export default function FinanceCategoryStats({
     {
       title: "Income Categories",
       value: categories.filter(
-        (category) => category.type === FinanceType.INCOME
+        (category) => category.type === FinanceType.INCOME,
       ).length,
       icon: FiTrendingUp,
       color: "emerald",
@@ -30,7 +30,7 @@ export default function FinanceCategoryStats({
     {
       title: "Expense Categories",
       value: categories.filter(
-        (category) => category.type === FinanceType.EXPENSE
+        (category) => category.type === FinanceType.EXPENSE,
       ).length,
       icon: FiTrendingDown,
       color: "red",

@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import type { Management, ManagementServerData } from "@/types/management";
-import { Department, Position } from "@/types/enums";
+import type {
+  Management,
+  ManagementServerData,
+} from "@/src/domain/entities/management";
+import { Department, Position } from "@/src/domain/enums/enums";
 import { formatEnumValue } from "@/src/presentation/lib/utils";
 import { useManagementForm } from "@/src/presentation/hooks/management/useManagementForm";
 import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";

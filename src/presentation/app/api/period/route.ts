@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { PeriodApiResponse } from "@/types/period";
+import type { PeriodApiResponse } from "@/src/domain/entities/period";
 import {
   getPeriods,
   createPeriod,

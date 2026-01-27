@@ -1,4 +1,4 @@
-import { Department, Status } from "./enums";
+import { Department, Status } from "../enums/enums";
 import { Period } from "./period";
 
 export interface Project {

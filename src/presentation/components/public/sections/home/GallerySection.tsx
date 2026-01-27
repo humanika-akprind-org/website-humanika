@@ -6,8 +6,8 @@ import { LatestGalleryGrid } from "../../pages/card/gallery/LatestGalleryGrid";
 import AlbumGrid from "../../pages/card/album/AlbumGrid";
 import { getGalleries } from "@/src/presentation/use-cases/api/gallery";
 import { getEvents } from "@/src/presentation/use-cases/api/event";
-import type { Gallery } from "@/types/gallery";
-import type { Event, ScheduleItem } from "@/types/event";
+import type { Gallery } from "@/src/domain/entities/gallery";
+import type { Event, ScheduleItem } from "@/src/domain/entities/event";
 
 import {
   Camera,
@@ -17,7 +17,7 @@ import {
   Album,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Status } from "@/types/enums";
+import { Status } from "@/src/domain/enums/enums";
 import { getPreviewUrl } from "@/src/presentation/lib/utils";
 import SectionHeaderSkeleton from "@/src/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
 import GalleryGridSkeleton from "@/src/presentation/components/public/ui/skeleton/GalleryGridSkeleton";

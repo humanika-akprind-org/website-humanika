@@ -6,8 +6,8 @@ import type {
   OrganizationalStructure,
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
-} from "@/types/structure";
-import { Status } from "@/types/enums";
+} from "@/src/domain/entities/structure";
+import { Status } from "@/src/domain/enums/enums";
 import { useStructureForm } from "@/src/presentation/hooks/structure/useStructureForm";
 import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
 import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";

@@ -4,7 +4,7 @@ import {
   getDocumentTypes,
   deleteDocumentType,
 } from "@/src/presentation/use-cases/api/document-type";
-import type { DocumentType } from "@/types/document-type";
+import type { DocumentType } from "@/src/domain/value-objects/document-type";
 
 export function useDocumentTypeManagement() {
   const router = useRouter();

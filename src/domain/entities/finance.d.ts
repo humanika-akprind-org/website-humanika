@@ -1,6 +1,6 @@
-import { Department, Status, FinanceType } from "./enums";
+import { Department, Status, FinanceType } from "../enums/enums";
 import { User } from "./user";
-import { FinanceCategory } from "./finance-category";
+import { FinanceCategory } from "../value-objects/finance-category";
 import { Approval } from "./approval";
 import { WorkProgram } from "./work";
 import { Period } from "./period";

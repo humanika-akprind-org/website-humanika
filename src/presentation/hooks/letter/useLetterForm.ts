@@ -4,8 +4,8 @@ import type {
   Letter,
   CreateLetterInput,
   UpdateLetterInput,
-} from "@/types/letter";
-import { LetterType, LetterPriority } from "@/types/enums";
+} from "@/src/domain/entities/letter";
+import { LetterType, LetterPriority } from "@/src/domain/enums/enums";
 import { useFile } from "@/src/presentation/hooks/useFile";
 import { letterFolderId } from "@/src/presentation/lib/config/config";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";

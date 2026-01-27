@@ -4,7 +4,7 @@ import { createGalleryCategory } from "@/src/presentation/use-cases/api/gallery-
 import type {
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
-} from "@/types/gallery-category";
+} from "@/src/domain/value-objects/gallery-category";
 
 export function useCreateGalleryCategory() {
   const router = useRouter();

@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { FiUser, FiMail, FiKey, FiUsers, FiLock, FiX } from "react-icons/fi";
-import { UserRole, Department, Position } from "@/types/enums";
+import { UserRole, Department, Position } from "@/src/domain/enums/enums";
 import { formatEnumValue } from "@/src/presentation/lib/utils";
-import type { User } from "@/types/user";
+import type { User } from "@/src/domain/entities/user";
 import TextInput from "../../ui/input/TextInput";
 import SelectInput from "../../ui/input/SelectInput";
 import PasswordInput from "../../ui/input/PasswordInput";

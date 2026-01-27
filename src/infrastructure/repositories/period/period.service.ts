@@ -1,7 +1,7 @@
 import prisma from "@/src/presentation/lib/prisma";
-import type { Period } from "@/types/period";
+import type { Period } from "@/src/domain/entities/period";
 import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import { ActivityType } from "@/src/domain/enums/enums";
 
 type CreatePeriodInput = {
   name: string;

@@ -1,4 +1,4 @@
-import { Status } from "./enums";
+import { Status } from "../enums/enums";
 import { Period } from "./period";
 
 export interface OrganizationalStructure {
@@ -21,8 +21,7 @@ export interface CreateOrganizationalStructureInput {
   structure?: string | null;
 }
 
-export interface UpdateOrganizationalStructureInput
-  extends Partial<CreateOrganizationalStructureInput> {
+export interface UpdateOrganizationalStructureInput extends Partial<CreateOrganizationalStructureInput> {
   status?: Status;
 }
 

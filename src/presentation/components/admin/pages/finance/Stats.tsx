@@ -2,8 +2,8 @@
 
 import { FiTrendingUp, FiTrendingDown } from "react-icons/fi";
 import { Wallet } from "lucide-react";
-import type { Finance } from "@/types/finance";
-import { FinanceType } from "@/types/enums";
+import type { Finance } from "@/src/domain/entities/finance";
+import { FinanceType } from "@/src/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface FinanceStatsProps {

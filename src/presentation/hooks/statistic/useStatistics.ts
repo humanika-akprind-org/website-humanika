@@ -3,7 +3,10 @@ import {
   getStatistics,
   getActivePeriodStatistic,
 } from "@/src/presentation/use-cases/api/statistic";
-import type { Statistic, StatisticFilter } from "@/types/statistic";
+import type {
+  Statistic,
+  StatisticFilter,
+} from "@/src/domain/entities/statistic";
 
 export function useStatistics(filter?: StatisticFilter) {
   const [statistics, setStatistics] = useState<Statistic[]>([]);

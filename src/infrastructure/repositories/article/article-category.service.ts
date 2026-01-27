@@ -3,9 +3,9 @@ import type {
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
   ArticleCategory,
-} from "@/types/article-category";
+} from "@/src/domain/value-objects/article-category";
 import { logActivityFromRequest } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import { ActivityType } from "@/src/domain/enums/enums";
 import type { NextRequest } from "next/server";
 
 export async function getArticleCategories(): Promise<ArticleCategory[]> {

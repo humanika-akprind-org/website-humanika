@@ -1,4 +1,4 @@
-import { LetterType, LetterPriority, Status } from "./enums";
+import { LetterType, LetterPriority, Status } from "../enums/enums";
 import { Approval } from "./approval";
 import type { User } from "./user";
 import type { Period } from "./period";

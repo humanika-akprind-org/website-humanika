@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
 import { Tag } from "lucide-react";
-import type { DocumentType } from "@/types/document-type";
+import type { DocumentType } from "@/src/domain/value-objects/document-type";
 import Checkbox from "../../../ui/checkbox/Checkbox";
 import DropdownMenu, {
   DropdownMenuItem,

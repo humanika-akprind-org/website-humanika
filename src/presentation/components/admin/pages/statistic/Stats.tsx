@@ -1,6 +1,6 @@
 "use client";
 
-import { type Statistic } from "@/types/statistic";
+import { type Statistic } from "@/src/domain/entities/statistic";
 
 interface StatisticStatsProps {
   statistics: Statistic[];
@@ -9,31 +9,31 @@ interface StatisticStatsProps {
 export default function StatisticStats({ statistics }: StatisticStatsProps) {
   const totalActiveMembers = statistics.reduce(
     (sum, stat) => sum + stat.activeMembers,
-    0
+    0,
   );
   const totalAnnualEvents = statistics.reduce(
     (sum, stat) => sum + stat.annualEvents,
-    0
+    0,
   );
   const totalCollaborativeProjects = statistics.reduce(
     (sum, stat) => sum + stat.collaborativeProjects,
-    0
+    0,
   );
   const totalInnovationProjects = statistics.reduce(
     (sum, stat) => sum + stat.innovationProjects,
-    0
+    0,
   );
   const totalAwards = statistics.reduce((sum, stat) => sum + stat.awards, 0);
   const averageMemberSatisfaction =
     statistics.length > 0
       ? Math.round(
           statistics.reduce((sum, stat) => sum + stat.memberSatisfaction, 0) /
-            statistics.length
+            statistics.length,
         )
       : 0;
   const totalLearningMaterials = statistics.reduce(
     (sum, stat) => sum + stat.learningMaterials,
-    0
+    0,
   );
 
   const stats = [

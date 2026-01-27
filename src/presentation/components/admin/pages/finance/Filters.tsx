@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Status, FinanceType } from "@/types/enums";
+import { Status, FinanceType } from "@/src/domain/enums/enums";
 import { WorkApi } from "@/src/presentation/use-cases/api/work";
 import { getFinanceCategories } from "@/src/presentation/use-cases/api/finance-category";
 import { PeriodApi } from "@/src/presentation/use-cases/api/period";

@@ -3,7 +3,7 @@ import type {
   CreateStatisticInput,
   UpdateStatisticInput,
   StatisticFilter,
-} from "@/types/statistic";
+} from "@/src/domain/entities/statistic";
 import { apiUrl } from "@/src/presentation/lib/config/config";
 
 const API_URL = apiUrl;

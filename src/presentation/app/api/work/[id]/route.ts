@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateWorkProgramInput } from "@/types/work";
+import type { UpdateWorkProgramInput } from "@/src/domain/entities/work";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getWorkProgram,

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import type {
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
-} from "@/types/finance-category";
+} from "@/src/domain/value-objects/finance-category";
 
 export function useCreateFinanceCategory() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export function useCreateFinanceCategory() {
   const [isLoading, _setIsLoading] = useState(false);
 
   const createFinanceCategory = async (
-    data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput
+    data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput,
   ) => {
     setIsSubmitting(true);
     setError(null);

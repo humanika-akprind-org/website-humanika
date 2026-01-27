@@ -6,8 +6,8 @@ import {
   FiTrendingUp,
   FiArchive,
 } from "react-icons/fi";
-import type { Letter } from "types/letter";
-import { Status } from "types/enums";
+import type { Letter } from "@/src/domain/entities/letter";
+import { Status } from "@/src/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {
@@ -30,7 +30,7 @@ export default function Stats({ letters, typeFilter }: StatsProps) {
     {
       title: "Published",
       value: filteredLetters.filter(
-        (letter) => letter.status === Status.PUBLISH
+        (letter) => letter.status === Status.PUBLISH,
       ).length,
       icon: FiCheckCircle,
       color: "green",
@@ -45,7 +45,7 @@ export default function Stats({ letters, typeFilter }: StatsProps) {
     {
       title: "Archived",
       value: filteredLetters.filter(
-        (letter) => letter.status === Status.ARCHIVE
+        (letter) => letter.status === Status.ARCHIVE,
       ).length,
       icon: FiArchive,
       color: "red",

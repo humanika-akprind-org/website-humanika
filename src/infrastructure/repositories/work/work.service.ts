@@ -2,12 +2,12 @@ import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
-} from "@/types/work";
-import type { Status, Department } from "@/types/enums";
-import type { User } from "@/types/user";
+} from "@/src/domain/entities/work";
+import type { Status, Department } from "@/src/domain/enums/enums";
+import type { User } from "@/src/domain/entities/user";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import { ActivityType } from "@/src/domain/enums/enums";
 
 type UserWithId = Pick<User, "id">;
 

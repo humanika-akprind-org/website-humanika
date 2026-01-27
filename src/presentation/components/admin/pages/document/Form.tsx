@@ -7,11 +7,11 @@ import type {
   Document,
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/types/document";
-import { Status } from "@/types/enums";
-import type { Event } from "@/types/event";
-import type { Letter } from "@/types/letter";
-import type { Period } from "@/types/period";
+} from "@/src/domain/entities/document";
+import { Status } from "@/src/domain/enums/enums";
+import type { Event } from "@/src/domain/entities/event";
+import type { Letter } from "@/src/domain/entities/letter";
+import type { Period } from "@/src/domain/entities/period";
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
 import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
 import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";

@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createArticle } from "@/src/presentation/use-cases/api/article";
-import type { CreateArticleInput, UpdateArticleInput } from "@/types/article";
+import type {
+  CreateArticleInput,
+  UpdateArticleInput,
+} from "@/src/domain/entities/article";
 
 export function useCreateArticle() {
   const router = useRouter();

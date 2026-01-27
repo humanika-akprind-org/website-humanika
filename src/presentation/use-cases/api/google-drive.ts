@@ -1,4 +1,4 @@
-import { type ApiRequestBody } from "@/types/google-drive";
+import { type ApiRequestBody } from "@/src/domain/value-objects/google-drive";
 
 export const callApi = async (body: ApiRequestBody, formData?: FormData) => {
   try {
@@ -32,7 +32,7 @@ export const fetchDriveFiles = async (accessToken: string) => {
 
 export const fetchDriveFolders = async (accessToken: string) => {
   const res = await fetch(
-    `/api/google-drive/folders?accessToken=${accessToken}`
+    `/api/google-drive/folders?accessToken=${accessToken}`,
   );
   const data = await res.json();
 

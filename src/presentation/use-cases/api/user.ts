@@ -1,11 +1,11 @@
-import { UserRole, Department, Position } from "@/types/enums";
+import { UserRole, Department, Position } from "@/src/domain/enums/enums";
 import type {
   User,
   CreateUserData,
   UpdateUserData,
   UsersResponse,
   ApiResponse,
-} from "@/types/user";
+} from "@/src/domain/entities/user";
 import { apiUrl } from "@/src/presentation/lib/config/config";
 
 const API_URL = apiUrl;

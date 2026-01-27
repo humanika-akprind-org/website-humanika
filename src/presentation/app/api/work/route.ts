@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateWorkProgramInput } from "@/types/work";
-import type { Status, Department } from "@/types/enums";
+import type { CreateWorkProgramInput } from "@/src/domain/entities/work";
+import type { Status, Department } from "@/src/domain/enums/enums";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getWorkPrograms,

@@ -6,7 +6,7 @@ import {
   FiBriefcase,
   FiTrendingUp,
 } from "react-icons/fi";
-import { Department } from "@/types/enums";
+import { Department } from "@/src/domain/enums/enums";
 import { formatEnumValue } from "@/src/presentation/use-cases/api/user";
 
 interface DepartmentProps {

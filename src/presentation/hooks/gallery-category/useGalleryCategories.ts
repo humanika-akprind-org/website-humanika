@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getGalleryCategories } from "@/src/presentation/use-cases/api/gallery-category";
-import type { GalleryCategory } from "@/types/gallery-category";
+import type { GalleryCategory } from "@/src/domain/value-objects/gallery-category";
 
 export function useGalleryCategories() {
   const [categories, setCategories] = useState<GalleryCategory[]>([]);

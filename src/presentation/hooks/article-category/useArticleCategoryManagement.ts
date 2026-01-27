@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { ArticleCategory } from "@/types/article-category";
+import type { ArticleCategory } from "@/src/domain/value-objects/article-category";
 import {
   getArticleCategories,
   deleteArticleCategory,

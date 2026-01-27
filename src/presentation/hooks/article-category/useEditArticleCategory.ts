@@ -7,7 +7,7 @@ import {
 import type {
   ArticleCategory,
   UpdateArticleCategoryInput,
-} from "@/types/article-category";
+} from "@/src/domain/value-objects/article-category";
 
 export function useEditArticleCategory(categoryId: string) {
   const router = useRouter();

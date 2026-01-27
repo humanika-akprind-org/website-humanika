@@ -4,7 +4,7 @@ import { createEventCategory } from "@/src/presentation/use-cases/api/event-cate
 import type {
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
-} from "@/types/event-category";
+} from "@/src/domain/value-objects/event-category";
 
 export function useCreateEventCategory() {
   const router = useRouter();

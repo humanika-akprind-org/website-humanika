@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { deleteFinance } from "@/src/presentation/use-cases/api/finance";
-import type { Finance } from "@/types/finance";
+import type { Finance } from "@/src/domain/entities/finance";
 import { useFinances } from "./useFinances";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
 import {

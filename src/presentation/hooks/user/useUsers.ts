@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { UserApi } from "@/src/presentation/use-cases/api/user";
-import type { User } from "@/types/user";
+import type { User } from "@/src/domain/entities/user";
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Document } from "@/types/document";
-import type { Status, DocumentType } from "@/types/enums";
+import type { Document } from "@/src/domain/entities/document";
+import type { Status, DocumentType } from "@/src/domain/enums/enums";
 
 export interface UseDocumentTableProps {
   documents: Document[];
@@ -59,7 +59,7 @@ export function useDocumentTable({
   // Delete modal states
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(
-    null
+    null,
   );
   const [isBulkDelete, setIsBulkDelete] = useState(false);
 
@@ -84,7 +84,7 @@ export function useDocumentTable({
     setSelectedDocuments((prev) =>
       prev.includes(id)
         ? prev.filter((documentId) => documentId !== id)
-        : [...prev, id]
+        : [...prev, id],
     );
   };
 

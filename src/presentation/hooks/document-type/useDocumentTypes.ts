@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { DocumentType } from "@/types/document-type";
+import type { DocumentType } from "@/src/domain/value-objects/document-type";
 import { getDocumentTypes } from "@/src/presentation/use-cases/api/document-type";
 
 export function useDocumentTypes() {

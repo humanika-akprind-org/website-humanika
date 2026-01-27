@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getLetters } from "@/src/presentation/use-cases/api/letter";
-import type { Letter, LetterFilter } from "@/types/letter";
+import type { Letter, LetterFilter } from "@/src/domain/entities/letter";
 
 export function useLetters(filter?: LetterFilter) {
   const [letters, setLetters] = useState<Letter[]>([]);

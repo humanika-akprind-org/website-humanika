@@ -3,7 +3,7 @@ import type {
   ArticleCategory,
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-} from "@/types/article-category";
+} from "@/src/domain/value-objects/article-category";
 
 export interface ArticleCategoryFormData {
   name: string;
@@ -13,8 +13,8 @@ export interface ArticleCategoryFormData {
 export const useArticleCategoryForm = (
   category?: ArticleCategory,
   onSubmit?: (
-    data: CreateArticleCategoryInput | UpdateArticleCategoryInput
-  ) => Promise<void>
+    data: CreateArticleCategoryInput | UpdateArticleCategoryInput,
+  ) => Promise<void>,
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ArticleCategoryFormData>({
@@ -25,7 +25,7 @@ export const useArticleCategoryForm = (
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

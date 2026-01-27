@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
 import { BarChart3 } from "lucide-react";
-import type { Statistic } from "@/types/statistic";
+import type { Statistic } from "@/src/domain/entities/statistic";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import EmptyState from "../../ui/EmptyState";

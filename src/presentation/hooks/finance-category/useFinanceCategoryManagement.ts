@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { FinanceCategory } from "@/types/finance-category";
+import type { FinanceCategory } from "@/src/domain/value-objects/finance-category";
 import {
   getFinanceCategories,
   deleteFinanceCategory,

@@ -3,8 +3,8 @@ import type {
   DocumentType,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/types/document-type";
-import type { User } from "@/types/user";
+} from "@/src/domain/value-objects/document-type";
+import type { User } from "@/src/domain/entities/user";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +17,7 @@ export async function getDocumentTypes(): Promise<DocumentType[]> {
 }
 
 export async function getDocumentType(
-  id: string
+  id: string,
 ): Promise<DocumentType | null> {
   return prisma.documentType.findUnique({
     where: { id },
@@ -26,7 +26,7 @@ export async function getDocumentType(
 
 export async function createDocumentType(
   data: CreateDocumentTypeInput,
-  _user: User
+  _user: User,
 ): Promise<DocumentType> {
   // Check if document type with same name already exists
   const existingDocumentType = await prisma.documentType.findFirst({
@@ -53,7 +53,7 @@ export async function createDocumentType(
 export async function updateDocumentType(
   id: string,
   data: UpdateDocumentTypeInput,
-  _user: User
+  _user: User,
 ): Promise<DocumentType> {
   // Check if document type exists
   const existingDocumentType = await prisma.documentType.findUnique({
@@ -94,7 +94,7 @@ export async function updateDocumentType(
 
 export async function deleteDocumentType(
   id: string,
-  _user: User
+  _user: User,
 ): Promise<void> {
   // Check if document type exists
   const existingDocumentType = await prisma.documentType.findUnique({
@@ -114,7 +114,7 @@ export async function deleteDocumentType(
 
   if (documentsCount > 0) {
     throw new Error(
-      "Cannot delete document type that is being used by documents"
+      "Cannot delete document type that is being used by documents",
     );
   }
 

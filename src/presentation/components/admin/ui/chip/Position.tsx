@@ -6,7 +6,7 @@ import {
   FiTrendingUp,
   FiX,
 } from "react-icons/fi";
-import { Position } from "@/types/enums";
+import { Position } from "@/src/domain/enums/enums";
 import { formatEnumValue } from "@/src/presentation/use-cases/api/user";
 
 interface PositionProps {

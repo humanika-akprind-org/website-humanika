@@ -2,10 +2,14 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import type { Event, CreateEventInput, UpdateEventInput } from "@/types/event";
-import { Department as DepartmentEnum } from "@/types/enums";
-import type { User } from "@/types/user";
-import type { Period } from "@/types/period";
+import type {
+  Event,
+  CreateEventInput,
+  UpdateEventInput,
+} from "@/src/domain/entities/event";
+import { Department as DepartmentEnum } from "@/src/domain/enums/enums";
+import type { User } from "@/src/domain/entities/user";
+import type { Period } from "@/src/domain/entities/period";
 import { FiBriefcase, FiUser, FiFolder } from "react-icons/fi";
 import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";

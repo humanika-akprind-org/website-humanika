@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import type {
   FinanceCategory,
   UpdateFinanceCategoryInput,
-} from "@/types/finance-category";
+} from "@/src/domain/value-objects/finance-category";
 import {
   getFinanceCategory,
   updateFinanceCategory,

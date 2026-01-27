@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createEvent } from "@/src/presentation/use-cases/api/event";
-import type { CreateEventInput, UpdateEventInput } from "@/types/event";
+import type {
+  CreateEventInput,
+  UpdateEventInput,
+} from "@/src/domain/entities/event";
 
 export function useCreateEvent() {
   const router = useRouter();

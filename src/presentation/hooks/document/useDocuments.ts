@@ -3,7 +3,7 @@ import {
   getDocuments,
   deleteDocument,
 } from "@/src/presentation/use-cases/api/document";
-import type { Document, DocumentFilter } from "@/types/document";
+import type { Document, DocumentFilter } from "@/src/domain/entities/document";
 import { useToast } from "@/src/presentation/hooks/use-toast";
 
 export function useDocuments(filter?: DocumentFilter) {

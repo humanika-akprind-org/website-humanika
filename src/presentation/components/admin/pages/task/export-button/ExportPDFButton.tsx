@@ -1,7 +1,7 @@
 import { FileText } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { DepartmentTask } from "@/types/task";
+import type { DepartmentTask } from "@/src/domain/entities/task";
 import {
   convertHtmlToPdfElements,
   type PdfElement,

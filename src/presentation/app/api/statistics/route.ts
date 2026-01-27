@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateStatisticInput, StatisticFilter } from "@/types/statistic";
+import type {
+  CreateStatisticInput,
+  StatisticFilter,
+} from "@/src/domain/entities/statistic";
 import {
   getStatistics,
   getActivePeriodStatistic,

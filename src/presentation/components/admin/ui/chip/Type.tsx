@@ -1,4 +1,4 @@
-import { LetterType } from "@/types/enums";
+import { LetterType } from "@/src/domain/enums/enums";
 
 interface TypeChipProps {
   type: LetterType;
@@ -19,7 +19,7 @@ export default function TypeChip({ type }: TypeChipProps) {
   return (
     <span
       className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getTypeColor(
-        type
+        type,
       )}`}
     >
       {type}

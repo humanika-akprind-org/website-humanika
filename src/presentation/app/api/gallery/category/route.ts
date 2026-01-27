@@ -4,7 +4,7 @@ import {
   getGalleryCategories,
   createGalleryCategory,
 } from "@/src/infrastructure/repositories/gallery/gallery-category.service";
-import type { CreateGalleryCategoryInput } from "@/types/gallery-category";
+import type { CreateGalleryCategoryInput } from "@/src/domain/value-objects/gallery-category";
 
 // Validation functions
 function validateCreateGalleryCategoryInput(body: CreateGalleryCategoryInput) {

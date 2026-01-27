@@ -3,7 +3,7 @@ import type {
   CreateArticleInput,
   UpdateArticleInput,
   ArticleFilter,
-} from "@/types/article";
+} from "@/src/domain/entities/article";
 import { apiUrl } from "@/src/presentation/lib/config/config";
 
 const API_URL = apiUrl;

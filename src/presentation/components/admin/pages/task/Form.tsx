@@ -6,8 +6,8 @@ import type {
   DepartmentTask,
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
-} from "@/types/task";
-import { Department, Status } from "@/types/enums";
+} from "@/src/domain/entities/task";
+import { Department, Status } from "@/src/domain/enums/enums";
 
 import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
@@ -15,8 +15,8 @@ import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInpu
 import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/src/presentation/components/ui/CancelButton";
 import { FiBriefcase, FiUser, FiCheckCircle, FiFolder } from "react-icons/fi";
-import type { User } from "@/types/user";
-import type { WorkProgram } from "@/types/work";
+import type { User } from "@/src/domain/entities/user";
+import type { WorkProgram } from "@/src/domain/entities/work";
 import { useTaskForm } from "@/src/presentation/hooks/task/useTaskForm";
 
 export interface CreateTaskData {

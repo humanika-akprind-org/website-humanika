@@ -7,7 +7,7 @@ import {
 import type {
   EventCategory,
   UpdateEventCategoryInput,
-} from "@/types/event-category";
+} from "@/src/domain/value-objects/event-category";
 
 export function useEditEventCategory(categoryId: string) {
   const router = useRouter();

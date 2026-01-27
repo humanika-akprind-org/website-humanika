@@ -6,7 +6,7 @@ import type {
   DocumentType,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/types/document-type";
+} from "@/src/domain/value-objects/document-type";
 
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
 import { Textarea } from "@/src/presentation/components/ui/textarea";

@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "./auth";
 import prisma from "./prisma";
-import { UserRole } from "@/types/enums";
+import { UserRole } from "@/src/domain/enums/enums";
 
 const COOKIE_NAME = "auth-token";
 
@@ -44,7 +44,7 @@ export async function getCurrentUser() {
   } catch (error) {
     console.error(
       "Failed to fetch user:",
-      error instanceof Error ? error.message : error
+      error instanceof Error ? error.message : error,
     );
     return null;
   }
@@ -52,13 +52,13 @@ export async function getCurrentUser() {
 
 export async function requireAuth(
   request: NextRequest,
-  allowedRoles: UserRole[] = [UserRole.ANGGOTA]
+  allowedRoles: UserRole[] = [UserRole.ANGGOTA],
 ): Promise<NextResponse | null> {
   const token = request.cookies.get(COOKIE_NAME)?.value;
 
   if (!token) {
     return NextResponse.redirect(
-      new URL("/auth/login?error=unauthorized", request.url)
+      new URL("/auth/login?error=unauthorized", request.url),
     );
   }
 
@@ -66,7 +66,7 @@ export async function requireAuth(
   if (!decoded) {
     clearAuthCookies();
     return NextResponse.redirect(
-      new URL("/auth/login?error=invalid_token", request.url)
+      new URL("/auth/login?error=invalid_token", request.url),
     );
   }
 
@@ -84,10 +84,10 @@ export async function requireAuth(
   } catch (error) {
     console.error(
       "Auth check failed:",
-      error instanceof Error ? error.message : error
+      error instanceof Error ? error.message : error,
     );
     return NextResponse.redirect(
-      new URL("/auth/login?error=server_error", request.url)
+      new URL("/auth/login?error=server_error", request.url),
     );
   }
 }
@@ -95,7 +95,7 @@ export async function requireAuth(
 export function setAuthCookie(
   response: NextResponse,
   token: string,
-  maxAge: number
+  maxAge: number,
 ): NextResponse {
   const COOKIE_OPTIONS = {
     httpOnly: true,
@@ -131,7 +131,7 @@ export async function invalidateToken(token: string): Promise<void> {
   } catch (error) {
     console.error(
       "Token invalidation failed:",
-      error instanceof Error ? error.message : error
+      error instanceof Error ? error.message : error,
     );
   }
 }

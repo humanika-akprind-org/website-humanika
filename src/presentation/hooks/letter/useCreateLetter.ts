@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { CreateLetterInput, UpdateLetterInput } from "@/types/letter";
+import type {
+  CreateLetterInput,
+  UpdateLetterInput,
+} from "@/src/domain/entities/letter";
 
 export function useCreateLetter() {
   const router = useRouter();
@@ -30,7 +33,7 @@ export function useCreateLetter() {
   };
 
   const createLetterForApproval = async (
-    data: CreateLetterInput | UpdateLetterInput
+    data: CreateLetterInput | UpdateLetterInput,
   ) => {
     setIsSubmitting(true);
     setError(null);

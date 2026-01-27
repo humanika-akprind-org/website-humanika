@@ -6,7 +6,7 @@ import type {
   GalleryCategory,
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
-} from "@/types/gallery-category";
+} from "@/src/domain/value-objects/gallery-category";
 
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
 import { Textarea } from "@/src/presentation/components/ui/textarea";

@@ -1,7 +1,7 @@
 // import GoogleDriveConnect from "@/components/admin/google-drive/GoogleDriveConnect";
 import RefreshButton from "./RefreshButton";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
-import { type AuthGuardProps } from "@/types/google-drive";
+import { type AuthGuardProps } from "@/src/domain/value-objects/google-drive";
 
 export default async function AuthGuard({
   // accessToken,

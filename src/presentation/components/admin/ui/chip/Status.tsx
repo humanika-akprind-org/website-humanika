@@ -5,7 +5,7 @@ import {
   FiAlertCircle,
   FiEye,
 } from "react-icons/fi";
-import { Status } from "@/types/enums";
+import { Status } from "@/src/domain/enums/enums";
 
 interface StatusChipProps {
   status: Status;

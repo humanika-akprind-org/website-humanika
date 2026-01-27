@@ -3,8 +3,8 @@ import prisma from "@/src/presentation/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { randomColor } from "@/src/presentation/lib/random-color";
 import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/types/enums";
-import type { User } from "@/types/user";
+import { ActivityType } from "@/src/domain/enums/enums";
+import type { User } from "@/src/domain/entities/user";
 
 interface RegisterResult {
   success: boolean;

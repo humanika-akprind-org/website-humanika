@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UserApi } from "@/src/presentation/use-cases/api/user";
-import type { User } from "@/types/user";
+import type { User } from "@/src/domain/entities/user";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

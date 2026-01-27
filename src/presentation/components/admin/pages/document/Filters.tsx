@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DocumentType, Status, StatusApproval } from "@/types/enums";
+import { DocumentType, Status, StatusApproval } from "@/src/domain/enums/enums";
 import { PeriodApi } from "@/src/presentation/use-cases/api/period";
 import SearchInput from "../../ui/input/SearchInput";
 import DeleteSelectedButton from "../../ui/button/DeleteSelectedButton";

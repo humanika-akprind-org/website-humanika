@@ -16,15 +16,15 @@ import { ActivityApi } from "@/src/presentation/use-cases/api/activity";
 import { ManagementApi } from "@/src/presentation/use-cases/api/management";
 import { getDepartmentTasks } from "@/src/presentation/use-cases/api/task";
 import { StructureApi } from "@/src/presentation/use-cases/api/structure";
-import type { Document } from "@/types/document";
-import type { WorkProgram } from "@/types/work";
-import type { Finance } from "@/types/finance";
-import type { Event, ScheduleItem } from "@/types/event";
-import type { Article } from "@/types/article";
+import type { Document } from "@/src/domain/entities/document";
+import type { WorkProgram } from "@/src/domain/entities/work";
+import type { Finance } from "@/src/domain/entities/finance";
+import type { Event, ScheduleItem } from "@/src/domain/entities/event";
+import type { Article } from "@/src/domain/entities/article";
 
-import type { ActivityLog } from "@/types/activity-log";
-import type { Period } from "@/types/period";
-import { Status } from "@/types/enums";
+import type { ActivityLog } from "@/src/domain/entities/activity-log";
+import type { Period } from "@/src/domain/entities/period";
+import { Status } from "@/src/domain/enums/enums";
 import {
   TrendingUp,
   Activity,

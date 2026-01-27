@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiTrash, FiEye, FiDownload, FiFile } from "react-icons/fi";
 import { Wallet } from "lucide-react";
-import type { Finance } from "@/types/finance";
+import type { Finance } from "@/src/domain/entities/finance";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import EmptyState from "../../ui/EmptyState";

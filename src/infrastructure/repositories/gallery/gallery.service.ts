@@ -1,8 +1,8 @@
 import prisma from "@/src/presentation/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/types/enums";
-import type { User } from "@/types/user";
+import { ActivityType } from "@/src/domain/enums/enums";
+import type { User } from "@/src/domain/entities/user";
 
 type UserWithId = Pick<User, "id">;
 

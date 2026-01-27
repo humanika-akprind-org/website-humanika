@@ -1,10 +1,10 @@
-import type { ScheduleItem } from "@/types/event";
+import type { ScheduleItem } from "@/src/domain/entities/event";
 
 /**
  * Helper function to get the earliest date from schedules
  */
 export const getEarliestScheduleDate = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): Date | null => {
   if (!schedules || schedules.length === 0) return null;
   const dates = schedules.map((s) => new Date(s.date));
@@ -15,7 +15,7 @@ export const getEarliestScheduleDate = (
  * Helper function to get the latest date from schedules
  */
 export const getLatestScheduleDate = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): Date | null => {
   if (!schedules || schedules.length === 0) return null;
   const dates = schedules.map((s) => new Date(s.date));
@@ -26,7 +26,7 @@ export const getLatestScheduleDate = (
  * Helper function to get startDate from schedules (for backward compatibility)
  */
 export const getStartDateFromSchedules = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): string | null => {
   const date = getEarliestScheduleDate(schedules);
   return date ? date.toISOString().split("T")[0] : null;
@@ -36,7 +36,7 @@ export const getStartDateFromSchedules = (
  * Helper function to get endDate from schedules (for backward compatibility)
  */
 export const getEndDateFromSchedules = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): string | null => {
   const date = getLatestScheduleDate(schedules);
   return date ? date.toISOString().split("T")[0] : null;
@@ -46,7 +46,7 @@ export const getEndDateFromSchedules = (
  * Check if event is upcoming based on schedules
  */
 export const isEventUpcoming = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): boolean => {
   const earliestDate = getEarliestScheduleDate(schedules);
   if (!earliestDate) return false;
@@ -57,7 +57,7 @@ export const isEventUpcoming = (
  * Check if event is ongoing based on schedules
  */
 export const isEventOngoing = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): boolean => {
   const earliestDate = getEarliestScheduleDate(schedules);
   const latestDate = getLatestScheduleDate(schedules);
@@ -70,7 +70,7 @@ export const isEventOngoing = (
  * Check if event is past based on schedules
  */
 export const isEventPast = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): boolean => {
   const latestDate = getLatestScheduleDate(schedules);
   if (!latestDate) return false;
@@ -81,7 +81,7 @@ export const isEventPast = (
  * Format date range from schedules for display
  */
 export const formatDateRangeFromSchedules = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): string => {
   const earliestDate = getEarliestScheduleDate(schedules);
   const latestDate = getLatestScheduleDate(schedules);
@@ -110,7 +110,7 @@ export const formatDateRangeFromSchedules = (
  * Check if event is multi-day based on schedules
  */
 export const isEventMultiDay = (
-  schedules: ScheduleItem[] | null | undefined
+  schedules: ScheduleItem[] | null | undefined,
 ): boolean => {
   const earliestDate = getEarliestScheduleDate(schedules);
   const latestDate = getLatestScheduleDate(schedules);

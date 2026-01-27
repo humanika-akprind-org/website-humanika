@@ -21,7 +21,7 @@ import {
 import DeleteModal from "./modal/DeleteModal";
 import RenameModal from "./modal/RenameModal";
 import Breadcrumbs from "./Breadcrumbs";
-import type { DriveTableProps } from "@/types/google-drive";
+import type { DriveTableProps } from "@/src/domain/value-objects/google-drive";
 import CreateFolderModal from "./modal/CreateFolderModal";
 import UploadProgressModal from "./modal/UploadProgressModal";
 import { useToast } from "./hooks/useToast";

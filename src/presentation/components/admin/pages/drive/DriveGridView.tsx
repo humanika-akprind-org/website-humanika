@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { DriveGridViewProps } from "@/types/google-drive";
+import type { DriveGridViewProps } from "@/src/domain/value-objects/google-drive";
 import { DriveFileCard } from "./index";
 
 const DriveGridView: React.FC<DriveGridViewProps> = ({

@@ -1,7 +1,7 @@
 "use client";
 
 import { FiImage, FiFolder, FiInbox } from "react-icons/fi";
-import type { Gallery } from "@/types/gallery";
+import type { Gallery } from "@/src/domain/entities/gallery";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {
@@ -13,10 +13,10 @@ export default function Stats({ galleries }: StatsProps) {
   const totalGalleries = galleries.length;
   const totalImages = galleries.length; // Assuming all are images for now
   const totalGalleriesWithCategory = galleries.filter(
-    (g) => g.categoryId
+    (g) => g.categoryId,
   ).length;
   const totalGalleriesWithoutCategory = galleries.filter(
-    (g) => !g.categoryId
+    (g) => !g.categoryId,
   ).length;
 
   const stats = [

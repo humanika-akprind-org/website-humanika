@@ -3,8 +3,8 @@ import type {
   FinanceCategory,
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
-} from "@/types/finance-category";
-import { FinanceType } from "@/types/enums";
+} from "@/src/domain/value-objects/finance-category";
+import { FinanceType } from "@/src/domain/enums/enums";
 
 export interface FinanceCategoryFormData {
   name: string;
@@ -15,8 +15,8 @@ export interface FinanceCategoryFormData {
 export const useFinanceCategoryForm = (
   category?: FinanceCategory,
   onSubmit?: (
-    data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput
-  ) => Promise<void>
+    data: CreateFinanceCategoryInput | UpdateFinanceCategoryInput,
+  ) => Promise<void>,
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FinanceCategoryFormData>({
@@ -30,7 +30,7 @@ export const useFinanceCategoryForm = (
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

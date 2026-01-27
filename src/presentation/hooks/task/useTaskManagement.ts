@@ -4,7 +4,7 @@ import {
   getDepartmentTasks,
   deleteDepartmentTask,
 } from "@/src/presentation/use-cases/api/task";
-import type { DepartmentTask } from "@/types/task";
+import type { DepartmentTask } from "@/src/domain/entities/task";
 
 interface UseTaskManagementReturn {
   tasks: DepartmentTask[];

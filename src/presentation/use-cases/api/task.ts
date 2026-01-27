@@ -3,8 +3,8 @@ import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
   DepartmentTaskFilter,
-} from "@/types/task";
-import { Department, Status } from "@/types/enums";
+} from "@/src/domain/entities/task";
+import { Department, Status } from "@/src/domain/enums/enums";
 import { apiUrl } from "@/src/presentation/lib/config/config";
 
 const API_URL = apiUrl;

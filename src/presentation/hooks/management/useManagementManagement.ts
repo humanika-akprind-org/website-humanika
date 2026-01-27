@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { ManagementApi } from "@/src/presentation/use-cases/api/management";
 import { UserApi } from "@/src/presentation/use-cases/api/user";
 import { PeriodApi } from "@/src/presentation/use-cases/api/period";
-import type { Management } from "@/types/management";
+import type { Management } from "@/src/domain/entities/management";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,

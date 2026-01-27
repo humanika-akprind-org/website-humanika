@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { UserFilters as UserFiltersType } from "@/types/user";
+import type { UserFilters as UserFiltersType } from "@/src/domain/entities/user";
 import {
   userRoleOptions,
   departmentOptions,

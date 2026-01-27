@@ -19,7 +19,7 @@ import StatusApprovalChip from "@/src/presentation/components/admin/ui/chip/Stat
 import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
 import { useLetterManagement } from "@/src/presentation/hooks/letter/useLetterManagement";
 import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
-import type { LetterFilter } from "@/types/letter";
+import type { LetterFilter } from "@/src/domain/entities/letter";
 
 export default function LettersPage() {
   const {

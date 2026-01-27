@@ -4,8 +4,8 @@ import { createWorkProgram } from "@/src/presentation/use-cases/api/work";
 import type {
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
-} from "@/types/work";
-import { Status } from "@/types/enums";
+} from "@/src/domain/entities/work";
+import { Status } from "@/src/domain/enums/enums";
 
 export function useCreateWorkProgram() {
   const router = useRouter();

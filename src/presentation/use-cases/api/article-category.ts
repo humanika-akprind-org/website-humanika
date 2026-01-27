@@ -2,7 +2,7 @@ import type {
   ArticleCategory,
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-} from "@/types/article-category";
+} from "@/src/domain/value-objects/article-category";
 
 import { apiUrl } from "@/src/presentation/lib/config/config";
 

@@ -6,7 +6,7 @@ import type {
   ArticleCategory,
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-} from "@/types/article-category";
+} from "@/src/domain/value-objects/article-category";
 
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
 import { Textarea } from "@/src/presentation/components/ui/textarea";

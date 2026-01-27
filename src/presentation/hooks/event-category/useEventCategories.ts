@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getEventCategories } from "@/src/presentation/use-cases/api/event-category";
-import type { EventCategory } from "@/types/event-category";
+import type { EventCategory } from "@/src/domain/value-objects/event-category";
 
 export function useEventCategories() {
   const [categories, setCategories] = useState<EventCategory[]>([]);

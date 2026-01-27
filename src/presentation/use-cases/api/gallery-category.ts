@@ -2,7 +2,7 @@ import type {
   GalleryCategory,
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
-} from "@/types/gallery-category";
+} from "@/src/domain/value-objects/gallery-category";
 
 export const getGalleryCategories = async (): Promise<GalleryCategory[]> => {
   const response = await fetch("/api/gallery/category");
@@ -13,7 +13,7 @@ export const getGalleryCategories = async (): Promise<GalleryCategory[]> => {
 };
 
 export const getGalleryCategory = async (
-  id: string
+  id: string,
 ): Promise<GalleryCategory> => {
   const response = await fetch(`/api/gallery/category/${id}`);
   if (!response.ok) {
@@ -23,7 +23,7 @@ export const getGalleryCategory = async (
 };
 
 export const createGalleryCategory = async (
-  data: CreateGalleryCategoryInput
+  data: CreateGalleryCategoryInput,
 ): Promise<GalleryCategory> => {
   const response = await fetch("/api/gallery/category", {
     method: "POST",
@@ -40,7 +40,7 @@ export const createGalleryCategory = async (
 
 export const updateGalleryCategory = async (
   id: string,
-  data: UpdateGalleryCategoryInput
+  data: UpdateGalleryCategoryInput,
 ): Promise<GalleryCategory> => {
   const response = await fetch(`/api/gallery/category/${id}`, {
     method: "PUT",

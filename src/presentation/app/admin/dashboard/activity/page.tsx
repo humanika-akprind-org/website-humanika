@@ -18,7 +18,7 @@ import {
   User,
 } from "lucide-react";
 
-import type { ActivityLog } from "@/types/activity-log";
+import type { ActivityLog } from "@/src/domain/entities/activity-log";
 import SelectFilter from "@/src/presentation/components/admin/ui/input/SelectFilter";
 import ExportButtons from "@/src/presentation/components/admin/pages/activity/export-button/ExportButtons";
 import LoadingActivityDashboard from "@/src/presentation/components/admin/pages/activity/LoadingActivityDashboard";

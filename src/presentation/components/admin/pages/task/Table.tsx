@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { FiEye, FiTrash, FiEdit } from "react-icons/fi";
 import { ClipboardList, FileText, File } from "lucide-react";
-import type { DepartmentTask } from "@/types/task";
+import type { DepartmentTask } from "@/src/domain/entities/task";
 import SortIcon from "../../ui/SortIcon";
 import StatusChip from "../../ui/chip/Status";
 import Checkbox from "../../ui/checkbox/Checkbox";

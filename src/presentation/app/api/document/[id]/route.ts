@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateDocumentInput } from "@/types/document";
+import type { UpdateDocumentInput } from "@/src/domain/entities/document";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getDocument,

@@ -6,8 +6,8 @@ import type {
   FinanceCategory,
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
-} from "@/types/finance-category";
-import { FinanceType } from "@/types/enums";
+} from "@/src/domain/value-objects/finance-category";
+import { FinanceType } from "@/src/domain/enums/enums";
 
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
 import { Textarea } from "@/src/presentation/components/ui/textarea";

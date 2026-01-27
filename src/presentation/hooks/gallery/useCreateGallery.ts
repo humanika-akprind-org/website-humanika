@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createGallery } from "@/src/presentation/use-cases/api/gallery";
-import type { CreateGalleryInput, UpdateGalleryInput } from "@/types/gallery";
+import type {
+  CreateGalleryInput,
+  UpdateGalleryInput,
+} from "@/src/domain/entities/gallery";
 
 export function useCreateGallery() {
   const router = useRouter();

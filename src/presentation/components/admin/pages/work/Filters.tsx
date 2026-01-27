@@ -1,6 +1,6 @@
 "use client";
 
-import { Department, Status } from "@/types/enums";
+import { Department, Status } from "@/src/domain/enums/enums";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";

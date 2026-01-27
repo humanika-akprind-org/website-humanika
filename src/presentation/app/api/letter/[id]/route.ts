@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateLetterInput } from "@/types/letter";
+import type { UpdateLetterInput } from "@/src/domain/entities/letter";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getLetter,

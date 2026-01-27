@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import ArticleCard from "../../pages/card/article/ArticleCard";
-import type { Article } from "@/types/article";
+import type { Article } from "@/src/domain/entities/article";
 import { motion } from "framer-motion";
 import {
   Newspaper,
@@ -12,8 +12,8 @@ import {
   Loader2,
   ChevronRight,
 } from "lucide-react";
-import { type ArticleCategory } from "@/types/article-category";
-import { Status } from "@/types/enums";
+import { type ArticleCategory } from "@/src/domain/value-objects/article-category";
+import { Status } from "@/src/domain/enums/enums";
 import SectionHeaderSkeleton from "@/src/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
 import CardSkeleton from "@/src/presentation/components/public/ui/skeleton/CardSkeleton";
 import CategoryPillsSkeleton from "@/src/presentation/components/public/ui/skeleton/CategoryPillsSkeleton";

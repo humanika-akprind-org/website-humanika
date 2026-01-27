@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { Article } from "@/types/article";
+import type { Article } from "@/src/domain/entities/article";
 
 export const useArticleData = () => {
   const [articles, setArticles] = useState<Article[]>([]);

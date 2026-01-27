@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
-import type { User } from "@/types/user";
+import type { User } from "@/src/domain/entities/user";
 import {
   getDocumentType,
   updateDocumentType,

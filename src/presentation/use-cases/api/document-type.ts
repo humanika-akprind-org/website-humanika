@@ -2,7 +2,7 @@ import type {
   DocumentType,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/types/document-type";
+} from "@/src/domain/value-objects/document-type";
 
 export async function getDocumentTypes(): Promise<DocumentType[]> {
   const response = await fetch("/api/document/type");
@@ -28,7 +28,7 @@ export async function getDocumentType(id: string): Promise<DocumentType> {
 }
 
 export async function createDocumentType(
-  data: CreateDocumentTypeInput
+  data: CreateDocumentTypeInput,
 ): Promise<DocumentType> {
   const response = await fetch("/api/document/type", {
     method: "POST",
@@ -48,7 +48,7 @@ export async function createDocumentType(
 
 export async function updateDocumentType(
   id: string,
-  data: UpdateDocumentTypeInput
+  data: UpdateDocumentTypeInput,
 ): Promise<DocumentType> {
   const response = await fetch(`/api/document/type/${id}`, {
     method: "PUT",

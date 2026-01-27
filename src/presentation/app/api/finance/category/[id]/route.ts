@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateFinanceCategoryInput } from "@/types/finance-category";
+import type { UpdateFinanceCategoryInput } from "@/src/domain/value-objects/finance-category";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getFinanceCategory,

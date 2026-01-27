@@ -4,7 +4,7 @@ import { createArticleCategory } from "@/src/presentation/use-cases/api/article-
 import type {
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-} from "@/types/article-category";
+} from "@/src/domain/value-objects/article-category";
 
 export function useCreateArticleCategory() {
   const router = useRouter();

@@ -1,14 +1,17 @@
 import prisma from "@/src/presentation/lib/prisma";
-import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
-import type { FinanceType, Status } from "@/types/enums";
+import type {
+  CreateFinanceInput,
+  UpdateFinanceInput,
+} from "@/src/domain/entities/finance";
+import type { FinanceType, Status } from "@/src/domain/enums/enums";
 import type {
   Prisma,
   Status as PrismaStatus,
   FinanceType as PrismaFinanceType,
 } from "@prisma/client";
 import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/types/enums";
-import type { User } from "@/types/user";
+import { ActivityType } from "@/src/domain/enums/enums";
+import type { User } from "@/src/domain/entities/user";
 
 type UserWithId = Pick<User, "id">;
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getArticleBySlug } from "@/src/presentation/use-cases/api/article";
-import type { Article } from "types/article";
+import type { Article } from "@/src/domain/entities/article";
 
 export function useArticleDetail(slug: string | undefined) {
   const [article, setArticle] = useState<Article | null>(null);

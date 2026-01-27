@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Period, PeriodFormData } from "@/types/period";
+import type { Period, PeriodFormData } from "@/src/domain/entities/period";
 
 export function usePeriodForm(period?: Period) {
   const [formData, setFormData] = useState<PeriodFormData>({
@@ -32,8 +32,8 @@ export function usePeriodForm(period?: Period) {
         type === "checkbox"
           ? checked
           : type === "number"
-          ? parseInt(value)
-          : value,
+            ? parseInt(value)
+            : value,
     }));
 
     // Clear error when field is changed

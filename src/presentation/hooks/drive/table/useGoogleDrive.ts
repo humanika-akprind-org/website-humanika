@@ -8,7 +8,10 @@ import {
   loadFolderFromLocalStorage,
   saveFolderToLocalStorage,
 } from "@/src/presentation/app/utils/google-drive";
-import type { LoadingStateTable, BreadcrumbItem } from "@/types/google-drive";
+import type {
+  LoadingStateTable,
+  BreadcrumbItem,
+} from "@/src/domain/value-objects/google-drive";
 
 export const useGoogleDriveFiles = (
   accessToken: string,

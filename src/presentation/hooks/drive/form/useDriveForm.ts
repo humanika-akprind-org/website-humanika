@@ -5,7 +5,7 @@ import { getFolderOptions } from "@/src/presentation/app/utils/google-drive";
 import type {
   UseDriveFormProps,
   UseDriveFormReturn,
-} from "@/types/google-drive";
+} from "@/src/domain/value-objects/google-drive";
 
 export function useDriveForm({
   accessToken,

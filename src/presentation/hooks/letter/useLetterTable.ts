@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Letter } from "@/types/letter";
+import type { Letter } from "@/src/domain/entities/letter";
 
 export function useLetterTable(letters: Letter[]) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,7 +21,7 @@ export function useLetterTable(letters: Letter[]) {
     setSelectedLetters((prev) =>
       prev.includes(id)
         ? prev.filter((letterId) => letterId !== id)
-        : [...prev, id]
+        : [...prev, id],
     );
   };
 

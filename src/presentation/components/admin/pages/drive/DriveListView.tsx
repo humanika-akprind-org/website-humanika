@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { DriveListViewProps } from "@/types/google-drive";
+import type { DriveListViewProps } from "@/src/domain/value-objects/google-drive";
 import { DriveFileRow } from "./index";
 
 const DriveListView: React.FC<DriveListViewProps> = ({

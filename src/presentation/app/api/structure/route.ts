@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateOrganizationalStructureInput } from "@/types/structure";
-import type { Status } from "@/types/enums";
+import type { CreateOrganizationalStructureInput } from "@/src/domain/entities/structure";
+import type { Status } from "@/src/domain/enums/enums";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getStructures,

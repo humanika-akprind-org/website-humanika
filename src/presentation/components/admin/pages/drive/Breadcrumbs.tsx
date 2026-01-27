@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { BreadcrumbsProps } from "@/types/google-drive";
+import type { BreadcrumbsProps } from "@/src/domain/value-objects/google-drive";
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   items,

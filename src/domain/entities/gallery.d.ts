@@ -1,5 +1,5 @@
-import { Status } from "./enums";
-import { GalleryCategory } from "./gallery-category";
+import { Status } from "../enums/enums";
+import { GalleryCategory } from "../value-objects/gallery-category";
 import { Event } from "./event";
 import { Period } from "./period";
 

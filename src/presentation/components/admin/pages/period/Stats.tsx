@@ -1,4 +1,4 @@
-import type { Period } from "@/types/period";
+import type { Period } from "@/src/domain/entities/period";
 import { FiUsers, FiClock, FiCheckCircle, FiCalendar } from "react-icons/fi";
 import StatCard from "../../ui/card/StatCard";
 
@@ -30,7 +30,7 @@ export default function PeriodStats({ periods }: PeriodStatsProps) {
       title: "Total Years",
       value: periods.reduce(
         (total, period) => total + (period.endYear - period.startYear + 1),
-        0
+        0,
       ),
       icon: FiCalendar,
       color: "purple",

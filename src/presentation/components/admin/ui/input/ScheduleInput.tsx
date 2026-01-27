@@ -10,7 +10,7 @@ import {
   FiAlertCircle,
 } from "react-icons/fi";
 import { GripHorizontal, GripVertical } from "lucide-react";
-import type { ScheduleItem } from "@/types/event";
+import type { ScheduleItem } from "@/src/domain/entities/event";
 import TextInput from "./TextInput";
 import DateInput from "@/src/presentation/components/admin/ui/date/DateInput";
 import TimeInput from "./TimeInput";

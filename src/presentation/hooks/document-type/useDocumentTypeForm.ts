@@ -3,12 +3,12 @@ import type {
   DocumentType,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/types/document-type";
+} from "@/src/domain/value-objects/document-type";
 
 interface UseDocumentTypeFormProps {
   category?: DocumentType;
   onSubmit: (
-    data: CreateDocumentTypeInput | UpdateDocumentTypeInput
+    data: CreateDocumentTypeInput | UpdateDocumentTypeInput,
   ) => Promise<void>;
 }
 
@@ -24,7 +24,7 @@ export function useDocumentTypeForm({
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

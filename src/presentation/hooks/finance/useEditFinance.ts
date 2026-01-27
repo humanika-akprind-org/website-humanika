@@ -8,7 +8,7 @@ import type {
   CreateFinanceInput,
   UpdateFinanceInput,
   Finance,
-} from "@/types/finance";
+} from "@/src/domain/entities/finance";
 
 export function useEditFinance(financeId: string) {
   const router = useRouter();

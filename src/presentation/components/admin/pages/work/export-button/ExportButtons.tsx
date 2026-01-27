@@ -5,7 +5,7 @@ import { FileText, FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { WorkProgram } from "@/types/work";
+import type { WorkProgram } from "@/src/domain/entities/work";
 import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
 import { X } from "lucide-react";
 

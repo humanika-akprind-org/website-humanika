@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { Article } from "types/article";
+import type { Article } from "@/src/domain/entities/article";
 
 interface ShareButtonsProps {
   article: Article;
@@ -13,28 +13,28 @@ export default function ShareButtons({ article }: ShareButtonsProps) {
 
   const shareToFacebook = () => {
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      shareUrl
+      shareUrl,
     )}`;
     window.open(url, "_blank", "width=600,height=400");
   };
 
   const shareToTwitter = () => {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-      shareText
+      shareText,
     )}&url=${encodeURIComponent(shareUrl)}`;
     window.open(url, "_blank", "width=600,height=400");
   };
 
   const shareToLinkedIn = () => {
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-      shareUrl
+      shareUrl,
     )}`;
     window.open(url, "_blank", "width=600,height=400");
   };
 
   const shareToWhatsApp = () => {
     const url = `https://wa.me/?text=${encodeURIComponent(
-      `${shareText} ${shareUrl}`
+      `${shareText} ${shareUrl}`,
     )}`;
     window.open(url, "_blank");
   };

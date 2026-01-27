@@ -7,7 +7,7 @@ import {
 import type {
   GalleryCategory,
   UpdateGalleryCategoryInput,
-} from "@/types/gallery-category";
+} from "@/src/domain/value-objects/gallery-category";
 
 export function useEditGalleryCategory(categoryId: string) {
   const router = useRouter();

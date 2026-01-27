@@ -1,6 +1,6 @@
-import type { Article } from "@/types/article";
+import type { Article } from "@/src/domain/entities/article";
 import type { SortOption } from "./constants";
-import { type ArticleCategory } from "@/types/article-category";
+import { type ArticleCategory } from "@/src/domain/value-objects/article-category";
 
 /**
  * Filters articles based on search query and category
@@ -8,7 +8,7 @@ import { type ArticleCategory } from "@/types/article-category";
 export const filterArticles = (
   articles: Article[],
   searchQuery: string,
-  selectedCategory: string
+  selectedCategory: string,
 ): Article[] => {
   let filtered = [...articles];
 
@@ -19,7 +19,7 @@ export const filterArticles = (
       (article) =>
         article.title.toLowerCase().includes(query) ||
         article.content?.toLowerCase().includes(query) ||
-        article.author?.name?.toLowerCase().includes(query)
+        article.author?.name?.toLowerCase().includes(query),
     );
   }
 
@@ -28,7 +28,7 @@ export const filterArticles = (
     filtered = filtered.filter(
       (article) =>
         article.category?.name?.toLowerCase().replace(/\s+/g, "-") ===
-        selectedCategory.toLowerCase()
+        selectedCategory.toLowerCase(),
     );
   }
 
@@ -40,7 +40,7 @@ export const filterArticles = (
  */
 export const sortArticles = (
   articles: Article[],
-  sortBy: SortOption
+  sortBy: SortOption,
 ): Article[] => {
   const sorted = [...articles];
 
@@ -84,7 +84,7 @@ export const formatArticleDate = (date: Date | string | undefined): string => {
  */
 export const truncateContent = (
   content: string | undefined,
-  maxLength: number
+  maxLength: number,
 ): string => {
   if (!content) return "";
   const cleanContent = content.replace(/<[^>]*>/g, "");
@@ -105,7 +105,7 @@ export const getUniqueAuthorCount = (articles: Article[]): number =>
 export const createCategoryOptions = (
   dynamicCategories: ArticleCategory[],
   articleCount: number,
-  colors: readonly string[]
+  colors: readonly string[],
 ) => {
   const allCategory = {
     id: "all",

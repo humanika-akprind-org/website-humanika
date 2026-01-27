@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/types/document";
+} from "@/src/domain/entities/document";
 
 export function useCreateDocument(
   redirectPath: string = "/admin/administration/documents",

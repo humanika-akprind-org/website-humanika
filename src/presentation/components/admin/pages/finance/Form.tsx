@@ -6,11 +6,11 @@ import type {
   Finance,
   CreateFinanceInput,
   UpdateFinanceInput,
-} from "@/types/finance";
-import { FinanceType, Status } from "@/types/enums";
-import type { FinanceCategory } from "@/types/finance-category";
-import type { WorkProgram } from "@/types/work";
-import type { Period } from "@/types/period";
+} from "@/src/domain/entities/finance";
+import { FinanceType, Status } from "@/src/domain/enums/enums";
+import type { FinanceCategory } from "@/src/domain/value-objects/finance-category";
+import type { WorkProgram } from "@/src/domain/entities/work";
+import type { Period } from "@/src/domain/entities/period";
 import { FiBriefcase, FiCalendar } from "react-icons/fi";
 import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";

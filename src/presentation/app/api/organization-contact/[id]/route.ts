@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateOrganizationContactInput } from "@/types/organization-contact";
+import type { UpdateOrganizationContactInput } from "@/src/domain/entities/organization-contact";
 import {
   getOrganizationContact,
   updateOrganizationContact,

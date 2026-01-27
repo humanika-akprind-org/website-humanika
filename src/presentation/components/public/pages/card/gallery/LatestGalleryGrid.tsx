@@ -3,7 +3,7 @@
 import { useState } from "react";
 import GalleryCard from "./GalleryCard";
 import { useGalleries } from "@/src/presentation/hooks/gallery/useGalleries";
-import type { Gallery } from "@/types/gallery";
+import type { Gallery } from "@/src/domain/entities/gallery";
 import {
   Filter,
   Grid3x3,

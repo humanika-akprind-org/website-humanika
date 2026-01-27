@@ -9,7 +9,7 @@ import {
   Heart,
   Users,
 } from "lucide-react";
-import type { Event } from "@/types/event";
+import type { Event } from "@/src/domain/entities/event";
 import { SORT_OPTIONS, VIEW_MODE_OPTIONS, ANIMATION_DELAYS } from "./constants";
 import {
   Select,

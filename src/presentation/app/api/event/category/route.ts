@@ -4,7 +4,7 @@ import {
   getEventCategories,
   createEventCategory,
 } from "@/src/infrastructure/repositories/event/event-category.service";
-import type { CreateEventCategoryInput } from "@/types/event-category";
+import type { CreateEventCategoryInput } from "@/src/domain/value-objects/event-category";
 
 // Validation functions
 function validateCreateEventCategoryInput(body: CreateEventCategoryInput) {

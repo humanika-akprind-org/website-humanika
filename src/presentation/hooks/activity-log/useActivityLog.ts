@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { type ActivityType } from "@/types/enums";
+import { type ActivityType } from "@/src/domain/enums/enums";
 
-import { type ActivityMetadata } from "@/types/activity-log";
+import { type ActivityMetadata } from "@/src/domain/entities/activity-log";
 
 interface LogActivityParams {
   activityType: ActivityType;
@@ -45,7 +45,7 @@ export function useActivityLog() {
         throw error;
       }
     },
-    []
+    [],
   );
 
   const getActivityLogs = useCallback(
@@ -81,7 +81,7 @@ export function useActivityLog() {
         throw error;
       }
     },
-    []
+    [],
   );
 
   return {

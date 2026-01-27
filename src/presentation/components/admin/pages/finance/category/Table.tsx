@@ -3,8 +3,8 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
 import { Tag } from "lucide-react";
-import type { FinanceCategory } from "@/types/finance-category";
-import { FinanceType } from "@/types/enums";
+import type { FinanceCategory } from "@/src/domain/value-objects/finance-category";
+import { FinanceType } from "@/src/domain/enums/enums";
 import Checkbox from "../../../ui/checkbox/Checkbox";
 import DropdownMenu, {
   DropdownMenuItem,

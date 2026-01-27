@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import ArticleCard from "@/src/presentation/components/public/pages/card/article/ArticleCard";
-import type { Article } from "@/types/article";
+import type { Article } from "@/src/domain/entities/article";
 import {
   formatArticleDate,
   truncateContent,

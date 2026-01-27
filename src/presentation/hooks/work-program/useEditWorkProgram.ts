@@ -8,7 +8,7 @@ import type {
   WorkProgram,
   UpdateWorkProgramInput,
   CreateWorkProgramInput,
-} from "@/types/work";
+} from "@/src/domain/entities/work";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

@@ -4,7 +4,7 @@ import { createDocumentType } from "@/src/presentation/use-cases/api/document-ty
 import type {
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/types/document-type";
+} from "@/src/domain/value-objects/document-type";
 
 export function useCreateDocumentType() {
   const router = useRouter();

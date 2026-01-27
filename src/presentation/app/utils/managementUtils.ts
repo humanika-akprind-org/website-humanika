@@ -1,4 +1,4 @@
-import { Department, Position } from "@/types/enums";
+import { Department, Position } from "@/src/domain/enums/enums";
 
 export const getDepartmentClass = (department: Department): string => {
   switch (department) {

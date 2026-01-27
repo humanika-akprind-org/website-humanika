@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import type {
   CreateOrganizationContactInput,
   OrganizationContactFilter,
-} from "@/types/organization-contact";
+} from "@/src/domain/entities/organization-contact";
 import {
   getOrganizationContacts,
   getActivePeriodOrganizationContact,

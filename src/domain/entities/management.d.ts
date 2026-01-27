@@ -1,4 +1,4 @@
-import { Department, Position } from "./enums";
+import { Department, Position } from "../enums/enums";
 
 export interface Management {
   isActive: unknown;

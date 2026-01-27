@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getPeriods } from "@/src/presentation/use-cases/api/period";
-import type { Period } from "@/types/period";
+import type { Period } from "@/src/domain/entities/period";
 
 export function useDocumentFormData() {
   const [users, setUsers] = useState([]);

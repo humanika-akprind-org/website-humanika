@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Status } from "@/types/enums";
+import { Status } from "@/src/domain/enums/enums";
 import { PeriodApi } from "@/src/presentation/use-cases/api/period";
 import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
 import { useEventCategories } from "@/src/presentation/hooks/event-category/useEventCategories";

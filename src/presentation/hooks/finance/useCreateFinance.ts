@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
-import { Status } from "@/types/enums";
+import type {
+  CreateFinanceInput,
+  UpdateFinanceInput,
+} from "@/src/domain/entities/finance";
+import { Status } from "@/src/domain/enums/enums";
 
 export function useCreateFinance() {
   const router = useRouter();
@@ -10,7 +13,7 @@ export function useCreateFinance() {
   const [isLoading, _setIsLoading] = useState(false);
 
   const createFinance = async (
-    data: CreateFinanceInput | UpdateFinanceInput
+    data: CreateFinanceInput | UpdateFinanceInput,
   ) => {
     setIsSubmitting(true);
     setError(null);
@@ -33,7 +36,7 @@ export function useCreateFinance() {
   };
 
   const createFinanceForApproval = async (
-    data: CreateFinanceInput | UpdateFinanceInput
+    data: CreateFinanceInput | UpdateFinanceInput,
   ) => {
     setIsSubmitting(true);
     setError(null);

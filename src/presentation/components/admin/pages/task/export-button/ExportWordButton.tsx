@@ -11,7 +11,7 @@ import {
   ShadingType,
   AlignmentType,
 } from "docx";
-import type { DepartmentTask } from "@/types/task";
+import type { DepartmentTask } from "@/src/domain/entities/task";
 import { convertHtmlToDocxElements } from "@/src/presentation/lib/htmlUtils";
 
 interface TextRunOptions {

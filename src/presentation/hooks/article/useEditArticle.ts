@@ -8,7 +8,7 @@ import type {
   CreateArticleInput,
   UpdateArticleInput,
   Article,
-} from "@/types/article";
+} from "@/src/domain/entities/article";
 
 export function useEditArticle(articleId: string) {
   const router = useRouter();

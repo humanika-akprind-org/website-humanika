@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import type { Event, ScheduleItem } from "@/types/event";
+import type { Event, ScheduleItem } from "@/src/domain/entities/event";
 
 interface EventCalendarViewProps {
   allEvents: Event[];
@@ -11,7 +11,7 @@ interface EventCalendarViewProps {
 // Helper function to check if event has a schedule on a specific date
 function eventHasScheduleOnDate(
   schedules: ScheduleItem[] | null | undefined,
-  targetDate: Date
+  targetDate: Date,
 ): boolean {
   if (!schedules || schedules.length === 0) return false;
   return schedules.some((schedule) => {
@@ -28,7 +28,7 @@ function eventHasScheduleOnDate(
 // Helper function to get events that have a schedule on a specific date
 function getEventsOnDate(events: Event[], targetDate: Date): Event[] {
   return events.filter((event) =>
-    eventHasScheduleOnDate(event.schedules, targetDate)
+    eventHasScheduleOnDate(event.schedules, targetDate),
   );
 }
 
@@ -57,7 +57,7 @@ export default function EventCalendarView({
   // Format month name
   const monthName = new Date(currentYear, currentMonth).toLocaleDateString(
     "id-ID",
-    { month: "long", year: "numeric" }
+    { month: "long", year: "numeric" },
   );
 
   // Navigate months
@@ -180,8 +180,8 @@ export default function EventCalendarView({
                   today
                     ? "bg-primary-600 border-primary-600 text-white font-semibold shadow-md"
                     : hasEvent
-                    ? "bg-primary-50 border-primary-200 text-primary-700 cursor-pointer hover:bg-primary-100 hover:border-primary-300"
-                    : "bg-grey-50 border-grey-200 text-grey-700 hover:bg-grey-100"
+                      ? "bg-primary-50 border-primary-200 text-primary-700 cursor-pointer hover:bg-primary-100 hover:border-primary-300"
+                      : "bg-grey-50 border-grey-200 text-grey-700 hover:bg-grey-100"
                 }`}
               >
                 {item.day}

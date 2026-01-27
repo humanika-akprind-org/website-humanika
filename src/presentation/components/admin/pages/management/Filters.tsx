@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Department, Position } from "@/types/enums";
-import type { Period } from "@/types/period";
+import { Department, Position } from "@/src/domain/enums/enums";
+import type { Period } from "@/src/domain/entities/period";
 import { getPeriods } from "@/src/presentation/use-cases/api/period";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type { PeriodFormData } from "@/types/period";
+import type { PeriodFormData } from "@/src/domain/entities/period";
 
 interface UsePeriodFormSubmitProps {
   validateForm: () => boolean;
@@ -26,7 +26,7 @@ export function usePeriodFormSubmit({
         await handleSubmit(formData);
       }
     },
-    [validateForm, handleSubmit, formData, externalOnSubmit]
+    [validateForm, handleSubmit, formData, externalOnSubmit],
   );
 
   return { onSubmit };

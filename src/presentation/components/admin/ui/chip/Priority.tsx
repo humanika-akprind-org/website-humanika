@@ -1,4 +1,4 @@
-import { LetterPriority } from "@/types/enums";
+import { LetterPriority } from "@/src/domain/enums/enums";
 
 interface PriorityChipProps {
   priority: LetterPriority;
@@ -21,7 +21,7 @@ export default function PriorityChip({ priority }: PriorityChipProps) {
   return (
     <span
       className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getPriorityColor(
-        priority
+        priority,
       )}`}
     >
       {priority}

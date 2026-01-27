@@ -8,8 +8,8 @@ import {
   FiEdit,
 } from "react-icons/fi";
 import StatCard from "../../ui/card/StatCard";
-import type { OrganizationalStructure } from "@/types/structure";
-import { Status } from "@/types/enums";
+import type { OrganizationalStructure } from "@/src/domain/entities/structure";
+import { Status } from "@/src/domain/enums/enums";
 
 interface StatsProps {
   structures: OrganizationalStructure[];
@@ -19,13 +19,13 @@ export default function Stats({ structures }: StatsProps) {
   // Calculate stats
   const totalStructures = structures.length;
   const publishedStructures = structures.filter(
-    (structure) => structure.status === Status.PUBLISH
+    (structure) => structure.status === Status.PUBLISH,
   ).length;
   const pendingStructures = structures.filter(
-    (structure) => structure.status === Status.PENDING
+    (structure) => structure.status === Status.PENDING,
   ).length;
   const draftStructures = structures.filter(
-    (structure) => structure.status === Status.DRAFT
+    (structure) => structure.status === Status.DRAFT,
   ).length;
 
   const stats = [

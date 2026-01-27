@@ -3,7 +3,7 @@ import {
   getEventBySlug,
   getEvents,
 } from "@/src/presentation/use-cases/api/event";
-import type { Event } from "types/event";
+import type { Event } from "@/src/domain/entities/event";
 import {
   getPastEvents,
   getRelatedEvents,

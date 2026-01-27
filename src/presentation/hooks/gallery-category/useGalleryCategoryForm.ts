@@ -3,7 +3,7 @@ import type {
   GalleryCategory,
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
-} from "@/types/gallery-category";
+} from "@/src/domain/value-objects/gallery-category";
 
 export interface GalleryCategoryFormData {
   name: string;
@@ -13,8 +13,8 @@ export interface GalleryCategoryFormData {
 export const useGalleryCategoryForm = (
   category?: GalleryCategory,
   onSubmit?: (
-    data: CreateGalleryCategoryInput | UpdateGalleryCategoryInput
-  ) => Promise<void>
+    data: CreateGalleryCategoryInput | UpdateGalleryCategoryInput,
+  ) => Promise<void>,
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<GalleryCategoryFormData>({
@@ -25,7 +25,7 @@ export const useGalleryCategoryForm = (
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

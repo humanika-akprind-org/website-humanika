@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ManagementApi } from "@/src/presentation/use-cases/api/management";
-import type { Management, ManagementServerData } from "@/types/management";
+import type {
+  Management,
+  ManagementServerData,
+} from "@/src/domain/entities/management";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

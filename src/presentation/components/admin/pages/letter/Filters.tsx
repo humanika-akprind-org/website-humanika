@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LetterType, LetterPriority, LetterClassification } from "types/enums";
-import type { LetterFilter } from "types/letter";
+import {
+  LetterType,
+  LetterPriority,
+  LetterClassification,
+} from "@/src/domain/enums/enums";
+import type { LetterFilter } from "@/src/domain/entities/letter";
 import { PeriodApi } from "@/src/presentation/use-cases/api/period";
 import SearchInput from "../../ui/input/SearchInput";
 import SelectFilter from "../../ui/input/SelectFilter";

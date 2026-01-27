@@ -1,6 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateLetterInput } from "@/types/letter";
-import type { LetterType, LetterPriority, Status } from "@/types/enums";
+import type { CreateLetterInput } from "@/src/domain/entities/letter";
+import type {
+  LetterType,
+  LetterPriority,
+  Status,
+} from "@/src/domain/enums/enums";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getLetters,

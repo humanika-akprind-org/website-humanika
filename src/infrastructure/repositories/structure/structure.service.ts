@@ -3,10 +3,10 @@ import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
   OrganizationalStructure,
-} from "@/types/structure";
-import type { Status } from "@/types/enums";
+} from "@/src/domain/entities/structure";
+import type { Status } from "@/src/domain/enums/enums";
 import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/types/enums";
+import { ActivityType } from "@/src/domain/enums/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 
 type UserWithId = { id: string };

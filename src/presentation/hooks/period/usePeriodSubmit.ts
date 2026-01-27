@@ -4,7 +4,7 @@ import {
   createPeriod,
   updatePeriod,
 } from "@/src/presentation/use-cases/api/period";
-import type { Period, PeriodFormData } from "@/types/period";
+import type { Period, PeriodFormData } from "@/src/domain/entities/period";
 import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
 
 export function usePeriodSubmit(isEdit: boolean, period?: Period) {

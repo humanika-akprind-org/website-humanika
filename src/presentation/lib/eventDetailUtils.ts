@@ -1,4 +1,4 @@
-import type { Event, ScheduleItem } from "types/event";
+import type { Event, ScheduleItem } from "@/src/domain/entities/event";
 import { getGoogleDrivePreviewUrl } from "@/src/presentation/lib/google-drive/file-utils";
 
 /**

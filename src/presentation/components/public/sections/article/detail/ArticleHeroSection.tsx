@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { User, Calendar, Eye, ArrowLeft, Bookmark } from "lucide-react";
-import type { Article } from "types/article";
+import type { Article } from "@/src/domain/entities/article";
 import { formatArticleDate } from "@/src/presentation/hooks/article/utils";
 import ShareButton from "@/src/presentation/components/public/ui/ShareButton";
 

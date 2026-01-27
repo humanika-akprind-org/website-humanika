@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { Period } from "@/types/period";
+import type { Period } from "@/src/domain/entities/period";
 import {
   getPeriods,
   deletePeriod,

@@ -1,4 +1,4 @@
-import type { Management } from "@/types/management";
+import type { Management } from "@/src/domain/entities/management";
 import Image from "next/image";
 
 interface ManagementAvatarProps {

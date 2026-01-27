@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
 import { FileText, BookText, BookCheck } from "lucide-react";
-import type { Letter } from "@/types/letter";
+import type { Letter } from "@/src/domain/entities/letter";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import StatusChip from "../../ui/chip/Status";
 import StatusApproval from "../../ui/chip/StatusApproval";

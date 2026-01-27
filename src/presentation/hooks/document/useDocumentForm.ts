@@ -3,8 +3,8 @@ import type {
   Document,
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/types/document";
-import { Status } from "@/types/enums";
+} from "@/src/domain/entities/document";
+import { Status } from "@/src/domain/enums/enums";
 import { useFile } from "@/src/presentation/hooks/useFile";
 import {
   documentFolderId,

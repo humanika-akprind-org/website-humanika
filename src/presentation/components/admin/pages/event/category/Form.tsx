@@ -6,7 +6,7 @@ import type {
   EventCategory,
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
-} from "@/types/event-category";
+} from "@/src/domain/value-objects/event-category";
 
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
 import { Textarea } from "@/src/presentation/components/ui/textarea";

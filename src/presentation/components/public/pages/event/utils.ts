@@ -1,9 +1,9 @@
-import type { Event } from "@/types/event";
-import type { EventCategory } from "@/types/event-category";
+import type { Event } from "@/src/domain/entities/event";
+import type { EventCategory } from "@/src/domain/value-objects/event-category";
 
 export function truncateDescription(
   description: string | undefined,
-  maxLength: number = 150
+  maxLength: number = 150,
 ): string {
   if (!description) return "";
   return description.length > maxLength
@@ -13,7 +13,7 @@ export function truncateDescription(
 
 export function generateCategories(
   eventCategories: EventCategory[],
-  allEvents: Event[]
+  allEvents: Event[],
 ) {
   const colors = [
     "from-blue-500 to-blue-600",

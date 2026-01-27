@@ -6,8 +6,11 @@ import {
 } from "@/src/presentation/use-cases/api/task";
 import { getUsers } from "@/src/presentation/use-cases/api/user";
 import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
-import type { DepartmentTask, UpdateDepartmentTaskInput } from "@/types/task";
-import type { User } from "@/types/user";
+import type {
+  DepartmentTask,
+  UpdateDepartmentTaskInput,
+} from "@/src/domain/entities/task";
+import type { User } from "@/src/domain/entities/user";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

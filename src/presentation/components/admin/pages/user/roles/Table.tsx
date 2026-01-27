@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { FiCheck } from "react-icons/fi";
 import { Users } from "lucide-react";
-import type { UserTableProps } from "@/types/user";
+import type { UserTableProps } from "@/src/domain/entities/user";
 import Avatar from "../../../ui/avatar/Avatar";
 import Role from "../../../ui/chip/Role";
 import PositionChip from "../../../ui/chip/Position";

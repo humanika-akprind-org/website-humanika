@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateArticleCategoryInput } from "@/types/article-category";
+import type { UpdateArticleCategoryInput } from "@/src/domain/value-objects/article-category";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getArticleCategoryById,

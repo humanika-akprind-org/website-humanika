@@ -1,4 +1,4 @@
-import { Department } from "./enums";
+import { Department } from "../enums/enums";
 import type { Prisma } from "@prisma/client";
 
 export interface DepartmentTask {
@@ -33,8 +33,7 @@ export interface CreateDepartmentTaskInput {
   status?: Prisma.Status;
 }
 
-export interface UpdateDepartmentTaskInput
-  extends Partial<CreateDepartmentTaskInput> {}
+export interface UpdateDepartmentTaskInput extends Partial<CreateDepartmentTaskInput> {}
 
 export interface DepartmentTaskFilter {
   department?: Department;

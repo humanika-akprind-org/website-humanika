@@ -1,6 +1,6 @@
 "use client";
 
-import type { Period, PeriodFormData } from "@/types/period";
+import type { Period, PeriodFormData } from "@/src/domain/entities/period";
 import { FiFileText, FiCalendar } from "react-icons/fi";
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
 import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";

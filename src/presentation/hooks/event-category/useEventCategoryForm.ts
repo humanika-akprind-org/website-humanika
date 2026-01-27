@@ -3,7 +3,7 @@ import type {
   EventCategory,
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
-} from "@/types/event-category";
+} from "@/src/domain/value-objects/event-category";
 
 export interface EventCategoryFormData {
   name: string;
@@ -13,8 +13,8 @@ export interface EventCategoryFormData {
 export const useEventCategoryForm = (
   category?: EventCategory,
   onSubmit?: (
-    data: CreateEventCategoryInput | UpdateEventCategoryInput
-  ) => Promise<void>
+    data: CreateEventCategoryInput | UpdateEventCategoryInput,
+  ) => Promise<void>,
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<EventCategoryFormData>({
@@ -25,7 +25,7 @@ export const useEventCategoryForm = (
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

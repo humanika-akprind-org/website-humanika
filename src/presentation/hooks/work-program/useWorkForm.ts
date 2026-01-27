@@ -3,10 +3,10 @@ import type {
   WorkProgram,
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
-} from "@/types/work";
-import type { User } from "@/types/user";
-import type { Period } from "@/types/period";
-import { Department } from "@/types/enums";
+} from "@/src/domain/entities/work";
+import type { User } from "@/src/domain/entities/user";
+import type { Period } from "@/src/domain/entities/period";
+import { Department } from "@/src/domain/enums/enums";
 import { UserApi } from "@/src/presentation/use-cases/api/user";
 import { getPeriods } from "@/src/presentation/use-cases/api/period";
 

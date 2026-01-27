@@ -1,4 +1,4 @@
-import type { ActivityLog } from "@/types/activity-log";
+import type { ActivityLog } from "@/src/domain/entities/activity-log";
 import { apiUrl } from "@/src/presentation/lib/config/config";
 
 const API_URL = apiUrl;

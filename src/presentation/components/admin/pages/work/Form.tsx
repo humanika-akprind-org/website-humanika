@@ -6,8 +6,8 @@ import type {
   WorkProgram,
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
-} from "@/types/work";
-import { Department } from "@/types/enums";
+} from "@/src/domain/entities/work";
+import { Department } from "@/src/domain/enums/enums";
 import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
 import CurrencyInput from "@/src/presentation/components/admin/ui/input/CurrencyInput";

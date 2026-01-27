@@ -3,7 +3,7 @@ import type {
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
   WorkProgramFilter,
-} from "@/types/work";
+} from "@/src/domain/entities/work";
 import { apiUrl } from "@/src/presentation/lib/config/config";
 
 const API_URL = apiUrl;

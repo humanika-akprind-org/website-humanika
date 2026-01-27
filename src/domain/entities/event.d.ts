@@ -1,9 +1,9 @@
-import { Department, Status, UserRole, Position } from "./enums";
+import { Department, Status, UserRole, Position } from "../enums/enums";
 import { User } from "./user";
 import { Period } from "./period";
 import { WorkProgram } from "./work";
 import { Approval } from "./approval";
-import { EventCategory } from "./event-category";
+import { EventCategory } from "../value-objects/event-category";
 import { Gallery } from "./gallery";
 import { Finance } from "./finance";
 import { Letter } from "./letter";

@@ -3,7 +3,7 @@ import type {
   CreateGalleryInput,
   UpdateGalleryInput,
   GalleryFilter,
-} from "@/types/gallery";
+} from "@/src/domain/entities/gallery";
 import { apiUrl } from "@/src/presentation/lib/config/config";
 
 const API_URL = apiUrl;

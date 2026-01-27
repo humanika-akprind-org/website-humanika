@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateDocumentInput } from "@/types/document";
-import type { Status } from "@/types/enums";
+import type { CreateDocumentInput } from "@/src/domain/entities/document";
+import type { Status } from "@/src/domain/enums/enums";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getDocuments,

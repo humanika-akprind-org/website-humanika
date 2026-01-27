@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateFinanceInput } from "@/types/finance";
+import type { UpdateFinanceInput } from "@/src/domain/entities/finance";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   getFinance,

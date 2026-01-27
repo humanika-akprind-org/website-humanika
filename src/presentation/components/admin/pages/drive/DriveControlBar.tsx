@@ -9,7 +9,7 @@ import {
   List,
   Grid as GridIcon,
 } from "lucide-react";
-import type { DriveControlBarProps } from "@/types/google-drive";
+import type { DriveControlBarProps } from "@/src/domain/value-objects/google-drive";
 
 const DriveControlBar: React.FC<DriveControlBarProps> = ({
   searchQuery,

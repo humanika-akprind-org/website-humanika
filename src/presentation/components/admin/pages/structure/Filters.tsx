@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Status } from "@/types/enums";
+import { Status } from "@/src/domain/enums/enums";
 import { getPeriods } from "@/src/presentation/use-cases/api/period";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";

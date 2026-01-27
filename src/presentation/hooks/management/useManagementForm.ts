@@ -4,10 +4,10 @@ import type {
   Management,
   ManagementFormData,
   ManagementServerData,
-} from "@/types/management";
-import { Position, Department } from "@/types/enums";
-import type { User } from "@/types/user";
-import type { Period } from "@/types/period";
+} from "@/src/domain/entities/management";
+import { Position, Department } from "@/src/domain/enums/enums";
+import type { User } from "@/src/domain/entities/user";
+import type { Period } from "@/src/domain/entities/period";
 import { useFile } from "@/src/presentation/hooks/useFile";
 import { photoManagementFolderId } from "@/src/presentation/lib/config/config";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { Article } from "@/types/article";
+import type { Article } from "@/src/domain/entities/article";
 import {
   getArticles,
   deleteArticle,

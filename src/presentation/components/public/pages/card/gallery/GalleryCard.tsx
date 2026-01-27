@@ -11,8 +11,8 @@ import {
   DialogTitle,
 } from "@/src/presentation/components/ui/dialog";
 import { Button } from "@/src/presentation/components/ui/button";
-import type { Gallery } from "@/types/gallery";
-import type { ScheduleItem } from "@/types/event";
+import type { Gallery } from "@/src/domain/entities/gallery";
+import type { ScheduleItem } from "@/src/domain/entities/event";
 import { motion } from "framer-motion";
 
 // Helper function to get preview URL

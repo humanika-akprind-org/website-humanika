@@ -1,4 +1,4 @@
-import { FinanceType } from "./enums";
+import { FinanceType } from "../enums/enums";
 
 export interface FinanceCategory {
   id: string;
@@ -19,8 +19,7 @@ export interface CreateFinanceCategoryInput {
   type: FinanceType;
 }
 
-export interface UpdateFinanceCategoryInput
-  extends Partial<CreateFinanceCategoryInput> {
+export interface UpdateFinanceCategoryInput extends Partial<CreateFinanceCategoryInput> {
   isActive?: boolean;
 }
 

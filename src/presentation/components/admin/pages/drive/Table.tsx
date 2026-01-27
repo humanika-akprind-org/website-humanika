@@ -9,7 +9,7 @@ import {
 } from "@/src/presentation/hooks/drive/table/useGoogleDrive";
 import DeleteModal from "./modal/DeleteModal";
 import Breadcrumbs from "./Breadcrumbs";
-import type { DriveTableProps } from "@/types/google-drive";
+import type { DriveTableProps } from "@/src/domain/value-objects/google-drive";
 
 const DriveTable: React.FC<DriveTableProps> = ({
   files: initialFiles = [],

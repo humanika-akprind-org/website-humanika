@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateDepartmentTaskInput } from "@/types/task";
-import type { Department, Status } from "@/types/enums";
+import type { CreateDepartmentTaskInput } from "@/src/domain/entities/task";
+import type { Department, Status } from "@/src/domain/enums/enums";
 import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import {
   createDepartmentTask,

@@ -6,9 +6,9 @@ import type {
   Article,
   CreateArticleInput,
   UpdateArticleInput,
-} from "@/types/article";
-import { Status } from "@/types/enums";
-import type { Period } from "@/types/period";
+} from "@/src/domain/entities/article";
+import { Status } from "@/src/domain/enums/enums";
+import type { Period } from "@/src/domain/entities/period";
 import { FiBriefcase, FiFolder } from "react-icons/fi";
 import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
@@ -17,7 +17,7 @@ import ImageUpload from "@/src/presentation/components/admin/ui/input/ImageUploa
 import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
 import CancelButton from "@/src/presentation/components/ui/CancelButton";
 import { useArticleForm } from "@/src/presentation/hooks/article/useArticleForm";
-import { type User } from "@/types/user";
+import { type User } from "@/src/domain/entities/user";
 
 interface ArticleFormProps {
   article?: Article;

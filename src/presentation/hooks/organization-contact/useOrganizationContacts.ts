@@ -6,7 +6,7 @@ import {
 import type {
   OrganizationContact,
   OrganizationContactFilter,
-} from "@/types/organization-contact";
+} from "@/src/domain/entities/organization-contact";
 
 // Helper to normalize mission field from JsonValue to string | string[]
 function normalizeMission(

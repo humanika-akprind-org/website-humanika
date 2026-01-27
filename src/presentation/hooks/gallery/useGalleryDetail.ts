@@ -4,9 +4,9 @@ import {
   getEvents,
 } from "@/src/presentation/use-cases/api/event";
 import { getGalleries } from "@/src/presentation/use-cases/api/gallery";
-import type { Event } from "@/types/event";
-import type { Gallery } from "@/types/gallery";
-import { Status } from "@/types/enums";
+import type { Event } from "@/src/domain/entities/event";
+import type { Gallery } from "@/src/domain/entities/gallery";
+import { Status } from "@/src/domain/enums/enums";
 
 export interface AlbumData {
   id: string;
