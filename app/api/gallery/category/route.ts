@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getGalleryCategories,
   createGalleryCategory,
-} from "@/infrastructure/repositories/gallery-category.repository";
+} from "@/infrastructure/repositories/gallery-category";
 import type { CreateGalleryCategoryInput } from "@/domain/value-objects/gallery-category";
 
 // Validation functions
