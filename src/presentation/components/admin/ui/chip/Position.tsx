@@ -7,7 +7,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { Position } from "@/src/domain/enums/enums";
-import { formatEnumValue } from "@/src/presentation/use-cases/api/user";
+import { formatEnumValue } from "@/src/presentation/services/user";
 
 interface PositionProps {
   position?: Position | null;

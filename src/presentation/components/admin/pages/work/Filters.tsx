@@ -7,7 +7,7 @@ import SelectFilter from "../../ui/input/SelectFilter";
 import DeleteSelectedButton from "../../ui/button/DeleteSelectedButton";
 import { useEffect, useState } from "react";
 import { type Period } from "@prisma/client";
-import { getPeriods } from "@/src/presentation/use-cases/api/period";
+import { getPeriods } from "@/src/presentation/services/period";
 
 interface WorkFiltersProps {
   filters: Record<string, string>;

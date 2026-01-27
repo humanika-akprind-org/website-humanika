@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { PeriodApi } from "@/src/presentation/services/period";
 import type { PeriodFormData } from "@/src/domain/entities/period";
 
 export function useCreatePeriod() {

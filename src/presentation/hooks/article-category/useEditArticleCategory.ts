@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import {
   getArticleCategory,
   updateArticleCategory,
-} from "@/src/presentation/use-cases/api/article-category";
+} from "@/src/presentation/services/article-category";
 import type {
   ArticleCategory,
   UpdateArticleCategoryInput,

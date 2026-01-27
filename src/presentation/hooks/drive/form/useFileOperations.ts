@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { callApi } from "@/src/presentation/use-cases/api/google-drive";
+import { callApi } from "@/src/presentation/services/google-drive";
 import type { UseFileOperationsReturn } from "@/src/domain/value-objects/google-drive";
 
 export function useFileOperations(): UseFileOperationsReturn {

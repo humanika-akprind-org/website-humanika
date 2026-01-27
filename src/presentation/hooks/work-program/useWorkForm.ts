@@ -7,8 +7,8 @@ import type {
 import type { User } from "@/src/domain/entities/user";
 import type { Period } from "@/src/domain/entities/period";
 import { Department } from "@/src/domain/enums/enums";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
-import { getPeriods } from "@/src/presentation/use-cases/api/period";
+import { UserApi } from "@/src/presentation/services/user";
+import { getPeriods } from "@/src/presentation/services/period";
 
 interface FormData {
   name: string;

@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  createPeriod,
-  updatePeriod,
-} from "@/src/presentation/use-cases/api/period";
+import { createPeriod, updatePeriod } from "@/src/presentation/services/period";
 import type { Period, PeriodFormData } from "@/src/domain/entities/period";
 import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
 

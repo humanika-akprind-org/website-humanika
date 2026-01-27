@@ -13,7 +13,7 @@ import {
   Archive,
   ExternalLink,
 } from "lucide-react";
-import { callApi } from "@/src/presentation/use-cases/api/google-drive";
+import { callApi } from "@/src/presentation/services/google-drive";
 import {
   useGoogleDriveFiles,
   useFileOperations,

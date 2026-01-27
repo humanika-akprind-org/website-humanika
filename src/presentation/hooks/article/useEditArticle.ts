@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getArticle,
-  updateArticle,
-} from "@/src/presentation/use-cases/api/article";
+import { getArticle, updateArticle } from "@/src/presentation/services/article";
 import type {
   CreateArticleInput,
   UpdateArticleInput,

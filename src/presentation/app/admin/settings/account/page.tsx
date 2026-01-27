@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FiKey, FiSave } from "react-icons/fi";
 import { useToast } from "@/src/presentation/hooks/use-toast";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
+import { UserApi } from "@/src/presentation/services/user";
 import SkeletonAccountPage from "@/src/presentation/components/admin/layout/loading/LoadingAccount";
 import { Eye, EyeOff } from "lucide-react";
 

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import {
   getDocumentTypes,
   deleteDocumentType,
-} from "@/src/presentation/use-cases/api/document-type";
+} from "@/src/presentation/services/document-type";
 import type { DocumentType } from "@/src/domain/value-objects/document-type";
 
 export function useDocumentTypeManagement() {

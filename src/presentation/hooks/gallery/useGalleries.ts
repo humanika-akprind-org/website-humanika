@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getGalleries } from "@/src/presentation/use-cases/api/gallery";
+import { getGalleries } from "@/src/presentation/services/gallery";
 import type { Gallery, GalleryFilter } from "@/src/domain/entities/gallery";
 
 export function useGalleries(filter?: GalleryFilter) {

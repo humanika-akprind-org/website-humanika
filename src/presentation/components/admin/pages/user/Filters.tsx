@@ -4,7 +4,7 @@ import {
   userRoleOptions,
   departmentOptions,
   positionOptions,
-} from "@/src/presentation/use-cases/api/user";
+} from "@/src/presentation/services/user";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";

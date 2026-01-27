@@ -3,8 +3,8 @@ import { useRouter } from "next/navigation";
 import {
   getDepartmentTask,
   updateDepartmentTask,
-} from "@/src/presentation/use-cases/api/task";
-import { getUsers } from "@/src/presentation/use-cases/api/user";
+} from "@/src/presentation/services/task";
+import { getUsers } from "@/src/presentation/services/user";
 import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
 import type {
   DepartmentTask,

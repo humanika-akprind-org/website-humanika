@@ -4,7 +4,7 @@ import type { ArticleCategory } from "@/src/domain/value-objects/article-categor
 import {
   getArticleCategories,
   deleteArticleCategory,
-} from "@/src/presentation/use-cases/api/article-category";
+} from "@/src/presentation/services/article-category";
 
 export const useArticleCategoryManagement = () => {
   const router = useRouter();

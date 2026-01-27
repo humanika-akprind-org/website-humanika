@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createGallery } from "@/src/presentation/use-cases/api/gallery";
+import { createGallery } from "@/src/presentation/services/gallery";
 import type {
   CreateGalleryInput,
   UpdateGalleryInput,

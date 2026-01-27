@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { PeriodApi } from "@/src/presentation/services/period";
 import type { Period, PeriodFormData } from "@/src/domain/entities/period";
 
 type AlertType = "error" | "success" | "warning" | "info";

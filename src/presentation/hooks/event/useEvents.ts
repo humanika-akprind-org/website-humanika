@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getEvents } from "@/src/presentation/use-cases/api/event";
+import { getEvents } from "@/src/presentation/services/event";
 import type { Event, EventFilter } from "@/src/domain/entities/event";
 
 export function useEvents(filter?: EventFilter) {

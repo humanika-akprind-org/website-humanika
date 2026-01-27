@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import {
   getGalleryCategory,
   updateGalleryCategory,
-} from "@/src/presentation/use-cases/api/gallery-category";
+} from "@/src/presentation/services/gallery-category";
 import type {
   GalleryCategory,
   UpdateGalleryCategoryInput,

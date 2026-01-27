@@ -5,10 +5,7 @@ import { FiUser, FiMail, FiSave, FiEdit3 } from "react-icons/fi";
 import { useToast } from "@/src/presentation/hooks/use-toast";
 import type { Department, Position } from "@/src/domain/enums/enums";
 import LoadingProfile from "@/src/presentation/components/admin/layout/loading/LoadingProfile";
-import {
-  UserApi,
-  formatEnumValue,
-} from "@/src/presentation/use-cases/api/user";
+import { UserApi, formatEnumValue } from "@/src/presentation/services/user";
 import type { User } from "@/src/domain/entities/user";
 
 interface UpdateUserData {

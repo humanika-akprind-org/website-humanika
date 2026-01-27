@@ -84,7 +84,7 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
       const fetchRelatedGalleries = async () => {
         try {
           const { getGalleries } =
-            await import("@/src/presentation/use-cases/api/gallery");
+            await import("@/src/presentation/services/gallery");
           const data = await getGalleries({ eventId: currentGallery.eventId });
           setRelatedGalleries(data);
         } catch (error) {

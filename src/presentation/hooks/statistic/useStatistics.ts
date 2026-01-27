@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   getStatistics,
   getActivePeriodStatistic,
-} from "@/src/presentation/use-cases/api/statistic";
+} from "@/src/presentation/services/statistic";
 import type {
   Statistic,
   StatisticFilter,

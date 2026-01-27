@@ -1,21 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
-import { DocumentApi } from "@/src/presentation/use-cases/api/document";
-import { ArticleApi } from "@/src/presentation/use-cases/api/article";
-import { EventApi } from "@/src/presentation/use-cases/api/event";
-import { LetterApi } from "@/src/presentation/use-cases/api/letter";
-import { WorkApi } from "@/src/presentation/use-cases/api/work";
-import { FinanceApi } from "@/src/presentation/use-cases/api/finance";
+import { UserApi } from "@/src/presentation/services/user";
+import { DocumentApi } from "@/src/presentation/services/document";
+import { ArticleApi } from "@/src/presentation/services/article";
+import { EventApi } from "@/src/presentation/services/event";
+import { LetterApi } from "@/src/presentation/services/letter";
+import { WorkApi } from "@/src/presentation/services/work";
+import { FinanceApi } from "@/src/presentation/services/finance";
 
-import { ApprovalApi } from "@/src/presentation/use-cases/api/approval";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { ApprovalApi } from "@/src/presentation/services/approval";
+import { PeriodApi } from "@/src/presentation/services/period";
 
-import { ActivityApi } from "@/src/presentation/use-cases/api/activity";
-import { ManagementApi } from "@/src/presentation/use-cases/api/management";
-import { getDepartmentTasks } from "@/src/presentation/use-cases/api/task";
-import { StructureApi } from "@/src/presentation/use-cases/api/structure";
+import { ActivityApi } from "@/src/presentation/services/activity";
+import { ManagementApi } from "@/src/presentation/services/management";
+import { getDepartmentTasks } from "@/src/presentation/services/task";
+import { StructureApi } from "@/src/presentation/services/structure";
 import type { Document } from "@/src/domain/entities/document";
 import type { WorkProgram } from "@/src/domain/entities/work";
 import type { Finance } from "@/src/domain/entities/finance";

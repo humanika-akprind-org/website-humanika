@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
+import { UserApi } from "@/src/presentation/services/user";
 import type {
   User,
   UserFilters as UserFiltersType,

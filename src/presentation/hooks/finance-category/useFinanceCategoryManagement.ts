@@ -6,7 +6,7 @@ import type { FinanceCategory } from "@/src/domain/value-objects/finance-categor
 import {
   getFinanceCategories,
   deleteFinanceCategory,
-} from "@/src/presentation/use-cases/api/finance-category";
+} from "@/src/presentation/services/finance-category";
 import { useToast } from "@/src/presentation/hooks/use-toast";
 
 export function useFinanceCategoryManagement() {

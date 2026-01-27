@@ -4,7 +4,7 @@ import {
   getWorkPrograms,
   deleteWorkProgram,
   deleteWorkPrograms,
-} from "@/src/presentation/use-cases/api/work";
+} from "@/src/presentation/services/work";
 import type { WorkProgram } from "@/src/domain/entities/work";
 import { type Department, type Status } from "@/src/domain/enums/enums";
 

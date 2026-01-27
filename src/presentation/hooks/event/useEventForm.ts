@@ -15,7 +15,7 @@ import type { Period } from "@/src/domain/entities/period";
 import { useUserManagement } from "@/src/presentation/hooks/user/useUserManagement";
 import { usePeriodManagement } from "@/src/presentation/hooks/period/usePeriodManagement";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
+import { UserApi } from "@/src/presentation/services/user";
 
 // Helper functions
 const isHtmlEmpty = (html: string): boolean => {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useEvents } from "@/src/presentation/hooks/event/useEvents";
 import { useGalleryCategories } from "@/src/presentation/hooks/gallery-category/useGalleryCategories";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { PeriodApi } from "@/src/presentation/services/period";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";

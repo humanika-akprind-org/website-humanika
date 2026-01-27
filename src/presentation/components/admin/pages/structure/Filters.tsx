@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Status } from "@/src/domain/enums/enums";
-import { getPeriods } from "@/src/presentation/use-cases/api/period";
+import { getPeriods } from "@/src/presentation/services/period";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";

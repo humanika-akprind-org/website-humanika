@@ -14,7 +14,7 @@ import {
 } from "@/src/presentation/lib/config/config";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
 
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { PeriodApi } from "@/src/presentation/services/period";
 import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
 
 export const useStructureForm = (

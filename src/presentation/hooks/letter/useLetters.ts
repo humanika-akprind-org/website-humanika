@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getLetters } from "@/src/presentation/use-cases/api/letter";
+import { getLetters } from "@/src/presentation/services/letter";
 import type { Letter, LetterFilter } from "@/src/domain/entities/letter";
 
 export function useLetters(filter?: LetterFilter) {

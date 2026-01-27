@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import {
   getWorkProgram,
   updateWorkProgram,
-} from "@/src/presentation/use-cases/api/work";
+} from "@/src/presentation/services/work";
 import type {
   WorkProgram,
   UpdateWorkProgramInput,

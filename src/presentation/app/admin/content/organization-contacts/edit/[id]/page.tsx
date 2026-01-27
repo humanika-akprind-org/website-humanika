@@ -10,7 +10,7 @@ import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
 import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
 import { useOrganizationContactManagement } from "@/src/presentation/hooks/organization-contact/useOrganizationContactManagement";
 import { usePeriods } from "@/src/presentation/hooks/period/usePeriods";
-import { getOrganizationContact } from "@/src/presentation/use-cases/api/organization-contact";
+import { getOrganizationContact } from "@/src/presentation/services/organization-contact";
 import { MissionItem } from "@/src/presentation/components/admin/ui/input/MissionArrayInput";
 
 interface InitialData {

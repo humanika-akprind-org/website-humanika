@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteEvent } from "@/src/presentation/use-cases/api/event";
+import { deleteEvent } from "@/src/presentation/services/event";
 import type { Event } from "@/src/domain/entities/event";
 import { useEvents } from "./useEvents";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";

@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { LatestGalleryGrid } from "../../pages/card/gallery/LatestGalleryGrid";
 import AlbumGrid from "../../pages/card/album/AlbumGrid";
-import { getGalleries } from "@/src/presentation/use-cases/api/gallery";
-import { getEvents } from "@/src/presentation/use-cases/api/event";
+import { getGalleries } from "@/src/presentation/services/gallery";
+import { getEvents } from "@/src/presentation/services/event";
 import type { Gallery } from "@/src/domain/entities/gallery";
 import type { Event, ScheduleItem } from "@/src/domain/entities/event";
 

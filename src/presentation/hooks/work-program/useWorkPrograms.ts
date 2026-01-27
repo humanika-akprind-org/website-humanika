@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getWorkPrograms } from "@/src/presentation/use-cases/api/work";
+import { getWorkPrograms } from "@/src/presentation/services/work";
 import type {
   WorkProgram,
   WorkProgramFilter,

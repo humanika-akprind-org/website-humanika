@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Status } from "@/src/domain/enums/enums";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { PeriodApi } from "@/src/presentation/services/period";
 import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
 import { useEventCategories } from "@/src/presentation/hooks/event-category/useEventCategories";
 import SearchInput from "../../ui/input/SearchInput";

@@ -4,7 +4,7 @@ import type { Article } from "@/src/domain/entities/article";
 import {
   getArticles,
   deleteArticle,
-} from "@/src/presentation/use-cases/api/article";
+} from "@/src/presentation/services/article";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,

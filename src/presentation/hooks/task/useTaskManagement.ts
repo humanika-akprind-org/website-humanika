@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import {
   getDepartmentTasks,
   deleteDepartmentTask,
-} from "@/src/presentation/use-cases/api/task";
+} from "@/src/presentation/services/task";
 import type { DepartmentTask } from "@/src/domain/entities/task";
 
 interface UseTaskManagementReturn {

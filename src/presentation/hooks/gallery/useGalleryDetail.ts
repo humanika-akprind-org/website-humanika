@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  getEventBySlug,
-  getEvents,
-} from "@/src/presentation/use-cases/api/event";
-import { getGalleries } from "@/src/presentation/use-cases/api/gallery";
+import { getEventBySlug, getEvents } from "@/src/presentation/services/event";
+import { getGalleries } from "@/src/presentation/services/gallery";
 import type { Event } from "@/src/domain/entities/event";
 import type { Gallery } from "@/src/domain/entities/gallery";
 import { Status } from "@/src/domain/enums/enums";

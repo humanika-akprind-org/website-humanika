@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getEvent } from "@/src/presentation/use-cases/api/event";
+import { getEvent } from "@/src/presentation/services/event";
 import type { Event } from "@/src/domain/entities/event";
 
 export function useEventDetail(id: string) {

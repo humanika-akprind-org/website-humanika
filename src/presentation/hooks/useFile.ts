@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { callApi } from "@/src/presentation/use-cases/api/google-drive";
+import { callApi } from "@/src/presentation/services/google-drive";
 
 export interface FileOwnerInfo {
   emailAddress?: string;

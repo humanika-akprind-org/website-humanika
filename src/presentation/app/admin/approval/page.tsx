@@ -11,7 +11,7 @@ import {
   FiEye,
   FiChevronDown,
 } from "react-icons/fi";
-import { ApprovalApi } from "@/src/presentation/use-cases/api/approval";
+import { ApprovalApi } from "@/src/presentation/services/approval";
 import type { ApprovalWithRelations } from "@/src/domain/entities/approval";
 
 enum StatusApproval {

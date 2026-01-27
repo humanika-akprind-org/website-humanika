@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
+import { UserApi } from "@/src/presentation/services/user";
 import type { User, UpdateUserData } from "@/src/domain/entities/user";
 import { UserRole } from "@/src/domain/enums/enums";
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createArticleCategory } from "@/src/presentation/use-cases/api/article-category";
+import { createArticleCategory } from "@/src/presentation/services/article-category";
 import type {
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,

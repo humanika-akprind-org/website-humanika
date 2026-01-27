@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Period } from "@/src/domain/entities/period";
-import {
-  getPeriods,
-  deletePeriod,
-} from "@/src/presentation/use-cases/api/period";
+import { getPeriods, deletePeriod } from "@/src/presentation/services/period";
 
 export function usePeriodManagement() {
   const router = useRouter();

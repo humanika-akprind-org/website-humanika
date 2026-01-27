@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import {
   getEventCategory,
   updateEventCategory,
-} from "@/src/presentation/use-cases/api/event-category";
+} from "@/src/presentation/services/event-category";
 import type {
   EventCategory,
   UpdateEventCategoryInput,

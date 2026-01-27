@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getPeriods } from "@/src/presentation/use-cases/api/period";
+import { getPeriods } from "@/src/presentation/services/period";
 import type { Period } from "@/src/domain/entities/period";
 
 export function useDocumentFormData() {

@@ -119,7 +119,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
           if (accessToken) {
             const { callApi } =
-              await import("@/src/presentation/use-cases/api/google-drive");
+              await import("@/src/presentation/services/google-drive");
             await callApi({
               action: "delete",
               fileId,

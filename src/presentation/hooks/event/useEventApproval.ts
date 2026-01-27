@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ApprovalApi } from "@/src/presentation/use-cases/api/approval";
+import { ApprovalApi } from "@/src/presentation/services/approval";
 import type { ApprovalWithRelations as Approval } from "@/src/domain/entities/approval";
 import { StatusApproval } from "@/src/domain/enums/enums";
 

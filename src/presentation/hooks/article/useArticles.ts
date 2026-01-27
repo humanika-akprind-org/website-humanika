@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getArticles } from "@/src/presentation/use-cases/api/article";
+import { getArticles } from "@/src/presentation/services/article";
 import type { Article, ArticleFilter } from "@/src/domain/entities/article";
 
 export function useArticles(filter?: ArticleFilter) {

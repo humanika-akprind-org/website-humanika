@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteDocument } from "@/src/presentation/use-cases/api/document";
+import { deleteDocument } from "@/src/presentation/services/document";
 import type { Document } from "@/src/domain/entities/document";
 import { useDocuments } from "./useDocuments";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";

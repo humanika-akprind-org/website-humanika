@@ -11,8 +11,8 @@ import type { Period } from "@/src/domain/entities/period";
 import { useFile } from "@/src/presentation/hooks/useFile";
 import { photoManagementFolderId } from "@/src/presentation/lib/config/config";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { UserApi } from "@/src/presentation/services/user";
+import { PeriodApi } from "@/src/presentation/services/period";
 import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
 
 export const useManagementForm = (

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getEvent, updateEvent } from "@/src/presentation/use-cases/api/event";
+import { getEvent, updateEvent } from "@/src/presentation/services/event";
 import type {
   CreateEventInput,
   UpdateEventInput,

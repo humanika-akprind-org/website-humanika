@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { UserApi } from "@/src/presentation/services/user";
+import { PeriodApi } from "@/src/presentation/services/period";
 import type { User } from "@/src/domain/entities/user";
 import type { Period } from "@/src/domain/entities/period";
 

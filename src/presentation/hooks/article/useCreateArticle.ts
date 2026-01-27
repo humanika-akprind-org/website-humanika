@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createArticle } from "@/src/presentation/use-cases/api/article";
+import { createArticle } from "@/src/presentation/services/article";
 import type {
   CreateArticleInput,
   UpdateArticleInput,

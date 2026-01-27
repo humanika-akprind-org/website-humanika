@@ -3,7 +3,7 @@ import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
 import {
   callApi,
   fetchDriveFolders,
-} from "@/src/presentation/use-cases/api/google-drive";
+} from "@/src/presentation/services/google-drive";
 import {
   loadFolderFromLocalStorage,
   saveFolderToLocalStorage,

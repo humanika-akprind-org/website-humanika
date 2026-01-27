@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteGallery } from "@/src/presentation/use-cases/api/gallery";
+import { deleteGallery } from "@/src/presentation/services/gallery";
 import type { Gallery } from "@/src/domain/entities/gallery";
 import { useGalleries } from "./useGalleries";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";

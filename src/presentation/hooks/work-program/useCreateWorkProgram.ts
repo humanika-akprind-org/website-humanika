@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createWorkProgram } from "@/src/presentation/use-cases/api/work";
+import { createWorkProgram } from "@/src/presentation/services/work";
 import type {
   CreateWorkProgramInput,
   UpdateWorkProgramInput,

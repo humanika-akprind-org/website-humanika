@@ -7,7 +7,7 @@ import {
   LetterClassification,
 } from "@/src/domain/enums/enums";
 import type { LetterFilter } from "@/src/domain/entities/letter";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { PeriodApi } from "@/src/presentation/services/period";
 import SearchInput from "../../ui/input/SearchInput";
 import SelectFilter from "../../ui/input/SelectFilter";
 import FilterButton from "../../ui/button/FilterButton";

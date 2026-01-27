@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createEventCategory } from "@/src/presentation/use-cases/api/event-category";
+import { createEventCategory } from "@/src/presentation/services/event-category";
 import type {
   CreateEventCategoryInput,
   UpdateEventCategoryInput,

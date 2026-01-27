@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteStatistic } from "@/src/presentation/use-cases/api/statistic";
+import { deleteStatistic } from "@/src/presentation/services/statistic";
 import type { Statistic } from "@/src/domain/entities/statistic";
 import { useStatistics } from "./useStatistics";
 import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";

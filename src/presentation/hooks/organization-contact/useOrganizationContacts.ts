@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   getOrganizationContacts,
   getActivePeriodOrganizationContact,
-} from "@/src/presentation/use-cases/api/organization-contact";
+} from "@/src/presentation/services/organization-contact";
 import type {
   OrganizationContact,
   OrganizationContactFilter,

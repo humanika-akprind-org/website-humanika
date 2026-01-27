@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getFinance,
-  updateFinance,
-} from "@/src/presentation/use-cases/api/finance";
+import { getFinance, updateFinance } from "@/src/presentation/services/finance";
 import type {
   CreateFinanceInput,
   UpdateFinanceInput,

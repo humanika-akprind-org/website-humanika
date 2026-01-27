@@ -3,7 +3,7 @@
  * Centralized utilities for handling Google Drive file URLs and IDs
  */
 
-import { callApi } from "@/src/presentation/use-cases/api/google-drive";
+import { callApi } from "@/src/presentation/services/google-drive";
 
 // ============= Constants =============
 

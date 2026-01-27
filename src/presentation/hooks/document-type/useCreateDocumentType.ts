@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createDocumentType } from "@/src/presentation/use-cases/api/document-type";
+import { createDocumentType } from "@/src/presentation/services/document-type";
 import type {
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { ManagementApi } from "@/src/presentation/use-cases/api/management";
-import { PeriodApi } from "@/src/presentation/use-cases/api/period";
+import { ManagementApi } from "@/src/presentation/services/management";
+import { PeriodApi } from "@/src/presentation/services/period";
 import type { Management } from "@/src/domain/entities/management";
 import type { Period } from "@/src/domain/entities/period";
 

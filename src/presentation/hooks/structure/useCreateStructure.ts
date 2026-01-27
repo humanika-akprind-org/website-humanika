@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { StructureApi } from "@/src/presentation/use-cases/api/structure";
+import { StructureApi } from "@/src/presentation/services/structure";
 import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,

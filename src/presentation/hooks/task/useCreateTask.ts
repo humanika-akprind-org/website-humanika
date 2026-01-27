@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createDepartmentTask } from "@/src/presentation/use-cases/api/task";
+import { createDepartmentTask } from "@/src/presentation/services/task";
 import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
+import { UserApi } from "@/src/presentation/services/user";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,

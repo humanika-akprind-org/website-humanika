@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getArticleBySlug } from "@/src/presentation/use-cases/api/article";
+import { getArticleBySlug } from "@/src/presentation/services/article";
 import type { Article } from "@/src/domain/entities/article";
 
 export function useArticleDetail(slug: string | undefined) {

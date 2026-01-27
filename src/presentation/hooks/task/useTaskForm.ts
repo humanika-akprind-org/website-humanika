@@ -7,8 +7,8 @@ import type {
 import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
 import type { User } from "@/src/domain/entities/user";
 import type { WorkProgram } from "@/src/domain/entities/work";
-import { UserApi } from "@/src/presentation/use-cases/api/user";
-import { getWorkPrograms } from "@/src/presentation/use-cases/api/work";
+import { UserApi } from "@/src/presentation/services/user";
+import { getWorkPrograms } from "@/src/presentation/services/work";
 
 export interface TaskFormData {
   title: string;
