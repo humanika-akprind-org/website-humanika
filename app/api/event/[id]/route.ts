@@ -16,10 +16,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { UpdateEventInput } from "@/domain/entities/event.entity";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import { EventRepositoryPrisma } from "@/infrastructure/repositories/event.repository";
-import { GetEventByIdUseCase } from "@/application/use-cases/event/get-event-by-id.usecase";
-import { UpdateEventUseCase } from "@/application/use-cases/event/update-event.usecase";
-import { DeleteEventUseCase } from "@/application/use-cases/event/delete-event.usecase";
+import { EventRepositoryPrisma } from "@/infrastructure/repositories/event";
+import { GetEventByIdUseCase } from "@/application/use-cases/event";
+import { UpdateEventUseCase } from "@/application/use-cases/event";
+import { DeleteEventUseCase } from "@/application/use-cases/event";
 
 // ============================================================================
 // Payload Extraction Functions

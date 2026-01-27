@@ -10,8 +10,8 @@
  */
 
 import { type NextRequest, NextResponse } from "next/server";
-import { EventRepositoryPrisma } from "@/infrastructure/repositories/event.repository";
-import { GetEventBySlugUseCase } from "@/application/use-cases/event/get-event-by-slug.usecase";
+import { EventRepositoryPrisma } from "@/infrastructure/repositories/event";
+import { GetEventBySlugUseCase } from "@/application/use-cases/event";
 
 // ============================================================================
 // Payload Extraction Functions
