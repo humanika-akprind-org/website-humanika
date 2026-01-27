@@ -1,12 +1,16 @@
 // app/api/user/[id]/route.ts
 import { type NextRequest, NextResponse } from "next/server";
 import { type UserRole, type Department, type Position } from "@prisma/client";
-import { getUser, updateUser, deleteUser } from "@/services/user/user.service";
+import {
+  getUser,
+  updateUser,
+  deleteUser,
+} from "@/src/infrastructure/repositories/user/user.service";
 
 // GET - Get user by ID
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -22,7 +26,7 @@ export async function GET(
     console.error("Error fetching user:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -30,7 +34,7 @@ export async function GET(
 // PUT - Update user
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -70,7 +74,7 @@ export async function PUT(
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -78,7 +82,7 @@ export async function PUT(
 // DELETE - Delete user
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -93,7 +97,7 @@ export async function DELETE(
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

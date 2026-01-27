@@ -2,7 +2,10 @@ import { type NextRequest, NextResponse } from "next/server";
 import type { CreateArticleInput } from "@/types/article";
 import type { Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth-server";
-import { getArticles, createArticle } from "@/services/article/article.service";
+import {
+  getArticles,
+  createArticle,
+} from "@/src/infrastructure/repositories/article/article.service";
 
 // Extract payload functions
 function extractArticleQueryParams(request: NextRequest) {
@@ -17,7 +20,7 @@ function extractArticleQueryParams(request: NextRequest) {
 }
 
 async function extractCreateArticleBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<CreateArticleInput> {
   return await request.json();
 }
@@ -58,7 +61,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching articles:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -88,7 +91,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating article:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -4,11 +4,11 @@ import {
   getGalleryCategory,
   updateGalleryCategory,
   deleteGalleryCategory,
-} from "@/services/gallery/gallery-category.service";
+} from "@/src/infrastructure/repositories/gallery/gallery-category.service";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Temporarily remove authentication check to allow public access
@@ -22,7 +22,7 @@ export async function GET(
     if (!categoryId) {
       return NextResponse.json(
         { error: "Category ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -31,7 +31,7 @@ export async function GET(
     if (!category) {
       return NextResponse.json(
         { error: "Gallery category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -40,14 +40,14 @@ export async function GET(
     console.error("Error fetching gallery category:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -60,7 +60,7 @@ export async function PUT(
     if (!categoryId) {
       return NextResponse.json(
         { error: "Category ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -70,7 +70,7 @@ export async function PUT(
     if (!body.name || body.name.trim() === "") {
       return NextResponse.json(
         { error: "Category name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,20 +86,20 @@ export async function PUT(
     ) {
       return NextResponse.json(
         { error: "Gallery category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -112,7 +112,7 @@ export async function DELETE(
     if (!categoryId) {
       return NextResponse.json(
         { error: "Category ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -130,13 +130,13 @@ export async function DELETE(
     ) {
       return NextResponse.json(
         { error: "Gallery category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

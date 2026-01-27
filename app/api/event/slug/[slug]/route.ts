@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getEventBySlug } from "@/services/event/event.service";
+import { getEventBySlug } from "@/src/infrastructure/repositories/event/event.service";
 
 /**
  * Event Slug API Route - uses slug for public URLs
@@ -7,7 +7,7 @@ import { getEventBySlug } from "@/services/event/event.service";
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
     const event = await getEventBySlug((await params).slug);
@@ -21,7 +21,7 @@ export async function GET(
     console.error("Error fetching event:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

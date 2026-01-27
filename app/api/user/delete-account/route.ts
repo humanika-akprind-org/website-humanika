@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, clearAuthCookies } from "@/lib/auth-server";
-import { deleteAccount } from "@/services/user/user.service";
+import { deleteAccount } from "@/src/infrastructure/repositories/user/user.service";
 
 export async function DELETE(_request: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function DELETE(_request: NextRequest) {
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

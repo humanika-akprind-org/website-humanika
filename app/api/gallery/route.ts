@@ -4,7 +4,7 @@ import {
   getGalleries,
   createGallery,
   type CreateGalleryInput,
-} from "@/services/gallery/gallery.service";
+} from "@/src/infrastructure/repositories/gallery/gallery.service";
 
 // Extract payload functions
 function extractGalleryQueryParams(request: NextRequest) {
@@ -16,7 +16,7 @@ function extractGalleryQueryParams(request: NextRequest) {
 }
 
 async function extractCreateGalleryBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<CreateGalleryInput> {
   return await request.json();
 }
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching galleries:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating gallery:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

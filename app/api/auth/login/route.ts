@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { setAuthCookie } from "@/lib/auth-server";
-import { login } from "@/services/auth/login.service";
+import { login } from "@/src/infrastructure/repositories/auth/login.service";
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     if (!result.success) {
       return NextResponse.json(
         { success: result.success, error: result.error },
-        { status: result.status }
+        { status: result.status },
       );
     }
 
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     console.error("Login error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { PeriodApiResponse } from "@/types/period";
-import { getPeriods, createPeriod } from "@/services/period/period.service";
+import {
+  getPeriods,
+  createPeriod,
+} from "@/src/infrastructure/repositories/period/period.service";
 
 // Extract payload functions
 async function extractCreatePeriodBody(request: NextRequest) {
@@ -41,13 +44,13 @@ export async function GET(): Promise<NextResponse<PeriodApiResponse>> {
         error: "Failed to fetch periods",
         message: (error as Error).message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function POST(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
     // 1. Extract payload
@@ -61,7 +64,7 @@ export async function POST(
           success: false,
           error: validation.error,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -82,7 +85,7 @@ export async function POST(
         error: "Failed to create period",
         message: (error as Error).message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

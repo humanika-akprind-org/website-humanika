@@ -1,7 +1,7 @@
 import { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "../prisma";
-import { login as loginUser } from "../../services/auth/login.service";
+import { login as loginUser } from "../../src/infrastructure/repositories/auth/login.service";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
 export const authOptions: NextAuthOptions = {
@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
 
         const response = await loginUser(
           credentials.email,
-          credentials.password
+          credentials.password,
         );
 
         if (!response.success || !response.user) {

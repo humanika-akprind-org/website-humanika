@@ -4,7 +4,7 @@ import {
   getOrganizationContact,
   updateOrganizationContact,
   deleteOrganizationContact,
-} from "@/services/organization-contact/organization-contact.service";
+} from "@/src/infrastructure/repositories/organization-contact/organization-contact.service";
 import { getCurrentUser } from "@/lib/auth-server";
 
 interface OrganizationContactParams {
@@ -13,7 +13,7 @@ interface OrganizationContactParams {
 
 export async function GET(
   _request: NextRequest,
-  { params }: OrganizationContactParams
+  { params }: OrganizationContactParams,
 ) {
   try {
     const { id } = await params;
@@ -24,7 +24,7 @@ export async function GET(
     if (!organizationContact) {
       return NextResponse.json(
         { error: "Organization contact not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -33,14 +33,14 @@ export async function GET(
     console.error("Error fetching organization contact:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: OrganizationContactParams
+  { params }: OrganizationContactParams,
 ) {
   try {
     const user = await getCurrentUser();
@@ -56,7 +56,7 @@ export async function PUT(
     if (!existingOrganizationContact) {
       return NextResponse.json(
         { error: "Organization contact not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -73,7 +73,7 @@ export async function PUT(
     const organizationContact = await updateOrganizationContact(
       id,
       updateData,
-      user
+      user,
     );
 
     return NextResponse.json(organizationContact);
@@ -81,14 +81,14 @@ export async function PUT(
     console.error("Error updating organization contact:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: OrganizationContactParams
+  { params }: OrganizationContactParams,
 ) {
   try {
     const user = await getCurrentUser();
@@ -108,7 +108,7 @@ export async function DELETE(
     console.error("Error deleting organization contact:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

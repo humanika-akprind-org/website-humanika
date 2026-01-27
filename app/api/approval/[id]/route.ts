@@ -3,10 +3,10 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   updateApproval,
   deleteApproval,
-} from "@/services/approval/approval.service";
+} from "@/src/infrastructure/repositories/approval/approval.service";
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -21,7 +21,7 @@ export async function PUT(
     if (!status) {
       return NextResponse.json(
         { error: "Status is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function PUT(
       id,
       { status, note },
       user.id,
-      request
+      request,
     );
 
     return NextResponse.json(updatedApproval);
@@ -40,14 +40,14 @@ export async function PUT(
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -67,7 +67,7 @@ export async function DELETE(
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

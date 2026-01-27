@@ -5,11 +5,11 @@ import {
   getFinanceCategory,
   updateFinanceCategory,
   deleteFinanceCategory,
-} from "@/services/finance/finance-category.service";
+} from "@/src/infrastructure/repositories/finance/finance-category.service";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -22,7 +22,7 @@ export async function GET(
     if (!financeCategory) {
       return NextResponse.json(
         { error: "Finance category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -31,14 +31,14 @@ export async function GET(
     console.error("Error fetching finance category:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -49,11 +49,9 @@ export async function PUT(
     const body: UpdateFinanceCategoryInput = await request.json();
 
     const financeCategory = await updateFinanceCategory(
-      (
-        await params
-      ).id,
+      (await params).id,
       body,
-      user
+      user,
     );
 
     return NextResponse.json(financeCategory);
@@ -68,19 +66,19 @@ export async function PUT(
     if (error instanceof Error && error.message.includes("Unique constraint")) {
       return NextResponse.json(
         { error: "Category name must be unique" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -103,7 +101,7 @@ export async function DELETE(
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   getActivities,
   createActivity,
-} from "@/services/activity/activity.service";
+} from "@/src/infrastructure/repositories/activity/activity.service";
 
 export async function GET(req: NextRequest) {
   try {
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
         startDate: startDate || undefined,
         endDate: endDate || undefined,
       },
-      { page, limit }
+      { page, limit },
     );
 
     return NextResponse.json(result);
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     }
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       { activityType, entityType, entityId, description, metadata },
       user,
       ipAddress,
-      userAgent
+      userAgent,
     );
 
     return NextResponse.json(activity);
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

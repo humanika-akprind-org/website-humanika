@@ -4,7 +4,7 @@ import {
   getStatistic,
   updateStatistic,
   deleteStatistic,
-} from "@/services/statistic/statistic.service";
+} from "@/src/infrastructure/repositories/statistic/statistic.service";
 import { getCurrentUser } from "@/lib/auth-server";
 
 interface StatisticParams {
@@ -21,7 +21,7 @@ export async function GET(_request: NextRequest, { params }: StatisticParams) {
     if (!statistic) {
       return NextResponse.json(
         { error: "Statistic not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -30,7 +30,7 @@ export async function GET(_request: NextRequest, { params }: StatisticParams) {
     console.error("Error fetching statistic:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: StatisticParams) {
     if (!existingStatistic) {
       return NextResponse.json(
         { error: "Statistic not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -73,14 +73,14 @@ export async function PUT(request: NextRequest, { params }: StatisticParams) {
     console.error("Error updating statistic:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: StatisticParams
+  { params }: StatisticParams,
 ) {
   try {
     const user = await getCurrentUser();
@@ -100,7 +100,7 @@ export async function DELETE(
     console.error("Error deleting statistic:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

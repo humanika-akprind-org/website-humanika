@@ -13,7 +13,7 @@ import {
   updateGallery,
   getEventsForGalleryForm,
   getPeriodsForForm,
-} from "@/services/gallery/gallery.service";
+} from "@/src/infrastructure/repositories/gallery/gallery.service";
 
 async function EditGalleryPage({
   params,

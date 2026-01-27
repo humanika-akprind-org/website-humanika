@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyUser } from "@/services/user/user.service";
+import { verifyUser } from "@/src/infrastructure/repositories/user/user.service";
 
 // PATCH - Verify user account
 export async function PATCH(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -19,7 +19,7 @@ export async function PATCH(
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

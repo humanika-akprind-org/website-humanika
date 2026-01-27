@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
-import { ManagementService } from "@/services/management/management.service";
+import { ManagementService } from "@/src/infrastructure/repositories/management/management.service";
 import type { ManagementServerData } from "@/types/management";
 
 // Extract payload functions
 async function extractCreateManagementBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<ManagementServerData> {
   return await request.json();
 }
@@ -38,7 +38,7 @@ export async function GET() {
             ? error.message
             : "Failed to fetch managements",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     if (!validation.isValid) {
       return NextResponse.json(
         { success: false, error: validation.error },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
             ? error.message
             : "Failed to create management",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

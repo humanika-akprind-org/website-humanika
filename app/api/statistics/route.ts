@@ -4,7 +4,7 @@ import {
   getStatistics,
   getActivePeriodStatistic,
   createStatistic,
-} from "@/services/statistic/statistic.service";
+} from "@/src/infrastructure/repositories/statistic/statistic.service";
 import { getCurrentUser } from "@/lib/auth-server";
 
 // Extract payload functions
@@ -17,7 +17,7 @@ function extractStatisticQueryParams(request: NextRequest) {
 }
 
 async function extractCreateStatisticBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<CreateStatisticInput> {
   const body = await request.json();
   return {
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching statistics:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating statistic:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { bulkVerifyUsers } from "@/services/user/user.service";
+import { bulkVerifyUsers } from "@/src/infrastructure/repositories/user/user.service";
 
 // POST - Bulk verify users
 export async function POST(request: NextRequest) {
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

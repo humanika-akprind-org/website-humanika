@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   getDocuments,
   createDocument,
-} from "@/services/document/document.service";
+} from "@/src/infrastructure/repositories/document/document.service";
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching documents:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     if (!body.name || !body.documentTypeId) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating document:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

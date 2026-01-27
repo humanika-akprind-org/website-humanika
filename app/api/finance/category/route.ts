@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   getFinanceCategories,
   createFinanceCategory,
-} from "@/services/finance/finance-category.service";
+} from "@/src/infrastructure/repositories/finance/finance-category.service";
 
 function extractFinanceCategoryQueryParams(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -17,7 +17,7 @@ function extractFinanceCategoryQueryParams(request: NextRequest) {
 }
 
 async function extractCreateFinanceCategoryBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<CreateFinanceCategoryInput> {
   return await request.json();
 }
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching finance categories:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -72,12 +72,12 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.message.includes("Unique constraint")) {
       return NextResponse.json(
         { error: "Category name must be unique" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   getGalleryCategories,
   createGalleryCategory,
-} from "@/services/gallery/gallery-category.service";
+} from "@/src/infrastructure/repositories/gallery/gallery-category.service";
 import type { CreateGalleryCategoryInput } from "@/types/gallery-category";
 
 // Validation functions
@@ -23,7 +23,7 @@ export async function GET(_request: NextRequest) {
     console.error("Error fetching gallery categories:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating gallery category:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -5,7 +5,7 @@ import {
   getArticleCategories,
   createArticleCategory,
   getArticleCategoriesWithCount,
-} from "@/services/article/article-category.service";
+} from "@/src/infrastructure/repositories/article/article-category.service";
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching article categories:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     if (!body.name || !body.name.trim()) {
       return NextResponse.json(
         { error: "Category name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating article category:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   getStructures,
   createStructure,
-} from "@/services/structure/structure.service";
+} from "@/src/infrastructure/repositories/structure/structure.service";
 
 // Extract payload functions
 async function extractCreateStructureBody(request: NextRequest) {

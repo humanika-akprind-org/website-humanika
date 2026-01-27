@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { register } from "@/services/auth/register.service";
+import { register } from "@/src/infrastructure/repositories/auth/register.service";
 
 export async function POST(request: Request) {
   try {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     if (!result.success) {
       return NextResponse.json(
         { success: result.success, error: result.error },
-        { status: result.status }
+        { status: result.status },
       );
     }
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     console.error("Registration error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -5,7 +5,7 @@ import {
   getPeriod,
   updatePeriod,
   deletePeriod,
-} from "@/services/period/period.service";
+} from "@/src/infrastructure/repositories/period/period.service";
 
 interface Context {
   params: Promise<{ id: string }>;
@@ -13,7 +13,7 @@ interface Context {
 
 export async function GET(
   _request: NextRequest,
-  context: Context
+  context: Context,
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
     const { id } = await context.params;
@@ -24,7 +24,7 @@ export async function GET(
           success: false,
           error: "Invalid period ID",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,14 +42,14 @@ export async function GET(
         error: "Failed to fetch period",
         message: (error as Error).message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  context: Context
+  context: Context,
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
     const { id } = await context.params;
@@ -60,7 +60,7 @@ export async function PUT(
           success: false,
           error: "Invalid period ID",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -77,7 +77,7 @@ export async function PUT(
           success: false,
           error: "Start year must be less than end year",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -96,7 +96,7 @@ export async function PUT(
           success: false,
           error: error.message,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
     return NextResponse.json(
@@ -105,14 +105,14 @@ export async function PUT(
         error: "Failed to update period",
         message: (error as Error).message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  context: Context
+  context: Context,
 ): Promise<NextResponse<PeriodApiResponse>> {
   try {
     const { id } = await context.params;
@@ -123,7 +123,7 @@ export async function DELETE(
           success: false,
           error: "Invalid period ID",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -141,7 +141,7 @@ export async function DELETE(
           success: false,
           error: error.message,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
     if (
@@ -153,7 +153,7 @@ export async function DELETE(
           success: false,
           error: error.message,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
     return NextResponse.json(
@@ -162,7 +162,7 @@ export async function DELETE(
         error: "Failed to delete period",
         message: (error as Error).message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

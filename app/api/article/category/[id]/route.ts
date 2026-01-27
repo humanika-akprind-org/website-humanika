@@ -5,11 +5,11 @@ import {
   getArticleCategoryById,
   updateArticleCategory,
   deleteArticleCategory,
-} from "@/services/article/article-category.service";
+} from "@/src/infrastructure/repositories/article/article-category.service";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -23,7 +23,7 @@ export async function GET(
     if (!category) {
       return NextResponse.json(
         { error: "Article category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -32,14 +32,14 @@ export async function GET(
     console.error("Error fetching article category:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -62,14 +62,14 @@ export async function PUT(
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -98,7 +98,7 @@ export async function DELETE(
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

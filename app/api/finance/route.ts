@@ -2,7 +2,10 @@ import { type NextRequest, NextResponse } from "next/server";
 import type { CreateFinanceInput } from "@/types/finance";
 import type { FinanceType, Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth-server";
-import { getFinances, createFinance } from "@/services/finance/finance.service";
+import {
+  getFinances,
+  createFinance,
+} from "@/src/infrastructure/repositories/finance/finance.service";
 
 function extractFinanceQueryParams(request: NextRequest) {
   const { searchParams } = new URL(request.url);

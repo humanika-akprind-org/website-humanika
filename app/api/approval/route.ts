@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   getApprovals,
   createApproval,
-} from "@/services/approval/approval.service";
+} from "@/src/infrastructure/repositories/approval/approval.service";
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching approvals:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     if (!entityType || !entityId || !userId) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
         note,
       },
       user.id,
-      request
+      request,
     );
 
     return NextResponse.json(approval);
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

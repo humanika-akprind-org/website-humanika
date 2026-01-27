@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-server";
-import { ManagementService } from "@/services/management/management.service";
+import { ManagementService } from "@/src/infrastructure/repositories/management/management.service";
 import type { ManagementServerData } from "@/types/management";
 
 interface RouteParams {
@@ -28,7 +28,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
         message:
           error instanceof Error ? error.message : "Failed to fetch management",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -43,11 +43,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const formData: ManagementServerData = await request.json();
 
     const management = await ManagementService.updateManagement(
-      (
-        await params
-      ).id,
+      (await params).id,
       formData,
-      user
+      user,
     );
 
     return NextResponse.json({
@@ -68,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
             ? error.message
             : "Failed to update management",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -127,7 +125,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
               accessToken,
             });
             console.log(
-              `Successfully deleted photo file ${fileId} from Google Drive`
+              `Successfully deleted photo file ${fileId} from Google Drive`,
             );
           } else {
             console.warn("No access token available for photo deletion");
@@ -159,7 +157,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             ? error.message
             : "Failed to delete management",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

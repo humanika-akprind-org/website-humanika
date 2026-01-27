@@ -2,7 +2,10 @@ import { type NextRequest, NextResponse } from "next/server";
 import type { CreateLetterInput } from "@/types/letter";
 import type { LetterType, LetterPriority, Status } from "@/types/enums";
 import { getCurrentUser } from "@/lib/auth-server";
-import { getLetters, createLetter } from "@/services/letter/letter.service";
+import {
+  getLetters,
+  createLetter,
+} from "@/src/infrastructure/repositories/letter/letter.service";
 
 // Extract payload functions
 function extractLetterQueryParams(request: NextRequest) {
@@ -18,7 +21,7 @@ function extractLetterQueryParams(request: NextRequest) {
 }
 
 async function extractCreateLetterBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<CreateLetterInput> {
   return await request.json();
 }
@@ -59,7 +62,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching letters:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -89,7 +92,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating letter:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getArticleBySlug } from "@/services/article/article.service";
+import { getArticleBySlug } from "@/src/infrastructure/repositories/article/article.service";
 
 /**
  * Article Slug API Route - uses slug for public URLs
@@ -7,7 +7,7 @@ import { getArticleBySlug } from "@/services/article/article.service";
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
     const article = await getArticleBySlug((await params).slug);
@@ -21,7 +21,7 @@ export async function GET(
     console.error("Error fetching article:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

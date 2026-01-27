@@ -5,11 +5,11 @@ import {
   getDocumentType,
   updateDocumentType,
   deleteDocumentType,
-} from "@/services/document/document-type.service";
+} from "@/src/infrastructure/repositories/document/document-type.service";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Temporarily remove authentication check to allow public access
@@ -23,7 +23,7 @@ export async function GET(
     if (!documentTypeId) {
       return NextResponse.json(
         { error: "Document type ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -32,7 +32,7 @@ export async function GET(
     if (!documentType) {
       return NextResponse.json(
         { error: "Document type not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -41,14 +41,14 @@ export async function GET(
     console.error("Error fetching document type:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -63,7 +63,7 @@ export async function PUT(
     if (!documentTypeId) {
       return NextResponse.json(
         { error: "Document type ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -73,14 +73,14 @@ export async function PUT(
     if (!body.name || body.name.trim() === "") {
       return NextResponse.json(
         { error: "Document type name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const documentType = await updateDocumentType(
       documentTypeId,
       body,
-      typedUser
+      typedUser,
     );
 
     return NextResponse.json(documentType);
@@ -90,7 +90,7 @@ export async function PUT(
     if (error instanceof Error && error.message === "Document type not found") {
       return NextResponse.json(
         { error: "Document type not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -100,20 +100,20 @@ export async function PUT(
     ) {
       return NextResponse.json(
         { error: "Document type with this name already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -128,7 +128,7 @@ export async function DELETE(
     if (!documentTypeId) {
       return NextResponse.json(
         { error: "Document type ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -143,7 +143,7 @@ export async function DELETE(
     if (error instanceof Error && error.message === "Document type not found") {
       return NextResponse.json(
         { error: "Document type not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -156,13 +156,13 @@ export async function DELETE(
         {
           error: "Cannot delete document type that is being used by documents",
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

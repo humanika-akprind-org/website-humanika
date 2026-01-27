@@ -5,11 +5,11 @@ import {
   getDepartmentTask,
   updateDepartmentTask,
   deleteDepartmentTask,
-} from "@/services/task/task.service";
+} from "@/src/infrastructure/repositories/task/task.service";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -30,14 +30,14 @@ export async function GET(
     console.error("Error fetching department task:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -61,7 +61,7 @@ export async function PUT(
     ) {
       return NextResponse.json(
         { error: "At least one field must be provided for update" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -72,14 +72,14 @@ export async function PUT(
     console.error("Error updating department task:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getCurrentUser();
@@ -102,7 +102,7 @@ export async function DELETE(
     console.error("Error deleting department task:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

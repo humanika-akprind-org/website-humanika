@@ -4,7 +4,7 @@ import type { User } from "@/types/user";
 import {
   getDocumentTypes,
   createDocumentType,
-} from "@/services/document/document-type.service";
+} from "@/src/infrastructure/repositories/document/document-type.service";
 
 export async function GET(_request: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function GET(_request: NextRequest) {
     console.error("Error fetching document types:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     if (!body.name || body.name.trim() === "") {
       return NextResponse.json(
         { error: "Document type name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -57,13 +57,13 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Document type with this name already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

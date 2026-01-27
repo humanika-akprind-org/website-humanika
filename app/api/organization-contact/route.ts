@@ -7,7 +7,7 @@ import {
   getOrganizationContacts,
   getActivePeriodOrganizationContact,
   createOrganizationContact,
-} from "@/services/organization-contact/organization-contact.service";
+} from "@/src/infrastructure/repositories/organization-contact/organization-contact.service";
 import { getCurrentUser } from "@/lib/auth-server";
 
 // Extract payload functions
@@ -20,7 +20,7 @@ function extractOrganizationContactQueryParams(request: NextRequest) {
 }
 
 async function extractCreateOrganizationContactBody(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<CreateOrganizationContactInput> {
   const body = await request.json();
   return {
@@ -35,7 +35,7 @@ async function extractCreateOrganizationContactBody(
 
 // Validation functions
 function validateCreateOrganizationContactInput(
-  body: CreateOrganizationContactInput
+  body: CreateOrganizationContactInput,
 ) {
   if (
     !body.vision ||
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     }
 
     const organizationContacts = await getOrganizationContacts(
-      queryParams as OrganizationContactFilter
+      queryParams as OrganizationContactFilter,
     );
 
     // 3. Response
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching organization contacts:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating organization contact:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

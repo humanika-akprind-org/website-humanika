@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import {
   getEventCategories,
   createEventCategory,
-} from "@/services/event/event-category.service";
+} from "@/src/infrastructure/repositories/event/event-category.service";
 import type { CreateEventCategoryInput } from "@/types/event-category";
 
 // Validation functions
@@ -23,7 +23,7 @@ export async function GET(_request: NextRequest) {
     console.error("Error fetching event categories:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating event category:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
