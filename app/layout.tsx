@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "@/app/globals.css";
+import "./globals.css";
 import { geistSans, geistMono } from "./ui/fonts";
 
 export const metadata: Metadata = {

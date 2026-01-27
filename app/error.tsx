@@ -1,6 +1,6 @@
 "use client";
 
-import "@/app/error.css";
+import "./error.css";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, AlertCircle, Mail, RefreshCw } from "lucide-react";
