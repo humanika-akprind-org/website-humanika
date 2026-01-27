@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import { ManagementService } from "@/infrastructure/repositories/management";
+import {
+  getManagements,
+  createManagement,
+} from "@/infrastructure/repositories/management";
 import type { ManagementServerData } from "@/domain/entities/management.entity";
 
 // Extract payload functions
@@ -21,7 +24,7 @@ function validateCreateManagementInput(body: ManagementServerData) {
 export async function GET() {
   try {
     // 1. Business logic
-    const managements = await ManagementService.getManagements();
+    const managements = await getManagements();
 
     // 2. Response
     return NextResponse.json({
@@ -66,7 +69,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Business logic
-    const management = await ManagementService.createManagement(body, user);
+    const management = await createManagement(body, user);
 
     // 4. Response
     return NextResponse.json({

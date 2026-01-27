@@ -5,7 +5,7 @@ import {
   getStructure,
   updateStructure,
   deleteStructure,
-} from "@/infrastructure/repositories/organizational-structure.repository";
+} from "@/infrastructure/repositories/organizational-structure";
 
 export async function GET(
   _request: NextRequest,
