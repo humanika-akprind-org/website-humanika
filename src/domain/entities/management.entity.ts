@@ -1,4 +1,4 @@
-import { type Department, type Position } from "../enums/enums";
+import { type Department, type Position } from "../enums";
 import { type User } from "./user.entity";
 import { type Period } from "./period.entity";
 

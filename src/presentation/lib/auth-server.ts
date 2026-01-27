@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "./auth";
 import prisma from "./prisma";
-import { UserRole } from "@/domain/enums/enums";
+import { UserRole } from "@/domain/enums";
 
 const COOKIE_NAME = "auth-token";
 

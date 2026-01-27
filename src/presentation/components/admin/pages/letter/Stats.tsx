@@ -7,7 +7,7 @@ import {
   FiArchive,
 } from "react-icons/fi";
 import type { Letter } from "@/domain/entities/letter.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {

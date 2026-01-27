@@ -1,7 +1,7 @@
 import { logActivityFromRequest } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { NextRequest } from "next/server";
-import { StatusApproval } from "@/domain/enums/enums";
+import { StatusApproval } from "@/domain/enums";
 import type {
   CreateApprovalData,
   UpdateApprovalData,

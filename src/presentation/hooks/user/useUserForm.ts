@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UserRole } from "@/domain/enums/enums";
+import { UserRole } from "@/domain/enums";
 import { type CreateUserData } from "@/presentation/components/admin/pages/user/Form";
 import { type AlertType } from "@/presentation/components/admin/ui/alert/Alert";
 

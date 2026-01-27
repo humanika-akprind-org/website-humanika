@@ -5,7 +5,7 @@ import type {
   ArticleCategory,
 } from "@/domain/value-objects/article-category";
 import { logActivityFromRequest } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { NextRequest } from "next/server";
 
 export async function getArticleCategories(): Promise<ArticleCategory[]> {

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { ApprovalApi } from "@/presentation/services/approval";
-import { ApprovalType } from "@/domain/enums/enums";
+import { ApprovalType } from "@/domain/enums";
 import type { ApprovalWithRelations as Approval } from "@/domain/entities/approval.entity";
-import { StatusApproval } from "@/domain/enums/enums";
+import { StatusApproval } from "@/domain/enums";
 
 // Helper function to get entity name
 const getEntityName = (approval: Approval) => {

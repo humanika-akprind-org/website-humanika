@@ -4,7 +4,7 @@ import type {
   CreateFinanceInput,
   UpdateFinanceInput,
 } from "@/domain/entities/finance.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 
 export function useCreateFinance() {
   const router = useRouter();

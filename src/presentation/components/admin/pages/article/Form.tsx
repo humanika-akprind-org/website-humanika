@@ -7,7 +7,7 @@ import type {
   CreateArticleInput,
   UpdateArticleInput,
 } from "@/domain/entities/article.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import type { Period } from "@/domain/entities/period.entity";
 import { FiBriefcase, FiFolder } from "react-icons/fi";
 import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";

@@ -4,9 +4,9 @@ import type {
   UpdateOrganizationalStructureInput,
   OrganizationalStructure,
 } from "@/domain/entities/organizational-structure.entity";
-import type { Status } from "@/domain/enums/enums";
+import type { Status } from "@/domain/enums";
 import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 
 type UserWithId = { id: string };

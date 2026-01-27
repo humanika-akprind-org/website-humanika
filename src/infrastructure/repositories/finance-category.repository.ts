@@ -3,10 +3,10 @@ import type {
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
 } from "@/domain/value-objects/finance-category";
-import type { FinanceType } from "@/domain/enums/enums";
+import type { FinanceType } from "@/domain/enums";
 import type { Prisma } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;

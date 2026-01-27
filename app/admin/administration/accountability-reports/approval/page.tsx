@@ -1,7 +1,7 @@
 "use client";
 
 import { useDocumentApproval } from "@/presentation/hooks/document/useDocumentApproval";
-import { ApprovalType } from "@/domain/enums/enums";
+import { ApprovalType } from "@/domain/enums";
 import ApprovalFilters from "@/presentation/components/admin/pages/approval/Filters";
 import ApprovalTable from "@/presentation/components/admin/pages/approval/Table";
 import ApprovalActionModal from "@/presentation/components/admin/pages/approval/ActionModal";

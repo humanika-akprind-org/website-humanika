@@ -1,4 +1,4 @@
-import { type Status } from "../enums/enums";
+import { type Status } from "../enums";
 import { type User } from "./user.entity";
 import { type Letter } from "./letter.entity";
 import { type Approval } from "./approval.entity";

@@ -4,7 +4,7 @@ import type {
   CreateFinanceInput,
   UpdateFinanceInput,
 } from "@/domain/entities/finance.entity";
-import { FinanceType, Status } from "@/domain/enums/enums";
+import { FinanceType, Status } from "@/domain/enums";
 import { useFile } from "@/presentation/hooks/useFile";
 import { financeFolderId } from "@/presentation/lib/config/config";
 import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";

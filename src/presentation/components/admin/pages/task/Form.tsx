@@ -7,7 +7,7 @@ import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
 } from "@/domain/entities/task-department.entity";
-import { Department, Status } from "@/domain/enums/enums";
+import { Department, Status } from "@/domain/enums";
 
 import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";

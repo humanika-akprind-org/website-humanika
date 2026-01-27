@@ -11,7 +11,7 @@ import type {
   CreateEventInput,
   UpdateEventInput,
 } from "@/domain/entities/event.entity";
-import type { Department, Status } from "@/domain/enums/enums";
+import type { Department, Status } from "@/domain/enums";
 
 // Extend the base interface for Event entity
 export interface IEventRepository extends IBaseRepository<

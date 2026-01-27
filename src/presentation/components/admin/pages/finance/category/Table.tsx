@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
 import { Tag } from "lucide-react";
 import type { FinanceCategory } from "@/domain/value-objects/finance-category";
-import { FinanceType } from "@/domain/enums/enums";
+import { FinanceType } from "@/domain/enums";
 import Checkbox from "../../../ui/checkbox/Checkbox";
 import DropdownMenu, {
   DropdownMenuItem,

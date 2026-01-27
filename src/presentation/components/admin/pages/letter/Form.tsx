@@ -12,7 +12,7 @@ import {
   LetterType,
   LetterPriority,
   LetterClassification,
-} from "@/domain/enums/enums";
+} from "@/domain/enums";
 import type { Period } from "@/domain/entities/period.entity";
 import type { Event } from "@/domain/entities/event.entity";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";

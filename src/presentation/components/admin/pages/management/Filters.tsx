@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Department, Position } from "@/domain/enums/enums";
+import { Department, Position } from "@/domain/enums";
 import type { Period } from "@/domain/entities/period.entity";
 import { getPeriods } from "@/presentation/services/period";
 import SearchInput from "../../ui/input/SearchInput";

@@ -7,7 +7,7 @@ import type {
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
 } from "@/domain/entities/work-program.entity";
-import { Department } from "@/domain/enums/enums";
+import { Department } from "@/domain/enums";
 import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";
 import CurrencyInput from "@/presentation/components/admin/ui/input/CurrencyInput";

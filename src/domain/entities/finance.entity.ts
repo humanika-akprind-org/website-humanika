@@ -1,4 +1,4 @@
-import { type Status, type FinanceType } from "../enums/enums";
+import { type Status, type FinanceType } from "../enums";
 import { type User } from "./user.entity";
 import { type FinanceCategory } from "../value-objects/finance-category";
 import { type Approval } from "./approval.entity";

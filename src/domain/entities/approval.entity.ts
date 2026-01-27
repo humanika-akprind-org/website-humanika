@@ -1,4 +1,4 @@
-import { type ApprovalType } from "../enums/enums";
+import { type ApprovalType } from "../enums";
 import { type StatusApproval } from "@prisma/client";
 
 export interface Approval {

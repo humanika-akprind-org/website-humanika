@@ -24,7 +24,7 @@ import type { Article } from "@/domain/entities/article.entity";
 
 import type { ActivityLog } from "@/domain/entities/activity-log.entity";
 import type { Period } from "@/domain/entities/period.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import {
   TrendingUp,
   Activity,

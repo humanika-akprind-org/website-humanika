@@ -1,4 +1,4 @@
-import { LetterPriority } from "@/domain/enums/enums";
+import { LetterPriority } from "@/domain/enums";
 
 interface PriorityChipProps {
   priority: LetterPriority;

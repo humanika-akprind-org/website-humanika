@@ -1,4 +1,4 @@
-import { UserRole, Department, Position } from "@/domain/enums/enums";
+import { UserRole, Department, Position } from "@/domain/enums";
 import type {
   User,
   CreateUserData,

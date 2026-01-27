@@ -13,7 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { type ArticleCategory } from "@/domain/value-objects/article-category";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import SectionHeaderSkeleton from "@/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
 import CardSkeleton from "@/presentation/components/public/ui/skeleton/CardSkeleton";
 import CategoryPillsSkeleton from "@/presentation/components/public/ui/skeleton/CategoryPillsSkeleton";

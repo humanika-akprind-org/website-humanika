@@ -9,7 +9,7 @@ import {
 } from "react-icons/fi";
 import StatCard from "../../ui/card/StatCard";
 import type { OrganizationalStructure } from "@/domain/entities/organizational-structure.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 
 interface StatsProps {
   structures: OrganizationalStructure[];

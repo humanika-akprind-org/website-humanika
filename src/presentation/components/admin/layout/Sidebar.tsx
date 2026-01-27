@@ -28,7 +28,7 @@ import Image from "next/image";
 import NavLink from "@/presentation/components/admin/layout/NavLink";
 import NavDropdown from "@/presentation/components/admin/layout/NavDropdown";
 import NavDropdownItem from "@/presentation/components/admin/layout/NavDropdownItem";
-import { UserRole } from "@/domain/enums/enums";
+import { UserRole } from "@/domain/enums";
 
 export default function Sidebar() {
   const [userRole, setUserRole] = useState<UserRole | null>(null);

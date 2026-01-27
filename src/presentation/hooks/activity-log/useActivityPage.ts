@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { type ActivityType } from "@/domain/enums/enums";
+import { type ActivityType } from "@/domain/enums";
 import { useActivityLog } from "@/presentation/hooks/activity-log/useActivityLog";
 
 interface ActivityLogData {

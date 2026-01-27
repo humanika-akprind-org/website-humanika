@@ -3,7 +3,7 @@ import {
   type LetterPriority,
   type Status,
   type LetterClassification,
-} from "../enums/enums";
+} from "../enums";
 import { type Approval } from "./approval.entity";
 import type { User } from "./user.entity";
 import type { Period } from "./period.entity";

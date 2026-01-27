@@ -13,7 +13,7 @@
 
 import { type NextRequest, NextResponse } from "next/server";
 import type { CreateEventInput } from "@/domain/entities/event.entity";
-import type { Department, Status } from "@/domain/enums/enums";
+import type { Department, Status } from "@/domain/enums";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import { GetEventsUseCase } from "@/application/use-cases/event";
 import { CreateEventUseCase } from "@/application/use-cases/event";

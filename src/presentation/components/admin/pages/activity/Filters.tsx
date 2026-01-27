@@ -1,4 +1,4 @@
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import DateInput from "../../ui/date/DateInput";
 import SelectFilter from "../../ui/input/SelectFilter";
 

@@ -3,7 +3,7 @@ import prisma from "@/presentation/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { randomColor } from "@/presentation/lib/random-color";
 import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 
 interface RegisterResult {

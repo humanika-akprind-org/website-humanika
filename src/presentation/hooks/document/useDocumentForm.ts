@@ -4,7 +4,7 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/domain/entities/document.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import { useFile } from "@/presentation/hooks/useFile";
 import {
   documentFolderId,

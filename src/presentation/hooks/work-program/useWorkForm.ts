@@ -6,7 +6,7 @@ import type {
 } from "@/domain/entities/work-program.entity";
 import type { User } from "@/domain/entities/user.entity";
 import type { Period } from "@/domain/entities/period.entity";
-import { Department } from "@/domain/enums/enums";
+import { Department } from "@/domain/enums";
 import { UserApi } from "@/presentation/services/user";
 import { getPeriods } from "@/presentation/services/period";
 

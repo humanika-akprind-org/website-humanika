@@ -4,7 +4,7 @@ import type {
   UpdateDepartmentTaskInput,
   DepartmentTaskFilter,
 } from "@/domain/entities/task-department.entity";
-import { Department, Status } from "@/domain/enums/enums";
+import { Department, Status } from "@/domain/enums";
 import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;

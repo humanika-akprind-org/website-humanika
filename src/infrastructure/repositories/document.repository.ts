@@ -7,10 +7,10 @@ import {
   type Status,
   type DocumentType as DocumentTypeEnum,
   ApprovalType,
-} from "@/domain/enums/enums";
+} from "@/domain/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;

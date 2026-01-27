@@ -2,8 +2,8 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/domain/entities/document.entity";
-import { Status, ApprovalType } from "@/domain/enums/enums";
-import { StatusApproval } from "@/domain/enums/enums";
+import { Status, ApprovalType } from "@/domain/enums";
+import { StatusApproval } from "@/domain/enums";
 import prisma from "@/presentation/lib/prisma";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import { redirect } from "next/navigation";

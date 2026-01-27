@@ -13,7 +13,7 @@ import type {
   EventPaginationResult,
 } from "@/application/interface/event.repository.interface";
 import type { Event } from "@/domain/entities/event.entity";
-import type { Department, Status } from "@/domain/enums/enums";
+import type { Department, Status } from "@/domain/enums";
 
 interface EventResult {
   events: Event[];

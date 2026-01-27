@@ -1,4 +1,4 @@
-import { FinanceType } from "../enums/enums";
+import { FinanceType } from "../enums";
 
 export interface FinanceCategory {
   id: string;

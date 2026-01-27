@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useEvents } from "@/presentation/hooks/event/useEvents";
 import { useGalleries } from "@/presentation/hooks/gallery/useGalleries";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import {
   getGalleryCounts,
   getYearsFromEvents,

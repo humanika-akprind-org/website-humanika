@@ -3,7 +3,7 @@ import {
   type Status,
   type UserRole,
   type Position,
-} from "../enums/enums";
+} from "../enums";
 import { type Period } from "./period.entity";
 import { type Approval } from "./approval.entity";
 

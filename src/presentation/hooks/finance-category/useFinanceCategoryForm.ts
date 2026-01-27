@@ -4,7 +4,7 @@ import type {
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
 } from "@/domain/value-objects/finance-category";
-import { FinanceType } from "@/domain/enums/enums";
+import { FinanceType } from "@/domain/enums";
 
 export interface FinanceCategoryFormData {
   name: string;

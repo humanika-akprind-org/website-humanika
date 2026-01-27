@@ -18,7 +18,7 @@ import type {
   UpdateEventInput,
 } from "@/domain/entities/event.entity";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
-import type { Department, Status } from "@/domain/enums/enums";
+import type { Department, Status } from "@/domain/enums";
 import type { Event } from "@/domain/entities/event.entity";
 
 // Type for schedule filter conditions (used for JSON array filtering)

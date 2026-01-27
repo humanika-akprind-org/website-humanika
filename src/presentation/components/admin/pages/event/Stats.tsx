@@ -2,7 +2,7 @@
 
 import { FiCalendar, FiCheckCircle, FiFileText, FiClock } from "react-icons/fi";
 import type { Event } from "@/domain/entities/event.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {

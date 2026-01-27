@@ -1,5 +1,5 @@
-import { type Department } from "../enums/enums";
-import { type Status } from "../enums/enums";
+import { type Department } from "../enums";
+import { type Status } from "../enums";
 
 export interface DepartmentTask {
   id: string;

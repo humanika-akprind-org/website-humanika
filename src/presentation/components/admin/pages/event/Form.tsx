@@ -7,7 +7,7 @@ import type {
   CreateEventInput,
   UpdateEventInput,
 } from "@/domain/entities/event.entity";
-import { Department as DepartmentEnum } from "@/domain/enums/enums";
+import { Department as DepartmentEnum } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 import type { Period } from "@/domain/entities/period.entity";
 import { FiBriefcase, FiUser, FiFolder } from "react-icons/fi";

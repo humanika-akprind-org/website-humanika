@@ -2,7 +2,7 @@
 
 import { FiFileText, FiEye, FiTrendingUp, FiArchive } from "react-icons/fi";
 import type { Article } from "@/domain/entities/article.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {

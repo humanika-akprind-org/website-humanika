@@ -4,7 +4,7 @@ import type {
   ManagementServerData,
 } from "@/domain/entities/management.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;

@@ -7,7 +7,7 @@ import ApprovalActionModal from "@/presentation/components/admin/pages/approval/
 import Alert from "@/presentation/components/admin/ui/alert/Alert";
 import LoadingApproval from "@/presentation/components/admin/layout/loading/LoadingApproval";
 import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
-import { ApprovalType } from "@/domain/enums/enums";
+import { ApprovalType } from "@/domain/enums";
 
 export default function DocumentApprovalPage() {
   const {

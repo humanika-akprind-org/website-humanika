@@ -1,5 +1,5 @@
 import { prisma } from "@/presentation/lib/prisma";
-import type { ApprovalType } from "@/domain/enums/enums";
+import type { ApprovalType } from "@/domain/enums";
 import type { StatusApproval } from "@prisma/client";
 import type {
   ApprovalFilters,

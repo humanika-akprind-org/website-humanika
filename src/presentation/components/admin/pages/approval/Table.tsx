@@ -73,7 +73,7 @@ export default function ApprovalTable({
   const getEntityName = (approval: Approval) => {
     switch (approval.entityType) {
       case "NAME_APPROVAL":
-        return approval.nameApproval?.name || "Name Approval";
+        return approval.nameApproval || "Name Approval";
       case "EVENT":
         return approval.event?.name || "Event";
       case "FINANCE":

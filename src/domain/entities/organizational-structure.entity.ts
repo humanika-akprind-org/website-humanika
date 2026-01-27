@@ -1,4 +1,4 @@
-import { type Status } from "../enums/enums";
+import { type Status } from "../enums";
 import { type Period } from "./period.entity";
 
 export interface OrganizationalStructure {

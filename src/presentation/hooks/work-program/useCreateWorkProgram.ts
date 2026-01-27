@@ -5,7 +5,7 @@ import type {
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
 } from "@/domain/entities/work-program.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 
 export function useCreateWorkProgram() {
   const router = useRouter();

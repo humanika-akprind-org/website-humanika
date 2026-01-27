@@ -8,7 +8,7 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
 } from "@/domain/entities/document.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import type { Event } from "@/domain/entities/event.entity";
 import type { Letter } from "@/domain/entities/letter.entity";
 import type { Period } from "@/domain/entities/period.entity";

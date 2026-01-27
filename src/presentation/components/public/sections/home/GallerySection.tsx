@@ -17,7 +17,7 @@ import {
   Album,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import { getPreviewUrl } from "@/presentation/lib/utils";
 import SectionHeaderSkeleton from "@/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
 import GalleryGridSkeleton from "@/presentation/components/public/ui/skeleton/GalleryGridSkeleton";

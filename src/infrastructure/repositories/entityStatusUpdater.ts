@@ -1,5 +1,5 @@
 import { prisma } from "@/presentation/lib/prisma";
-import type { Status } from "@/domain/enums/enums";
+import type { Status } from "@/domain/enums";
 import { StatusApproval } from "@prisma/client";
 
 export async function updateEntityStatus(

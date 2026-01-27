@@ -7,7 +7,7 @@ import prisma from "@/presentation/lib/prisma";
 import type { CreateEventInput } from "@/domain/entities/event.entity";
 import type { Prisma } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;

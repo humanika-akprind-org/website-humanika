@@ -3,7 +3,7 @@ import type { UserRole, Department, Position } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { randomColor } from "@/presentation/lib/random-color";
 import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 
 export const getUsers = async (filter: {
   page?: number;

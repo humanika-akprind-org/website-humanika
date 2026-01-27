@@ -2,7 +2,7 @@
 
 import { FiTag, FiTrendingUp, FiTrendingDown } from "react-icons/fi";
 import type { FinanceCategory } from "@/domain/value-objects/finance-category";
-import { FinanceType } from "@/domain/enums/enums";
+import { FinanceType } from "@/domain/enums";
 import StatCard from "../../../ui/card/StatCard";
 
 interface FinanceCategoryStatsProps {

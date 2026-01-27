@@ -6,7 +6,7 @@ import type {
   Management,
   ManagementServerData,
 } from "@/domain/entities/management.entity";
-import { Department, Position } from "@/domain/enums/enums";
+import { Department, Position } from "@/domain/enums";
 import { formatEnumValue } from "@/presentation/lib/utils";
 import { useManagementForm } from "@/presentation/hooks/management/useManagementForm";
 import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";

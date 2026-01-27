@@ -1,5 +1,5 @@
 import type { StatusApproval } from "@prisma/client";
-import type { ApprovalType } from "@/domain/enums/enums";
+import type { ApprovalType } from "@/domain/enums";
 
 export interface UpdateApprovalData {
   status: StatusApproval;

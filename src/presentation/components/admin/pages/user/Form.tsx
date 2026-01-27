@@ -1,7 +1,7 @@
 "use client";
 
 import { FiUser, FiMail, FiKey, FiUsers, FiLock } from "react-icons/fi";
-import { UserRole, Department, Position } from "@/domain/enums/enums";
+import { UserRole, Department, Position } from "@/domain/enums";
 import { formatEnumValue } from "@/presentation/lib/utils";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";
 import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";

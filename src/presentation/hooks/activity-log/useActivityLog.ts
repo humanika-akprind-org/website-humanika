@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { type ActivityType } from "@/domain/enums/enums";
+import { type ActivityType } from "@/domain/enums";
 
 import { type ActivityMetadata } from "@/domain/entities/activity-log.entity";
 

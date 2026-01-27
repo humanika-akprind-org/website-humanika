@@ -3,9 +3,9 @@ import type {
   CreateArticleInput,
   UpdateArticleInput,
 } from "@/domain/entities/article.entity";
-import type { Status } from "@/domain/enums/enums";
+import type { Status } from "@/domain/enums";
 import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums/enums";
+import { ActivityType } from "@/domain/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 
 type ArticleWithPartialAuthor = Prisma.ArticleGetPayload<{

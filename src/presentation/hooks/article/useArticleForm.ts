@@ -4,7 +4,7 @@ import type {
   CreateArticleInput,
   UpdateArticleInput,
 } from "@/domain/entities/article.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import { useFile } from "@/presentation/hooks/useFile";
 import { articleFolderId } from "@/presentation/lib/config/config";
 import type { Period } from "@/domain/entities/period.entity";

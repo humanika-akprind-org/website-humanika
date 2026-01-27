@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Department, Status } from "@/domain/enums/enums";
+import { Department, Status } from "@/domain/enums";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,

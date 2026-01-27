@@ -5,7 +5,7 @@ import type {
   ManagementFormData,
   ManagementServerData,
 } from "@/domain/entities/management.entity";
-import { Position, Department } from "@/domain/enums/enums";
+import { Position, Department } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 import type { Period } from "@/domain/entities/period.entity";
 import { useFile } from "@/presentation/hooks/useFile";

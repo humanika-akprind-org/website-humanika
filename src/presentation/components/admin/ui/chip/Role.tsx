@@ -1,5 +1,5 @@
 import { FiUser, FiUsers, FiSettings, FiShield } from "react-icons/fi";
-import { UserRole } from "@/domain/enums/enums";
+import { UserRole } from "@/domain/enums";
 import { formatEnumValue } from "@/presentation/services/user";
 
 interface RoleProps {

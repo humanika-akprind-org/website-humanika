@@ -1,4 +1,4 @@
-import { type ActivityType } from "../enums/enums";
+import { type ActivityType } from "../enums";
 
 export interface ActivityMetadata {
   // Data tambahan untuk berbagai jenis aktivitas

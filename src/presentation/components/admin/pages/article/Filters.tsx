@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FiFilter, FiChevronDown } from "react-icons/fi";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import { PeriodApi } from "@/presentation/services/period";
 import { getArticleCategories } from "@/presentation/services/article-category";
 import SearchInput from "../../ui/input/SearchInput";

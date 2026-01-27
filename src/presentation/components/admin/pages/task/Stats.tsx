@@ -7,7 +7,7 @@ import {
   FiFileText,
 } from "react-icons/fi";
 import type { DepartmentTask } from "@/domain/entities/task-department.entity";
-import { Status } from "@/domain/enums/enums";
+import { Status } from "@/domain/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface TaskStatsProps {

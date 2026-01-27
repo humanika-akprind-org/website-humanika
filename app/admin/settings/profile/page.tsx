@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FiUser, FiMail, FiSave, FiEdit3 } from "react-icons/fi";
 import { useToast } from "@/presentation/hooks/use-toast";
-import type { Department, Position } from "@/domain/enums/enums";
+import type { Department, Position } from "@/domain/enums";
 import LoadingProfile from "@/presentation/components/admin/layout/loading/LoadingProfile";
 import { UserApi, formatEnumValue } from "@/presentation/services/user";
 import type { User } from "@/domain/entities/user.entity";
