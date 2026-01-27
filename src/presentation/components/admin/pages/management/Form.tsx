@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation";
 import type {
   Management,
   ManagementServerData,
-} from "@/src/domain/entities/management";
-import { Department, Position } from "@/src/domain/enums/enums";
-import { formatEnumValue } from "@/src/presentation/lib/utils";
-import { useManagementForm } from "@/src/presentation/hooks/management/useManagementForm";
+} from "@/domain/entities/management";
+import { Department, Position } from "@/domain/enums/enums";
+import { formatEnumValue } from "@/presentation/lib/utils";
+import { useManagementForm } from "@/presentation/hooks/management/useManagementForm";
 import { FiUser, FiCalendar, FiHome, FiBriefcase } from "react-icons/fi";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import PhotoUpload from "@/src/presentation/components/admin/ui/input/PhotoUpload";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import PhotoUpload from "@/presentation/components/admin/ui/input/PhotoUpload";
+import CancelButton from "@/presentation/components/ui/CancelButton";
 
 // Mapping department to valid positions
 const DEPARTMENT_POSITIONS: Record<Department, Position[]> = {

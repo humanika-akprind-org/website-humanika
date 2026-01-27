@@ -1,6 +1,6 @@
 "use client";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/src/presentation/components/ui/button";
+import { Button } from "@/presentation/components/ui/button";
 import { useState } from "react";
 
 export default function GoogleDriveConnect() {

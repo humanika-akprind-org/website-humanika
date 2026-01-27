@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Status, FinanceType } from "@/src/domain/enums/enums";
-import { WorkApi } from "@/src/presentation/services/work";
-import { getFinanceCategories } from "@/src/presentation/services/finance-category";
-import { PeriodApi } from "@/src/presentation/services/period";
+import { Status, FinanceType } from "@/domain/enums/enums";
+import { WorkApi } from "@/presentation/services/work";
+import { getFinanceCategories } from "@/presentation/services/finance-category";
+import { PeriodApi } from "@/presentation/services/period";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";

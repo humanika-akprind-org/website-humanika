@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import FinanceCategoryForm from "@/src/presentation/components/admin/pages/finance/category/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useEditFinanceCategory } from "@/src/presentation/hooks/finance-category/useEditFinanceCategory";
+import FinanceCategoryForm from "@/presentation/components/admin/pages/finance/category/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useEditFinanceCategory } from "@/presentation/hooks/finance-category/useEditFinanceCategory";
 
 export default function EditFinanceCategoryPage() {
   const params = useParams();

@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { FiCheck } from "react-icons/fi";
 import { Users } from "lucide-react";
-import type { UserTableProps } from "@/src/domain/entities/user";
+import type { UserTableProps } from "@/domain/entities/user";
 import Avatar from "../../../ui/avatar/Avatar";
 import Role from "../../../ui/chip/Role";
 import PositionChip from "../../../ui/chip/Position";
@@ -14,7 +14,7 @@ import EmptyState from "../../../ui/EmptyState";
 import DropdownMenu, {
   DropdownMenuItem,
 } from "../../../ui/dropdown/DropdownMenu";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 export default function UserTable({
   users,

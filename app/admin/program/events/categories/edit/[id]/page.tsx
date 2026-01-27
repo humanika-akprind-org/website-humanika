@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EventCategoryForm from "@/src/presentation/components/admin/pages/event/category/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useEditEventCategory } from "@/src/presentation/hooks/event-category/useEditEventCategory";
+import EventCategoryForm from "@/presentation/components/admin/pages/event/category/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useEditEventCategory } from "@/presentation/hooks/event-category/useEditEventCategory";
 
 export default function EditEventCategoryPage() {
   const params = useParams();

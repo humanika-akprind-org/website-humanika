@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useState } from "react";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
 
 interface ImageViewProps {
   imageUrl?: string | null;

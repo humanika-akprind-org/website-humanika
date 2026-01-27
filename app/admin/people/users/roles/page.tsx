@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import UserStats from "@/src/presentation/components/admin/pages/user/roles/Stats";
-import UserFilters from "@/src/presentation/components/admin/pages/user/roles/Filters";
-import UserTable from "@/src/presentation/components/admin/pages/user/roles/Table";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import UserStats from "@/presentation/components/admin/pages/user/roles/Stats";
+import UserFilters from "@/presentation/components/admin/pages/user/roles/Filters";
+import UserTable from "@/presentation/components/admin/pages/user/roles/Table";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import VerifyButton from "@/src/presentation/components/admin/ui/button/VerifyButton";
-import { useUnverifiedUserManagement } from "@/src/presentation/hooks/user/useUnverifiedUserManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import VerifyButton from "@/presentation/components/admin/ui/button/VerifyButton";
+import { useUnverifiedUserManagement } from "@/presentation/hooks/user/useUnverifiedUserManagement";
 
 export default function UsersPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);

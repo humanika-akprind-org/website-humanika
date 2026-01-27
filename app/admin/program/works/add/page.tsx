@@ -1,11 +1,11 @@
 // app/(admin)/admin/people/users/add/page.tsx
 "use client";
 
-import WorkProgramForm from "@/src/presentation/components/admin/pages/work/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateWorkProgram } from "@/src/presentation/hooks/work-program/useCreateWorkProgram";
+import WorkProgramForm from "@/presentation/components/admin/pages/work/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateWorkProgram } from "@/presentation/hooks/work-program/useCreateWorkProgram";
 
 export default function AddUserPage() {
   const {

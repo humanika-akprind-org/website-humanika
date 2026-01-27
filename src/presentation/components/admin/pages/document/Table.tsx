@@ -1,6 +1,6 @@
 import { FiEdit, FiTrash, FiEye, FiDownload } from "react-icons/fi";
 import { SquareLibrary, BookText, BookCheck } from "lucide-react";
-import type { Document } from "@/src/domain/entities/document";
+import type { Document } from "@/domain/entities/document";
 
 import Checkbox from "../../ui/checkbox/Checkbox";
 import StatusChip from "../../ui/chip/Status";
@@ -11,8 +11,8 @@ import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import { useRef, useState } from "react";
-import { getGoogleDriveDirectUrl } from "@/src/infrastructure/external-services/google-drive/file-utils";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { getGoogleDriveDirectUrl } from "@/infrastructure/external-services/google-drive/file-utils";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface DocumentTableProps {
   documents: Document[];

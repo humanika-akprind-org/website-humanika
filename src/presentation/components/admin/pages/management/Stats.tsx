@@ -3,7 +3,7 @@
 import React from "react";
 import { FiUsers, FiCode, FiZap, FiShield } from "react-icons/fi";
 import StatCard from "../../ui/card/StatCard";
-import type { Management } from "@/src/domain/entities/management";
+import type { Management } from "@/domain/entities/management";
 
 interface ManagementStatsProps {
   managements: Management[];

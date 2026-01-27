@@ -7,26 +7,26 @@ import type {
   Letter,
   CreateLetterInput,
   UpdateLetterInput,
-} from "@/src/domain/entities/letter";
+} from "@/domain/entities/letter";
 import {
   LetterType,
   LetterPriority,
   LetterClassification,
-} from "@/src/domain/enums/enums";
-import type { Period } from "@/src/domain/entities/period";
-import type { Event } from "@/src/domain/entities/event";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import DateInput from "@/src/presentation/components/admin/ui/date/DateInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import FileUpload from "@/src/presentation/components/admin/ui/input/FileUpload";
-import { useLetterForm } from "@/src/presentation/hooks/letter/useLetterForm";
-import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
+} from "@/domain/enums/enums";
+import type { Period } from "@/domain/entities/period";
+import type { Event } from "@/domain/entities/event";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import DateInput from "@/presentation/components/admin/ui/date/DateInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import FileUpload from "@/presentation/components/admin/ui/input/FileUpload";
+import { useLetterForm } from "@/presentation/hooks/letter/useLetterForm";
+import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";
 import {
   getGoogleDrivePreviewUrl,
   getFileIdFromFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 interface LetterFormProps {
   letter?: Letter;

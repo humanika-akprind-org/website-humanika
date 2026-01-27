@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { bulkVerifyUsers } from "@/src/infrastructure/repositories/user/user.service";
+import { bulkVerifyUsers } from "@/infrastructure/repositories/user/user.service";
 
 // POST - Bulk verify users
 export async function POST(request: NextRequest) {

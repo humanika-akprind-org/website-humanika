@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getEventBySlug } from "@/src/infrastructure/repositories/event/event.service";
+import { getEventBySlug } from "@/infrastructure/repositories/event/event.service";
 
 /**
  * Event Slug API Route - uses slug for public URLs

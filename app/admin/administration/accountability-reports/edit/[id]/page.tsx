@@ -1,12 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import DocumentForm from "@/src/presentation/components/admin/pages/document/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useEditDocument } from "@/src/presentation/hooks/document/useEditDocument";
-import { useDocumentFormData } from "@/src/presentation/hooks/document/useDocumentFormData";
+import DocumentForm from "@/presentation/components/admin/pages/document/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useEditDocument } from "@/presentation/hooks/document/useEditDocument";
+import { useDocumentFormData } from "@/presentation/hooks/document/useDocumentFormData";
 
 export default function EditDocumentPage() {
   const params = useParams();

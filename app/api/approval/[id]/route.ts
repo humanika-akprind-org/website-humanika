@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   updateApproval,
   deleteApproval,
-} from "@/src/infrastructure/repositories/approval/approval.service";
+} from "@/infrastructure/repositories/approval/approval.service";
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

@@ -3,7 +3,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/src/presentation/components/ui/card";
+} from "@/presentation/components/ui/card";
 
 export default function DashboardStats() {
   return (

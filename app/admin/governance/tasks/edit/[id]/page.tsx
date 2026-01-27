@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import TaskForm from "@/src/presentation/components/admin/pages/task/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import { useEditTask } from "@/src/presentation/hooks/task/useEditTask";
+import TaskForm from "@/presentation/components/admin/pages/task/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import { useEditTask } from "@/presentation/hooks/task/useEditTask";
 
 export default function EditTaskPage() {
   const params = useParams();

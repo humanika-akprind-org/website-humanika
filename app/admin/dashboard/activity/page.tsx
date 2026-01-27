@@ -18,11 +18,11 @@ import {
   User,
 } from "lucide-react";
 
-import type { ActivityLog } from "@/src/domain/entities/activity-log";
-import SelectFilter from "@/src/presentation/components/admin/ui/input/SelectFilter";
-import ExportButtons from "@/src/presentation/components/admin/pages/activity/export-button/ExportButtons";
-import LoadingActivityDashboard from "@/src/presentation/components/admin/pages/activity/LoadingActivityDashboard";
-import StatCard from "@/src/presentation/components/admin/ui/card/StatCard";
+import type { ActivityLog } from "@/domain/entities/activity-log";
+import SelectFilter from "@/presentation/components/admin/ui/input/SelectFilter";
+import ExportButtons from "@/presentation/components/admin/pages/activity/export-button/ExportButtons";
+import LoadingActivityDashboard from "@/presentation/components/admin/pages/activity/LoadingActivityDashboard";
+import StatCard from "@/presentation/components/admin/ui/card/StatCard";
 
 export default function ActivityPage() {
   const [activities, setActivities] = useState<ActivityLog[]>([]);

@@ -6,25 +6,25 @@ import type {
   Finance,
   CreateFinanceInput,
   UpdateFinanceInput,
-} from "@/src/domain/entities/finance";
-import { FinanceType, Status } from "@/src/domain/enums/enums";
-import type { FinanceCategory } from "@/src/domain/value-objects/finance-category";
-import type { WorkProgram } from "@/src/domain/entities/work";
-import type { Period } from "@/src/domain/entities/period";
+} from "@/domain/entities/finance";
+import { FinanceType, Status } from "@/domain/enums/enums";
+import type { FinanceCategory } from "@/domain/value-objects/finance-category";
+import type { WorkProgram } from "@/domain/entities/work";
+import type { Period } from "@/domain/entities/period";
 import { FiBriefcase, FiCalendar } from "react-icons/fi";
-import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import CurrencyInput from "@/src/presentation/components/admin/ui/input/CurrencyInput";
-import DateInput from "@/src/presentation/components/admin/ui/date/DateInput";
-import FileUpload from "@/src/presentation/components/admin/ui/input/FileUpload";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import { useFinanceForm } from "@/src/presentation/hooks/finance/useFinanceForm";
+import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import CurrencyInput from "@/presentation/components/admin/ui/input/CurrencyInput";
+import DateInput from "@/presentation/components/admin/ui/date/DateInput";
+import FileUpload from "@/presentation/components/admin/ui/input/FileUpload";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import { useFinanceForm } from "@/presentation/hooks/finance/useFinanceForm";
 import {
   getGoogleDrivePreviewUrl,
   getFileIdFromFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 interface FinanceFormProps {
   finance?: Finance;

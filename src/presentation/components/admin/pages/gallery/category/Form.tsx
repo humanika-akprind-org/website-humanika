@@ -6,14 +6,14 @@ import type {
   GalleryCategory,
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
-} from "@/src/domain/value-objects/gallery-category";
+} from "@/domain/value-objects/gallery-category";
 
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import { Textarea } from "@/src/presentation/components/ui/textarea";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import { Textarea } from "@/presentation/components/ui/textarea";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
 import { FiImage } from "react-icons/fi";
-import { useGalleryCategoryForm } from "@/src/presentation/hooks/gallery-category/useGalleryCategoryForm";
+import { useGalleryCategoryForm } from "@/presentation/hooks/gallery-category/useGalleryCategoryForm";
 
 interface GalleryCategoryFormProps {
   category?: GalleryCategory;

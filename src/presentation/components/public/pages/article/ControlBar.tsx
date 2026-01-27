@@ -12,7 +12,7 @@ import {
 import type {
   SortOption,
   ViewMode,
-} from "@/src/presentation/hooks/article/constants";
+} from "@/presentation/hooks/article/constants";
 
 interface Category {
   id: string;

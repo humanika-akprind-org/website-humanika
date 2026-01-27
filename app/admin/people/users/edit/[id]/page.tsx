@@ -2,11 +2,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import UserEditForm from "@/src/presentation/components/admin/pages/user/EditForm";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import { useEditUser } from "@/src/presentation/hooks/user/useEditUser";
+import UserEditForm from "@/presentation/components/admin/pages/user/EditForm";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import { useEditUser } from "@/presentation/hooks/user/useEditUser";
 
 export default function EditUserPage() {
   const params = useParams();

@@ -1,23 +1,23 @@
 "use client";
 
-import UserStats from "@/src/presentation/components/admin/pages/user/Stats";
-import UserFilters from "@/src/presentation/components/admin/pages/user/Filters";
-import UserTable from "@/src/presentation/components/admin/pages/user/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import UserStats from "@/presentation/components/admin/pages/user/Stats";
+import UserFilters from "@/presentation/components/admin/pages/user/Filters";
+import UserTable from "@/presentation/components/admin/pages/user/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import Avatar from "@/src/presentation/components/admin/ui/avatar/Avatar";
-import Role from "@/src/presentation/components/admin/ui/chip/Role";
-import DepartmentChip from "@/src/presentation/components/admin/ui/chip/Department";
-import PositionChip from "@/src/presentation/components/admin/ui/chip/Position";
-import ActiveChip from "@/src/presentation/components/admin/ui/chip/Active";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import { useUserManagement } from "@/src/presentation/hooks/user/useUserManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import Avatar from "@/presentation/components/admin/ui/avatar/Avatar";
+import Role from "@/presentation/components/admin/ui/chip/Role";
+import DepartmentChip from "@/presentation/components/admin/ui/chip/Department";
+import PositionChip from "@/presentation/components/admin/ui/chip/Position";
+import ActiveChip from "@/presentation/components/admin/ui/chip/Active";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import { useUserManagement } from "@/presentation/hooks/user/useUserManagement";
 
 export default function UsersPage() {
   const {

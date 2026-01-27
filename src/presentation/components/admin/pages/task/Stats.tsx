@@ -6,8 +6,8 @@ import {
   FiTrendingUp,
   FiFileText,
 } from "react-icons/fi";
-import type { DepartmentTask } from "@/src/domain/entities/task";
-import { Status } from "@/src/domain/enums/enums";
+import type { DepartmentTask } from "@/domain/entities/task";
+import { Status } from "@/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface TaskStatsProps {

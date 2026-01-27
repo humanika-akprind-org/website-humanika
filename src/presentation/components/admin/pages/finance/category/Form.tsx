@@ -6,16 +6,16 @@ import type {
   FinanceCategory,
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
-} from "@/src/domain/value-objects/finance-category";
-import { FinanceType } from "@/src/domain/enums/enums";
+} from "@/domain/value-objects/finance-category";
+import { FinanceType } from "@/domain/enums/enums";
 
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import { Textarea } from "@/src/presentation/components/ui/textarea";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import { Textarea } from "@/presentation/components/ui/textarea";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
 import { FiTag } from "react-icons/fi";
-import { useFinanceCategoryForm } from "@/src/presentation/hooks/finance-category/useFinanceCategoryForm";
+import { useFinanceCategoryForm } from "@/presentation/hooks/finance-category/useFinanceCategoryForm";
 
 interface FinanceCategoryFormProps {
   category?: FinanceCategory;

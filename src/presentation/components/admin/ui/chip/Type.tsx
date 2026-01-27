@@ -1,4 +1,4 @@
-import { LetterType } from "@/src/domain/enums/enums";
+import { LetterType } from "@/domain/enums/enums";
 
 interface TypeChipProps {
   type: LetterType;

@@ -1,11 +1,11 @@
 "use client";
 
-import GalleryForm from "@/src/presentation/components/admin/pages/gallery/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateGallery } from "@/src/presentation/hooks/gallery/useCreateGallery";
-import { useGalleryFormData } from "@/src/presentation/hooks/gallery/useGalleryFormData";
+import GalleryForm from "@/presentation/components/admin/pages/gallery/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateGallery } from "@/presentation/hooks/gallery/useCreateGallery";
+import { useGalleryFormData } from "@/presentation/hooks/gallery/useGalleryFormData";
 
 export default function AddGalleryPage() {
   const { createGallery, handleBack, isSubmitting, error, isLoading } =

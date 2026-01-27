@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
-import { fetchDriveFolders } from "@/src/presentation/services/google-drive";
+import { fetchDriveFolders } from "@/presentation/services/google-drive";
 import type { drive_v3 } from "googleapis/build/src/apis/drive/v3";
-import type { UseDriveFoldersReturn } from "@/src/domain/value-objects/google-drive";
+import type { UseDriveFoldersReturn } from "@/domain/value-objects/google-drive";
 
 export function useDriveFolders(accessToken: string): UseDriveFoldersReturn {
   const [folders, setFolders] = useState<drive_v3.Schema$File[]>([]);

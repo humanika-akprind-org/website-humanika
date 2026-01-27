@@ -1,10 +1,10 @@
 "use client";
 
-import TaskForm from "@/src/presentation/components/admin/pages/task/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateTask } from "@/src/presentation/hooks/task/useCreateTask";
+import TaskForm from "@/presentation/components/admin/pages/task/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateTask } from "@/presentation/hooks/task/useCreateTask";
 
 export default function AddTaskPage() {
   const { createTask, handleBack, isSubmitting, error, isLoading } =

@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { Camera, Grid3x3 } from "lucide-react";
 import AlbumGrid from "../card/album/AlbumGrid";
 import GalleryGrid from "../card/gallery/GalleryGrid";
-import type { Album } from "@/src/presentation/lib/gallery-utils";
-import type { Gallery } from "@/src/domain/entities/gallery";
+import type { Album } from "@/presentation/lib/gallery-utils";
+import type { Gallery } from "@/domain/entities/gallery";
 import { ANIMATION_DELAYS } from "./constants";
 
 interface GalleryContentProps {

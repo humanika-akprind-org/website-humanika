@@ -1,10 +1,10 @@
 import { useState } from "react";
-import type { UserFilters as UserFiltersType } from "@/src/domain/entities/user";
+import type { UserFilters as UserFiltersType } from "@/domain/entities/user";
 import {
   userRoleOptions,
   departmentOptions,
   positionOptions,
-} from "@/src/presentation/services/user";
+} from "@/presentation/services/user";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";

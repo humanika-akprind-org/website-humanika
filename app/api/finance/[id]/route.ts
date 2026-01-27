@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateFinanceInput } from "@/src/domain/entities/finance";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { UpdateFinanceInput } from "@/domain/entities/finance";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getFinance,
   updateFinance,
   deleteFinance,
-} from "@/src/infrastructure/repositories/finance/finance.service";
+} from "@/infrastructure/repositories/finance/finance.service";
 
 export async function GET(
   _request: NextRequest,

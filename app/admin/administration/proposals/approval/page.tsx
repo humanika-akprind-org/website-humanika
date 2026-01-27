@@ -1,13 +1,13 @@
 "use client";
 
-import { useDocumentApproval } from "@/src/presentation/hooks/document/useDocumentApproval";
-import ApprovalFilters from "@/src/presentation/components/admin/pages/approval/Filters";
-import ApprovalTable from "@/src/presentation/components/admin/pages/approval/Table";
-import ApprovalActionModal from "@/src/presentation/components/admin/pages/approval/ActionModal";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import LoadingApproval from "@/src/presentation/components/admin/layout/loading/LoadingApproval";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import { ApprovalType } from "@/src/domain/enums/enums";
+import { useDocumentApproval } from "@/presentation/hooks/document/useDocumentApproval";
+import ApprovalFilters from "@/presentation/components/admin/pages/approval/Filters";
+import ApprovalTable from "@/presentation/components/admin/pages/approval/Table";
+import ApprovalActionModal from "@/presentation/components/admin/pages/approval/ActionModal";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import LoadingApproval from "@/presentation/components/admin/layout/loading/LoadingApproval";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import { ApprovalType } from "@/domain/enums/enums";
 
 export default function DocumentApprovalPage() {
   const {

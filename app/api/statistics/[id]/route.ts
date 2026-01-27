@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateStatisticInput } from "@/src/domain/entities/statistic";
+import type { UpdateStatisticInput } from "@/domain/entities/statistic";
 import {
   getStatistic,
   updateStatistic,
   deleteStatistic,
-} from "@/src/infrastructure/repositories/statistic/statistic.service";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+} from "@/infrastructure/repositories/statistic/statistic.service";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 interface StatisticParams {
   params: Promise<{ id: string }>;

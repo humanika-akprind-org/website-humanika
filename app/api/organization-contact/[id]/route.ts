@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateOrganizationContactInput } from "@/src/domain/entities/organization-contact";
+import type { UpdateOrganizationContactInput } from "@/domain/entities/organization-contact";
 import {
   getOrganizationContact,
   updateOrganizationContact,
   deleteOrganizationContact,
-} from "@/src/infrastructure/repositories/organization-contact/organization-contact.service";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+} from "@/infrastructure/repositories/organization-contact/organization-contact.service";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 interface OrganizationContactParams {
   params: Promise<{ id: string }>;

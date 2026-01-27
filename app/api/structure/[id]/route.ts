@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateOrganizationalStructureInput } from "@/src/domain/entities/structure";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { UpdateOrganizationalStructureInput } from "@/domain/entities/structure";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getStructure,
   updateStructure,
   deleteStructure,
-} from "@/src/infrastructure/repositories/structure/structure.service";
+} from "@/infrastructure/repositories/structure/structure.service";
 
 export async function GET(
   _request: NextRequest,

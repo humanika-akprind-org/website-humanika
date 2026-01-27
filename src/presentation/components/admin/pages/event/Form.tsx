@@ -6,18 +6,18 @@ import type {
   Event,
   CreateEventInput,
   UpdateEventInput,
-} from "@/src/domain/entities/event";
-import { Department as DepartmentEnum } from "@/src/domain/enums/enums";
-import type { User } from "@/src/domain/entities/user";
-import type { Period } from "@/src/domain/entities/period";
+} from "@/domain/entities/event";
+import { Department as DepartmentEnum } from "@/domain/enums/enums";
+import type { User } from "@/domain/entities/user";
+import type { Period } from "@/domain/entities/period";
 import { FiBriefcase, FiUser, FiFolder } from "react-icons/fi";
-import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import ImageUpload from "@/src/presentation/components/admin/ui/input/ImageUpload";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import { useEventForm } from "@/src/presentation/hooks/event/useEventForm";
+import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import ImageUpload from "@/presentation/components/admin/ui/input/ImageUpload";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import { useEventForm } from "@/presentation/hooks/event/useEventForm";
 import ScheduleInput from "../../ui/input/ScheduleInput";
 
 interface EventFormProps {

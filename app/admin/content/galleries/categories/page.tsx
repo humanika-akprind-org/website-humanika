@@ -1,17 +1,17 @@
 "use client";
 
-import GalleryCategoryStats from "@/src/presentation/components/admin/pages/gallery/category/Stats";
-import GalleryCategoryFilters from "@/src/presentation/components/admin/pages/gallery/category/Filters";
-import GalleryCategoryTable from "@/src/presentation/components/admin/pages/gallery/category/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import GalleryCategoryStats from "@/presentation/components/admin/pages/gallery/category/Stats";
+import GalleryCategoryFilters from "@/presentation/components/admin/pages/gallery/category/Filters";
+import GalleryCategoryTable from "@/presentation/components/admin/pages/gallery/category/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import { useGalleryCategoryManagement } from "@/src/presentation/hooks/gallery-category/useGalleryCategoryManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import { useGalleryCategoryManagement } from "@/presentation/hooks/gallery-category/useGalleryCategoryManagement";
 
 export default function GalleryCategoriesPage() {
   const {

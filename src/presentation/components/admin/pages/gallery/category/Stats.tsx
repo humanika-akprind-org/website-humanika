@@ -1,5 +1,5 @@
 import { FiTag, FiFileText } from "react-icons/fi";
-import type { GalleryCategory } from "@/src/domain/value-objects/gallery-category";
+import type { GalleryCategory } from "@/domain/value-objects/gallery-category";
 import StatCard from "../../../ui/card/StatCard";
 
 interface GalleryCategoryStatsProps {

@@ -6,14 +6,14 @@ import type {
   WorkProgram,
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
-} from "@/src/domain/entities/work";
-import { Department } from "@/src/domain/enums/enums";
-import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import CurrencyInput from "@/src/presentation/components/admin/ui/input/CurrencyInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
+} from "@/domain/entities/work";
+import { Department } from "@/domain/enums/enums";
+import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import CurrencyInput from "@/presentation/components/admin/ui/input/CurrencyInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
 import {
   FiFileText,
   FiBriefcase,
@@ -23,7 +23,7 @@ import {
   FiTrendingDown,
   FiUser,
 } from "react-icons/fi";
-import { useWorkForm } from "@/src/presentation/hooks/work-program/useWorkForm";
+import { useWorkForm } from "@/presentation/hooks/work-program/useWorkForm";
 
 interface WorkProgramFormProps {
   workProgram?: WorkProgram;

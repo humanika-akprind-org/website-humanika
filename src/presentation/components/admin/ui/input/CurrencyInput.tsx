@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { cn } from "@/src/presentation/lib/utils";
+import { cn } from "@/presentation/lib/utils";
 
 interface CurrencyInputProps {
   label: string;

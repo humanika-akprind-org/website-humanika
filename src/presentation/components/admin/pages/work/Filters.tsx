@@ -1,13 +1,13 @@
 "use client";
 
-import { Department, Status } from "@/src/domain/enums/enums";
+import { Department, Status } from "@/domain/enums/enums";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";
 import DeleteSelectedButton from "../../ui/button/DeleteSelectedButton";
 import { useEffect, useState } from "react";
 import { type Period } from "@prisma/client";
-import { getPeriods } from "@/src/presentation/services/period";
+import { getPeriods } from "@/presentation/services/period";
 
 interface WorkFiltersProps {
   filters: Record<string, string>;

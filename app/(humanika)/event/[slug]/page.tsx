@@ -2,13 +2,13 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
-import { useEventDetailPage } from "@/src/presentation/hooks/event/useEventDetailPage";
-import EventDetailHeroSection from "@/src/presentation/components/public/sections/event/detail/EventDetailHeroSection";
-import EventDetailContentSection from "@/src/presentation/components/public/sections/event/detail/EventDetailContentSection";
-import EventSections from "@/src/presentation/components/public/sections/event/EventSections";
-import EventDetailLoadingState from "@/src/presentation/components/public/pages/event/EventDetailLoadingState";
-import EventErrorState from "@/src/presentation/components/public/pages/event/EventErrorState";
-import EventNotFoundState from "@/src/presentation/components/public/pages/event/EventNotFoundState";
+import { useEventDetailPage } from "@/presentation/hooks/event/useEventDetailPage";
+import EventDetailHeroSection from "@/presentation/components/public/sections/event/detail/EventDetailHeroSection";
+import EventDetailContentSection from "@/presentation/components/public/sections/event/detail/EventDetailContentSection";
+import EventSections from "@/presentation/components/public/sections/event/EventSections";
+import EventDetailLoadingState from "@/presentation/components/public/pages/event/EventDetailLoadingState";
+import EventErrorState from "@/presentation/components/public/pages/event/EventErrorState";
+import EventNotFoundState from "@/presentation/components/public/pages/event/EventNotFoundState";
 
 /**
  * Event detail page component

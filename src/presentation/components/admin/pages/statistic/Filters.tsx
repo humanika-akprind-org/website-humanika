@@ -1,7 +1,7 @@
 "use client";
 
-import DeleteSelectedButton from "@/src/presentation/components/admin/ui/button/DeleteSelectedButton";
-import SearchInput from "@/src/presentation/components/admin/ui/input/SearchInput";
+import DeleteSelectedButton from "@/presentation/components/admin/ui/button/DeleteSelectedButton";
+import SearchInput from "@/presentation/components/admin/ui/input/SearchInput";
 
 interface StatisticFiltersProps {
   searchTerm: string;

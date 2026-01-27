@@ -3,7 +3,7 @@ import { Calendar, Trophy, BarChart3, Clock } from "lucide-react";
 import type {
   EventTab,
   EventStats,
-} from "@/src/presentation/hooks/event/useEventPage";
+} from "@/presentation/hooks/event/useEventPage";
 
 interface EventTabsProps {
   activeTab: EventTab;

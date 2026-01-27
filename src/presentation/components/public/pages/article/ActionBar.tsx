@@ -2,8 +2,8 @@
 
 import React from "react";
 import { Bookmark } from "lucide-react";
-import ShareButton from "@/src/presentation/components/public/ui/ShareButton";
-import type { Article } from "@/src/domain/entities/article";
+import ShareButton from "@/presentation/components/public/ui/ShareButton";
+import type { Article } from "@/domain/entities/article";
 
 interface ActionBarProps {
   article: Article;

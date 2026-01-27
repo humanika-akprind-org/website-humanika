@@ -1,10 +1,10 @@
 "use client";
 
-import LoadingActivity from "@/src/presentation/components/admin/layout/loading/LoadingActivity";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import ActivityFilters from "@/src/presentation/components/admin/pages/activity/Filters";
-import ActivityTable from "@/src/presentation/components/admin/pages/activity/Table";
-import { useActivityPage } from "@/src/presentation/hooks/activity-log/useActivityPage";
+import LoadingActivity from "@/presentation/components/admin/layout/loading/LoadingActivity";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import ActivityFilters from "@/presentation/components/admin/pages/activity/Filters";
+import ActivityTable from "@/presentation/components/admin/pages/activity/Table";
+import { useActivityPage } from "@/presentation/hooks/activity-log/useActivityPage";
 
 export default function ActivityLogPage() {
   const {

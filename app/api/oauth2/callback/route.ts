@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { oauth2Client } from "@/src/infrastructure/external-services/google-drive/google-oauth";
+import { oauth2Client } from "@/infrastructure/external-services/google-drive/google-oauth";
 import { cookies } from "next/headers";
-import { isProduction } from "@/src/presentation/lib/config/config";
+import { isProduction } from "@/presentation/lib/config/config";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

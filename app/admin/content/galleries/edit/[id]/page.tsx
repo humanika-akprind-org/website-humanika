@@ -1,22 +1,22 @@
-import GalleryForm from "@/src/presentation/components/admin/pages/gallery/Form";
-import AuthGuard from "@/src/presentation/components/admin/auth/google-oauth/AuthGuard";
-import { getGoogleAccessToken } from "@/src/infrastructure/external-services/google-drive/google-oauth";
+import GalleryForm from "@/presentation/components/admin/pages/gallery/Form";
+import AuthGuard from "@/presentation/components/admin/auth/google-oauth/AuthGuard";
+import { getGoogleAccessToken } from "@/infrastructure/external-services/google-drive/google-oauth";
 import type {
   Gallery,
   UpdateGalleryInput,
-} from "@/src/domain/entities/gallery";
-import type { Event } from "@/src/domain/entities/event";
-import type { Period } from "@/src/domain/entities/period";
+} from "@/domain/entities/gallery";
+import type { Event } from "@/domain/entities/event";
+import type { Period } from "@/domain/entities/period";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import { redirect, notFound } from "next/navigation";
 import {
   getGallery,
   updateGallery,
   getEventsForGalleryForm,
   getPeriodsForForm,
-} from "@/src/infrastructure/repositories/gallery/gallery.service";
+} from "@/infrastructure/repositories/gallery/gallery.service";
 
 async function EditGalleryPage({
   params,

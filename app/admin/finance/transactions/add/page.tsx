@@ -1,11 +1,11 @@
 "use client";
 
-import FinanceForm from "@/src/presentation/components/admin/pages/finance/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateFinance } from "@/src/presentation/hooks/finance/useCreateFinance";
-import { useFinanceFormData } from "@/src/presentation/hooks/finance/useFinanceFormData";
+import FinanceForm from "@/presentation/components/admin/pages/finance/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateFinance } from "@/presentation/hooks/finance/useCreateFinance";
+import { useFinanceFormData } from "@/presentation/hooks/finance/useFinanceFormData";
 export default function AddFinancePage() {
   const {
     createFinance,

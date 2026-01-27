@@ -3,12 +3,12 @@
 import { useRouter } from "next/navigation";
 import StatisticForm, {
   type StatisticFormData,
-} from "@/src/presentation/components/admin/pages/statistic/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import { useStatisticManagement } from "@/src/presentation/hooks/statistic/useStatisticManagement";
-import { usePeriods } from "@/src/presentation/hooks/period/usePeriods";
+} from "@/presentation/components/admin/pages/statistic/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import { useStatisticManagement } from "@/presentation/hooks/statistic/useStatisticManagement";
+import { usePeriods } from "@/presentation/hooks/period/usePeriods";
 
 export default function AddStatisticPage() {
   const router = useRouter();

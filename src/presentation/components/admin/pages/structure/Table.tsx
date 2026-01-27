@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
 import { Network } from "lucide-react";
 import Image from "next/image";
-import type { OrganizationalStructure } from "@/src/domain/entities/structure";
+import type { OrganizationalStructure } from "@/domain/entities/structure";
 import StatusChip from "../../ui/chip/Status";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -16,8 +16,8 @@ import ViewModal from "../../ui/modal/ViewModal";
 import {
   getGoogleDriveDirectUrl,
   getFileIdFromFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+} from "@/infrastructure/external-services/google-drive/file-utils";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface StructureTableProps {
   structures: OrganizationalStructure[];

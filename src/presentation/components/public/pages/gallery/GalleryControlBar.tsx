@@ -9,7 +9,7 @@ import {
   Heart,
   Users,
 } from "lucide-react";
-import type { Event } from "@/src/domain/entities/event";
+import type { Event } from "@/domain/entities/event";
 import { SORT_OPTIONS, VIEW_MODE_OPTIONS, ANIMATION_DELAYS } from "./constants";
 import {
   Select,
@@ -17,7 +17,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/src/presentation/components/ui/select";
+} from "@/presentation/components/ui/select";
 
 const iconMap = {
   Calendar,

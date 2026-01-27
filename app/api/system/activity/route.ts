@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { ActivityType } from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { ActivityType } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getActivities,
   createActivity,
-} from "@/src/infrastructure/repositories/activity/activity.service";
+} from "@/infrastructure/repositories/activity/activity.service";
 
 export async function GET(req: NextRequest) {
   try {

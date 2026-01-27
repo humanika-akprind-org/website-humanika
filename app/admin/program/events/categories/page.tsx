@@ -1,17 +1,17 @@
 "use client";
 
-import EventCategoryStats from "@/src/presentation/components/admin/pages/event/category/Stats";
-import EventCategoryFilters from "@/src/presentation/components/admin/pages/event/category/Filters";
-import EventCategoryTable from "@/src/presentation/components/admin/pages/event/category/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import EventCategoryStats from "@/presentation/components/admin/pages/event/category/Stats";
+import EventCategoryFilters from "@/presentation/components/admin/pages/event/category/Filters";
+import EventCategoryTable from "@/presentation/components/admin/pages/event/category/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import { useEventCategoryManagement } from "@/src/presentation/hooks/event-category/useEventCategoryManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import { useEventCategoryManagement } from "@/presentation/hooks/event-category/useEventCategoryManagement";
 
 export default function EventCategoriesPage() {
   const {

@@ -2,14 +2,14 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
-import { useArticleDetail } from "@/src/presentation/hooks/article/useArticleDetail";
-import { useBookmark } from "@/src/presentation/hooks/article/useBookmark";
-import ArticleHeroSection from "@/src/presentation/components/public/sections/article/detail/ArticleHeroSection";
-import ArticleContentSection from "@/src/presentation/components/public/sections/article/detail/ArticleContentSection";
-import ArticleDetailLoadingState from "@/src/presentation/components/public/pages/article/ArticleDetailLoadingState";
-import ArticleNotFoundState from "@/src/presentation/components/public/pages/article/ArticleNotFoundState";
-import ArticleErrorState from "@/src/presentation/components/public/pages/article/ArticleErrorState";
-import RelatedArticlesSection from "@/src/presentation/components/public/sections/article/RelatedArticlesSection";
+import { useArticleDetail } from "@/presentation/hooks/article/useArticleDetail";
+import { useBookmark } from "@/presentation/hooks/article/useBookmark";
+import ArticleHeroSection from "@/presentation/components/public/sections/article/detail/ArticleHeroSection";
+import ArticleContentSection from "@/presentation/components/public/sections/article/detail/ArticleContentSection";
+import ArticleDetailLoadingState from "@/presentation/components/public/pages/article/ArticleDetailLoadingState";
+import ArticleNotFoundState from "@/presentation/components/public/pages/article/ArticleNotFoundState";
+import ArticleErrorState from "@/presentation/components/public/pages/article/ArticleErrorState";
+import RelatedArticlesSection from "@/presentation/components/public/sections/article/RelatedArticlesSection";
 
 export default function ArticleDetail() {
   const params = useParams();

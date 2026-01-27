@@ -1,17 +1,17 @@
 "use client";
 
-import FinanceCategoryStats from "@/src/presentation/components/admin/pages/finance/category/Stats";
-import FinanceCategoryFilters from "@/src/presentation/components/admin/pages/finance/category/Filters";
-import FinanceCategoryTable from "@/src/presentation/components/admin/pages/finance/category/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import FinanceCategoryStats from "@/presentation/components/admin/pages/finance/category/Stats";
+import FinanceCategoryFilters from "@/presentation/components/admin/pages/finance/category/Filters";
+import FinanceCategoryTable from "@/presentation/components/admin/pages/finance/category/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import { useFinanceCategoryManagement } from "@/src/presentation/hooks/finance-category/useFinanceCategoryManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import { useFinanceCategoryManagement } from "@/presentation/hooks/finance-category/useFinanceCategoryManagement";
 
 export default function FinanceCategoriesPage() {
   const {

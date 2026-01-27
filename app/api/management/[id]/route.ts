@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
-import { ManagementService } from "@/src/infrastructure/repositories/management/management.service";
-import type { ManagementServerData } from "@/src/domain/entities/management";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
+import { ManagementService } from "@/infrastructure/repositories/management/management.service";
+import type { ManagementServerData } from "@/domain/entities/management";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -119,7 +119,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
           if (accessToken) {
             const { callApi } =
-              await import("@/src/presentation/services/google-drive");
+              await import("@/presentation/services/google-drive");
             await callApi({
               action: "delete",
               fileId,

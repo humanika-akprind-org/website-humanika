@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getArticle, updateArticle } from "@/src/presentation/services/article";
+import { getArticle, updateArticle } from "@/presentation/services/article";
 import type {
   CreateArticleInput,
   UpdateArticleInput,
   Article,
-} from "@/src/domain/entities/article";
+} from "@/domain/entities/article";
 
 export function useEditArticle(articleId: string) {
   const router = useRouter();

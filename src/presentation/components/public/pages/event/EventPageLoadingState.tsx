@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import SectionHeaderSkeleton from "@/src/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
-import StatsSkeleton from "@/src/presentation/components/public/ui/skeleton/StatsSkeleton";
-import CategoryPillsSkeleton from "@/src/presentation/components/public/ui/skeleton/CategoryPillsSkeleton";
-import CardSkeleton from "@/src/presentation/components/public/ui/skeleton/CardSkeleton";
+import SectionHeaderSkeleton from "@/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
+import StatsSkeleton from "@/presentation/components/public/ui/skeleton/StatsSkeleton";
+import CategoryPillsSkeleton from "@/presentation/components/public/ui/skeleton/CategoryPillsSkeleton";
+import CardSkeleton from "@/presentation/components/public/ui/skeleton/CardSkeleton";
 
 export default function EventPageLoadingState() {
   return (

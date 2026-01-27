@@ -3,12 +3,12 @@
 import { useRouter } from "next/navigation";
 import OrganizationContactForm, {
   type OrganizationContactFormData,
-} from "@/src/presentation/components/admin/pages/organization-contact/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import { useOrganizationContactManagement } from "@/src/presentation/hooks/organization-contact/useOrganizationContactManagement";
-import { usePeriods } from "@/src/presentation/hooks/period/usePeriods";
+} from "@/presentation/components/admin/pages/organization-contact/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import { useOrganizationContactManagement } from "@/presentation/hooks/organization-contact/useOrganizationContactManagement";
+import { usePeriods } from "@/presentation/hooks/period/usePeriods";
 
 export default function AddOrganizationContactPage() {
   const router = useRouter();

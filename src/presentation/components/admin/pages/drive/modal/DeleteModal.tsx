@@ -1,5 +1,5 @@
 import React from "react";
-import { type DeleteModalProps } from "@/src/domain/value-objects/google-drive";
+import { type DeleteModalProps } from "@/domain/value-objects/google-drive";
 
 const DeleteModal: React.FC<DeleteModalProps> = ({
   isOpen,

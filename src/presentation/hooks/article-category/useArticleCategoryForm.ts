@@ -3,7 +3,7 @@ import type {
   ArticleCategory,
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-} from "@/src/domain/value-objects/article-category";
+} from "@/domain/value-objects/article-category";
 
 export interface ArticleCategoryFormData {
   name: string;

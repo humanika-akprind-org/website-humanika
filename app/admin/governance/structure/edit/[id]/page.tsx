@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import StructureForm from "@/src/presentation/components/admin/pages/structure/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import { useEditStructure } from "@/src/presentation/hooks/structure/useEditStructure";
+import StructureForm from "@/presentation/components/admin/pages/structure/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import { useEditStructure } from "@/presentation/hooks/structure/useEditStructure";
 
 export default function EditStructurePage() {
   const params = useParams();

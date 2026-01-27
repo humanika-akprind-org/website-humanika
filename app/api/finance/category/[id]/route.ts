@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateFinanceCategoryInput } from "@/src/domain/value-objects/finance-category";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { UpdateFinanceCategoryInput } from "@/domain/value-objects/finance-category";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getFinanceCategory,
   updateFinanceCategory,
   deleteFinanceCategory,
-} from "@/src/infrastructure/repositories/finance/finance-category.service";
+} from "@/infrastructure/repositories/finance/finance-category.service";
 
 export async function GET(
   _request: NextRequest,

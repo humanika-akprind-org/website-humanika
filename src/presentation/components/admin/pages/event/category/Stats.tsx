@@ -1,5 +1,5 @@
 import { FiFolder, FiFileText } from "react-icons/fi";
-import type { EventCategory } from "@/src/domain/value-objects/event-category";
+import type { EventCategory } from "@/domain/value-objects/event-category";
 import StatCard from "../../../ui/card/StatCard";
 
 interface EventCategoryStatsProps {

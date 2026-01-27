@@ -14,9 +14,9 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import type { Event, ScheduleItem } from "@/src/domain/entities/event";
-import { getEventStatus } from "@/src/presentation/lib/eventDetailUtils";
-import ShareButton from "@/src/presentation/components/public/ui/ShareButton";
+import type { Event, ScheduleItem } from "@/domain/entities/event";
+import { getEventStatus } from "@/presentation/lib/eventDetailUtils";
+import ShareButton from "@/presentation/components/public/ui/ShareButton";
 
 interface EventDetailHeroSectionProps {
   event: Event;

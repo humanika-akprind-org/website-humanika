@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { LatestGalleryGrid } from "../../pages/card/gallery/LatestGalleryGrid";
 import AlbumGrid from "../../pages/card/album/AlbumGrid";
-import { getGalleries } from "@/src/presentation/services/gallery";
-import { getEvents } from "@/src/presentation/services/event";
-import type { Gallery } from "@/src/domain/entities/gallery";
-import type { Event, ScheduleItem } from "@/src/domain/entities/event";
+import { getGalleries } from "@/presentation/services/gallery";
+import { getEvents } from "@/presentation/services/event";
+import type { Gallery } from "@/domain/entities/gallery";
+import type { Event, ScheduleItem } from "@/domain/entities/event";
 
 import {
   Camera,
@@ -17,10 +17,10 @@ import {
   Album,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Status } from "@/src/domain/enums/enums";
-import { getPreviewUrl } from "@/src/presentation/lib/utils";
-import SectionHeaderSkeleton from "@/src/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
-import GalleryGridSkeleton from "@/src/presentation/components/public/ui/skeleton/GalleryGridSkeleton";
+import { Status } from "@/domain/enums/enums";
+import { getPreviewUrl } from "@/presentation/lib/utils";
+import SectionHeaderSkeleton from "@/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
+import GalleryGridSkeleton from "@/presentation/components/public/ui/skeleton/GalleryGridSkeleton";
 
 // Helper function to get the earliest schedule date from an event
 function getEarliestScheduleDate(

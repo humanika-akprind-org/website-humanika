@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
 import { Images } from "lucide-react";
-import type { Gallery } from "@/src/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import EmptyState from "../../ui/EmptyState";
@@ -11,7 +11,7 @@ import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import ThumbnailCell from "../../ui/ThumbnailCell";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface GalleryTableProps {
   galleries: Gallery[];

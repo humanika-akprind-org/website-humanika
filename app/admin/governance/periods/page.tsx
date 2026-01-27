@@ -1,20 +1,20 @@
 "use client";
 
-import PeriodStats from "@/src/presentation/components/admin/pages/period/Stats";
-import PeriodFilters from "@/src/presentation/components/admin/pages/period/Filters";
-import PeriodTable from "@/src/presentation/components/admin/pages/period/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import PeriodStats from "@/presentation/components/admin/pages/period/Stats";
+import PeriodFilters from "@/presentation/components/admin/pages/period/Filters";
+import PeriodTable from "@/presentation/components/admin/pages/period/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import ActiveChip from "@/src/presentation/components/admin/ui/chip/Active";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import { usePeriodManagement } from "@/src/presentation/hooks/period/usePeriodManagement";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import ActiveChip from "@/presentation/components/admin/ui/chip/Active";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import { usePeriodManagement } from "@/presentation/hooks/period/usePeriodManagement";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 export default function PeriodsPage() {
   const {

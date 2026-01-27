@@ -1,8 +1,8 @@
 "use client";
 
 import { FiFileText, FiEye, FiTrendingUp, FiArchive } from "react-icons/fi";
-import type { Article } from "@/src/domain/entities/article";
-import { Status } from "@/src/domain/enums/enums";
+import type { Article } from "@/domain/entities/article";
+import { Status } from "@/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {

@@ -7,26 +7,26 @@ import type {
   Document,
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/src/domain/entities/document";
-import { Status } from "@/src/domain/enums/enums";
-import type { Event } from "@/src/domain/entities/event";
-import type { Letter } from "@/src/domain/entities/letter";
-import type { Period } from "@/src/domain/entities/period";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import FileUpload from "@/src/presentation/components/admin/ui/input/FileUpload";
-import { useDocumentForm } from "@/src/presentation/hooks/document/useDocumentForm";
-import { useDocumentTypes } from "@/src/presentation/hooks/document-type/useDocumentTypes";
+} from "@/domain/entities/document";
+import { Status } from "@/domain/enums/enums";
+import type { Event } from "@/domain/entities/event";
+import type { Letter } from "@/domain/entities/letter";
+import type { Period } from "@/domain/entities/period";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import FileUpload from "@/presentation/components/admin/ui/input/FileUpload";
+import { useDocumentForm } from "@/presentation/hooks/document/useDocumentForm";
+import { useDocumentTypes } from "@/presentation/hooks/document-type/useDocumentTypes";
 import {
   getDynamicLabel,
   getDynamicPlaceholder,
-} from "@/src/presentation/lib/document/document-utils";
+} from "@/presentation/lib/document/document-utils";
 import {
   getGoogleDrivePreviewUrl,
   getFileIdFromFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 interface DocumentFormProps {
   document?: Document;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { LogoutButton } from "@/src/presentation/components/public/ui/LogoutButton";
+import { LogoutButton } from "@/presentation/components/public/ui/LogoutButton";
 
 interface User {
   name: string;

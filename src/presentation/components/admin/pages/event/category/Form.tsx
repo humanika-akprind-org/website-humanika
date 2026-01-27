@@ -6,14 +6,14 @@ import type {
   EventCategory,
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
-} from "@/src/domain/value-objects/event-category";
+} from "@/domain/value-objects/event-category";
 
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import { Textarea } from "@/src/presentation/components/ui/textarea";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import { Textarea } from "@/presentation/components/ui/textarea";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
 import { FiTag } from "react-icons/fi";
-import { useEventCategoryForm } from "@/src/presentation/hooks/event-category/useEventCategoryForm";
+import { useEventCategoryForm } from "@/presentation/hooks/event-category/useEventCategoryForm";
 
 interface EventCategoryFormProps {
   category?: EventCategory;

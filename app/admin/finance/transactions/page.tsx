@@ -1,24 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import Stats from "@/src/presentation/components/admin/pages/finance/Stats";
-import Filters from "@/src/presentation/components/admin/pages/finance/Filters";
-import FinanceTable from "@/src/presentation/components/admin/pages/finance/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import Stats from "@/presentation/components/admin/pages/finance/Stats";
+import Filters from "@/presentation/components/admin/pages/finance/Filters";
+import FinanceTable from "@/presentation/components/admin/pages/finance/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import HtmlRenderer from "@/src/presentation/components/admin/ui/HtmlRenderer";
-import StatusChip from "@/src/presentation/components/admin/ui/chip/Status";
-import StatusApprovalChip from "@/src/presentation/components/admin/ui/chip/StatusApproval";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import ImageView from "@/src/presentation/components/admin/ui/avatar/ImageView";
-import { useFinanceManagement } from "@/src/presentation/hooks/finance/useFinanceManagement";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
+import StatusChip from "@/presentation/components/admin/ui/chip/Status";
+import StatusApprovalChip from "@/presentation/components/admin/ui/chip/StatusApproval";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import ImageView from "@/presentation/components/admin/ui/avatar/ImageView";
+import { useFinanceManagement } from "@/presentation/hooks/finance/useFinanceManagement";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 export default function FinanceTransactionsPage() {
   const [statusFilter, setStatusFilter] = useState("all");

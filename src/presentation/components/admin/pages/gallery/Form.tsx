@@ -6,16 +6,16 @@ import type {
   Gallery,
   CreateGalleryInput,
   UpdateGalleryInput,
-} from "@/src/domain/entities/gallery";
-import type { Event } from "@/src/domain/entities/event";
-import type { Period } from "@/src/domain/entities/period";
+} from "@/domain/entities/gallery";
+import type { Event } from "@/domain/entities/event";
+import type { Period } from "@/domain/entities/period";
 import { FiImage, FiCalendar } from "react-icons/fi";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import ImageUpload from "@/src/presentation/components/admin/ui/input/ImageUpload";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import { useGalleryForm } from "@/src/presentation/hooks/gallery/useGalleryForm";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import ImageUpload from "@/presentation/components/admin/ui/input/ImageUpload";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import { useGalleryForm } from "@/presentation/hooks/gallery/useGalleryForm";
 
 interface GalleryFormProps {
   gallery?: Gallery;

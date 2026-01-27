@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { PageHeaderProps } from "@/src/domain/value-objects/google-drive";
+import type { PageHeaderProps } from "@/domain/value-objects/google-drive";
 
 export default function PageHeader({
   title,

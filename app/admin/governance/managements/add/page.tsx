@@ -1,11 +1,11 @@
 // app/(admin)/admin/governance/managements/add/page.tsx
 "use client";
 
-import ManagementForm from "@/src/presentation/components/admin/pages/management/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateManagement } from "@/src/presentation/hooks/management/useCreateManagement";
+import ManagementForm from "@/presentation/components/admin/pages/management/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateManagement } from "@/presentation/hooks/management/useCreateManagement";
 
 export default function AddManagementPage() {
   const { createManagement, handleBack, isSubmitting, error } =

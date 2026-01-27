@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, Cloudy, CloudOff } from "lucide-react";
-import { Button } from "@/src/presentation/components/ui/button";
+import { Button } from "@/presentation/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 
 interface GoogleDriveStatusProps {

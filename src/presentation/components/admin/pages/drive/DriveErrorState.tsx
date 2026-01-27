@@ -2,7 +2,7 @@
 
 import React from "react";
 import { XCircle, RefreshCw } from "lucide-react";
-import type { DriveErrorStateProps } from "@/src/domain/value-objects/google-drive";
+import type { DriveErrorStateProps } from "@/domain/value-objects/google-drive";
 
 const DriveErrorState: React.FC<DriveErrorStateProps> = ({
   error,

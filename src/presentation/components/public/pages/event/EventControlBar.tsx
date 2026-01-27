@@ -12,7 +12,7 @@ import type {
   EventFilters,
   ViewMode,
   SortBy,
-} from "@/src/presentation/hooks/event/useEventPage";
+} from "@/presentation/hooks/event/useEventPage";
 import { hasActiveFilters } from "./utils";
 
 interface EventControlBarProps {

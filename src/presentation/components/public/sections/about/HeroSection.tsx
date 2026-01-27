@@ -8,7 +8,7 @@ import {
   TrendingUp,
   BookOpen,
 } from "lucide-react";
-import { useActivePeriodStatistic } from "@/src/presentation/hooks/statistic/useStatistics";
+import { useActivePeriodStatistic } from "@/presentation/hooks/statistic/useStatistics";
 
 // Fallback data when API is loading or fails
 const FALLBACK_STATS_DATA = [

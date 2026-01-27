@@ -1,12 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EventForm from "@/src/presentation/components/admin/pages/event/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useEditEvent } from "@/src/presentation/hooks/event/useEditEvent";
-import { useEventFormData } from "@/src/presentation/hooks/event/useEventFormData";
+import EventForm from "@/presentation/components/admin/pages/event/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useEditEvent } from "@/presentation/hooks/event/useEditEvent";
+import { useEventFormData } from "@/presentation/hooks/event/useEventFormData";
 
 export default function EditEventPage() {
   const params = useParams();

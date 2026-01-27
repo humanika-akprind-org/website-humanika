@@ -3,8 +3,8 @@ import type {
   DocumentType,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/src/domain/value-objects/document-type";
-import type { User } from "@/src/domain/entities/user";
+} from "@/domain/value-objects/document-type";
+import type { User } from "@/domain/entities/user";
 
 const prisma = new PrismaClient();
 

@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getEventCategory,
   updateEventCategory,
   deleteEventCategory,
-} from "@/src/infrastructure/repositories/event/event-category.service";
+} from "@/infrastructure/repositories/event/event-category.service";
 
 export async function GET(
   _request: NextRequest,

@@ -2,15 +2,15 @@
 
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useGalleryDetail } from "@/src/presentation/hooks/gallery/useGalleryDetail";
-import GalleryDetailHeroSection from "@/src/presentation/components/public/sections/gallery/GalleryDetailHeroSection";
-import GalleryDetailAlbumThumbnail from "@/src/presentation/components/public/pages/gallery/GalleryDetailAlbumThumbnail";
-import GalleryDetailAlbumDescription from "@/src/presentation/components/public/pages/gallery/GalleryDetailAlbumDescription";
-import GalleryDetailPhotoGrid from "@/src/presentation/components/public/pages/card/gallery/GalleryDetailPhotoGrid";
-import GalleryDetailRelatedAlbumsSection from "@/src/presentation/components/public/sections/gallery/GalleryDetailRelatedAlbumsSection";
-import GalleryDetailLoadingState from "@/src/presentation/components/public/pages/gallery/GalleryDetailLoadingState";
-import GalleryDetailErrorState from "@/src/presentation/components/public/pages/gallery/GalleryDetailErrorState";
-import GalleryDetailNotFoundState from "@/src/presentation/components/public/pages/gallery/GalleryDetailNotFoundState";
+import { useGalleryDetail } from "@/presentation/hooks/gallery/useGalleryDetail";
+import GalleryDetailHeroSection from "@/presentation/components/public/sections/gallery/GalleryDetailHeroSection";
+import GalleryDetailAlbumThumbnail from "@/presentation/components/public/pages/gallery/GalleryDetailAlbumThumbnail";
+import GalleryDetailAlbumDescription from "@/presentation/components/public/pages/gallery/GalleryDetailAlbumDescription";
+import GalleryDetailPhotoGrid from "@/presentation/components/public/pages/card/gallery/GalleryDetailPhotoGrid";
+import GalleryDetailRelatedAlbumsSection from "@/presentation/components/public/sections/gallery/GalleryDetailRelatedAlbumsSection";
+import GalleryDetailLoadingState from "@/presentation/components/public/pages/gallery/GalleryDetailLoadingState";
+import GalleryDetailErrorState from "@/presentation/components/public/pages/gallery/GalleryDetailErrorState";
+import GalleryDetailNotFoundState from "@/presentation/components/public/pages/gallery/GalleryDetailNotFoundState";
 
 export default function GalleryDetail() {
   const params = useParams();

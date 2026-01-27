@@ -3,8 +3,8 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import type { Event, ScheduleItem } from "@/src/domain/entities/event";
-import HtmlRenderer from "@/src/presentation/components/admin/ui/HtmlRenderer";
+import type { Event, ScheduleItem } from "@/domain/entities/event";
+import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
 import { Calendar, ArrowRight, Tag } from "lucide-react";
 import { motion } from "framer-motion";
 

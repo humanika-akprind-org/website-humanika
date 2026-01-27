@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Film } from "lucide-react";
-import HtmlRenderer from "@/src/presentation/components/admin/ui/HtmlRenderer";
+import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
 
 interface GalleryDetailAlbumDescriptionProps {
   description: string;

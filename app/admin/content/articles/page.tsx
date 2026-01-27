@@ -1,22 +1,22 @@
 "use client";
 
-import ArticleStats from "@/src/presentation/components/admin/pages/article/Stats";
-import ArticleFilters from "@/src/presentation/components/admin/pages/article/Filters";
-import ArticleTable from "@/src/presentation/components/admin/pages/article/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import ArticleStats from "@/presentation/components/admin/pages/article/Stats";
+import ArticleFilters from "@/presentation/components/admin/pages/article/Filters";
+import ArticleTable from "@/presentation/components/admin/pages/article/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import HtmlRenderer from "@/src/presentation/components/admin/ui/HtmlRenderer";
-import StatusChip from "@/src/presentation/components/admin/ui/chip/Status";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import ImageView from "@/src/presentation/components/admin/ui/avatar/ImageView";
-import { useArticleManagement } from "@/src/presentation/hooks/article/useArticleManagement";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
+import StatusChip from "@/presentation/components/admin/ui/chip/Status";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import ImageView from "@/presentation/components/admin/ui/avatar/ImageView";
+import { useArticleManagement } from "@/presentation/hooks/article/useArticleManagement";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 export default function ArticlesPage() {
   const {

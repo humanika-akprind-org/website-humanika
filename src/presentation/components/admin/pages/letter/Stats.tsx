@@ -6,8 +6,8 @@ import {
   FiTrendingUp,
   FiArchive,
 } from "react-icons/fi";
-import type { Letter } from "@/src/domain/entities/letter";
-import { Status } from "@/src/domain/enums/enums";
+import type { Letter } from "@/domain/entities/letter";
+import { Status } from "@/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {

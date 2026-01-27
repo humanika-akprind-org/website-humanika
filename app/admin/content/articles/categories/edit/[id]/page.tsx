@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import ArticleCategoryForm from "@/src/presentation/components/admin/pages/article/category/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useEditArticleCategory } from "@/src/presentation/hooks/article-category/useEditArticleCategory";
+import ArticleCategoryForm from "@/presentation/components/admin/pages/article/category/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useEditArticleCategory } from "@/presentation/hooks/article-category/useEditArticleCategory";
 
 export default function EditArticleCategoryPage() {
   const params = useParams();

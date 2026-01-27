@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { DriveLoadingStateProps } from "@/src/domain/value-objects/google-drive";
+import type { DriveLoadingStateProps } from "@/domain/value-objects/google-drive";
 
 const DriveLoadingState: React.FC<DriveLoadingStateProps> = ({
   count = 10,

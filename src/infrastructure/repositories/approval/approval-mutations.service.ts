@@ -1,12 +1,12 @@
-import { logActivityFromRequest } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/src/domain/enums/enums";
+import { logActivityFromRequest } from "@/presentation/lib/activity-log";
+import { ActivityType } from "@/domain/enums/enums";
 import type { NextRequest } from "next/server";
-import { StatusApproval } from "@/src/domain/enums/enums";
+import { StatusApproval } from "@/domain/enums/enums";
 import type {
   CreateApprovalData,
   UpdateApprovalData,
   ApprovalWithRelations,
-} from "@/src/domain/entities/approval";
+} from "@/domain/entities/approval";
 import {
   findApprovalByEntity,
   createApprovalRecord,

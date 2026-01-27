@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getGalleryCategories,
   createGalleryCategory,
-} from "@/src/infrastructure/repositories/gallery/gallery-category.service";
-import type { CreateGalleryCategoryInput } from "@/src/domain/value-objects/gallery-category";
+} from "@/infrastructure/repositories/gallery/gallery-category.service";
+import type { CreateGalleryCategoryInput } from "@/domain/value-objects/gallery-category";
 
 // Validation functions
 function validateCreateGalleryCategoryInput(body: CreateGalleryCategoryInput) {

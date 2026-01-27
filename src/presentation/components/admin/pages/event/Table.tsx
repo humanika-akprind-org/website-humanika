@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
 import { CalendarRange } from "lucide-react";
-import type { Event } from "@/src/domain/entities/event";
+import type { Event } from "@/domain/entities/event";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import EmptyState from "../../ui/EmptyState";
@@ -14,7 +14,7 @@ import ThumbnailCell from "../../ui/ThumbnailCell";
 import StatusChip from "../../ui/chip/Status";
 import StatusApproval from "../../ui/chip/StatusApproval";
 import DepartmentChip from "../../ui/chip/Department";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface EventTableProps {
   events: Event[];

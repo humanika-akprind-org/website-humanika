@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateLetterInput } from "@/src/domain/entities/letter";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { UpdateLetterInput } from "@/domain/entities/letter";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getLetter,
   updateLetter,
   deleteLetter,
-} from "@/src/infrastructure/repositories/letter/letter.service";
+} from "@/infrastructure/repositories/letter/letter.service";
 
 export async function GET(
   _request: NextRequest,

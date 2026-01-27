@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateWorkProgramInput } from "@/src/domain/entities/work";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { UpdateWorkProgramInput } from "@/domain/entities/work";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getWorkProgram,
   updateWorkProgram,
   deleteWorkProgram,
-} from "@/src/infrastructure/repositories/work/work.service";
+} from "@/infrastructure/repositories/work/work.service";
 
 // GET work program by ID
 export async function GET(

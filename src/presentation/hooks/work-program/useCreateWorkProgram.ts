@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createWorkProgram } from "@/src/presentation/services/work";
+import { createWorkProgram } from "@/presentation/services/work";
 import type {
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
-} from "@/src/domain/entities/work";
-import { Status } from "@/src/domain/enums/enums";
+} from "@/domain/entities/work";
+import { Status } from "@/domain/enums/enums";
 
 export function useCreateWorkProgram() {
   const router = useRouter();

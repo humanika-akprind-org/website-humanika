@@ -2,7 +2,7 @@
 
 import React from "react";
 import { CheckCircle, XCircle, Info } from "lucide-react";
-import type { DriveToastProps } from "@/src/domain/value-objects/google-drive";
+import type { DriveToastProps } from "@/domain/value-objects/google-drive";
 
 const DriveToast: React.FC<DriveToastProps> = ({ toast }) => {
   if (!toast) return null;

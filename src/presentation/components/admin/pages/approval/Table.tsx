@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { FiCheck, FiX, FiClock, FiEye, FiRotateCcw } from "react-icons/fi";
 import { Activity } from "lucide-react";
-import type { ApprovalWithRelations as Approval } from "@/src/domain/entities/approval";
+import type { ApprovalWithRelations as Approval } from "@/domain/entities/approval";
 import SortIcon from "../../ui/SortIcon";
 import StatusApproval from "../../ui/chip/StatusApproval";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -14,7 +14,7 @@ import DropdownMenu from "../../ui/dropdown/DropdownMenu";
 import ApprovalActionModal from "./ActionModal";
 import ViewModal from "../../ui/modal/ViewModal";
 import HtmlRenderer from "../../ui/HtmlRenderer";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface ApprovalTableProps {
   approvals: Approval[];

@@ -5,7 +5,7 @@ import {
   getUser,
   updateUser,
   deleteUser,
-} from "@/src/infrastructure/repositories/user/user.service";
+} from "@/infrastructure/repositories/user/user.service";
 
 // GET - Get user by ID
 export async function GET(

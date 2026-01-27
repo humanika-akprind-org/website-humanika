@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ChevronRight, Calendar, Clock } from "lucide-react";
 import EventCard from "../../pages/card/event/EventCard";
-import type { Event } from "@/src/domain/entities/event";
+import type { Event } from "@/domain/entities/event";
 import { truncateDescription } from "../../pages/event/utils";
 import RelatedEventsEmptyState from "../../pages/event/RelatedEventsEmptyState";
 

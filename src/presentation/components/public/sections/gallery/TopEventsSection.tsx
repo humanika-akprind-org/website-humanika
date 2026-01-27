@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar, Image as ImageIcon } from "lucide-react";
-import type { Album } from "@/src/presentation/lib/gallery-utils";
+import type { Album } from "@/presentation/lib/gallery-utils";
 import { ANIMATION_DELAYS } from "../../pages/gallery/constants";
 
 interface TopEventsSectionProps {

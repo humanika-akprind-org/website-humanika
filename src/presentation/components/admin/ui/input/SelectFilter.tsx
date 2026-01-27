@@ -7,8 +7,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/src/presentation/components/ui/select";
-import { cn } from "@/src/presentation/lib/utils";
+} from "@/presentation/components/ui/select";
+import { cn } from "@/presentation/lib/utils";
 import { Search, X } from "lucide-react";
 
 interface SelectFilterProps {

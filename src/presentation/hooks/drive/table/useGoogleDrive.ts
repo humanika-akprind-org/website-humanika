@@ -3,15 +3,15 @@ import { type drive_v3 } from "googleapis/build/src/apis/drive/v3";
 import {
   callApi,
   fetchDriveFolders,
-} from "@/src/presentation/services/google-drive";
+} from "@/presentation/services/google-drive";
 import {
   loadFolderFromLocalStorage,
   saveFolderToLocalStorage,
-} from "@/src/presentation/app/utils/google-drive";
+} from "@/presentation/app/utils/google-drive";
 import type {
   LoadingStateTable,
   BreadcrumbItem,
-} from "@/src/domain/value-objects/google-drive";
+} from "@/domain/value-objects/google-drive";
 
 export const useGoogleDriveFiles = (
   accessToken: string,

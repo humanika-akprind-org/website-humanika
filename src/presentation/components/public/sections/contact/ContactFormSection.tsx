@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button } from "@/src/presentation/components/ui/button";
+import { Button } from "@/presentation/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,9 +12,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/src/presentation/components/ui/form";
-import { Input } from "@/src/presentation/components/ui/input";
-import { Textarea } from "@/src/presentation/components/ui/textarea";
+} from "@/presentation/components/ui/form";
+import { Input } from "@/presentation/components/ui/input";
+import { Textarea } from "@/presentation/components/ui/textarea";
 import { toast } from "sonner";
 import {
   User,

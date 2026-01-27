@@ -1,5 +1,5 @@
 import { FiFolder, FiFileText } from "react-icons/fi";
-import type { ArticleCategory } from "@/src/domain/value-objects/article-category";
+import type { ArticleCategory } from "@/domain/value-objects/article-category";
 import StatCard from "../../../ui/card/StatCard";
 
 interface ArticleCategoryStatsProps {

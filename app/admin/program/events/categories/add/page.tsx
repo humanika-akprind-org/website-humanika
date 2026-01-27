@@ -1,10 +1,10 @@
 "use client";
 
-import EventCategoryForm from "@/src/presentation/components/admin/pages/event/category/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateEventCategory } from "@/src/presentation/hooks/event-category/useCreateEventCategory";
+import EventCategoryForm from "@/presentation/components/admin/pages/event/category/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateEventCategory } from "@/presentation/hooks/event-category/useCreateEventCategory";
 
 export default function AddEventCategoryPage() {
   const { createEventCategory, handleBack, isSubmitting, error, isLoading } =

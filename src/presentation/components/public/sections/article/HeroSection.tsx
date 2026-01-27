@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Newspaper, Search, X } from "lucide-react";
-import type { Article } from "@/src/domain/entities/article";
+import type { Article } from "@/domain/entities/article";
 import { getUniqueAuthorCount } from "../../../../hooks/article/utils";
-import { type ArticleCategory } from "@/src/domain/value-objects/article-category";
+import { type ArticleCategory } from "@/domain/value-objects/article-category";
 
 interface HeroSectionProps {
   articles: Article[];

@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import ManagementForm from "@/src/presentation/components/admin/pages/management/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import { useEditManagement } from "@/src/presentation/hooks/management/useEditManagement";
+import ManagementForm from "@/presentation/components/admin/pages/management/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import { useEditManagement } from "@/presentation/hooks/management/useEditManagement";
 
 export default function EditManagementPage() {
   const params = useParams();

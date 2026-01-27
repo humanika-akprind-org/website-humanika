@@ -3,14 +3,14 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
 import { BarChart3 } from "lucide-react";
-import type { Statistic } from "@/src/domain/entities/statistic";
+import type { Statistic } from "@/domain/entities/statistic";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import EmptyState from "../../ui/EmptyState";
 import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface StatisticTableProps {
   statistics: Statistic[];

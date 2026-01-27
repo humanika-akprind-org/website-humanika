@@ -2,11 +2,11 @@ import {
   userRoleOptions,
   departmentOptions,
   positionOptions,
-} from "@/src/presentation/services/user";
+} from "@/presentation/services/user";
 import SearchInput from "../../../ui/input/SearchInput";
 import FilterButton from "../../../ui/button/FilterButton";
 import SelectFilter from "../../../ui/input/SelectFilter";
-import type { UserFilters } from "@/src/domain/entities/user";
+import type { UserFilters } from "@/domain/entities/user";
 
 interface FiltersProps {
   searchTerm: string;

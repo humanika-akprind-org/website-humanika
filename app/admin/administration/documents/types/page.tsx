@@ -1,17 +1,17 @@
 "use client";
 
-import DocumentTypeStats from "@/src/presentation/components/admin/pages/document/type/Stats";
-import DocumentTypeFilters from "@/src/presentation/components/admin/pages/document/type/Filters";
-import DocumentTypeTable from "@/src/presentation/components/admin/pages/document/type/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import DocumentTypeStats from "@/presentation/components/admin/pages/document/type/Stats";
+import DocumentTypeFilters from "@/presentation/components/admin/pages/document/type/Filters";
+import DocumentTypeTable from "@/presentation/components/admin/pages/document/type/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import { useDocumentTypeManagement } from "@/src/presentation/hooks/document-type/useDocumentTypeManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import { useDocumentTypeManagement } from "@/presentation/hooks/document-type/useDocumentTypeManagement";
 
 export default function DocumentTypesPage() {
   const {

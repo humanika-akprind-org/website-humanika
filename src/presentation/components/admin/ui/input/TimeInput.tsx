@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { FiClock } from "react-icons/fi";
-import TimePicker from "@/src/presentation/components/admin/ui/date/TimePicker";
+import TimePicker from "@/presentation/components/admin/ui/date/TimePicker";
 
 interface TimeInputProps {
   label: string;

@@ -6,14 +6,14 @@ import type {
   DocumentType,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/src/domain/value-objects/document-type";
+} from "@/domain/value-objects/document-type";
 
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import { Textarea } from "@/src/presentation/components/ui/textarea";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import { Textarea } from "@/presentation/components/ui/textarea";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
 import { FiFileText } from "react-icons/fi";
-import { useDocumentTypeForm } from "@/src/presentation/hooks/document-type/useDocumentTypeForm";
+import { useDocumentTypeForm } from "@/presentation/hooks/document-type/useDocumentTypeForm";
 
 interface DocumentTypeFormProps {
   category?: DocumentType;

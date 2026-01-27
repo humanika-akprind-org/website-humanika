@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiTrash, FiEye, FiDownload, FiFile } from "react-icons/fi";
 import { Wallet } from "lucide-react";
-import type { Finance } from "@/src/domain/entities/finance";
+import type { Finance } from "@/domain/entities/finance";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import EmptyState from "../../ui/EmptyState";
@@ -12,8 +12,8 @@ import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import StatusChip from "../../ui/chip/Status";
 import StatusApproval from "../../ui/chip/StatusApproval";
-import { getGoogleDriveDirectUrl } from "@/src/infrastructure/external-services/google-drive/file-utils";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { getGoogleDriveDirectUrl } from "@/infrastructure/external-services/google-drive/file-utils";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface FinanceTableProps {
   finances: Finance[];

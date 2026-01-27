@@ -2,8 +2,8 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Camera, FolderOpen } from "lucide-react";
-import { getPreviewUrl } from "@/src/presentation/lib/gallery-utils";
-import type { AlbumData } from "@/src/presentation/hooks/gallery/useGalleryDetail";
+import { getPreviewUrl } from "@/presentation/lib/gallery-utils";
+import type { AlbumData } from "@/presentation/hooks/gallery/useGalleryDetail";
 
 interface GalleryDetailAlbumThumbnailProps {
   album: AlbumData;

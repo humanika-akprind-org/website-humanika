@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
 import { CalendarClock } from "lucide-react";
-import type { Period } from "@/src/domain/entities/period";
+import type { Period } from "@/domain/entities/period";
 import ActiveChip from "../../ui/chip/Active";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
@@ -11,7 +11,7 @@ import Pagination from "../../ui/pagination/Pagination";
 import EmptyState from "../../ui/EmptyState";
 import SortIcon from "../../ui/SortIcon";
 import AddButton from "../../ui/button/AddButton";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 interface PeriodTableProps {
   periods: Period[];
   selectedPeriods: string[];

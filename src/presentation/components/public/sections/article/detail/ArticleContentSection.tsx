@@ -1,10 +1,10 @@
 import React from "react";
 import Image from "next/image";
 import { FileText } from "lucide-react";
-import HtmlRenderer from "@/src/presentation/components/admin/ui/HtmlRenderer";
-import ActionBar from "@/src/presentation/components/public/pages/article/ActionBar";
-import type { Article } from "@/src/domain/entities/article";
-import { getPreviewUrl } from "@/src/presentation/lib/utils";
+import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
+import ActionBar from "@/presentation/components/public/pages/article/ActionBar";
+import type { Article } from "@/domain/entities/article";
+import { getPreviewUrl } from "@/presentation/lib/utils";
 
 interface ArticleContentSectionProps {
   article: Article;

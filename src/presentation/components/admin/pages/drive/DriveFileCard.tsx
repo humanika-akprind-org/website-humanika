@@ -9,8 +9,8 @@ import {
   Edit2,
   Trash2,
 } from "lucide-react";
-import type { DriveFileCardProps } from "@/src/domain/value-objects/google-drive";
-import { getGoogleDriveDirectUrl } from "@/src/infrastructure/external-services/google-drive/file-utils";
+import type { DriveFileCardProps } from "@/domain/value-objects/google-drive";
+import { getGoogleDriveDirectUrl } from "@/infrastructure/external-services/google-drive/file-utils";
 
 const DriveFileCard: React.FC<DriveFileCardProps> = ({
   file,

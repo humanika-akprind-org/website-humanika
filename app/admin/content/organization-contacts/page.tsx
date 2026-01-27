@@ -1,17 +1,17 @@
 "use client";
 
-import OrganizationContactTable from "@/src/presentation/components/admin/pages/organization-contact/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import OrganizationContactTable from "@/presentation/components/admin/pages/organization-contact/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import { useOrganizationContactManagement } from "@/src/presentation/hooks/organization-contact/useOrganizationContactManagement";
-import OrganizationContactFilters from "@/src/presentation/components/admin/pages/organization-contact/Filters";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import { useOrganizationContactManagement } from "@/presentation/hooks/organization-contact/useOrganizationContactManagement";
+import OrganizationContactFilters from "@/presentation/components/admin/pages/organization-contact/Filters";
 
 export default function OrganizationContactsPage() {
   const {

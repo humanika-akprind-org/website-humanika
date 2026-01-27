@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import WorkProgramForm from "@/src/presentation/components/admin/pages/work/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import { useEditWorkProgram } from "@/src/presentation/hooks/work-program/useEditWorkProgram";
+import WorkProgramForm from "@/presentation/components/admin/pages/work/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import { useEditWorkProgram } from "@/presentation/hooks/work-program/useEditWorkProgram";
 
 export default function EditWorkProgramPage() {
   const params = useParams();

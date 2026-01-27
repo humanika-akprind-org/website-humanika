@@ -1,5 +1,5 @@
-import type { Event } from "@/src/domain/entities/event";
-import type { EventCategory } from "@/src/domain/value-objects/event-category";
+import type { Event } from "@/domain/entities/event";
+import type { EventCategory } from "@/domain/value-objects/event-category";
 
 export function truncateDescription(
   description: string | undefined,

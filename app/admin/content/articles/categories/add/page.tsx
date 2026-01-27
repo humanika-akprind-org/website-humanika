@@ -1,10 +1,10 @@
 "use client";
 
-import ArticleCategoryForm from "@/src/presentation/components/admin/pages/article/category/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateArticleCategory } from "@/src/presentation/hooks/article-category/useCreateArticleCategory";
+import ArticleCategoryForm from "@/presentation/components/admin/pages/article/category/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateArticleCategory } from "@/presentation/hooks/article-category/useCreateArticleCategory";
 
 export default function AddArticleCategoryPage() {
   const { createArticleCategory, handleBack, isSubmitting, error, isLoading } =

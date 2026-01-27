@@ -2,7 +2,7 @@
 
 import React from "react";
 import { FolderOpen } from "lucide-react";
-import type { DriveEmptyStateProps } from "@/src/domain/value-objects/google-drive";
+import type { DriveEmptyStateProps } from "@/domain/value-objects/google-drive";
 
 const DriveEmptyState: React.FC<DriveEmptyStateProps> = ({
   searchQuery,

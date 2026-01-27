@@ -1,17 +1,17 @@
 "use client";
 
-import ArticleCategoryStats from "@/src/presentation/components/admin/pages/article/category/Stats";
-import ArticleCategoryFilters from "@/src/presentation/components/admin/pages/article/category/Filters";
-import ArticleCategoryTable from "@/src/presentation/components/admin/pages/article/category/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import ArticleCategoryStats from "@/presentation/components/admin/pages/article/category/Stats";
+import ArticleCategoryFilters from "@/presentation/components/admin/pages/article/category/Filters";
+import ArticleCategoryTable from "@/presentation/components/admin/pages/article/category/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import { useArticleCategoryManagement } from "@/src/presentation/hooks/article-category/useArticleCategoryManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import { useArticleCategoryManagement } from "@/presentation/hooks/article-category/useArticleCategoryManagement";
 
 export default function ArticleCategoriesPage() {
   const {

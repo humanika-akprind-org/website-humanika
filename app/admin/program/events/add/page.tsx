@@ -1,11 +1,11 @@
 "use client";
 
-import EventForm from "@/src/presentation/components/admin/pages/event/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateEvent } from "@/src/presentation/hooks/event/useCreateEvent";
-import { useEventFormData } from "@/src/presentation/hooks/event/useEventFormData";
+import EventForm from "@/presentation/components/admin/pages/event/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateEvent } from "@/presentation/hooks/event/useCreateEvent";
+import { useEventFormData } from "@/presentation/hooks/event/useEventFormData";
 
 export default function AddEventPage() {
   const { createEvent, handleBack, isSubmitting, error, isLoading } =

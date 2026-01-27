@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Sparkles, Search, X } from "lucide-react";
-import type { EventStats } from "@/src/presentation/hooks/event/useEventPage";
+import type { EventStats } from "@/presentation/hooks/event/useEventPage";
 
 interface EventHeroSectionProps {
   searchQuery: string;

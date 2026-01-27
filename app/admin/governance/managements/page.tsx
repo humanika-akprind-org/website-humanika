@@ -1,22 +1,22 @@
 "use client";
 
-import ManagementStats from "@/src/presentation/components/admin/pages/management/Stats";
-import ManagementFilters from "@/src/presentation/components/admin/pages/management/Filters";
-import ManagementTable from "@/src/presentation/components/admin/pages/management/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import ManagementStats from "@/presentation/components/admin/pages/management/Stats";
+import ManagementFilters from "@/presentation/components/admin/pages/management/Filters";
+import ManagementTable from "@/presentation/components/admin/pages/management/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import ManagementAvatar from "@/src/presentation/components/admin/ui/avatar/ManagementAvatar";
-import DepartmentChip from "@/src/presentation/components/admin/ui/chip/Department";
-import PositionChip from "@/src/presentation/components/admin/ui/chip/Position";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import { useManagementManagement } from "@/src/presentation/hooks/management/useManagementManagement";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import ManagementAvatar from "@/presentation/components/admin/ui/avatar/ManagementAvatar";
+import DepartmentChip from "@/presentation/components/admin/ui/chip/Department";
+import PositionChip from "@/presentation/components/admin/ui/chip/Position";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import { useManagementManagement } from "@/presentation/hooks/management/useManagementManagement";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 export default function ManagementsPage() {
   const {

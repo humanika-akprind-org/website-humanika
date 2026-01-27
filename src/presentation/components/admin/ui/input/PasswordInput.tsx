@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Input } from "@/src/presentation/components/ui/input";
-import { cn } from "@/src/presentation/lib/utils";
+import { Input } from "@/presentation/components/ui/input";
+import { cn } from "@/presentation/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 
 interface PasswordInputProps {

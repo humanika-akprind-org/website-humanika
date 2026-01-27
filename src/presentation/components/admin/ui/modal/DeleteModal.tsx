@@ -1,6 +1,6 @@
 import { FiX } from "react-icons/fi";
 import { useState, useEffect } from "react";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import { Loader2 } from "lucide-react";
 
 interface DeleteModalProps {

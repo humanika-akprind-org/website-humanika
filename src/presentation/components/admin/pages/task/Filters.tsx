@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   taskStatusOptions,
   taskDepartmentOptions,
-} from "@/src/presentation/services/task";
+} from "@/presentation/services/task";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";

@@ -1,4 +1,4 @@
-import { LetterClassification } from "@/src/domain/enums/enums";
+import { LetterClassification } from "@/domain/enums/enums";
 
 interface ClassificationChipProps {
   classification: LetterClassification | string | null | undefined;

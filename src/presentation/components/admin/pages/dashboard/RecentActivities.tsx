@@ -5,7 +5,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/src/presentation/components/ui/table";
+} from "@/presentation/components/ui/table";
 
 export default function RecentActivities() {
   const activities = [

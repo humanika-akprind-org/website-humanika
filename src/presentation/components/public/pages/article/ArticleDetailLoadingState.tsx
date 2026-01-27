@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import CategoryPillsSkeleton from "@/src/presentation/components/public/ui/skeleton/CategoryPillsSkeleton";
+import CategoryPillsSkeleton from "@/presentation/components/public/ui/skeleton/CategoryPillsSkeleton";
 
 export default function ArticleDetailLoadingState() {
   return (

@@ -2,14 +2,14 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { callApi } from "@/src/presentation/services/google-drive";
+import { callApi } from "@/presentation/services/google-drive";
 import {
   useGoogleDriveFiles,
   useFileOperations,
-} from "@/src/presentation/hooks/drive/table/useGoogleDrive";
+} from "@/presentation/hooks/drive/table/useGoogleDrive";
 import DeleteModal from "./modal/DeleteModal";
 import Breadcrumbs from "./Breadcrumbs";
-import type { DriveTableProps } from "@/src/domain/value-objects/google-drive";
+import type { DriveTableProps } from "@/domain/value-objects/google-drive";
 
 const DriveTable: React.FC<DriveTableProps> = ({
   files: initialFiles = [],

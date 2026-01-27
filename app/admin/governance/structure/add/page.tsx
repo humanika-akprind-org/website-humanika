@@ -1,10 +1,10 @@
 "use client";
 
-import StructureForm from "@/src/presentation/components/admin/pages/structure/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateStructure } from "@/src/presentation/hooks/structure/useCreateStructure";
+import StructureForm from "@/presentation/components/admin/pages/structure/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateStructure } from "@/presentation/hooks/structure/useCreateStructure";
 
 export default function AddStructurePage() {
   const { createStructure, handleBack, isSubmitting, error } =

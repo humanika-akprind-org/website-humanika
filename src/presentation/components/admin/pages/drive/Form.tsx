@@ -2,8 +2,8 @@
 
 import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useDriveForm } from "@/src/presentation/hooks/drive/form/useDriveForm";
-import type { DriveFormProps } from "@/src/domain/value-objects/google-drive";
+import { useDriveForm } from "@/presentation/hooks/drive/form/useDriveForm";
+import type { DriveFormProps } from "@/domain/value-objects/google-drive";
 
 const DriveForm: React.FC<DriveFormProps> = ({
   accessToken,

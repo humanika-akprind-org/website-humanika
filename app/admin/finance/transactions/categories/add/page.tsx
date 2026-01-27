@@ -1,10 +1,10 @@
 "use client";
 
-import FinanceCategoryForm from "@/src/presentation/components/admin/pages/finance/category/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateFinanceCategory } from "@/src/presentation/hooks/finance-category/useCreateFinanceCategory";
+import FinanceCategoryForm from "@/presentation/components/admin/pages/finance/category/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateFinanceCategory } from "@/presentation/hooks/finance-category/useCreateFinanceCategory";
 
 export default function AddFinanceCategoryPage() {
   const { createFinanceCategory, handleBack, isSubmitting, error, isLoading } =

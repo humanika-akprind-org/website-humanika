@@ -20,15 +20,15 @@ import {
   Radar,
 } from "recharts";
 import { TrendingUp, Mail, Users, BarChart3 } from "lucide-react";
-import { MetricCard } from "@/src/presentation/components/admin/pages/dashboard/MetricCard";
-import { useFinances } from "@/src/presentation/hooks/finance/useFinances";
-import { useLetters } from "@/src/presentation/hooks/letter/useLetters";
-import { useArticles } from "@/src/presentation/hooks/article/useArticles";
-import { useGalleries } from "@/src/presentation/hooks/gallery/useGalleries";
-import { useEvents } from "@/src/presentation/hooks/event/useEvents";
-import { useManagements } from "@/src/presentation/hooks/management/useManagements";
-import { useActivityStats } from "@/src/presentation/hooks/activity/useActivityStats";
-import LoadingStats from "@/src/presentation/components/admin/pages/dashboard/LoadingStats";
+import { MetricCard } from "@/presentation/components/admin/pages/dashboard/MetricCard";
+import { useFinances } from "@/presentation/hooks/finance/useFinances";
+import { useLetters } from "@/presentation/hooks/letter/useLetters";
+import { useArticles } from "@/presentation/hooks/article/useArticles";
+import { useGalleries } from "@/presentation/hooks/gallery/useGalleries";
+import { useEvents } from "@/presentation/hooks/event/useEvents";
+import { useManagements } from "@/presentation/hooks/management/useManagements";
+import { useActivityStats } from "@/presentation/hooks/activity/useActivityStats";
+import LoadingStats from "@/presentation/components/admin/pages/dashboard/LoadingStats";
 
 // Custom hook for dashboard data processing
 const useDashboardData = () => {

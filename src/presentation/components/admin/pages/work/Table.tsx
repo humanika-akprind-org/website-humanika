@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
 import { MonitorCog } from "lucide-react";
-import type { WorkProgram } from "@/src/domain/entities/work";
+import type { WorkProgram } from "@/domain/entities/work";
 import SortIcon from "../../ui/SortIcon";
 import StatusChip from "../../ui/chip/Status";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -14,7 +14,7 @@ import DropdownMenuItem from "../../ui/dropdown/DropdownMenuItem";
 import DropdownMenu from "../../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../../ui/chip/Department";
 import StatusApprovalChip from "../../ui/chip/StatusApproval";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface WorkProgramTableProps {
   workPrograms: WorkProgram[];

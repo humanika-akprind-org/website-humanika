@@ -1,30 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserApi } from "@/src/presentation/services/user";
-import { DocumentApi } from "@/src/presentation/services/document";
-import { ArticleApi } from "@/src/presentation/services/article";
-import { EventApi } from "@/src/presentation/services/event";
-import { LetterApi } from "@/src/presentation/services/letter";
-import { WorkApi } from "@/src/presentation/services/work";
-import { FinanceApi } from "@/src/presentation/services/finance";
+import { UserApi } from "@/presentation/services/user";
+import { DocumentApi } from "@/presentation/services/document";
+import { ArticleApi } from "@/presentation/services/article";
+import { EventApi } from "@/presentation/services/event";
+import { LetterApi } from "@/presentation/services/letter";
+import { WorkApi } from "@/presentation/services/work";
+import { FinanceApi } from "@/presentation/services/finance";
 
-import { ApprovalApi } from "@/src/presentation/services/approval";
-import { PeriodApi } from "@/src/presentation/services/period";
+import { ApprovalApi } from "@/presentation/services/approval";
+import { PeriodApi } from "@/presentation/services/period";
 
-import { ActivityApi } from "@/src/presentation/services/activity";
-import { ManagementApi } from "@/src/presentation/services/management";
-import { getDepartmentTasks } from "@/src/presentation/services/task";
-import { StructureApi } from "@/src/presentation/services/structure";
-import type { Document } from "@/src/domain/entities/document";
-import type { WorkProgram } from "@/src/domain/entities/work";
-import type { Finance } from "@/src/domain/entities/finance";
-import type { Event, ScheduleItem } from "@/src/domain/entities/event";
-import type { Article } from "@/src/domain/entities/article";
+import { ActivityApi } from "@/presentation/services/activity";
+import { ManagementApi } from "@/presentation/services/management";
+import { getDepartmentTasks } from "@/presentation/services/task";
+import { StructureApi } from "@/presentation/services/structure";
+import type { Document } from "@/domain/entities/document";
+import type { WorkProgram } from "@/domain/entities/work";
+import type { Finance } from "@/domain/entities/finance";
+import type { Event, ScheduleItem } from "@/domain/entities/event";
+import type { Article } from "@/domain/entities/article";
 
-import type { ActivityLog } from "@/src/domain/entities/activity-log";
-import type { Period } from "@/src/domain/entities/period";
-import { Status } from "@/src/domain/enums/enums";
+import type { ActivityLog } from "@/domain/entities/activity-log";
+import type { Period } from "@/domain/entities/period";
+import { Status } from "@/domain/enums/enums";
 import {
   TrendingUp,
   Activity,
@@ -33,8 +33,8 @@ import {
   CheckCircle,
   Users,
 } from "lucide-react";
-import { MetricCard } from "@/src/presentation/components/admin/pages/dashboard/MetricCard";
-import LoadingOverview from "@/src/presentation/components/admin/pages/dashboard/LoadingOverview";
+import { MetricCard } from "@/presentation/components/admin/pages/dashboard/MetricCard";
+import LoadingOverview from "@/presentation/components/admin/pages/dashboard/LoadingOverview";
 
 // Helper function to get the earliest schedule date from an event
 function getEarliestScheduleDate(

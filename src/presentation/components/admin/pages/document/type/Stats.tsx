@@ -1,5 +1,5 @@
 import { FiFolder, FiFileText } from "react-icons/fi";
-import type { DocumentType } from "@/src/domain/value-objects/document-type";
+import type { DocumentType } from "@/domain/value-objects/document-type";
 import StatCard from "../../../ui/card/StatCard";
 
 interface DocumentTypeStatsProps {

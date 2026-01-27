@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import { FiUser, FiMail, FiKey, FiUsers, FiLock, FiX } from "react-icons/fi";
-import { UserRole, Department, Position } from "@/src/domain/enums/enums";
-import { formatEnumValue } from "@/src/presentation/lib/utils";
-import type { User } from "@/src/domain/entities/user";
+import { UserRole, Department, Position } from "@/domain/enums/enums";
+import { formatEnumValue } from "@/presentation/lib/utils";
+import type { User } from "@/domain/entities/user";
 import TextInput from "../../ui/input/TextInput";
 import SelectInput from "../../ui/input/SelectInput";
 import PasswordInput from "../../ui/input/PasswordInput";
 import Alert from "../../ui/alert/Alert";
 import SubmitButton from "../../ui/button/SubmitButton";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
 import UserInfoHeader from "../../ui/UserInfoHeader";
 import { useRouter } from "next/navigation";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import { useEditUserForm } from "@/src/presentation/hooks/user/useEditUserForm";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import { useEditUserForm } from "@/presentation/hooks/user/useEditUserForm";
 
 interface UserEditFormProps {
   userId: string;

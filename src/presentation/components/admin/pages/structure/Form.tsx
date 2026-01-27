@@ -6,20 +6,20 @@ import type {
   OrganizationalStructure,
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
-} from "@/src/domain/entities/structure";
-import { Status } from "@/src/domain/enums/enums";
-import { useStructureForm } from "@/src/presentation/hooks/structure/useStructureForm";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import ImageUpload from "@/src/presentation/components/admin/ui/input/ImageUpload";
-import FileUpload from "@/src/presentation/components/admin/ui/input/FileUpload";
+} from "@/domain/entities/structure";
+import { Status } from "@/domain/enums/enums";
+import { useStructureForm } from "@/presentation/hooks/structure/useStructureForm";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import ImageUpload from "@/presentation/components/admin/ui/input/ImageUpload";
+import FileUpload from "@/presentation/components/admin/ui/input/FileUpload";
 import { FiBriefcase, FiCalendar } from "react-icons/fi";
 import {
   getGoogleDrivePreviewUrl,
   getFileIdFromFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 interface StructureFormProps {
   structure?: OrganizationalStructure;

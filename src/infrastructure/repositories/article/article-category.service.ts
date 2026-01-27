@@ -1,11 +1,11 @@
-import prisma from "@/src/presentation/lib/prisma";
+import prisma from "@/presentation/lib/prisma";
 import type {
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
   ArticleCategory,
-} from "@/src/domain/value-objects/article-category";
-import { logActivityFromRequest } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/src/domain/enums/enums";
+} from "@/domain/value-objects/article-category";
+import { logActivityFromRequest } from "@/presentation/lib/activity-log";
+import { ActivityType } from "@/domain/enums/enums";
 import type { NextRequest } from "next/server";
 
 export async function getArticleCategories(): Promise<ArticleCategory[]> {

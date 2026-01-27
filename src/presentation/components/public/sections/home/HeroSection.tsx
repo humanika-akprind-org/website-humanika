@@ -11,9 +11,9 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useActivePeriodStatistic } from "@/src/presentation/hooks/statistic/useStatistics";
+import { useActivePeriodStatistic } from "@/presentation/hooks/statistic/useStatistics";
 
-import StatsSkeleton from "@/src/presentation/components/public/ui/skeleton/StatsSkeleton";
+import StatsSkeleton from "@/presentation/components/public/ui/skeleton/StatsSkeleton";
 
 export default function HeroSection() {
   const { statistic, isLoading: loading } = useActivePeriodStatistic();

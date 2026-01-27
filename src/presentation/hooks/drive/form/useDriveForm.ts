@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useDriveFolders } from "./useDriveFolders";
 import { useFileOperations } from "./useFileOperations";
-import { getFolderOptions } from "@/src/presentation/app/utils/google-drive";
+import { getFolderOptions } from "@/presentation/app/utils/google-drive";
 import type {
   UseDriveFormProps,
   UseDriveFormReturn,
-} from "@/src/domain/value-objects/google-drive";
+} from "@/domain/value-objects/google-drive";
 
 export function useDriveForm({
   accessToken,

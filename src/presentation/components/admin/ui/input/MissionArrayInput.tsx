@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Button from "@/src/presentation/components/admin/ui/button/Button";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
+import Button from "@/presentation/components/admin/ui/button/Button";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
 import IconPicker, { type IconOption, defaultIcons } from "./IconPicker";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 

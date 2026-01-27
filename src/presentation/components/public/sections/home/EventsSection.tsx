@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import EventCard from "@/src/presentation/components/public/pages/card/event/EventCard";
-import type { Event, ScheduleItem } from "@/src/domain/entities/event";
+import EventCard from "@/presentation/components/public/pages/card/event/EventCard";
+import type { Event, ScheduleItem } from "@/domain/entities/event";
 import {
   Filter,
   CalendarDays,
@@ -14,9 +14,9 @@ import {
   Calendar,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import SectionHeaderSkeleton from "@/src/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
-import EventsControlSkeleton from "@/src/presentation/components/public/ui/skeleton/EventsControlSkeleton";
-import CardSkeleton from "@/src/presentation/components/public/ui/skeleton/CardSkeleton";
+import SectionHeaderSkeleton from "@/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
+import EventsControlSkeleton from "@/presentation/components/public/ui/skeleton/EventsControlSkeleton";
+import CardSkeleton from "@/presentation/components/public/ui/skeleton/CardSkeleton";
 
 // Helper function to get the earliest schedule date from an event
 function getEarliestScheduleDate(

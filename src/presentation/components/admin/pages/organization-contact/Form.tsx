@@ -4,13 +4,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FiSave, FiX } from "react-icons/fi";
-import Button from "@/src/presentation/components/admin/ui/button/Button";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import TextAreaInput from "@/src/presentation/components/admin/ui/input/TextAreaInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
+import Button from "@/presentation/components/admin/ui/button/Button";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import TextAreaInput from "@/presentation/components/admin/ui/input/TextAreaInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
 import MissionArrayInput, {
   type MissionItem,
-} from "@/src/presentation/components/admin/ui/input/MissionArrayInput";
+} from "@/presentation/components/admin/ui/input/MissionArrayInput";
 
 const organizationContactSchema = z.object({
   vision: z.string().min(1, "Vision is required"),

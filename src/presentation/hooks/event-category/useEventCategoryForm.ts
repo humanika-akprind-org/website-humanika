@@ -3,7 +3,7 @@ import type {
   EventCategory,
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
-} from "@/src/domain/value-objects/event-category";
+} from "@/domain/value-objects/event-category";
 
 export interface EventCategoryFormData {
   name: string;

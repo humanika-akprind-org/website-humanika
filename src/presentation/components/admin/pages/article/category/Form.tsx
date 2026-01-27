@@ -6,14 +6,14 @@ import type {
   ArticleCategory,
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-} from "@/src/domain/value-objects/article-category";
+} from "@/domain/value-objects/article-category";
 
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import { Textarea } from "@/src/presentation/components/ui/textarea";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import { Textarea } from "@/presentation/components/ui/textarea";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
 import { FiTag } from "react-icons/fi";
-import { useArticleCategoryForm } from "@/src/presentation/hooks/article-category/useArticleCategoryForm";
+import { useArticleCategoryForm } from "@/presentation/hooks/article-category/useArticleCategoryForm";
 
 interface ArticleCategoryFormProps {
   category?: ArticleCategory;

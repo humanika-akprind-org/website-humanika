@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { callApi } from "@/src/presentation/services/google-drive";
-import type { UseFileOperationsReturn } from "@/src/domain/value-objects/google-drive";
+import { callApi } from "@/presentation/services/google-drive";
+import type { UseFileOperationsReturn } from "@/domain/value-objects/google-drive";
 
 export function useFileOperations(): UseFileOperationsReturn {
   const [isLoading, setIsLoading] = useState(false);

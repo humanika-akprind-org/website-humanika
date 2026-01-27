@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import {
   getCurrentUser,
   clearAuthCookies,
-} from "@/src/presentation/lib/auth-server";
-import { deleteAccount } from "@/src/infrastructure/repositories/user/user.service";
+} from "@/presentation/lib/auth-server";
+import { deleteAccount } from "@/infrastructure/repositories/user/user.service";
 
 export async function DELETE(_request: NextRequest) {
   try {

@@ -1,8 +1,8 @@
 "use client";
 
 import { FiCalendar, FiCheckCircle, FiFileText, FiClock } from "react-icons/fi";
-import type { Event } from "@/src/domain/entities/event";
-import { Status } from "@/src/domain/enums/enums";
+import type { Event } from "@/domain/entities/event";
+import { Status } from "@/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {

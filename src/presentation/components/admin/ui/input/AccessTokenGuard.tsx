@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import GoogleDriveConnect from "@/src/presentation/components/admin/google-drive/GoogleDriveConnect";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import GoogleDriveConnect from "@/presentation/components/admin/google-drive/GoogleDriveConnect";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 
 interface AccessTokenGuardProps {
   label: string;

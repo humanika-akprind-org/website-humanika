@@ -1,15 +1,15 @@
 "use client";
 
 import { FiUser, FiMail, FiKey, FiUsers, FiLock } from "react-icons/fi";
-import { UserRole, Department, Position } from "@/src/domain/enums/enums";
-import { formatEnumValue } from "@/src/presentation/lib/utils";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import PasswordInput from "@/src/presentation/components/admin/ui/input/PasswordInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
+import { UserRole, Department, Position } from "@/domain/enums/enums";
+import { formatEnumValue } from "@/presentation/lib/utils";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import PasswordInput from "@/presentation/components/admin/ui/input/PasswordInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
 import { useRouter } from "next/navigation";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import { useUserForm } from "@/src/presentation/hooks/user/useUserForm";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import { useUserForm } from "@/presentation/hooks/user/useUserForm";
 export interface CreateUserData {
   name: string;
   email: string;

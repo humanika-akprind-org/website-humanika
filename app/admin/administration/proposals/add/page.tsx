@@ -1,15 +1,15 @@
 "use client";
 
-import DocumentForm from "@/src/presentation/components/admin/pages/document/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateDocument } from "@/src/presentation/hooks/document/useCreateDocument";
-import { useDocumentFormData } from "@/src/presentation/hooks/document/useDocumentFormData";
-import { useDocumentTypes } from "@/src/presentation/hooks/document-type/useDocumentTypes";
+import DocumentForm from "@/presentation/components/admin/pages/document/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateDocument } from "@/presentation/hooks/document/useCreateDocument";
+import { useDocumentFormData } from "@/presentation/hooks/document/useDocumentFormData";
+import { useDocumentTypes } from "@/presentation/hooks/document-type/useDocumentTypes";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import WarningModal from "@/src/presentation/components/admin/ui/modal/WarningModal";
+import WarningModal from "@/presentation/components/admin/ui/modal/WarningModal";
 
 export default function AddDocumentPage() {
   const router = useRouter();

@@ -1,12 +1,12 @@
-import prisma from "@/src/presentation/lib/prisma";
+import prisma from "@/presentation/lib/prisma";
 import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
   OrganizationalStructure,
-} from "@/src/domain/entities/structure";
-import type { Status } from "@/src/domain/enums/enums";
-import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/src/domain/enums/enums";
+} from "@/domain/entities/structure";
+import type { Status } from "@/domain/enums/enums";
+import { logActivity } from "@/presentation/lib/activity-log";
+import { ActivityType } from "@/domain/enums/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 
 type UserWithId = { id: string };

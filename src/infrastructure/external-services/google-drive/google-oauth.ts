@@ -3,7 +3,7 @@ import {
   googleClientId,
   googleClientSecret,
   googleRedirectUri,
-} from "@/src/presentation/lib/config/config";
+} from "@/presentation/lib/config/config";
 import { cookies } from "next/headers";
 
 export const oauth2Client = new google.auth.OAuth2(

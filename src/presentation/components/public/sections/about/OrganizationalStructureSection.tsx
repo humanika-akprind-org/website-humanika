@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import type { OrganizationalStructure } from "@/src/domain/entities/structure";
-import StructureAvatar from "@/src/presentation/components/admin/ui/avatar/ImageView";
+import type { OrganizationalStructure } from "@/domain/entities/structure";
+import StructureAvatar from "@/presentation/components/admin/ui/avatar/ImageView";
 import { Users, BarChart3, ChevronRight } from "lucide-react";
 import Link from "next/link";
 

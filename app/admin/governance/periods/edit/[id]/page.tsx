@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import PeriodForm from "@/src/presentation/components/admin/pages/period/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import { useEditPeriod } from "@/src/presentation/hooks/period/useEditPeriod";
+import PeriodForm from "@/presentation/components/admin/pages/period/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import { useEditPeriod } from "@/presentation/hooks/period/useEditPeriod";
 
 export default function EditPeriodPage() {
   const params = useParams();

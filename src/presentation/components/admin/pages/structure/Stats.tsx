@@ -8,8 +8,8 @@ import {
   FiEdit,
 } from "react-icons/fi";
 import StatCard from "../../ui/card/StatCard";
-import type { OrganizationalStructure } from "@/src/domain/entities/structure";
-import { Status } from "@/src/domain/enums/enums";
+import type { OrganizationalStructure } from "@/domain/entities/structure";
+import { Status } from "@/domain/enums/enums";
 
 interface StatsProps {
   structures: OrganizationalStructure[];

@@ -5,8 +5,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/src/presentation/components/ui/table";
-import { ActivityType } from "@/src/domain/enums/enums";
+} from "@/presentation/components/ui/table";
+import { ActivityType } from "@/domain/enums/enums";
 import type { ActivityType as PrismaActivityType } from "@prisma/client";
 
 interface ActivityLogData {

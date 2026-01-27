@@ -1,11 +1,11 @@
 // app/(admin)/admin/people/users/add/page.tsx
 "use client";
 
-import UserForm from "@/src/presentation/components/admin/pages/user/Form";
-import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import { useCreateUser } from "@/src/presentation/hooks/user/useCreateUser";
+import UserForm from "@/presentation/components/admin/pages/user/Form";
+import LoadingForm from "@/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/presentation/components/admin/ui/PageHeader";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import { useCreateUser } from "@/presentation/hooks/user/useCreateUser";
 
 export default function AddUserPage() {
   const { createUser, handleBack, isSubmitting, error } = useCreateUser();

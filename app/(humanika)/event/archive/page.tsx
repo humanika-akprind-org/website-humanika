@@ -2,27 +2,27 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import EventCard from "@/src/presentation/components/public/pages/card/event/EventCard";
-import { useEventCategories } from "@/src/presentation/hooks/event-category/useEventCategories";
-import { useEventData } from "@/src/presentation/hooks/event/useEventPage";
+import EventCard from "@/presentation/components/public/pages/card/event/EventCard";
+import { useEventCategories } from "@/presentation/hooks/event-category/useEventCategories";
+import { useEventData } from "@/presentation/hooks/event/useEventPage";
 import {
   generateCategories,
   truncateDescription,
-} from "@/src/presentation/components/public/pages/event/utils";
-import EventHeroSection from "@/src/presentation/components/public/sections/event/EventHeroSection";
-import EventControlBar from "@/src/presentation/components/public/pages/event/EventControlBar";
-import EventEmptyState from "@/src/presentation/components/public/pages/event/EventEmptyState";
-import EventCalendarView from "@/src/presentation/components/public/pages/event/EventCalendarView";
-import EventLoadMore from "@/src/presentation/components/public/pages/event/EventLoadMore";
-import ArchivePageLoadingState from "@/src/presentation/components/public/pages/event/ArchivePageLoadingState";
-import ErrorState from "@/src/presentation/components/public/pages/event/EventErrorState";
-import PopularCategories from "@/src/presentation/components/public/pages/event/EventPopularCategories";
+} from "@/presentation/components/public/pages/event/utils";
+import EventHeroSection from "@/presentation/components/public/sections/event/EventHeroSection";
+import EventControlBar from "@/presentation/components/public/pages/event/EventControlBar";
+import EventEmptyState from "@/presentation/components/public/pages/event/EventEmptyState";
+import EventCalendarView from "@/presentation/components/public/pages/event/EventCalendarView";
+import EventLoadMore from "@/presentation/components/public/pages/event/EventLoadMore";
+import ArchivePageLoadingState from "@/presentation/components/public/pages/event/ArchivePageLoadingState";
+import ErrorState from "@/presentation/components/public/pages/event/EventErrorState";
+import PopularCategories from "@/presentation/components/public/pages/event/EventPopularCategories";
 import type {
   EventFilters,
   ViewMode,
   SortBy,
-} from "@/src/presentation/hooks/event/useEventPage";
-import type { ScheduleItem } from "@/src/domain/entities/event";
+} from "@/presentation/hooks/event/useEventPage";
+import type { ScheduleItem } from "@/domain/entities/event";
 
 // Helper function to get the latest schedule date from an event
 function getLatestScheduleDate(

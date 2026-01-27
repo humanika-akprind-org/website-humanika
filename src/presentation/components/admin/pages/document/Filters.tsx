@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DocumentType, Status, StatusApproval } from "@/src/domain/enums/enums";
-import { PeriodApi } from "@/src/presentation/services/period";
+import { DocumentType, Status, StatusApproval } from "@/domain/enums/enums";
+import { PeriodApi } from "@/presentation/services/period";
 import SearchInput from "../../ui/input/SearchInput";
 import DeleteSelectedButton from "../../ui/button/DeleteSelectedButton";
 import SelectFilter from "../../ui/input/SelectFilter";

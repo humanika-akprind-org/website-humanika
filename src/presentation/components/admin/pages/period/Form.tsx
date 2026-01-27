@@ -1,12 +1,12 @@
 "use client";
 
-import type { Period, PeriodFormData } from "@/src/domain/entities/period";
+import type { Period, PeriodFormData } from "@/domain/entities/period";
 import { FiFileText, FiCalendar } from "react-icons/fi";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
-import CheckboxInput from "@/src/presentation/components/admin/ui/checkbox/CheckboxInput";
-import { usePeriodFormLogic } from "@/src/presentation/hooks/period/usePeriodFormLogic";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
+import CheckboxInput from "@/presentation/components/admin/ui/checkbox/CheckboxInput";
+import { usePeriodFormLogic } from "@/presentation/hooks/period/usePeriodFormLogic";
 
 interface PeriodFormProps {
   period?: Period;

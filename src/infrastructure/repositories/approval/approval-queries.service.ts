@@ -1,11 +1,11 @@
-import { prisma } from "@/src/presentation/lib/prisma";
-import type { ApprovalType } from "@/src/domain/enums/enums";
+import { prisma } from "@/presentation/lib/prisma";
+import type { ApprovalType } from "@/domain/enums/enums";
 import type { StatusApproval } from "@prisma/client";
 import type {
   ApprovalFilters,
   ApprovalsResponse,
   ApprovalWithRelations,
-} from "@/src/domain/entities/approval";
+} from "@/domain/entities/approval";
 
 export async function getApprovals(
   filters: ApprovalFilters,

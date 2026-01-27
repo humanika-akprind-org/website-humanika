@@ -1,19 +1,19 @@
 "use client";
 
-import GalleryStats from "@/src/presentation/components/admin/pages/gallery/Stats";
-import GalleryFilters from "@/src/presentation/components/admin/pages/gallery/Filters";
-import GalleryTable from "@/src/presentation/components/admin/pages/gallery/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import GalleryStats from "@/presentation/components/admin/pages/gallery/Stats";
+import GalleryFilters from "@/presentation/components/admin/pages/gallery/Filters";
+import GalleryTable from "@/presentation/components/admin/pages/gallery/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import ImageView from "@/src/presentation/components/admin/ui/avatar/ImageView";
-import { useGalleryManagement } from "@/src/presentation/hooks/gallery/useGalleryManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import ImageView from "@/presentation/components/admin/ui/avatar/ImageView";
+import { useGalleryManagement } from "@/presentation/hooks/gallery/useGalleryManagement";
 
 export default function GalleriesPage() {
   const {

@@ -1,12 +1,12 @@
 "use client";
 
-import { useWorkProgramApproval } from "@/src/presentation/hooks/work-program/useWorkProgramApproval";
-import ApprovalFilters from "@/src/presentation/components/admin/pages/approval/Filters";
-import ApprovalTable from "@/src/presentation/components/admin/pages/approval/Table";
-import ApprovalActionModal from "@/src/presentation/components/admin/pages/approval/ActionModal";
-import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
-import LoadingApproval from "@/src/presentation/components/admin/layout/loading/LoadingApproval";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
+import { useWorkProgramApproval } from "@/presentation/hooks/work-program/useWorkProgramApproval";
+import ApprovalFilters from "@/presentation/components/admin/pages/approval/Filters";
+import ApprovalTable from "@/presentation/components/admin/pages/approval/Table";
+import ApprovalActionModal from "@/presentation/components/admin/pages/approval/ActionModal";
+import Alert from "@/presentation/components/admin/ui/alert/Alert";
+import LoadingApproval from "@/presentation/components/admin/layout/loading/LoadingApproval";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
 
 export default function WorkProgramApprovalPage() {
   const {

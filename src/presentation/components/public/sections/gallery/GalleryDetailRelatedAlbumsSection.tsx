@@ -2,9 +2,9 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ChevronRight, FolderOpen } from "lucide-react";
-import AlbumGrid from "@/src/presentation/components/public/pages/card/album/AlbumGrid";
-import { transformEventsToAlbums } from "@/src/presentation/lib/gallery-utils";
-import type { Event } from "@/src/domain/entities/event";
+import AlbumGrid from "@/presentation/components/public/pages/card/album/AlbumGrid";
+import { transformEventsToAlbums } from "@/presentation/lib/gallery-utils";
+import type { Event } from "@/domain/entities/event";
 
 interface GalleryDetailRelatedAlbumsSectionProps {
   relatedEvents: Event[];

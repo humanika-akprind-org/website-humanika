@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { FiEye, FiTrash, FiEdit } from "react-icons/fi";
 import { ClipboardList, FileText, File } from "lucide-react";
-import type { DepartmentTask } from "@/src/domain/entities/task";
+import type { DepartmentTask } from "@/domain/entities/task";
 import SortIcon from "../../ui/SortIcon";
 import StatusChip from "../../ui/chip/Status";
 import Checkbox from "../../ui/checkbox/Checkbox";
@@ -13,7 +13,7 @@ import DropdownMenu from "../../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../../ui/chip/Department";
 import { exportSingleTaskToPDF } from "./export-button/ExportPDFButton";
 import { exportSingleTaskToWord } from "./export-button/ExportWordButton";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface TaskTableProps {
   tasks: DepartmentTask[];

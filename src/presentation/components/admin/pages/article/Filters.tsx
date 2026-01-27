@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { FiFilter, FiChevronDown } from "react-icons/fi";
-import { Status } from "@/src/domain/enums/enums";
-import { PeriodApi } from "@/src/presentation/services/period";
-import { getArticleCategories } from "@/src/presentation/services/article-category";
+import { Status } from "@/domain/enums/enums";
+import { PeriodApi } from "@/presentation/services/period";
+import { getArticleCategories } from "@/presentation/services/article-category";
 import SearchInput from "../../ui/input/SearchInput";
 import SelectFilter from "../../ui/input/SelectFilter";
 import DeleteSelectedButton from "../../ui/button/DeleteSelectedButton";

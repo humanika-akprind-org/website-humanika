@@ -2,14 +2,14 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Calendar, Trophy, Sparkles, Target } from "lucide-react";
-import type { Event, ScheduleItem } from "@/src/domain/entities/event";
-import HtmlRenderer from "@/src/presentation/components/admin/ui/HtmlRenderer";
+import type { Event, ScheduleItem } from "@/domain/entities/event";
+import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
 import {
   getPreviewUrl,
   getEventStatus,
   getEarliestScheduleDate,
   getLatestScheduleDate,
-} from "@/src/presentation/lib/eventDetailUtils";
+} from "@/presentation/lib/eventDetailUtils";
 
 interface EventDetailContentSectionProps {
   event: Event;

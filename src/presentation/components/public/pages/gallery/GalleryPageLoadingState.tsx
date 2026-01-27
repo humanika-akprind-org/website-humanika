@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import SectionHeaderSkeleton from "@/src/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
-import GalleryGridSkeleton from "@/src/presentation/components/public/ui/skeleton/GalleryGridSkeleton";
+import SectionHeaderSkeleton from "@/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
+import GalleryGridSkeleton from "@/presentation/components/public/ui/skeleton/GalleryGridSkeleton";
 
 export default function GalleryPageLoadingState() {
   return (

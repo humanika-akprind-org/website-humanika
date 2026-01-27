@@ -6,18 +6,18 @@ import type {
   DepartmentTask,
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
-} from "@/src/domain/entities/task";
-import { Department, Status } from "@/src/domain/enums/enums";
+} from "@/domain/entities/task";
+import { Department, Status } from "@/domain/enums/enums";
 
-import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
-import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
-import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
-import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
-import CancelButton from "@/src/presentation/components/ui/CancelButton";
+import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";
+import TextInput from "@/presentation/components/admin/ui/input/TextInput";
+import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";
+import SubmitButton from "@/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/presentation/components/ui/CancelButton";
 import { FiBriefcase, FiUser, FiCheckCircle, FiFolder } from "react-icons/fi";
-import type { User } from "@/src/domain/entities/user";
-import type { WorkProgram } from "@/src/domain/entities/work";
-import { useTaskForm } from "@/src/presentation/hooks/task/useTaskForm";
+import type { User } from "@/domain/entities/user";
+import type { WorkProgram } from "@/domain/entities/work";
+import { useTaskForm } from "@/presentation/hooks/task/useTaskForm";
 
 export interface CreateTaskData {
   title: string;

@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateFinanceCategoryInput } from "@/src/domain/value-objects/finance-category";
-import type { FinanceType } from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { CreateFinanceCategoryInput } from "@/domain/value-objects/finance-category";
+import type { FinanceType } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getFinanceCategories,
   createFinanceCategory,
-} from "@/src/infrastructure/repositories/finance/finance-category.service";
+} from "@/infrastructure/repositories/finance/finance-category.service";
 
 function extractFinanceCategoryQueryParams(request: NextRequest) {
   const { searchParams } = new URL(request.url);

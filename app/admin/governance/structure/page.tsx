@@ -1,20 +1,20 @@
 "use client";
 
-import StructureStats from "@/src/presentation/components/admin/pages/structure/Stats";
-import StructureFilters from "@/src/presentation/components/admin/pages/structure/Filters";
-import StructureTable from "@/src/presentation/components/admin/pages/structure/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import StructureStats from "@/presentation/components/admin/pages/structure/Stats";
+import StructureFilters from "@/presentation/components/admin/pages/structure/Filters";
+import StructureTable from "@/presentation/components/admin/pages/structure/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import { useStructureManagement } from "@/src/presentation/hooks/structure/useStructureManagement";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
-import ImageView from "@/src/presentation/components/admin/ui/avatar/ImageView";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import { useStructureManagement } from "@/presentation/hooks/structure/useStructureManagement";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
+import ImageView from "@/presentation/components/admin/ui/avatar/ImageView";
 
 export default function StructuresPage() {
   const {

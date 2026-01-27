@@ -1,22 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import DocumentStats from "@/src/presentation/components/admin/pages/document/Stats";
-import DocumentFilters from "@/src/presentation/components/admin/pages/document/Filters";
-import DocumentTable from "@/src/presentation/components/admin/pages/document/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import DocumentStats from "@/presentation/components/admin/pages/document/Stats";
+import DocumentFilters from "@/presentation/components/admin/pages/document/Filters";
+import DocumentTable from "@/presentation/components/admin/pages/document/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import StatusChip from "@/src/presentation/components/admin/ui/chip/Status";
-import StatusApprovalChip from "@/src/presentation/components/admin/ui/chip/StatusApproval";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import { useDocumentManagement } from "@/src/presentation/hooks/document/useDocumentManagement";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import StatusChip from "@/presentation/components/admin/ui/chip/Status";
+import StatusApprovalChip from "@/presentation/components/admin/ui/chip/StatusApproval";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import { useDocumentManagement } from "@/presentation/hooks/document/useDocumentManagement";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 export default function AccountabilityReportsPage() {
   const [statusFilter, setStatusFilter] = useState("all");

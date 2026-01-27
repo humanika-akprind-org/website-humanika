@@ -3,12 +3,12 @@ import { useRouter } from "next/navigation";
 import {
   getWorkProgram,
   updateWorkProgram,
-} from "@/src/presentation/services/work";
+} from "@/presentation/services/work";
 import type {
   WorkProgram,
   UpdateWorkProgramInput,
   CreateWorkProgramInput,
-} from "@/src/domain/entities/work";
+} from "@/domain/entities/work";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

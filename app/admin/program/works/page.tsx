@@ -1,24 +1,24 @@
 "use client";
 
-import WorkStats from "@/src/presentation/components/admin/pages/work/Stats";
-import WorkFilters from "@/src/presentation/components/admin/pages/work/Filters";
-import WorkTable from "@/src/presentation/components/admin/pages/work/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import WorkStats from "@/presentation/components/admin/pages/work/Stats";
+import WorkFilters from "@/presentation/components/admin/pages/work/Filters";
+import WorkTable from "@/presentation/components/admin/pages/work/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import StatusChip from "@/src/presentation/components/admin/ui/chip/Status";
-import DepartmentChip from "@/src/presentation/components/admin/ui/chip/Department";
-import StatusApprovalChip from "@/src/presentation/components/admin/ui/chip/StatusApproval";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import HtmlRenderer from "@/src/presentation/components/admin/ui/HtmlRenderer";
-import { useWorkManagement } from "@/src/presentation/hooks/work-program/useWorkManagement";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
-import ExportButtons from "@/src/presentation/components/admin/pages/work/export-button/ExportButtons";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import StatusChip from "@/presentation/components/admin/ui/chip/Status";
+import DepartmentChip from "@/presentation/components/admin/ui/chip/Department";
+import StatusApprovalChip from "@/presentation/components/admin/ui/chip/StatusApproval";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
+import { useWorkManagement } from "@/presentation/hooks/work-program/useWorkManagement";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
+import ExportButtons from "@/presentation/components/admin/pages/work/export-button/ExportButtons";
 
 export default function WorkProgramPage() {
   const {

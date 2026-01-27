@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { PeriodApiResponse } from "@/src/domain/entities/period";
+import type { PeriodApiResponse } from "@/domain/entities/period";
 import { ObjectId } from "mongodb";
 import {
   getPeriod,
   updatePeriod,
   deletePeriod,
-} from "@/src/infrastructure/repositories/period/period.service";
+} from "@/infrastructure/repositories/period/period.service";
 
 interface Context {
   params: Promise<{ id: string }>;

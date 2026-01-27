@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getEventCategories,
   createEventCategory,
-} from "@/src/infrastructure/repositories/event/event-category.service";
-import type { CreateEventCategoryInput } from "@/src/domain/value-objects/event-category";
+} from "@/infrastructure/repositories/event/event-category.service";
+import type { CreateEventCategoryInput } from "@/domain/value-objects/event-category";
 
 // Validation functions
 function validateCreateEventCategoryInput(body: CreateEventCategoryInput) {

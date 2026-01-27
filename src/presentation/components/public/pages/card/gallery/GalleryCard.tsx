@@ -9,10 +9,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/src/presentation/components/ui/dialog";
-import { Button } from "@/src/presentation/components/ui/button";
-import type { Gallery } from "@/src/domain/entities/gallery";
-import type { ScheduleItem } from "@/src/domain/entities/event";
+} from "@/presentation/components/ui/dialog";
+import { Button } from "@/presentation/components/ui/button";
+import type { Gallery } from "@/domain/entities/gallery";
+import type { ScheduleItem } from "@/domain/entities/event";
 import { motion } from "framer-motion";
 
 // Helper function to get preview URL
@@ -84,7 +84,7 @@ export default function GalleryCard({ gallery, index = 0 }: GalleryCardProps) {
       const fetchRelatedGalleries = async () => {
         try {
           const { getGalleries } =
-            await import("@/src/presentation/services/gallery");
+            await import("@/presentation/services/gallery");
           const data = await getGalleries({ eventId: currentGallery.eventId });
           setRelatedGalleries(data);
         } catch (error) {

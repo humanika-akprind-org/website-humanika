@@ -6,8 +6,8 @@ import {
   FiBriefcase,
   FiTrendingUp,
 } from "react-icons/fi";
-import { Department } from "@/src/domain/enums/enums";
-import { formatEnumValue } from "@/src/presentation/services/user";
+import { Department } from "@/domain/enums/enums";
+import { formatEnumValue } from "@/presentation/services/user";
 
 interface DepartmentProps {
   department?: Department | null;

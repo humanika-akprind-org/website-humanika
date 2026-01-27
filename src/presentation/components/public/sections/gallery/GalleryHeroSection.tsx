@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Camera, Image as ImageIcon } from "lucide-react";
-import { type GalleryStats } from "@/src/presentation/lib/gallery-utils";
+import { type GalleryStats } from "@/presentation/lib/gallery-utils";
 import { ANIMATION_DELAYS } from "../../pages/gallery/constants";
 
 interface GalleryHeroSectionProps {

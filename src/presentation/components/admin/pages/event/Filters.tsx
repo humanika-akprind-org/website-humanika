@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Status } from "@/src/domain/enums/enums";
-import { PeriodApi } from "@/src/presentation/services/period";
-import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
-import { useEventCategories } from "@/src/presentation/hooks/event-category/useEventCategories";
+import { Status } from "@/domain/enums/enums";
+import { PeriodApi } from "@/presentation/services/period";
+import { useWorkPrograms } from "@/presentation/hooks/work-program/useWorkPrograms";
+import { useEventCategories } from "@/presentation/hooks/event-category/useEventCategories";
 import SearchInput from "../../ui/input/SearchInput";
 import FilterButton from "../../ui/button/FilterButton";
 import SelectFilter from "../../ui/input/SelectFilter";

@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEye, FiEdit, FiTrash } from "react-icons/fi";
 import { UserCog } from "lucide-react";
-import type { Management } from "@/src/domain/entities/management";
+import type { Management } from "@/domain/entities/management";
 import ManagementAvatar from "../../ui/avatar/ManagementAvatar";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../../ui/chip/Department";
@@ -13,7 +13,7 @@ import Pagination from "../../ui/pagination/Pagination";
 import AddButton from "../../ui/button/AddButton";
 import EmptyState from "../../ui/EmptyState";
 import SortIcon from "../../ui/SortIcon";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface ManagementTableProps {
   managements: Management[];

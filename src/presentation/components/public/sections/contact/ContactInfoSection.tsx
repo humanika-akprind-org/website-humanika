@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { CONTACT_INFO, SOCIAL_MEDIA } from "../../pages/contact/constants";
-import { useActivePeriodOrganizationContact } from "@/src/presentation/hooks/organization-contact/useOrganizationContacts";
+import { useActivePeriodOrganizationContact } from "@/presentation/hooks/organization-contact/useOrganizationContacts";
 
 export default function ContactInfoSection() {
   const { organizationContact, isLoading: orgLoading } =

@@ -1,18 +1,18 @@
 "use client";
 
-import StatisticStats from "@/src/presentation/components/admin/pages/statistic/Stats";
-import StatisticFilters from "@/src/presentation/components/admin/pages/statistic/Filters";
-import StatisticTable from "@/src/presentation/components/admin/pages/statistic/Table";
-import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
-import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
-import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import StatisticStats from "@/presentation/components/admin/pages/statistic/Stats";
+import StatisticFilters from "@/presentation/components/admin/pages/statistic/Filters";
+import StatisticTable from "@/presentation/components/admin/pages/statistic/Table";
+import DeleteModal from "@/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/presentation/components/admin/layout/loading/Loading";
 import Alert, {
   type AlertType,
-} from "@/src/presentation/components/admin/ui/alert/Alert";
-import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
-import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
-import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
-import { useStatisticManagement } from "@/src/presentation/hooks/statistic/useStatisticManagement";
+} from "@/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/presentation/components/admin/ui/button/AddButton";
+import DateDisplay from "@/presentation/components/admin/ui/date/DateDisplay";
+import { useStatisticManagement } from "@/presentation/hooks/statistic/useStatisticManagement";
 
 export default function StatisticsPage() {
   const {

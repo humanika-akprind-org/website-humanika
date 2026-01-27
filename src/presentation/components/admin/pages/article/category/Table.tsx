@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
 import { Tag } from "lucide-react";
-import type { ArticleCategory } from "@/src/domain/value-objects/article-category";
+import type { ArticleCategory } from "@/domain/value-objects/article-category";
 import Checkbox from "../../../ui/checkbox/Checkbox";
 import DropdownMenu, {
   DropdownMenuItem,
@@ -12,7 +12,7 @@ import EmptyState from "../../../ui/EmptyState";
 import AddButton from "../../../ui/button/AddButton";
 import SortIcon from "../../../ui/SortIcon";
 import Pagination from "../../../ui/pagination/Pagination";
-import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface ArticleCategoryTableProps {
   categories: ArticleCategory[];

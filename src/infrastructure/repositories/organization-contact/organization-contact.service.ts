@@ -1,12 +1,12 @@
-import prisma from "@/src/presentation/lib/prisma";
+import prisma from "@/presentation/lib/prisma";
 import type {
   CreateOrganizationContactInput,
   UpdateOrganizationContactInput,
   OrganizationContactFilter,
-} from "@/src/domain/entities/organization-contact";
-import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/src/domain/enums/enums";
-import type { User } from "@/src/domain/entities/user";
+} from "@/domain/entities/organization-contact";
+import { logActivity } from "@/presentation/lib/activity-log";
+import { ActivityType } from "@/domain/enums/enums";
+import type { User } from "@/domain/entities/user";
 import type { Prisma } from "@prisma/client";
 
 type UserWithId = Pick<User, "id">;

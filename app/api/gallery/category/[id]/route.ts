@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getGalleryCategory,
   updateGalleryCategory,
   deleteGalleryCategory,
-} from "@/src/infrastructure/repositories/gallery/gallery-category.service";
+} from "@/infrastructure/repositories/gallery/gallery-category.service";
 
 export async function GET(
   _request: NextRequest,

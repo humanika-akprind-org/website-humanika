@@ -3,11 +3,11 @@ import { useRouter } from "next/navigation";
 import {
   getArticleCategory,
   updateArticleCategory,
-} from "@/src/presentation/services/article-category";
+} from "@/presentation/services/article-category";
 import type {
   ArticleCategory,
   UpdateArticleCategoryInput,
-} from "@/src/domain/value-objects/article-category";
+} from "@/domain/value-objects/article-category";
 
 export function useEditArticleCategory(categoryId: string) {
   const router = useRouter();

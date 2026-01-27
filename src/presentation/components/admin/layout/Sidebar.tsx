@@ -23,12 +23,12 @@ import {
   BookText,
   Wallet,
 } from "lucide-react";
-import { LogoutButton } from "@/src/presentation/components/admin/auth/LogoutButton";
+import { LogoutButton } from "@/presentation/components/admin/auth/LogoutButton";
 import Image from "next/image";
-import NavLink from "@/src/presentation/components/admin/layout/NavLink";
-import NavDropdown from "@/src/presentation/components/admin/layout/NavDropdown";
-import NavDropdownItem from "@/src/presentation/components/admin/layout/NavDropdownItem";
-import { UserRole } from "@/src/domain/enums/enums";
+import NavLink from "@/presentation/components/admin/layout/NavLink";
+import NavDropdown from "@/presentation/components/admin/layout/NavDropdown";
+import NavDropdownItem from "@/presentation/components/admin/layout/NavDropdownItem";
+import { UserRole } from "@/domain/enums/enums";
 
 export default function Sidebar() {
   const [userRole, setUserRole] = useState<UserRole | null>(null);

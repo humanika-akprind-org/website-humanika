@@ -1,6 +1,6 @@
-import { comparePasswords, generateToken } from "@/src/presentation/lib/auth";
-import prisma from "@/src/presentation/lib/prisma";
-import type { User } from "@/src/domain/entities/user";
+import { comparePasswords, generateToken } from "@/presentation/lib/auth";
+import prisma from "@/presentation/lib/prisma";
+import type { User } from "@/domain/entities/user";
 
 interface LoginResult {
   success: boolean;

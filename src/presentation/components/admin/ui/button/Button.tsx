@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import { cn } from "@/src/presentation/lib/utils";
+import { cn } from "@/presentation/lib/utils";
 
 export type ButtonVariant =
   | "primary"
