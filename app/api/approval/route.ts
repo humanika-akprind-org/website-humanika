@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getApprovals,
   createApproval,
-} from "@/src/infrastructure/repositories/approval/approval.service";
+} from "@/infrastructure/repositories/approval/approval.service";
 
 export async function GET(request: NextRequest) {
   try {

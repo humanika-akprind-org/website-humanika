@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  getDocuments,
-  deleteDocument,
-} from "@/src/presentation/services/document";
-import type { Document, DocumentFilter } from "@/src/domain/entities/document";
-import { useToast } from "@/src/presentation/hooks/use-toast";
+import { getDocuments, deleteDocument } from "@/presentation/services/document";
+import type { Document, DocumentFilter } from "@/domain/entities/document";
+import { useToast } from "@/presentation/hooks/use-toast";
 
 export function useDocuments(filter?: DocumentFilter) {
   const [documents, setDocuments] = useState<Document[]>([]);

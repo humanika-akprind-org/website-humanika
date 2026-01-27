@@ -2,7 +2,7 @@ import type {
   GalleryCategory,
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
-} from "@/src/domain/value-objects/gallery-category";
+} from "@/domain/value-objects/gallery-category";
 
 export const getGalleryCategories = async (): Promise<GalleryCategory[]> => {
   const response = await fetch("/api/gallery/category");

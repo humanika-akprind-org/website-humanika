@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { appConfig } from "@/src/presentation/lib/config/config";
+import { appConfig } from "@/presentation/lib/config/config";
 
 const resend = new Resend(appConfig.resendApiKey);
 

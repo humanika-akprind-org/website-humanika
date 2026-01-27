@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { StructureApi } from "@/src/presentation/services/structure";
-import { PeriodApi } from "@/src/presentation/services/period";
-import type { OrganizationalStructure } from "@/src/domain/entities/structure";
-import type { Period } from "@/src/domain/entities/period";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import { StructureApi } from "@/presentation/services/structure";
+import { PeriodApi } from "@/presentation/services/period";
+import type { OrganizationalStructure } from "@/domain/entities/structure";
+import type { Period } from "@/domain/entities/period";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 type StructureFiltersType = {
   status: string;

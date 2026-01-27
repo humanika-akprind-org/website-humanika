@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { PeriodApiResponse } from "@/src/domain/entities/period";
+import type { PeriodApiResponse } from "@/domain/entities/period";
 import {
   getPeriods,
   createPeriod,
-} from "@/src/infrastructure/repositories/period/period.service";
+} from "@/infrastructure/repositories/period/period.service";
 
 // Extract payload functions
 async function extractCreatePeriodBody(request: NextRequest) {

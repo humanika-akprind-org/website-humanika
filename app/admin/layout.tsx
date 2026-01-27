@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import AuthProvider from "@/src/presentation/components/admin/auth/AuthProvider";
-import Sidebar from "@/src/presentation/components/admin/layout/Sidebar";
-import { Toaster } from "@/src/presentation/components/ui/toaster";
+import AuthProvider from "@/presentation/components/admin/auth/AuthProvider";
+import Sidebar from "@/presentation/components/admin/layout/Sidebar";
+import { Toaster } from "@/presentation/components/ui/toaster";
 import "./admin.css";
 import {
   getGoogleAccessToken,
   getGoogleUserEmail,
-} from "@/src/infrastructure/external-services/google-drive/google-oauth";
-import AuthGuard from "@/src/presentation/components/admin/auth/google-oauth/AuthGuard";
-import UserInfo from "@/src/presentation/components/admin/layout/UserInfo";
-import { geistSans, geistMono } from "@/src/presentation/app/ui/fonts";
-import SidebarMobile from "@/src/presentation/components/admin/layout/SidebarMobile";
-import RefreshHandler from "@/src/presentation/components/admin/ui/RefreshHandler";
-import GoogleDriveStatus from "@/src/presentation/components/admin/google-drive/GoogleDriveStatus";
+} from "@/infrastructure/external-services/google-drive/google-oauth";
+import AuthGuard from "@/presentation/components/admin/auth/google-oauth/AuthGuard";
+import UserInfo from "@/presentation/components/admin/layout/UserInfo";
+import { geistSans, geistMono } from "@/presentation/app/ui/fonts";
+import SidebarMobile from "@/presentation/components/admin/layout/SidebarMobile";
+import RefreshHandler from "@/presentation/components/admin/ui/RefreshHandler";
+import GoogleDriveStatus from "@/presentation/components/admin/google-drive/GoogleDriveStatus";
 
 export const metadata: Metadata = {
   title: "Organizational Management System",

@@ -3,8 +3,8 @@ import type {
   CreateEventInput,
   UpdateEventInput,
   EventFilter,
-} from "@/src/domain/entities/event";
-import { apiUrl } from "@/src/presentation/lib/config/config";
+} from "@/domain/entities/event";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

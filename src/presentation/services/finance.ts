@@ -3,8 +3,8 @@ import type {
   CreateFinanceInput,
   UpdateFinanceInput,
   FinanceFilter,
-} from "@/src/domain/entities/finance";
-import { apiUrl } from "@/src/presentation/lib/config/config";
+} from "@/domain/entities/finance";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

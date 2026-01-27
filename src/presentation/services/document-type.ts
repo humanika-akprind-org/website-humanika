@@ -2,7 +2,7 @@ import type {
   DocumentType,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/src/domain/value-objects/document-type";
+} from "@/domain/value-objects/document-type";
 
 export async function getDocumentTypes(): Promise<DocumentType[]> {
   const response = await fetch("/api/document/type");

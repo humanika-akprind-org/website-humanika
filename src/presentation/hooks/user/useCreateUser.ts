@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserApi } from "@/src/presentation/services/user";
-import type { CreateUserData } from "@/src/domain/entities/user";
+import { UserApi } from "@/presentation/services/user";
+import type { CreateUserData } from "@/domain/entities/user";
 
 export function useCreateUser() {
   const router = useRouter();

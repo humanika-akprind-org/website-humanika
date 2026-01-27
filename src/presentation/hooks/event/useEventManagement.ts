@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteEvent } from "@/src/presentation/services/event";
-import type { Event } from "@/src/domain/entities/event";
+import { deleteEvent } from "@/presentation/services/event";
+import type { Event } from "@/domain/entities/event";
 import { useEvents } from "./useEvents";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 export function useEventManagement() {
   const router = useRouter();

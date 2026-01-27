@@ -2,9 +2,9 @@ import type {
   ArticleCategory,
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-} from "@/src/domain/value-objects/article-category";
+} from "@/domain/value-objects/article-category";
 
-import { apiUrl } from "@/src/presentation/lib/config/config";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

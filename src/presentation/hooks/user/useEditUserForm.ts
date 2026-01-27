@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { UserApi } from "@/src/presentation/services/user";
-import type { User, UpdateUserData } from "@/src/domain/entities/user";
-import { UserRole } from "@/src/domain/enums/enums";
+import { UserApi } from "@/presentation/services/user";
+import type { User, UpdateUserData } from "@/domain/entities/user";
+import { UserRole } from "@/domain/enums/enums";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

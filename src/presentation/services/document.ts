@@ -3,8 +3,8 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
   DocumentFilter,
-} from "@/src/domain/entities/document";
-import { apiUrl } from "@/src/presentation/lib/config/config";
+} from "@/domain/entities/document";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

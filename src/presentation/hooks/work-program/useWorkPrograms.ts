@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-import { getWorkPrograms } from "@/src/presentation/services/work";
-import type {
-  WorkProgram,
-  WorkProgramFilter,
-} from "@/src/domain/entities/work";
+import { getWorkPrograms } from "@/presentation/services/work";
+import type { WorkProgram, WorkProgramFilter } from "@/domain/entities/work";
 
 export function useWorkPrograms(filter?: WorkProgramFilter) {
   const [workPrograms, setWorkPrograms] = useState<WorkProgram[]>([]);

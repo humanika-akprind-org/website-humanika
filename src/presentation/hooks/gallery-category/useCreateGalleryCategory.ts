@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createGalleryCategory } from "@/src/presentation/services/gallery-category";
+import { createGalleryCategory } from "@/presentation/services/gallery-category";
 import type {
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
-} from "@/src/domain/value-objects/gallery-category";
+} from "@/domain/value-objects/gallery-category";
 
 export function useCreateGalleryCategory() {
   const router = useRouter();

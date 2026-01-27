@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { type ActivityType } from "@/src/domain/enums/enums";
+import { type ActivityType } from "@/domain/enums/enums";
 
-import { type ActivityMetadata } from "@/src/domain/entities/activity-log";
+import { type ActivityMetadata } from "@/domain/entities/activity-log";
 
 interface LogActivityParams {
   activityType: ActivityType;

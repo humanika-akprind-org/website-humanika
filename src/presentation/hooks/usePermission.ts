@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  hasPermission,
-  type ActionType,
-} from "@/src/presentation/lib/permissions";
+import { hasPermission, type ActionType } from "@/presentation/lib/permissions";
 
 interface UsePermissionReturn {
   userRole: string | null;

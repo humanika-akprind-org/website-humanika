@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import { jwtSecret } from "@/src/presentation/lib/config/config";
+import { jwtSecret } from "@/presentation/lib/config/config";
 
 const JWT_SECRET = jwtSecret;
 

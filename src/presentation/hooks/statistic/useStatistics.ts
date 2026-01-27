@@ -2,11 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import {
   getStatistics,
   getActivePeriodStatistic,
-} from "@/src/presentation/services/statistic";
-import type {
-  Statistic,
-  StatisticFilter,
-} from "@/src/domain/entities/statistic";
+} from "@/presentation/services/statistic";
+import type { Statistic, StatisticFilter } from "@/domain/entities/statistic";
 
 export function useStatistics(filter?: StatisticFilter) {
   const [statistics, setStatistics] = useState<Statistic[]>([]);

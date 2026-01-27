@@ -11,4 +11,4 @@ export type {
   ApprovalFilters,
   ApprovalWithRelations,
   ApprovalsResponse,
-} from "@/src/domain/entities/approval";
+} from "@/domain/entities/approval";

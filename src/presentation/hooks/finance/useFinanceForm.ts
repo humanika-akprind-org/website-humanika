@@ -3,13 +3,13 @@ import type {
   Finance,
   CreateFinanceInput,
   UpdateFinanceInput,
-} from "@/src/domain/entities/finance";
-import { FinanceType, Status } from "@/src/domain/enums/enums";
-import { useFile } from "@/src/presentation/hooks/useFile";
-import { financeFolderId } from "@/src/presentation/lib/config/config";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
-import type { FinanceCategory } from "@/src/domain/value-objects/finance-category";
-import { type WorkProgram } from "@/src/domain/entities/work";
+} from "@/domain/entities/finance";
+import { FinanceType, Status } from "@/domain/enums/enums";
+import { useFile } from "@/presentation/hooks/useFile";
+import { financeFolderId } from "@/presentation/lib/config/config";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
+import type { FinanceCategory } from "@/domain/value-objects/finance-category";
+import { type WorkProgram } from "@/domain/entities/work";
 
 // Helper function to get preview URL from file (file ID or URL)
 const getPreviewUrl = (file: string | null | undefined): string | null => {

@@ -1,15 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateLetterInput } from "@/src/domain/entities/letter";
-import type {
-  LetterType,
-  LetterPriority,
-  Status,
-} from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { CreateLetterInput } from "@/domain/entities/letter";
+import type { LetterType, LetterPriority, Status } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getLetters,
   createLetter,
-} from "@/src/infrastructure/repositories/letter/letter.service";
+} from "@/infrastructure/repositories/letter/letter.service";
 
 // Extract payload functions
 function extractLetterQueryParams(request: NextRequest) {

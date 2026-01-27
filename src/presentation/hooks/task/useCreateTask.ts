@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createDepartmentTask } from "@/src/presentation/services/task";
-import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
-import { UserApi } from "@/src/presentation/services/user";
+import { createDepartmentTask } from "@/presentation/services/task";
+import { useWorkPrograms } from "@/presentation/hooks/work-program/useWorkPrograms";
+import { UserApi } from "@/presentation/services/user";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
-} from "@/src/domain/entities/task";
-import type { User } from "@/src/domain/entities/user";
+} from "@/domain/entities/task";
+import type { User } from "@/domain/entities/user";
 
 export function useCreateTask() {
   const router = useRouter();

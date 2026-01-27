@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Period, PeriodFormData } from "@/src/domain/entities/period";
+import type { Period, PeriodFormData } from "@/domain/entities/period";
 
 export function usePeriodForm(period?: Period) {
   const [formData, setFormData] = useState<PeriodFormData>({

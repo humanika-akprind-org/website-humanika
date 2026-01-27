@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateDepartmentTaskInput } from "@/src/domain/entities/task";
-import type { Department, Status } from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { CreateDepartmentTaskInput } from "@/domain/entities/task";
+import type { Department, Status } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   createDepartmentTask,
   getDepartmentTasks,
-} from "@/src/infrastructure/repositories/task/task.service";
+} from "@/infrastructure/repositories/task/task.service";
 
 export async function GET(request: NextRequest) {
   try {

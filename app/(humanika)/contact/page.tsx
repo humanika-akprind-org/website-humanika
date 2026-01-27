@@ -1,10 +1,10 @@
 "use client";
 
-import ContactHero from "@/src/presentation/components/public/pages/contact/ContactHero";
-import ContactInfoSection from "@/src/presentation/components/public/sections/contact/ContactInfoSection";
-import ContactFormSection from "@/src/presentation/components/public/sections/contact/ContactFormSection";
-import MapSection from "@/src/presentation/components/public/sections/contact/MapSection";
-import FAQCTASection from "@/src/presentation/components/public/sections/contact/FAQCTASection";
+import ContactHero from "@/presentation/components/public/pages/contact/ContactHero";
+import ContactInfoSection from "@/presentation/components/public/sections/contact/ContactInfoSection";
+import ContactFormSection from "@/presentation/components/public/sections/contact/ContactFormSection";
+import MapSection from "@/presentation/components/public/sections/contact/MapSection";
+import FAQCTASection from "@/presentation/components/public/sections/contact/FAQCTASection";
 
 export default function ContactPage() {
   return (

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { Department, Status } from "@/src/domain/enums/enums";
+import { Department, Status } from "@/domain/enums/enums";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
-} from "@/src/domain/entities/task";
-import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
-import type { User } from "@/src/domain/entities/user";
-import type { WorkProgram } from "@/src/domain/entities/work";
-import { UserApi } from "@/src/presentation/services/user";
-import { getWorkPrograms } from "@/src/presentation/services/work";
+} from "@/domain/entities/task";
+import type { AlertType } from "@/presentation/components/admin/ui/alert/Alert";
+import type { User } from "@/domain/entities/user";
+import type { WorkProgram } from "@/domain/entities/work";
+import { UserApi } from "@/presentation/services/user";
+import { getWorkPrograms } from "@/presentation/services/work";
 
 export interface TaskFormData {
   title: string;

@@ -2,13 +2,13 @@ import { type NextRequest, NextResponse } from "next/server";
 import type {
   CreateStatisticInput,
   StatisticFilter,
-} from "@/src/domain/entities/statistic";
+} from "@/domain/entities/statistic";
 import {
   getStatistics,
   getActivePeriodStatistic,
   createStatistic,
-} from "@/src/infrastructure/repositories/statistic/statistic.service";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+} from "@/infrastructure/repositories/statistic/statistic.service";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 // Extract payload functions
 function extractStatisticQueryParams(request: NextRequest) {

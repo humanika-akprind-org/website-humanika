@@ -4,8 +4,8 @@ import { type UserRole, type Department, type Position } from "@prisma/client";
 import {
   getUsers,
   createUser,
-} from "@/src/infrastructure/repositories/user/user.service";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+} from "@/infrastructure/repositories/user/user.service";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 // GET - Get all users
 export async function GET(request: NextRequest) {

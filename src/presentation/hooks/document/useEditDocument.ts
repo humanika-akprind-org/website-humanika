@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import type {
-  UpdateDocumentInput,
-  Document,
-} from "@/src/domain/entities/document";
+import type { UpdateDocumentInput, Document } from "@/domain/entities/document";
 
 interface UseEditDocumentProps {
   redirectPath?: string;

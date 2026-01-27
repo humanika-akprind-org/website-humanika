@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteDocument } from "@/src/presentation/services/document";
-import type { Document } from "@/src/domain/entities/document";
+import { deleteDocument } from "@/presentation/services/document";
+import type { Document } from "@/domain/entities/document";
 import { useDocuments } from "./useDocuments";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 interface UseDocumentManagementOptions {
   addPath?: string;

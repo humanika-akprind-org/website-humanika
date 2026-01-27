@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteFinance } from "@/src/presentation/services/finance";
-import type { Finance } from "@/src/domain/entities/finance";
+import { deleteFinance } from "@/presentation/services/finance";
+import type { Finance } from "@/domain/entities/finance";
 import { useFinances } from "./useFinances";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 export function useFinanceManagement() {
   const router = useRouter();

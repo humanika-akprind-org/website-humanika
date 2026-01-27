@@ -3,8 +3,8 @@ import { useRouter } from "next/navigation";
 import {
   getDocumentTypes,
   deleteDocumentType,
-} from "@/src/presentation/services/document-type";
-import type { DocumentType } from "@/src/domain/value-objects/document-type";
+} from "@/presentation/services/document-type";
+import type { DocumentType } from "@/domain/value-objects/document-type";
 
 export function useDocumentTypeManagement() {
   const router = useRouter();

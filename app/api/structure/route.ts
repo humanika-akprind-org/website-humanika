@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateOrganizationalStructureInput } from "@/src/domain/entities/structure";
-import type { Status } from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { CreateOrganizationalStructureInput } from "@/domain/entities/structure";
+import type { Status } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getStructures,
   createStructure,
-} from "@/src/infrastructure/repositories/structure/structure.service";
+} from "@/infrastructure/repositories/structure/structure.service";
 
 // Extract payload functions
 async function extractCreateStructureBody(request: NextRequest) {

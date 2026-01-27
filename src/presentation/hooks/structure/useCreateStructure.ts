@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { StructureApi } from "@/src/presentation/services/structure";
+import { StructureApi } from "@/presentation/services/structure";
 import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
-} from "@/src/domain/entities/structure";
+} from "@/domain/entities/structure";
 
 export function useCreateStructure() {
   const router = useRouter();

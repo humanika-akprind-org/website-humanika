@@ -4,13 +4,13 @@ import type {
   Gallery,
   CreateGalleryInput,
   UpdateGalleryInput,
-} from "@/src/domain/entities/gallery";
-import type { Event } from "@/src/domain/entities/event";
-import { useEvents } from "@/src/presentation/hooks/event/useEvents";
-import { useGalleryCategories } from "@/src/presentation/hooks/gallery-category/useGalleryCategories";
-import { useFile } from "@/src/presentation/hooks/useFile";
-import { galleryFolderId } from "@/src/presentation/lib/config/config";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+} from "@/domain/entities/gallery";
+import type { Event } from "@/domain/entities/event";
+import { useEvents } from "@/presentation/hooks/event/useEvents";
+import { useGalleryCategories } from "@/presentation/hooks/gallery-category/useGalleryCategories";
+import { useFile } from "@/presentation/hooks/useFile";
+import { galleryFolderId } from "@/presentation/lib/config/config";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 
 // Helper functions
 const getPreviewUrl = (image: string | null | undefined): string | null => {

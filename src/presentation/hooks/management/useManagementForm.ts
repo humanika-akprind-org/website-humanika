@@ -4,16 +4,16 @@ import type {
   Management,
   ManagementFormData,
   ManagementServerData,
-} from "@/src/domain/entities/management";
-import { Position, Department } from "@/src/domain/enums/enums";
-import type { User } from "@/src/domain/entities/user";
-import type { Period } from "@/src/domain/entities/period";
-import { useFile } from "@/src/presentation/hooks/useFile";
-import { photoManagementFolderId } from "@/src/presentation/lib/config/config";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
-import { UserApi } from "@/src/presentation/services/user";
-import { PeriodApi } from "@/src/presentation/services/period";
-import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
+} from "@/domain/entities/management";
+import { Position, Department } from "@/domain/enums/enums";
+import type { User } from "@/domain/entities/user";
+import type { Period } from "@/domain/entities/period";
+import { useFile } from "@/presentation/hooks/useFile";
+import { photoManagementFolderId } from "@/presentation/lib/config/config";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
+import { UserApi } from "@/presentation/services/user";
+import { PeriodApi } from "@/presentation/services/period";
+import type { AlertType } from "@/presentation/components/admin/ui/alert/Alert";
 
 export const useManagementForm = (
   management: Management | undefined,

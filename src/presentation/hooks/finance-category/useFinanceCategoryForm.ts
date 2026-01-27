@@ -3,8 +3,8 @@ import type {
   FinanceCategory,
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
-} from "@/src/domain/value-objects/finance-category";
-import { FinanceType } from "@/src/domain/enums/enums";
+} from "@/domain/value-objects/finance-category";
+import { FinanceType } from "@/domain/enums/enums";
 
 export interface FinanceCategoryFormData {
   name: string;

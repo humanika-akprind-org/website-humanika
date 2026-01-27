@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import {
   getOrganizationContacts,
   getActivePeriodOrganizationContact,
-} from "@/src/presentation/services/organization-contact";
+} from "@/presentation/services/organization-contact";
 import type {
   OrganizationContact,
   OrganizationContactFilter,
-} from "@/src/domain/entities/organization-contact";
+} from "@/domain/entities/organization-contact";
 
 // Helper to normalize mission field from JsonValue to string | string[]
 function normalizeMission(

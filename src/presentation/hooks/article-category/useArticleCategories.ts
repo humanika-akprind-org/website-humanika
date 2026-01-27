@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { ArticleCategory } from "@/src/domain/value-objects/article-category";
+import type { ArticleCategory } from "@/domain/value-objects/article-category";
 
 export const useArticleCategories = () => {
   const [categories, setCategories] = useState<ArticleCategory[]>([]);

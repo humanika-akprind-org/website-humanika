@@ -2,26 +2,26 @@
 
 import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { useArticleCategories } from "@/src/presentation/hooks/article-category/useArticleCategories";
-import { useArticleData } from "@/src/presentation/hooks/article/useArticleData";
-import { useArticleFilters } from "@/src/presentation/hooks/article/useArticleFilters";
+import { useArticleCategories } from "@/presentation/hooks/article-category/useArticleCategories";
+import { useArticleData } from "@/presentation/hooks/article/useArticleData";
+import { useArticleFilters } from "@/presentation/hooks/article/useArticleFilters";
 import {
   createCategoryOptions,
   filterArticles,
   sortArticles,
-} from "@/src/presentation/hooks/article/utils";
+} from "@/presentation/hooks/article/utils";
 import {
   CATEGORY_COLORS,
   ARTICLES_PER_PAGE,
-} from "@/src/presentation/hooks/article/constants";
-import { HeroSection } from "@/src/presentation/components/public/sections/article/HeroSection";
-import { ControlBar } from "@/src/presentation/components/public/pages/article/ControlBar";
-import { ArticleGrid } from "@/src/presentation/components/public/pages/article/ArticleGrid";
-import { ArticleList } from "@/src/presentation/components/public/pages/article/ArticleList";
-import ArticlePageLoadingState from "@/src/presentation/components/public/pages/article/ArticlePageLoadingState";
-import ArticleErrorState from "@/src/presentation/components/public/pages/article/ArticleErrorState";
-import { ArticleEmptyState } from "@/src/presentation/components/public/pages/article/ArticleEmptyState";
-import { PopularCategories } from "@/src/presentation/components/public/pages/article/EventPopularCategories";
+} from "@/presentation/hooks/article/constants";
+import { HeroSection } from "@/presentation/components/public/sections/article/HeroSection";
+import { ControlBar } from "@/presentation/components/public/pages/article/ControlBar";
+import { ArticleGrid } from "@/presentation/components/public/pages/article/ArticleGrid";
+import { ArticleList } from "@/presentation/components/public/pages/article/ArticleList";
+import ArticlePageLoadingState from "@/presentation/components/public/pages/article/ArticlePageLoadingState";
+import ArticleErrorState from "@/presentation/components/public/pages/article/ArticleErrorState";
+import { ArticleEmptyState } from "@/presentation/components/public/pages/article/ArticleEmptyState";
+import { PopularCategories } from "@/presentation/components/public/pages/article/EventPopularCategories";
 
 interface ArticlePageType extends React.FC {
   fetchArticles?: () => void;

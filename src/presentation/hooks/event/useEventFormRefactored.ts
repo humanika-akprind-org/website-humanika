@@ -4,16 +4,16 @@ import type {
   CreateEventInput,
   UpdateEventInput,
   ScheduleItem,
-} from "@/src/domain/entities/event";
-import { Department as DepartmentEnum, Status } from "@/src/domain/enums/enums";
-import { useFile } from "@/src/presentation/hooks/useFile";
-import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
-import { useEventCategories } from "@/src/presentation/hooks/event-category/useEventCategories";
-import { eventThumbnailFolderId } from "@/src/presentation/lib/config/config";
-import type { User } from "@/src/domain/entities/user";
-import type { Period } from "@/src/domain/entities/period";
-import { useUserManagement } from "@/src/presentation/hooks/user/useUserManagement";
-import { usePeriodManagement } from "@/src/presentation/hooks/period/usePeriodManagement";
+} from "@/domain/entities/event";
+import { Department as DepartmentEnum, Status } from "@/domain/enums/enums";
+import { useFile } from "@/presentation/hooks/useFile";
+import { useWorkPrograms } from "@/presentation/hooks/work-program/useWorkPrograms";
+import { useEventCategories } from "@/presentation/hooks/event-category/useEventCategories";
+import { eventThumbnailFolderId } from "@/presentation/lib/config/config";
+import type { User } from "@/domain/entities/user";
+import type { Period } from "@/domain/entities/period";
+import { useUserManagement } from "@/presentation/hooks/user/useUserManagement";
+import { usePeriodManagement } from "@/presentation/hooks/period/usePeriodManagement";
 
 // Helper function to check if HTML content is empty
 const isHtmlEmpty = (html: string): boolean => {

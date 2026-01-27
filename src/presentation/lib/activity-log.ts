@@ -1,6 +1,6 @@
-import { prisma } from "@/src/presentation/lib/prisma";
-import type { ActivityType } from "@/src/domain/enums/enums";
-import type { ActivityMetadata } from "@/src/domain/entities/activity-log";
+import { prisma } from "@/presentation/lib/prisma";
+import type { ActivityType } from "@/domain/enums/enums";
+import type { ActivityMetadata } from "@/domain/entities/activity-log";
 import type { InputJsonValue } from "@prisma/client/runtime/library";
 
 interface LogActivityParams {

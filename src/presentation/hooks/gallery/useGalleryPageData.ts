@@ -1,13 +1,13 @@
 import { useMemo } from "react";
-import { useEvents } from "@/src/presentation/hooks/event/useEvents";
-import { useGalleries } from "@/src/presentation/hooks/gallery/useGalleries";
-import { Status } from "@/src/domain/enums/enums";
+import { useEvents } from "@/presentation/hooks/event/useEvents";
+import { useGalleries } from "@/presentation/hooks/gallery/useGalleries";
+import { Status } from "@/domain/enums/enums";
 import {
   getGalleryCounts,
   getYearsFromEvents,
   transformEventsToAlbums,
   calculateGalleryStats,
-} from "@/src/presentation/lib/gallery-utils";
+} from "@/presentation/lib/gallery-utils";
 
 export function useGalleryPageData() {
   const eventFilter = useMemo(() => ({ status: Status.PUBLISH }), []);

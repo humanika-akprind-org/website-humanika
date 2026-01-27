@@ -1,6 +1,6 @@
 // lib/auth/clearAuthCookies.ts
 import { NextResponse } from "next/server";
-import { isProduction } from "@/src/presentation/lib/config/config";
+import { isProduction } from "@/presentation/lib/config/config";
 
 export function clearAuthCookies(response?: NextResponse) {
   const res = response || NextResponse.next();

@@ -3,11 +3,11 @@ import { useRouter } from "next/navigation";
 import {
   getGalleryCategory,
   updateGalleryCategory,
-} from "@/src/presentation/services/gallery-category";
+} from "@/presentation/services/gallery-category";
 import type {
   GalleryCategory,
   UpdateGalleryCategoryInput,
-} from "@/src/domain/value-objects/gallery-category";
+} from "@/domain/value-objects/gallery-category";
 
 export function useEditGalleryCategory(categoryId: string) {
   const router = useRouter();

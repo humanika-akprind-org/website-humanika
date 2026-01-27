@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getEvent } from "@/src/presentation/services/event";
-import type { Event } from "@/src/domain/entities/event";
+import { getEvent } from "@/presentation/services/event";
+import type { Event } from "@/domain/entities/event";
 
 export function useEventDetail(id: string) {
   const [event, setEvent] = useState<Event | null>(null);

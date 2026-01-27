@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { StructureApi } from "@/src/presentation/services/structure";
+import { StructureApi } from "@/presentation/services/structure";
 import type {
   OrganizationalStructure,
   UpdateOrganizationalStructureInput,
-} from "@/src/domain/entities/structure";
+} from "@/domain/entities/structure";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

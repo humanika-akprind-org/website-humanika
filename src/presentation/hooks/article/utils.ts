@@ -1,6 +1,6 @@
-import type { Article } from "@/src/domain/entities/article";
+import type { Article } from "@/domain/entities/article";
 import type { SortOption } from "./constants";
-import { type ArticleCategory } from "@/src/domain/value-objects/article-category";
+import { type ArticleCategory } from "@/domain/value-objects/article-category";
 
 /**
  * Filters articles based on search query and category

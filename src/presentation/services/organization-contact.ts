@@ -3,8 +3,8 @@ import type {
   CreateOrganizationContactInput,
   UpdateOrganizationContactInput,
   OrganizationContactFilter,
-} from "@/src/domain/entities/organization-contact";
-import { apiUrl } from "@/src/presentation/lib/config/config";
+} from "@/domain/entities/organization-contact";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

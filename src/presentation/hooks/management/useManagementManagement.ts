@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ManagementApi } from "@/src/presentation/services/management";
-import { UserApi } from "@/src/presentation/services/user";
-import { PeriodApi } from "@/src/presentation/services/period";
-import type { Management } from "@/src/domain/entities/management";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import { ManagementApi } from "@/presentation/services/management";
+import { UserApi } from "@/presentation/services/user";
+import { PeriodApi } from "@/presentation/services/period";
+import type { Management } from "@/domain/entities/management";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 type ManagementFiltersType = {
   department: string;

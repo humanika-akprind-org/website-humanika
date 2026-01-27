@@ -2,7 +2,7 @@ import type {
   EventCategory,
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
-} from "@/src/domain/value-objects/event-category";
+} from "@/domain/value-objects/event-category";
 
 export const getEventCategories = async (): Promise<EventCategory[]> => {
   const response = await fetch("/api/event/category");

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import type {
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
-} from "@/src/domain/value-objects/finance-category";
+} from "@/domain/value-objects/finance-category";
 
 export function useCreateFinanceCategory() {
   const router = useRouter();

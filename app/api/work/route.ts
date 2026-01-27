@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateWorkProgramInput } from "@/src/domain/entities/work";
-import type { Status, Department } from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { CreateWorkProgramInput } from "@/domain/entities/work";
+import type { Status, Department } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getWorkPrograms,
   createWorkProgram,
   bulkDeleteWorkPrograms,
-} from "@/src/infrastructure/repositories/work/work.service";
+} from "@/infrastructure/repositories/work/work.service";
 
 export async function GET(request: NextRequest) {
   try {

@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { FinanceCategory } from "@/src/domain/value-objects/finance-category";
+import type { FinanceCategory } from "@/domain/value-objects/finance-category";
 import {
   getFinanceCategories,
   deleteFinanceCategory,
-} from "@/src/presentation/services/finance-category";
-import { useToast } from "@/src/presentation/hooks/use-toast";
+} from "@/presentation/services/finance-category";
+import { useToast } from "@/presentation/hooks/use-toast";
 
 export function useFinanceCategoryManagement() {
   const [categories, setCategories] = useState<FinanceCategory[]>([]);

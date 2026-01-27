@@ -3,7 +3,7 @@ import type {
   GalleryCategory,
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
-} from "@/src/domain/value-objects/gallery-category";
+} from "@/domain/value-objects/gallery-category";
 
 export interface GalleryCategoryFormData {
   name: string;

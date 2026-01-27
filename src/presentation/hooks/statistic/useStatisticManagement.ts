@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteStatistic } from "@/src/presentation/services/statistic";
-import type { Statistic } from "@/src/domain/entities/statistic";
+import { deleteStatistic } from "@/presentation/services/statistic";
+import type { Statistic } from "@/domain/entities/statistic";
 import { useStatistics } from "./useStatistics";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
-import { getCurrentUserAction } from "@/src/presentation/lib/actions/getCurrentUser";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
+import { getCurrentUserAction } from "@/presentation/lib/actions/getCurrentUser";
 
 export function useStatisticManagement() {
   const router = useRouter();

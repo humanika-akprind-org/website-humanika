@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import type { UpdateLetterInput, Letter } from "@/src/domain/entities/letter";
+import type { UpdateLetterInput, Letter } from "@/domain/entities/letter";
 
 export function useEditLetter(id: string) {
   const router = useRouter();

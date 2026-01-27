@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteEventCategory } from "@/src/presentation/services/event-category";
-import type { EventCategory } from "@/src/domain/value-objects/event-category";
+import { deleteEventCategory } from "@/presentation/services/event-category";
+import type { EventCategory } from "@/domain/value-objects/event-category";
 import { useEventCategories } from "./useEventCategories";
 
 export function useEventCategoryManagement() {

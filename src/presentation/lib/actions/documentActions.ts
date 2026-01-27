@@ -1,11 +1,11 @@
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/src/domain/entities/document";
-import { Status, ApprovalType } from "@/src/domain/enums/enums";
-import { StatusApproval } from "@/src/domain/enums/enums";
-import prisma from "@/src/presentation/lib/prisma";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+} from "@/domain/entities/document";
+import { Status, ApprovalType } from "@/domain/enums/enums";
+import { StatusApproval } from "@/domain/enums/enums";
+import prisma from "@/presentation/lib/prisma";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import { redirect } from "next/navigation";
 import type { Prisma } from "@prisma/client";
 

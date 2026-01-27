@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { ArticleCategory } from "@/src/domain/value-objects/article-category";
+import type { ArticleCategory } from "@/domain/value-objects/article-category";
 import {
   getArticleCategories,
   deleteArticleCategory,
-} from "@/src/presentation/services/article-category";
+} from "@/presentation/services/article-category";
 
 export const useArticleCategoryManagement = () => {
   const router = useRouter();

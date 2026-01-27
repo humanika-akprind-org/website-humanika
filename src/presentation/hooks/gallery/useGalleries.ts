@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { getGalleries } from "@/src/presentation/services/gallery";
-import type { Gallery, GalleryFilter } from "@/src/domain/entities/gallery";
+import { getGalleries } from "@/presentation/services/gallery";
+import type { Gallery, GalleryFilter } from "@/domain/entities/gallery";
 
 export function useGalleries(filter?: GalleryFilter) {
   const [galleries, setGalleries] = useState<Gallery[]>([]);

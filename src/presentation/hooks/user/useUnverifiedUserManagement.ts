@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { UserApi } from "@/src/presentation/services/user";
+import { UserApi } from "@/presentation/services/user";
 import type {
   User,
   UserFilters as UserFiltersType,
-} from "@/src/domain/entities/user";
+} from "@/domain/entities/user";
 
 export function useUnverifiedUserManagement() {
   const router = useRouter();

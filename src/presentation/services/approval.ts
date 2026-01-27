@@ -1,10 +1,10 @@
-import { apiUrl } from "@/src/presentation/lib/config/config";
+import { apiUrl } from "@/presentation/lib/config/config";
 import type {
   ApprovalsResponse,
   CreateApprovalInput,
   UpdateApprovalInput,
   ApprovalWithRelations,
-} from "@/src/domain/entities/approval";
+} from "@/domain/entities/approval";
 
 class ApprovalApi {
   private static API_URL = apiUrl;

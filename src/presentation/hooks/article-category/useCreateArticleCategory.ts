@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createArticleCategory } from "@/src/presentation/services/article-category";
+import { createArticleCategory } from "@/presentation/services/article-category";
 import type {
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
-} from "@/src/domain/value-objects/article-category";
+} from "@/domain/value-objects/article-category";
 
 export function useCreateArticleCategory() {
   const router = useRouter();

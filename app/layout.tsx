@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
-import { geistSans, geistMono } from "@/src/presentation/app/ui/fonts";
+import { geistSans, geistMono } from "@/presentation/app/ui/fonts";
 
 export const metadata: Metadata = {
   title: "HUMANIKA",

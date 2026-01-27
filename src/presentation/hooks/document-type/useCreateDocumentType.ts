@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createDocumentType } from "@/src/presentation/services/document-type";
+import { createDocumentType } from "@/presentation/services/document-type";
 import type {
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/src/domain/value-objects/document-type";
+} from "@/domain/value-objects/document-type";
 
 export function useCreateDocumentType() {
   const router = useRouter();

@@ -3,8 +3,8 @@ import { useRouter } from "next/navigation";
 import {
   getDepartmentTasks,
   deleteDepartmentTask,
-} from "@/src/presentation/services/task";
-import type { DepartmentTask } from "@/src/domain/entities/task";
+} from "@/presentation/services/task";
+import type { DepartmentTask } from "@/domain/entities/task";
 
 interface UseTaskManagementReturn {
   tasks: DepartmentTask[];

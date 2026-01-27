@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateArticleInput } from "@/src/domain/entities/article";
-import type { Status } from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { CreateArticleInput } from "@/domain/entities/article";
+import type { Status } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getArticles,
   createArticle,
-} from "@/src/infrastructure/repositories/article/article.service";
+} from "@/infrastructure/repositories/article/article.service";
 
 // Extract payload functions
 function extractArticleQueryParams(request: NextRequest) {

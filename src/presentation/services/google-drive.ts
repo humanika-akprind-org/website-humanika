@@ -1,4 +1,4 @@
-import { type ApiRequestBody } from "@/src/domain/value-objects/google-drive";
+import { type ApiRequestBody } from "@/domain/value-objects/google-drive";
 
 export const callApi = async (body: ApiRequestBody, formData?: FormData) => {
   try {

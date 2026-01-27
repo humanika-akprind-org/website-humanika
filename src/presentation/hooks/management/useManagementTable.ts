@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
-import type { Management } from "@/src/domain/entities/management";
-import { Department, Position } from "@/src/domain/enums/enums";
-import { useFileOperations } from "@/src/presentation/hooks/drive/form/useFileOperations";
-import { ManagementApi } from "@/src/presentation/services/management";
+import type { Management } from "@/domain/entities/management";
+import { Department, Position } from "@/domain/enums/enums";
+import { useFileOperations } from "@/presentation/hooks/drive/form/useFileOperations";
+import { ManagementApi } from "@/presentation/services/management";
 
 export const useManagementTable = (
   managements: Management[],

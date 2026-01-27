@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { getEvents } from "@/src/presentation/services/event";
-import { getGalleryCategories } from "@/src/presentation/services/gallery-category";
-import { getPeriods } from "@/src/presentation/services/period";
-import type { Event } from "@/src/domain/entities/event";
-import type { GalleryCategory } from "@/src/domain/value-objects/gallery-category";
-import type { Period } from "@/src/domain/entities/period";
+import { getEvents } from "@/presentation/services/event";
+import { getGalleryCategories } from "@/presentation/services/gallery-category";
+import { getPeriods } from "@/presentation/services/period";
+import type { Event } from "@/domain/entities/event";
+import type { GalleryCategory } from "@/domain/value-objects/gallery-category";
+import type { Period } from "@/domain/entities/period";
 
 export function useGalleryFormData() {
   const [events, setEvents] = useState<Event[]>([]);

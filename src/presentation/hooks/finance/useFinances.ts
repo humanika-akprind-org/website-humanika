@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getFinances } from "@/src/presentation/services/finance";
-import type { Finance, FinanceFilter } from "@/src/domain/entities/finance";
+import { getFinances } from "@/presentation/services/finance";
+import type { Finance, FinanceFilter } from "@/domain/entities/finance";
 
 export function useFinances(filter?: FinanceFilter) {
   const [finances, setFinances] = useState<Finance[]>([]);

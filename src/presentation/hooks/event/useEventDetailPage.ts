@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { getEventBySlug, getEvents } from "@/src/presentation/services/event";
-import type { Event } from "@/src/domain/entities/event";
+import { getEventBySlug, getEvents } from "@/presentation/services/event";
+import type { Event } from "@/domain/entities/event";
 import {
   getPastEvents,
   getRelatedEvents,
-} from "@/src/presentation/lib/eventDetailUtils";
+} from "@/presentation/lib/eventDetailUtils";
 
 interface UseEventDetailPageReturn {
   event: Event | null;

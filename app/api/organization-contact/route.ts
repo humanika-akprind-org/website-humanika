@@ -2,13 +2,13 @@ import { type NextRequest, NextResponse } from "next/server";
 import type {
   CreateOrganizationContactInput,
   OrganizationContactFilter,
-} from "@/src/domain/entities/organization-contact";
+} from "@/domain/entities/organization-contact";
 import {
   getOrganizationContacts,
   getActivePeriodOrganizationContact,
   createOrganizationContact,
-} from "@/src/infrastructure/repositories/organization-contact/organization-contact.service";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+} from "@/infrastructure/repositories/organization-contact/organization-contact.service";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 // Extract payload functions
 function extractOrganizationContactQueryParams(request: NextRequest) {

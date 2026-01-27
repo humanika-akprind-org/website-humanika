@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteGalleryCategory } from "@/src/presentation/services/gallery-category";
-import type { GalleryCategory } from "@/src/domain/value-objects/gallery-category";
+import { deleteGalleryCategory } from "@/presentation/services/gallery-category";
+import type { GalleryCategory } from "@/domain/value-objects/gallery-category";
 import { useGalleryCategories } from "./useGalleryCategories";
 
 export function useGalleryCategoryManagement() {

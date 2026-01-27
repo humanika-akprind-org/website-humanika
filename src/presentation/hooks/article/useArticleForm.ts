@@ -3,15 +3,15 @@ import type {
   Article,
   CreateArticleInput,
   UpdateArticleInput,
-} from "@/src/domain/entities/article";
-import { Status } from "@/src/domain/enums/enums";
-import { useFile } from "@/src/presentation/hooks/useFile";
-import { articleFolderId } from "@/src/presentation/lib/config/config";
-import type { Period } from "@/src/domain/entities/period";
-import { usePeriodManagement } from "@/src/presentation/hooks/period/usePeriodManagement";
-import { useArticleCategoryManagement } from "@/src/presentation/hooks/article-category/useArticleCategoryManagement";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
-import { type User } from "@/src/domain/entities/user";
+} from "@/domain/entities/article";
+import { Status } from "@/domain/enums/enums";
+import { useFile } from "@/presentation/hooks/useFile";
+import { articleFolderId } from "@/presentation/lib/config/config";
+import type { Period } from "@/domain/entities/period";
+import { usePeriodManagement } from "@/presentation/hooks/period/usePeriodManagement";
+import { useArticleCategoryManagement } from "@/presentation/hooks/article-category/useArticleCategoryManagement";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
+import { type User } from "@/domain/entities/user";
 
 // Helper functions
 const isHtmlEmpty = (html: string): boolean => {

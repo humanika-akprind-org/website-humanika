@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { type ActivityType } from "@/src/domain/enums/enums";
-import { useActivityLog } from "@/src/presentation/hooks/activity-log/useActivityLog";
+import { type ActivityType } from "@/domain/enums/enums";
+import { useActivityLog } from "@/presentation/hooks/activity-log/useActivityLog";
 
 interface ActivityLogData {
   id: string;

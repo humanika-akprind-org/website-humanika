@@ -3,7 +3,7 @@ import type {
   DocumentType,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "@/src/domain/value-objects/document-type";
+} from "@/domain/value-objects/document-type";
 
 interface UseDocumentTypeFormProps {
   category?: DocumentType;

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createEventCategory } from "@/src/presentation/services/event-category";
+import { createEventCategory } from "@/presentation/services/event-category";
 import type {
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
-} from "@/src/domain/value-objects/event-category";
+} from "@/domain/value-objects/event-category";
 
 export function useCreateEventCategory() {
   const router = useRouter();

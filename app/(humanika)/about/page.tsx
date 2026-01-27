@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import type { TabType } from "@/src/presentation/components/public/pages/about/constants";
-import HeroSection from "@/src/presentation/components/public/sections/about/HeroSection";
-import NavigationTabs from "@/src/presentation/components/public/pages/about/NavigationTabs";
-import AboutTab from "@/src/presentation/components/public/pages/about/AboutTab";
-import VisionTab from "@/src/presentation/components/public/pages/about/VisionTab";
-import OrganizationalStructureSection from "@/src/presentation/components/public/sections/about/OrganizationalStructureSection";
-import JoinCTASection from "@/src/presentation/components/public/sections/about/JoinCTASection";
+import type { TabType } from "@/presentation/components/public/pages/about/constants";
+import HeroSection from "@/presentation/components/public/sections/about/HeroSection";
+import NavigationTabs from "@/presentation/components/public/pages/about/NavigationTabs";
+import AboutTab from "@/presentation/components/public/pages/about/AboutTab";
+import VisionTab from "@/presentation/components/public/pages/about/VisionTab";
+import OrganizationalStructureSection from "@/presentation/components/public/sections/about/OrganizationalStructureSection";
+import JoinCTASection from "@/presentation/components/public/sections/about/JoinCTASection";
 
 export default function AboutPage() {
   const [activeTab, setActiveTab] = useState<TabType>("about");

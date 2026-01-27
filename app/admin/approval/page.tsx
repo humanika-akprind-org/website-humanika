@@ -11,8 +11,8 @@ import {
   FiEye,
   FiChevronDown,
 } from "react-icons/fi";
-import { ApprovalApi } from "@/src/presentation/services/approval";
-import type { ApprovalWithRelations } from "@/src/domain/entities/approval";
+import { ApprovalApi } from "@/presentation/services/approval";
+import type { ApprovalWithRelations } from "@/domain/entities/approval";
 
 enum StatusApproval {
   PENDING = "PENDING",

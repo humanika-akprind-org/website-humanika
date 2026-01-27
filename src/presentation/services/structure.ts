@@ -3,8 +3,8 @@ import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
   OrganizationalStructureFilter,
-} from "@/src/domain/entities/structure";
-import { apiUrl } from "@/src/presentation/lib/config/config";
+} from "@/domain/entities/structure";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

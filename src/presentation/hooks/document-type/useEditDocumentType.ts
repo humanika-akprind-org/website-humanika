@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import type {
   DocumentType,
   UpdateDocumentTypeInput,
-} from "@/src/domain/value-objects/document-type";
+} from "@/domain/value-objects/document-type";
 
 export function useEditDocumentType(id: string) {
   const router = useRouter();

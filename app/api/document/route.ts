@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateDocumentInput } from "@/src/domain/entities/document";
-import type { Status } from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { CreateDocumentInput } from "@/domain/entities/document";
+import type { Status } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getDocuments,
   createDocument,
-} from "@/src/infrastructure/repositories/document/document.service";
+} from "@/infrastructure/repositories/document/document.service";
 
 export async function GET(request: NextRequest) {
   try {

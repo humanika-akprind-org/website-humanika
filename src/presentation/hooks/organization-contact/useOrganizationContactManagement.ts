@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteOrganizationContact } from "@/src/presentation/services/organization-contact";
-import type { OrganizationContact } from "@/src/domain/entities/organization-contact";
+import { deleteOrganizationContact } from "@/presentation/services/organization-contact";
+import type { OrganizationContact } from "@/domain/entities/organization-contact";
 import { useOrganizationContacts } from "./useOrganizationContacts";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
-import { getCurrentUserAction } from "@/src/presentation/lib/actions/getCurrentUser";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
+import { getCurrentUserAction } from "@/presentation/lib/actions/getCurrentUser";
 
 export function useOrganizationContactManagement() {
   const router = useRouter();

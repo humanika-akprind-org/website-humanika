@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteGallery } from "@/src/presentation/services/gallery";
-import type { Gallery } from "@/src/domain/entities/gallery";
+import { deleteGallery } from "@/presentation/services/gallery";
+import type { Gallery } from "@/domain/entities/gallery";
 import { useGalleries } from "./useGalleries";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 export function useGalleryManagement() {
   const router = useRouter();

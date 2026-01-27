@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { getFinanceCategories } from "@/src/presentation/services/finance-category";
-import { getWorkPrograms } from "@/src/presentation/services/work";
-import { getPeriods } from "@/src/presentation/services/period";
-import type { FinanceCategory } from "@/src/domain/value-objects/finance-category";
-import type { WorkProgram } from "@/src/domain/entities/work";
-import type { Period } from "@/src/domain/entities/period";
+import { getFinanceCategories } from "@/presentation/services/finance-category";
+import { getWorkPrograms } from "@/presentation/services/work";
+import { getPeriods } from "@/presentation/services/period";
+import type { FinanceCategory } from "@/domain/value-objects/finance-category";
+import type { WorkProgram } from "@/domain/entities/work";
+import type { Period } from "@/domain/entities/period";
 
 export function useFinanceFormData() {
   const [categories, setCategories] = useState<FinanceCategory[]>([]);

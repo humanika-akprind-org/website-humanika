@@ -2,14 +2,14 @@
 
 import React, { useMemo } from "react";
 import { Image as ImageIcon, RefreshCw } from "lucide-react";
-import { useGalleryPageData } from "@/src/presentation/hooks/gallery/useGalleryPageData";
-import { useGalleryFilters } from "@/src/presentation/hooks/gallery/useGalleryFilters";
-import GalleryHeroSection from "@/src/presentation/components/public/sections/gallery/GalleryHeroSection";
-import GalleryTabs from "@/src/presentation/components/public/pages/gallery/GalleryTabs";
-import GalleryControlBar from "@/src/presentation/components/public/pages/gallery/GalleryControlBar";
-import GalleryContent from "@/src/presentation/components/public/pages/gallery/GalleryContent";
-import TopEventsSection from "@/src/presentation/components/public/sections/gallery/TopEventsSection";
-import GalleryPageLoadingState from "@/src/presentation/components/public/pages/gallery/GalleryPageLoadingState";
+import { useGalleryPageData } from "@/presentation/hooks/gallery/useGalleryPageData";
+import { useGalleryFilters } from "@/presentation/hooks/gallery/useGalleryFilters";
+import GalleryHeroSection from "@/presentation/components/public/sections/gallery/GalleryHeroSection";
+import GalleryTabs from "@/presentation/components/public/pages/gallery/GalleryTabs";
+import GalleryControlBar from "@/presentation/components/public/pages/gallery/GalleryControlBar";
+import GalleryContent from "@/presentation/components/public/pages/gallery/GalleryContent";
+import TopEventsSection from "@/presentation/components/public/sections/gallery/TopEventsSection";
+import GalleryPageLoadingState from "@/presentation/components/public/pages/gallery/GalleryPageLoadingState";
 
 export default function GalleryPage() {
   const { events, galleries, isLoading, error, refetch, albums, stats, years } =

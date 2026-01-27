@@ -3,12 +3,12 @@ import { useRouter } from "next/navigation";
 import type {
   FinanceCategory,
   UpdateFinanceCategoryInput,
-} from "@/src/domain/value-objects/finance-category";
+} from "@/domain/value-objects/finance-category";
 import {
   getFinanceCategory,
   updateFinanceCategory,
-} from "@/src/presentation/services/finance-category";
-import { useToast } from "@/src/presentation/hooks/use-toast";
+} from "@/presentation/services/finance-category";
+import { useToast } from "@/presentation/hooks/use-toast";
 
 export function useEditFinanceCategory(id: string) {
   const router = useRouter();

@@ -1,16 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { Article } from "@/src/domain/entities/article";
-import {
-  getArticles,
-  deleteArticle,
-} from "@/src/presentation/services/article";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+import type { Article } from "@/domain/entities/article";
+import { getArticles, deleteArticle } from "@/presentation/services/article";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 export const useArticleManagement = () => {
   const router = useRouter();

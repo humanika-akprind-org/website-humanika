@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { getEventBySlug, getEvents } from "@/src/presentation/services/event";
-import { getGalleries } from "@/src/presentation/services/gallery";
-import type { Event } from "@/src/domain/entities/event";
-import type { Gallery } from "@/src/domain/entities/gallery";
-import { Status } from "@/src/domain/enums/enums";
+import { getEventBySlug, getEvents } from "@/presentation/services/event";
+import { getGalleries } from "@/presentation/services/gallery";
+import type { Event } from "@/domain/entities/event";
+import type { Gallery } from "@/domain/entities/gallery";
+import { Status } from "@/domain/enums/enums";
 
 export interface AlbumData {
   id: string;

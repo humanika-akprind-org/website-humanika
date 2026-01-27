@@ -3,19 +3,19 @@ import type {
   Document,
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/src/domain/entities/document";
-import { Status } from "@/src/domain/enums/enums";
-import { useFile } from "@/src/presentation/hooks/useFile";
+} from "@/domain/entities/document";
+import { Status } from "@/domain/enums/enums";
+import { useFile } from "@/presentation/hooks/useFile";
 import {
   documentFolderId,
   accountabilityReportFolderId,
   proposalFolderId,
-} from "@/src/presentation/lib/config/config";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+} from "@/presentation/lib/config/config";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
-} from "@/src/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google-drive/file-utils";
 
 const getFolderIdForDocumentType = (
   documentTypeName: string | undefined,

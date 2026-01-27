@@ -2,8 +2,8 @@ import type {
   Period,
   PeriodFormData,
   PeriodApiResponse,
-} from "@/src/domain/entities/period";
-import { apiUrl } from "@/src/presentation/lib/config/config";
+} from "@/domain/entities/period";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

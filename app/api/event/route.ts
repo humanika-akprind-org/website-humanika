@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateEventInput } from "@/src/domain/entities/event";
-import type { Status, Department } from "@/src/domain/enums/enums";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
+import type { CreateEventInput } from "@/domain/entities/event";
+import type { Status, Department } from "@/domain/enums/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getEvents,
   createEvent,
-} from "@/src/infrastructure/repositories/event/event.service";
+} from "@/infrastructure/repositories/event/event.service";
 
 // Extract payload functions
 function extractEventQueryParams(request: NextRequest) {

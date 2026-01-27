@@ -3,12 +3,12 @@ import type {
   WorkProgram,
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
-} from "@/src/domain/entities/work";
-import type { User } from "@/src/domain/entities/user";
-import type { Period } from "@/src/domain/entities/period";
-import { Department } from "@/src/domain/enums/enums";
-import { UserApi } from "@/src/presentation/services/user";
-import { getPeriods } from "@/src/presentation/services/period";
+} from "@/domain/entities/work";
+import type { User } from "@/domain/entities/user";
+import type { Period } from "@/domain/entities/period";
+import { Department } from "@/domain/enums/enums";
+import { UserApi } from "@/presentation/services/user";
+import { getPeriods } from "@/presentation/services/period";
 
 interface FormData {
   name: string;

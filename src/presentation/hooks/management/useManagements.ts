@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { ManagementApi } from "@/src/presentation/services/management";
-import { PeriodApi } from "@/src/presentation/services/period";
-import type { Management } from "@/src/domain/entities/management";
-import type { Period } from "@/src/domain/entities/period";
+import { ManagementApi } from "@/presentation/services/management";
+import { PeriodApi } from "@/presentation/services/period";
+import type { Management } from "@/domain/entities/management";
+import type { Period } from "@/domain/entities/period";
 
 export function useManagements() {
   const [managements, setManagements] = useState<Management[]>([]);

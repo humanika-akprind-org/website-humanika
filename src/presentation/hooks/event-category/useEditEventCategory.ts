@@ -3,11 +3,11 @@ import { useRouter } from "next/navigation";
 import {
   getEventCategory,
   updateEventCategory,
-} from "@/src/presentation/services/event-category";
+} from "@/presentation/services/event-category";
 import type {
   EventCategory,
   UpdateEventCategoryInput,
-} from "@/src/domain/value-objects/event-category";
+} from "@/domain/value-objects/event-category";
 
 export function useEditEventCategory(categoryId: string) {
   const router = useRouter();

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PeriodApi } from "@/src/presentation/services/period";
-import type { PeriodFormData } from "@/src/domain/entities/period";
+import { PeriodApi } from "@/presentation/services/period";
+import type { PeriodFormData } from "@/domain/entities/period";
 
 export function useCreatePeriod() {
   const router = useRouter();

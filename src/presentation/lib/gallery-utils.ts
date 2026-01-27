@@ -1,7 +1,7 @@
-import type { Event } from "@/src/domain/entities/event";
-import type { Gallery } from "@/src/domain/entities/gallery";
-import { getGoogleDrivePreviewUrl } from "@/src/infrastructure/external-services/google-drive/file-utils";
-import { getEarliestScheduleDate } from "@/src/presentation/lib/event-utils";
+import type { Event } from "@/domain/entities/event";
+import type { Gallery } from "@/domain/entities/gallery";
+import { getGoogleDrivePreviewUrl } from "@/infrastructure/external-services/google-drive/file-utils";
+import { getEarliestScheduleDate } from "@/presentation/lib/event-utils";
 
 export interface Album {
   id: string;

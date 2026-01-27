@@ -3,14 +3,14 @@ import { useRouter } from "next/navigation";
 import {
   getDepartmentTask,
   updateDepartmentTask,
-} from "@/src/presentation/services/task";
-import { getUsers } from "@/src/presentation/services/user";
-import { useWorkPrograms } from "@/src/presentation/hooks/work-program/useWorkPrograms";
+} from "@/presentation/services/task";
+import { getUsers } from "@/presentation/services/user";
+import { useWorkPrograms } from "@/presentation/hooks/work-program/useWorkPrograms";
 import type {
   DepartmentTask,
   UpdateDepartmentTaskInput,
-} from "@/src/domain/entities/task";
-import type { User } from "@/src/domain/entities/user";
+} from "@/domain/entities/task";
+import type { User } from "@/domain/entities/user";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

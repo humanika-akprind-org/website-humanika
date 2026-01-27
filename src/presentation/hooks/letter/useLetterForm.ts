@@ -4,11 +4,11 @@ import type {
   Letter,
   CreateLetterInput,
   UpdateLetterInput,
-} from "@/src/domain/entities/letter";
-import { LetterType, LetterPriority } from "@/src/domain/enums/enums";
-import { useFile } from "@/src/presentation/hooks/useFile";
-import { letterFolderId } from "@/src/presentation/lib/config/config";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+} from "@/domain/entities/letter";
+import { LetterType, LetterPriority } from "@/domain/enums/enums";
+import { useFile } from "@/presentation/hooks/useFile";
+import { letterFolderId } from "@/presentation/lib/config/config";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 
 // Helper functions
 const isGoogleDriveLetter = (ltr: string | null | undefined): boolean => {

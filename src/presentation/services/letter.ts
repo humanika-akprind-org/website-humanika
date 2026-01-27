@@ -3,8 +3,8 @@ import type {
   CreateLetterInput,
   UpdateLetterInput,
   LetterFilter,
-} from "@/src/domain/entities/letter";
-import { apiUrl } from "@/src/presentation/lib/config/config";
+} from "@/domain/entities/letter";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

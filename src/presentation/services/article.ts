@@ -3,8 +3,8 @@ import type {
   CreateArticleInput,
   UpdateArticleInput,
   ArticleFilter,
-} from "@/src/domain/entities/article";
-import { apiUrl } from "@/src/presentation/lib/config/config";
+} from "@/domain/entities/article";
+import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 

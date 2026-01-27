@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { UserApi } from "@/src/presentation/services/user";
-import { PeriodApi } from "@/src/presentation/services/period";
-import type { User } from "@/src/domain/entities/user";
-import type { Period } from "@/src/domain/entities/period";
+import { UserApi } from "@/presentation/services/user";
+import { PeriodApi } from "@/presentation/services/period";
+import type { User } from "@/domain/entities/user";
+import type { Period } from "@/domain/entities/period";
 
 export function useEventFormData() {
   const [users, setUsers] = useState<User[]>([]);

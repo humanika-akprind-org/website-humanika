@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getEvent, updateEvent } from "@/src/presentation/services/event";
+import { getEvent, updateEvent } from "@/presentation/services/event";
 import type {
   CreateEventInput,
   UpdateEventInput,
   Event,
-} from "@/src/domain/entities/event";
+} from "@/domain/entities/event";
 
 export function useEditEvent(eventId: string) {
   const router = useRouter();

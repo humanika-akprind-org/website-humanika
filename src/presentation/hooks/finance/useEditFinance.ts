@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getFinance, updateFinance } from "@/src/presentation/services/finance";
+import { getFinance, updateFinance } from "@/presentation/services/finance";
 import type {
   CreateFinanceInput,
   UpdateFinanceInput,
   Finance,
-} from "@/src/domain/entities/finance";
+} from "@/domain/entities/finance";
 
 export function useEditFinance(financeId: string) {
   const router = useRouter();

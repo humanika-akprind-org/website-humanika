@@ -4,18 +4,18 @@ import type {
   OrganizationalStructure,
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
-} from "@/src/domain/entities/structure";
-import { Status } from "@/src/domain/enums/enums";
-import type { Period } from "@/src/domain/entities/period";
-import { useFile } from "@/src/presentation/hooks/useFile";
+} from "@/domain/entities/structure";
+import { Status } from "@/domain/enums/enums";
+import type { Period } from "@/domain/entities/period";
+import { useFile } from "@/presentation/hooks/useFile";
 import {
   structureFolderId,
   organizationalStructureFolderId,
-} from "@/src/presentation/lib/config/config";
-import { getAccessTokenAction } from "@/src/presentation/lib/actions/accessToken";
+} from "@/presentation/lib/config/config";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 
-import { PeriodApi } from "@/src/presentation/services/period";
-import type { AlertType } from "@/src/presentation/components/admin/ui/alert/Alert";
+import { PeriodApi } from "@/presentation/services/period";
+import type { AlertType } from "@/presentation/components/admin/ui/alert/Alert";
 
 export const useStructureForm = (
   structure: OrganizationalStructure | undefined,

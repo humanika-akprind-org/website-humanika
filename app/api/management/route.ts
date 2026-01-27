@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/src/presentation/lib/auth-server";
-import { ManagementService } from "@/src/infrastructure/repositories/management/management.service";
-import type { ManagementServerData } from "@/src/domain/entities/management";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
+import { ManagementService } from "@/infrastructure/repositories/management/management.service";
+import type { ManagementServerData } from "@/domain/entities/management";
 
 // Extract payload functions
 async function extractCreateManagementBody(

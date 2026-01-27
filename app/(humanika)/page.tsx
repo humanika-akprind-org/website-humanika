@@ -1,13 +1,13 @@
 "use client";
 
-import HeroSection from "@/src/presentation/components/public/sections/home/HeroSection";
-import FeaturesSection from "@/src/presentation/components/public/sections/home/FeaturesSection";
-import ArticleSection from "@/src/presentation/components/public/sections/home/ArticleSection";
-import AboutSection from "@/src/presentation/components/public/sections/home/AboutSection";
-import EventsSection from "@/src/presentation/components/public/sections/home/EventsSection";
-import GallerySection from "@/src/presentation/components/public/sections/home/GallerySection";
-import CTASection from "@/src/presentation/components/public/sections/home/CTASection";
-import Divider from "@/src/presentation/components/public/ui/Divider";
+import HeroSection from "@/presentation/components/public/sections/home/HeroSection";
+import FeaturesSection from "@/presentation/components/public/sections/home/FeaturesSection";
+import ArticleSection from "@/presentation/components/public/sections/home/ArticleSection";
+import AboutSection from "@/presentation/components/public/sections/home/AboutSection";
+import EventsSection from "@/presentation/components/public/sections/home/EventsSection";
+import GallerySection from "@/presentation/components/public/sections/home/GallerySection";
+import CTASection from "@/presentation/components/public/sections/home/CTASection";
+import Divider from "@/presentation/components/public/ui/Divider";
 
 /**
  * Home page component for HUMANIKA website

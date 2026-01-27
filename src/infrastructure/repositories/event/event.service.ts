@@ -1,13 +1,13 @@
-import prisma from "@/src/presentation/lib/prisma";
+import prisma from "@/presentation/lib/prisma";
 import type {
   CreateEventInput,
   UpdateEventInput,
-} from "@/src/domain/entities/event";
-import type { Status, Department } from "@/src/domain/enums/enums";
+} from "@/domain/entities/event";
+import type { Status, Department } from "@/domain/enums/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
-import { logActivity } from "@/src/presentation/lib/activity-log";
-import { ActivityType } from "@/src/domain/enums/enums";
-import type { User } from "@/src/domain/entities/user";
+import { logActivity } from "@/presentation/lib/activity-log";
+import { ActivityType } from "@/domain/enums/enums";
+import type { User } from "@/domain/entities/user";
 
 type UserWithId = Pick<User, "id">;
 
