@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import GalleryCategoryForm from "@/components/admin/pages/gallery/category/Form";
-import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/components/admin/ui/PageHeader";
-import Alert from "@/components/admin/ui/alert/Alert";
-import { useEditGalleryCategory } from "@/hooks/gallery-category/useEditGalleryCategory";
+import GalleryCategoryForm from "@/src/presentation/components/admin/pages/gallery/category/Form";
+import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
+import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
+import { useEditGalleryCategory } from "@/src/presentation/hooks/gallery-category/useEditGalleryCategory";
 
 export default function EditGalleryCategoryPage() {
   const params = useParams();

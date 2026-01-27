@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import DocumentTypeForm from "@/components/admin/pages/document/type/Form";
-import LoadingForm from "@/components/admin/layout/loading/LoadingForm";
-import PageHeader from "@/components/admin/ui/PageHeader";
-import Alert from "@/components/admin/ui/alert/Alert";
-import { useEditDocumentType } from "@/hooks/document-type/useEditDocumentType";
+import DocumentTypeForm from "@/src/presentation/components/admin/pages/document/type/Form";
+import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
+import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
+import { useEditDocumentType } from "@/src/presentation/hooks/document-type/useEditDocumentType";
 
 export default function EditDocumentTypePage() {
   const params = useParams();
