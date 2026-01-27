@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getFinanceCategories,
   createFinanceCategory,
-} from "@/infrastructure/repositories/finance-category.repository";
+} from "@/infrastructure/repositories/finance-category";
 
 function extractFinanceCategoryQueryParams(request: NextRequest) {
   const { searchParams } = new URL(request.url);
