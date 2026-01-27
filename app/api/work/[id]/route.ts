@@ -5,7 +5,7 @@ import {
   getWorkProgram,
   updateWorkProgram,
   deleteWorkProgram,
-} from "@/infrastructure/repositories/work.repository";
+} from "@/infrastructure/repositories/work-program";
 
 // GET work program by ID
 export async function GET(
