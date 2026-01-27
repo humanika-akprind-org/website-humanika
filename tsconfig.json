@@ -15,11 +15,11 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/components/*": ["src/presentation/components/*"],
-      "@/lib/*": ["src/presentation/lib/*"],
-      "@/types/*": ["types/*"],
-      "@/hooks/*": ["src/presentation/hooks/*"]
+      "@/*": ["./src/*"],
+      "@/domain/*": ["src/domain/*"],
+      "@/application/*": ["src/application/*"],
+      "@/infrastructure/*": ["src/infrastructure/*"],
+      "@/presentation/*": ["src/presentation/*"]
     },
     "typeRoots": ["node_modules/@types", "types"],
     "plugins": [

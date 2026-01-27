@@ -6,7 +6,7 @@ import {
   FinanceType,
 } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { colors } from "../lib/random-color";
+import { colors } from "@/presentation/lib/random-color";
 
 const prisma = new PrismaClient();
 
@@ -386,7 +386,7 @@ async function main() {
   }
 
   console.log(
-    "✅ Seeding selesai: Semua role user, kategori artikel, tipe dokumen, kategori event, kategori keuangan, dan kategori galeri berhasil dibuat!"
+    "✅ Seeding selesai: Semua role user, kategori artikel, tipe dokumen, kategori event, kategori keuangan, dan kategori galeri berhasil dibuat!",
   );
 }
 

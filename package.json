@@ -22,11 +22,12 @@
     "postinstall": "prisma generate",
     "dev:with-db": "prisma generate && prisma db push && next dev",
     "dev:reset": "prisma migrate reset && next dev",
-    "seed": "ts-node prisma/seed.ts",
-    "db:seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node src/infrastructure/prisma/seed.ts",
+    "db:seed": "ts-node src/infrastructure/prisma/seed.ts"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "schema": "src/infrastructure/prisma/schema.prisma",
+    "seed": "tsx src/infrastructure/prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
