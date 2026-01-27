@@ -11,6 +11,7 @@ import {
   FiTable,
   FiImage,
   FiFileMinus,
+  FiRefreshCw,
 } from "react-icons/fi";
 
 interface FileUploadProps {
@@ -264,6 +265,73 @@ const isValidImageUrl = (url: string): boolean => {
   }
 };
 
+// Helper function to compress image file
+const compressImage = async (
+  file: File,
+  maxSizeMB: number = 5,
+  quality: number = 0.8,
+  maxWidth: number = 1920,
+): Promise<File> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.src = event.target?.result as string;
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Scale down if width exceeds maxWidth
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name, {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              });
+
+              // If still too large, reduce quality further
+              if (compressedFile.size > maxSizeMB * 1024 * 1024) {
+                resolve(
+                  compressImage(file, maxSizeMB, quality - 0.1, maxWidth),
+                );
+              } else {
+                resolve(compressedFile);
+              }
+            } else {
+              reject(new Error("Failed to compress image"));
+            }
+          },
+          "image/jpeg",
+          quality,
+        );
+      };
+
+      img.onerror = () => {
+        reject(new Error("Failed to load image"));
+      };
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Failed to read file"));
+    };
+  });
+
 export default function FileUpload({
   label,
   previewUrl: propPreviewUrl,
@@ -308,6 +376,12 @@ export default function FileUpload({
   // Track if image failed to load (for fallback to icon)
   const [imageLoadError, setImageLoadError] = useState(false);
 
+  // Track if file has been converted (for files > 5MB)
+  const [isConverted, setIsConverted] = useState(false);
+
+  // Track conversion loading state
+  const [isConverting, setIsConverting] = useState(false);
+
   // Use prop preview URL if provided and non-empty, otherwise use internal state
   const previewUrl =
     propPreviewUrl && propPreviewUrl.trim() !== ""
@@ -350,6 +424,8 @@ export default function FileUpload({
     if (existingFile && existingFile.trim() !== "") {
       setHasNewFile(false);
       setImageLoadError(false);
+      setIsConverted(false);
+      setIsConverting(false);
       const isImg = isImageFile(existingFile);
       setIsImage(isImg);
       if (isImg) {
@@ -366,19 +442,35 @@ export default function FileUpload({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Reset conversion states
+      setIsConverted(false);
+      setIsConverting(false);
+
       if (file.size > maxSize) {
-        setSizeError(
-          `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`,
-        );
-        return;
+        // For image files, allow upload and show convert button
+        if (file.type.startsWith("image/")) {
+          setSizeError(
+            `File size is ${Math.round(file.size / (1024 * 1024))}MB. Click "Convert File" to compress it.`,
+          );
+        } else {
+          setSizeError(
+            `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`,
+          );
+          return;
+        }
+      } else {
+        setSizeError(null);
       }
-      setSizeError(null);
       setCroppedImage(null);
       setCropModalOpen(false);
       setHasNewFile(true);
       setUploadedFile(file);
       setImageLoadError(false);
-      onFileChange(file);
+
+      // Only call onFileChange if file is within size limit
+      if (file.size <= maxSize) {
+        onFileChange(file);
+      }
 
       // Set preview for images
       if (file.type.startsWith("image/")) {
@@ -392,6 +484,33 @@ export default function FileUpload({
         setInternalPreviewUrl(null);
         setIsImage(false);
       }
+    }
+  };
+
+  // Handle file conversion for large images
+  const handleConvertFile = async () => {
+    if (!uploadedFile) return;
+
+    setIsConverting(true);
+    try {
+      const compressedFile = await compressImage(uploadedFile, 5, 0.8, 1920);
+      setIsConverted(true);
+      setSizeError(null);
+      onFileChange(compressedFile);
+
+      // Update preview with compressed image
+      if (compressedFile.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setInternalPreviewUrl(reader.result as string);
+        };
+        reader.readAsDataURL(compressedFile);
+      }
+    } catch (error) {
+      console.error("Error converting file:", error);
+      setSizeError("Failed to convert file. Please try a different file.");
+    } finally {
+      setIsConverting(false);
     }
   };
 
@@ -570,6 +689,25 @@ export default function FileUpload({
                 })()}
               </div>
               <div className="flex gap-2 mt-2">
+                {/* Convert button for large images (> 5MB) */}
+                {uploadedFile &&
+                  uploadedFile.type.startsWith("image/") &&
+                  uploadedFile.size > maxSize &&
+                  !isConverted && (
+                    <button
+                      type="button"
+                      onClick={handleConvertFile}
+                      className="text-sm text-green-600 hover:text-green-800 flex items-center"
+                      disabled={isLoading || isConverting}
+                    >
+                      <FiRefreshCw
+                        className={`w-4 h-4 inline mr-1 ${
+                          isConverting ? "animate-spin" : ""
+                        }`}
+                      />
+                      {isConverting ? "Converting..." : "Convert File"}
+                    </button>
+                  )}
                 {enableCrop && isImage && showCropButton && (
                   <button
                     type="button"
@@ -593,6 +731,7 @@ export default function FileUpload({
                     setCroppedImage(null);
                     setHasNewFile(false);
                     setUploadedFile(null);
+                    setIsConverted(false);
                     onRemoveFile?.();
                   }}
                   className="text-sm text-red-600 hover:text-red-800"

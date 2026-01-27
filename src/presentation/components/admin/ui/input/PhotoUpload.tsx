@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Crop } from "lucide-react";
+import { FiRefreshCw } from "react-icons/fi";
 import { cn } from "@/presentation/lib/utils";
 import AccessTokenGuard from "./AccessTokenGuard";
 import ImageCropper from "./ImageCropper";
@@ -69,6 +70,15 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [sizeError, setSizeError] = useState<string | null>(null);
 
+  // Track if file has been converted (for files > 5MB)
+  const [isConverted, setIsConverted] = useState(false);
+
+  // Track conversion loading state
+  const [isConverting, setIsConverting] = useState(false);
+
+  // Track uploaded file for conversion
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
   // Function to handle cropped image upload
   const handleCroppedImageUpload = useCallback(
     async (croppedImg: string) => {
@@ -109,30 +119,119 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
     setImageErrors((prev) => new Set(prev).add(url));
   };
 
+  // Helper function to compress image file
+  const compressImage = async (
+    file: File,
+    maxSizeMB: number = 5,
+    quality: number = 0.8,
+    maxWidth: number = 1920,
+  ): Promise<File> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.src = event.target?.result as string;
+
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          // Scale down if width exceeds maxWidth
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+
+                // If still too large, reduce quality further
+                if (compressedFile.size > maxSizeMB * 1024 * 1024) {
+                  resolve(
+                    compressImage(file, maxSizeMB, quality - 0.1, maxWidth),
+                  );
+                } else {
+                  resolve(compressedFile);
+                }
+              } else {
+                reject(new Error("Failed to compress image"));
+              }
+            },
+            "image/jpeg",
+            quality,
+          );
+        };
+
+        img.onerror = () => {
+          reject(new Error("Failed to load image"));
+        };
+      };
+
+      reader.onerror = () => {
+        reject(new Error("Failed to read file"));
+      };
+    });
+
+  // Handle file conversion for large images
+  const handleConvertFile = async () => {
+    if (!uploadedFile) return;
+
+    setIsConverting(true);
+    try {
+      const compressedFile = await compressImage(uploadedFile, 5, 0.8, 1920);
+      setIsConverted(true);
+      setSizeError(null);
+      onFileChange(compressedFile);
+    } catch (error) {
+      console.error("Error converting file:", error);
+      setSizeError("Failed to convert file. Please try a different file.");
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Reset conversion states
+      setIsConverted(false);
+      setIsConverting(false);
+      setUploadedFile(file);
+
       // Validate file size
       if (file.size > maxSize) {
         setSizeError(
-          `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`,
+          `File size is ${Math.round(file.size / (1024 * 1024))}MB. Click "Convert File" to compress it.`,
         );
-        return;
-      }
-      // Clear size error when valid file is selected
-      setSizeError(null);
+      } else {
+        setSizeError(null);
 
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        alert("Please select an image file");
-        return;
+        // Validate file type
+        if (!file.type.startsWith("image/")) {
+          alert("Please select an image file");
+          return;
+        }
+
+        onFileChange(file);
       }
 
       // Reset crop-related state when new file is selected
       setCroppedImage(null);
       setCropModalOpen(false);
-
-      onFileChange(file);
     }
   };
 
@@ -209,6 +308,22 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
           </div>
           {(previewUrl || existingPhoto || croppedImage) && (
             <div className="flex gap-2 mt-2">
+              {/* Convert button for large images (> 5MB) */}
+              {uploadedFile && uploadedFile.size > maxSize && !isConverted && (
+                <button
+                  type="button"
+                  onClick={handleConvertFile}
+                  className="text-sm text-green-600 hover:text-green-800 flex items-center"
+                  disabled={isLoading || isConverting}
+                >
+                  <FiRefreshCw
+                    className={`w-4 h-4 inline mr-1 ${
+                      isConverting ? "animate-spin" : ""
+                    }`}
+                  />
+                  {isConverting ? "Converting..." : "Convert File"}
+                </button>
+              )}
               {(previewUrl || existingPhoto) && (
                 <button
                   type="button"
@@ -234,6 +349,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
                     type="button"
                     onClick={() => {
                       setCroppedImage(null);
+                      setIsConverted(false);
+                      setUploadedFile(null);
                       onRemovePhoto();
                     }}
                     className="text-sm text-red-600 hover:text-red-800"
