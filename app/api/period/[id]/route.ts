@@ -5,7 +5,7 @@ import {
   getPeriod,
   updatePeriod,
   deletePeriod,
-} from "@/infrastructure/repositories/period.repository";
+} from "@/infrastructure/repositories/period";
 
 interface Context {
   params: Promise<{ id: string }>;
