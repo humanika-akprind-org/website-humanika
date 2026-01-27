@@ -5,7 +5,7 @@ import {
   getLetter,
   updateLetter,
   deleteLetter,
-} from "@/infrastructure/repositories/letter.repository";
+} from "@/infrastructure/repositories/letter";
 
 export async function GET(
   _request: NextRequest,
