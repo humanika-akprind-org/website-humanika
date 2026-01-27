@@ -5,7 +5,7 @@ import {
   getArticleCategories,
   createArticleCategory,
   getArticleCategoriesWithCount,
-} from "@/infrastructure/repositories/article-category.repository";
+} from "@/infrastructure/repositories/article-category";
 
 export async function GET(request: NextRequest) {
   try {
