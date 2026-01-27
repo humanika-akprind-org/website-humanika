@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import { changePassword } from "@/infrastructure/repositories/user.repository";
+import { changePassword } from "@/infrastructure/repositories/user";
 
 export async function POST(request: NextRequest) {
   try {

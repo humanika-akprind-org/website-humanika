@@ -3,7 +3,7 @@ import {
   getCurrentUser,
   clearAuthCookies,
 } from "@/presentation/lib/auth-server";
-import { deleteAccount } from "@/infrastructure/repositories/user.repository";
+import { deleteAccount } from "@/infrastructure/repositories/user";
 
 export async function DELETE(_request: NextRequest) {
   try {
