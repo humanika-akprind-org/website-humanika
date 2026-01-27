@@ -2,26 +2,23 @@
  * Article ID API Route - Clean Architecture Hybrid Pattern
  * Part of Clean Architecture: Presentation Layer (API)
  *
- * This route demonstrates the hybrid pattern:
- * - GET: Uses use case for single read operation with validation
- * - PUT: Uses use case for complex write operations with validation
- * - DELETE: Uses use case for delete operation with validation
+ * This route demonstrates the pattern:
+ * - GET: Uses repository directly for single read operation
+ * - PUT: Uses repository directly for write operations
+ * - DELETE: Uses repository directly for delete operation
  *
  * Pattern Choice Rationale:
- * - GET article by ID: Use case provides better separation and validation
- * - PUT update: Use case provides validation, logging, and approval workflow
- * - DELETE: Use case provides validation and activity logging
+ * - Direct repository calls for simpler operations
  */
 
 import { type NextRequest, NextResponse } from "next/server";
 import type { UpdateArticleInput } from "@/domain/entities/article.entity";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
-  GetArticleByIdUseCase,
-  UpdateArticleUseCase,
-  DeleteArticleUseCase,
-} from "@/application/use-cases/article";
-import { ArticleRepositoryPrisma } from "@/infrastructure/repositories/article";
+  getArticleById,
+  updateArticle,
+  deleteArticle,
+} from "@/infrastructure/repositories/article";
 
 // ============================================================================
 // Payload Extraction Functions
@@ -54,7 +51,7 @@ function validateUpdateArticleInput(body: UpdateArticleInput) {
 }
 
 // ============================================================================
-// GET /api/articles/:id - Use Case Pattern
+// GET /api/articles/:id
 // ============================================================================
 
 export async function GET(
@@ -62,15 +59,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    // 1. Extract payload
     const id = (await params).id;
 
-    // 2. Use use case for single read with validation
-    const repo = new ArticleRepositoryPrisma();
-    const useCase = new GetArticleByIdUseCase(repo);
-    const article = await useCase.execute(id);
+    // Use repository directly
+    const article = await getArticleById(id);
 
-    // 3. Handle not found
     if (!article) {
       return NextResponse.json(
         {
@@ -81,25 +74,12 @@ export async function GET(
       );
     }
 
-    // 4. Response - consistent format
     return NextResponse.json({
       success: true,
       data: article,
     });
   } catch (error) {
     console.error("Error fetching article:", error);
-
-    // Handle validation errors specifically
-    if ((error as Error).message.includes("Article ID is required")) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: (error as Error).message,
-        },
-        { status: 400 },
-      );
-    }
-
     return NextResponse.json(
       {
         success: false,
@@ -112,7 +92,7 @@ export async function GET(
 }
 
 // ============================================================================
-// PUT /api/articles/:id - Use Case Pattern
+// PUT /api/articles/:id
 // ============================================================================
 
 export async function PUT(
@@ -120,7 +100,6 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    // Check authentication
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -129,11 +108,9 @@ export async function PUT(
       );
     }
 
-    // 1. Extract payload
     const id = (await params).id;
     const body = await extractUpdateArticleBody(request);
 
-    // 2. Basic validation (use case will do deeper validation)
     const validation = validateUpdateArticleInput(body);
     if (!validation.isValid) {
       return NextResponse.json(
@@ -142,41 +119,15 @@ export async function PUT(
       );
     }
 
-    // 3. Use use case for complex write with validation, logging, and approval
-    const repo = new ArticleRepositoryPrisma();
-    const useCase = new UpdateArticleUseCase(repo);
-    const article = await useCase.execute(id, body, { id: user.id });
+    // Use repository directly with user
+    const article = await updateArticle(id, body, { id: user.id });
 
-    // 4. Response
     return NextResponse.json({
       success: true,
       data: article,
     });
   } catch (error) {
     console.error("Error updating article:", error);
-
-    // Handle validation errors specifically
-    if ((error as Error).message.includes("Validation failed")) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: (error as Error).message,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Handle not found error
-    if ((error as Error).message.includes("not found")) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: (error as Error).message,
-        },
-        { status: 404 },
-      );
-    }
-
     return NextResponse.json(
       {
         success: false,
@@ -189,7 +140,7 @@ export async function PUT(
 }
 
 // ============================================================================
-// DELETE /api/articles/:id - Use Case Pattern
+// DELETE /api/articles/:id
 // ============================================================================
 
 export async function DELETE(
@@ -197,7 +148,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    // Check authentication
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -206,44 +156,17 @@ export async function DELETE(
       );
     }
 
-    // 1. Extract payload
     const id = (await params).id;
 
-    // 2. Use use case for delete with validation
-    const repo = new ArticleRepositoryPrisma();
-    const useCase = new DeleteArticleUseCase(repo);
-    await useCase.execute(id, { id: user.id });
+    // Use repository directly with user
+    await deleteArticle(id, { id: user.id });
 
-    // 3. Response
     return NextResponse.json({
       success: true,
       message: "Article deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting article:", error);
-
-    // Handle not found error
-    if ((error as Error).message.includes("not found")) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: (error as Error).message,
-        },
-        { status: 404 },
-      );
-    }
-
-    // Handle validation errors specifically
-    if ((error as Error).message.includes("Article ID is required")) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: (error as Error).message,
-        },
-        { status: 400 },
-      );
-    }
-
     return NextResponse.json(
       {
         success: false,

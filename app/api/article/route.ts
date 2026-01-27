@@ -18,9 +18,10 @@ import type {
 } from "@/domain/entities/article.entity";
 import type { Status } from "@/domain/enums";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import { GetArticlesUseCase } from "@/application/use-cases/article";
-import { CreateArticleUseCase } from "@/application/use-cases/article";
-import { ArticleRepositoryPrisma } from "@/infrastructure/repositories/article";
+import {
+  getArticles,
+  createArticle,
+} from "@/infrastructure/repositories/article";
 
 // ============================================================================
 // Payload Extraction Functions
@@ -48,28 +49,9 @@ async function extractCreateArticleBody(
 // ============================================================================
 
 function validateCreateArticleInput(body: CreateArticleInput) {
-  const errors: string[] = [];
-
-  if (!body.title || body.title.trim() === "") {
-    errors.push("Title is required");
+  if (!body.title || !body.content || !body.authorId || !body.categoryId) {
+    return { isValid: false, error: "Missing required fields" };
   }
-
-  if (!body.content || body.content.trim() === "") {
-    errors.push("Content is required");
-  }
-
-  if (!body.authorId || body.authorId.trim() === "") {
-    errors.push("Author ID is required");
-  }
-
-  if (!body.categoryId || body.categoryId.trim() === "") {
-    errors.push("Category ID is required");
-  }
-
-  if (errors.length > 0) {
-    return { isValid: false, error: errors.join(", ") };
-  }
-
   return { isValid: true };
 }
 
@@ -82,16 +64,13 @@ export async function GET(request: NextRequest) {
     // 1. Extract payload
     const queryParams = extractArticleQueryParams(request);
 
-    // 2. Use use case for complex read with validation and pagination
-    const repo = new ArticleRepositoryPrisma();
-    const useCase = new GetArticlesUseCase(repo);
-    const result = await useCase.execute(queryParams);
+    // 2. Use repository directly
+    const articles = await getArticles(queryParams);
 
     // 3. Response - consistent format
     return NextResponse.json({
       success: true,
-      data: result.articles,
-      pagination: result.pagination,
+      data: articles,
     });
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -126,10 +105,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // 3. Use use case for complex write with validation, logging, and approval
-    const repo = new ArticleRepositoryPrisma();
-    const useCase = new CreateArticleUseCase(repo);
-    const article = await useCase.execute(body, { id: user.id });
+    // 3. Use repository directly
+    const article = await createArticle(body, user);
 
     // 4. Response
     return NextResponse.json(

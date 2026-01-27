@@ -21,3 +21,7 @@ export type {
   DepartmentActivityData,
 } from "./activity.repository.interface";
 export type { IArticleRepository } from "./article.repository.interface";
+export type {
+  IArticleCategoryRepository,
+  CategoryFilter,
+} from "./article-category.repository.interface";
