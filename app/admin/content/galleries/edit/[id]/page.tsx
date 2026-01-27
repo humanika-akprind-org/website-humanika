@@ -16,7 +16,7 @@ import {
   updateGallery,
   getEventsForGalleryForm,
   getPeriodsForForm,
-} from "@/infrastructure/repositories/gallery.repository";
+} from "@/infrastructure/repositories/gallery";
 
 async function EditGalleryPage({
   params,

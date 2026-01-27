@@ -4,7 +4,7 @@ import {
   getGalleries,
   createGallery,
   type CreateGalleryInput,
-} from "@/infrastructure/repositories/gallery.repository";
+} from "@/infrastructure/repositories/gallery";
 
 // Extract payload functions
 function extractGalleryQueryParams(request: NextRequest) {
