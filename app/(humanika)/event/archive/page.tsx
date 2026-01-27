@@ -22,7 +22,7 @@ import type {
   ViewMode,
   SortBy,
 } from "@/presentation/hooks/event/useEventPage";
-import type { ScheduleItem } from "@/domain/entities/event";
+import type { ScheduleItem } from "@/domain/entities/event.entity";
 
 // Helper function to get the latest schedule date from an event
 function getLatestScheduleDate(

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getEvents } from "@/presentation/services/event";
 import { getGalleryCategories } from "@/presentation/services/gallery-category";
 import { getPeriods } from "@/presentation/services/period";
-import type { Event } from "@/domain/entities/event";
+import type { Event } from "@/domain/entities/event.entity";
 import type { GalleryCategory } from "@/domain/value-objects/gallery-category";
 import type { Period } from "@/domain/entities/period";
 

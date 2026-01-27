@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { ChevronRight, FolderOpen } from "lucide-react";
 import AlbumGrid from "@/presentation/components/public/pages/card/album/AlbumGrid";
 import { transformEventsToAlbums } from "@/presentation/lib/gallery-utils";
-import type { Event } from "@/domain/entities/event";
+import type { Event } from "@/domain/entities/event.entity";
 
 interface GalleryDetailRelatedAlbumsSectionProps {
   relatedEvents: Event[];

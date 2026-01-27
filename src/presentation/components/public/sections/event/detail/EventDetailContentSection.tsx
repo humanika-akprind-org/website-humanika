@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Calendar, Trophy, Sparkles, Target } from "lucide-react";
-import type { Event, ScheduleItem } from "@/domain/entities/event";
+import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
 import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
 import {
   getPreviewUrl,

@@ -5,7 +5,7 @@ import type {
   CreateEventInput,
   UpdateEventInput,
   Event,
-} from "@/domain/entities/event";
+} from "@/domain/entities/event.entity";
 
 export function useEditEvent(eventId: string) {
   const router = useRouter();

@@ -7,7 +7,7 @@ import type {
   CreateGalleryInput,
   UpdateGalleryInput,
 } from "@/domain/entities/gallery";
-import type { Event } from "@/domain/entities/event";
+import type { Event } from "@/domain/entities/event.entity";
 import type { Period } from "@/domain/entities/period";
 import { FiImage, FiCalendar } from "react-icons/fi";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";

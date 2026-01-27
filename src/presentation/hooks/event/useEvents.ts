@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getEvents } from "@/presentation/services/event";
-import type { Event, EventFilter } from "@/domain/entities/event";
+import type { Event, EventFilter } from "@/domain/entities/event.entity";
 
 export function useEvents(filter?: EventFilter) {
   const [events, setEvents] = useState<Event[]>([]);

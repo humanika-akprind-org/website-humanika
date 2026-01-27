@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateEventInput } from "@/domain/entities/event";
+import type { UpdateEventInput } from "@/domain/entities/event.entity";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getEvent,
   updateEvent,
   deleteEvent,
-} from "@/infrastructure/repositories/event/event.service";
+} from "@/infrastructure/repositories/event/event.repository";
 
 export async function GET(
   _request: NextRequest,

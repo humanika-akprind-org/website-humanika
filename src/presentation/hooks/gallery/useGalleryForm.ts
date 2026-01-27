@@ -5,7 +5,7 @@ import type {
   CreateGalleryInput,
   UpdateGalleryInput,
 } from "@/domain/entities/gallery";
-import type { Event } from "@/domain/entities/event";
+import type { Event } from "@/domain/entities/event.entity";
 import { useEvents } from "@/presentation/hooks/event/useEvents";
 import { useGalleryCategories } from "@/presentation/hooks/gallery-category/useGalleryCategories";
 import { useFile } from "@/presentation/hooks/useFile";

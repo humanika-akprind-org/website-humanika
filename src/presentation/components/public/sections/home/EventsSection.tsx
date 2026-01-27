@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import EventCard from "@/presentation/components/public/pages/card/event/EventCard";
-import type { Event, ScheduleItem } from "@/domain/entities/event";
+import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
 import {
   Filter,
   CalendarDays,

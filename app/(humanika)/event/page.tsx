@@ -25,7 +25,7 @@ import FeaturedPastEvents from "@/presentation/components/public/pages/event/Fea
 import PopularCategories from "@/presentation/components/public/pages/event/EventPopularCategories";
 import EventPageLoadingState from "@/presentation/components/public/pages/event/EventPageLoadingState";
 import EventErrorState from "@/presentation/components/public/pages/event/EventErrorState";
-import type { ScheduleItem } from "@/domain/entities/event";
+import type { ScheduleItem } from "@/domain/entities/event.entity";
 
 // Helper function to get the latest schedule date from an event
 function getLatestScheduleDate(

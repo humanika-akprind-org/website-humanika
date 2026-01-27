@@ -9,7 +9,7 @@ import type {
   UpdateDocumentInput,
 } from "@/domain/entities/document";
 import { Status } from "@/domain/enums/enums";
-import type { Event } from "@/domain/entities/event";
+import type { Event } from "@/domain/entities/event.entity";
 import type { Letter } from "@/domain/entities/letter";
 import type { Period } from "@/domain/entities/period";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";

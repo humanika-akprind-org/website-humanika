@@ -2,7 +2,7 @@ import { LetterType, LetterPriority, Status } from "../enums/enums";
 import { Approval } from "./approval";
 import type { User } from "./user";
 import type { Period } from "./period";
-import type { Event } from "./event";
+import type { Event } from "./event.entity";
 import type { Document } from "./document";
 
 export interface Letter {

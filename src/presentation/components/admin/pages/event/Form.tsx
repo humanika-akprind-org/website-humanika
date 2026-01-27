@@ -6,7 +6,7 @@ import type {
   Event,
   CreateEventInput,
   UpdateEventInput,
-} from "@/domain/entities/event";
+} from "@/domain/entities/event.entity";
 import { Department as DepartmentEnum } from "@/domain/enums/enums";
 import type { User } from "@/domain/entities/user";
 import type { Period } from "@/domain/entities/period";

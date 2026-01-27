@@ -4,7 +4,7 @@ import { createEvent } from "@/presentation/services/event";
 import type {
   CreateEventInput,
   UpdateEventInput,
-} from "@/domain/entities/event";
+} from "@/domain/entities/event.entity";
 
 export function useCreateEvent() {
   const router = useRouter();

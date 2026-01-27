@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import type { Event, ScheduleItem } from "@/domain/entities/event";
+import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
 
 interface EventCalendarViewProps {
   allEvents: Event[];

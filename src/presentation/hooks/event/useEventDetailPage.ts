@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getEventBySlug, getEvents } from "@/presentation/services/event";
-import type { Event } from "@/domain/entities/event";
+import type { Event } from "@/domain/entities/event.entity";
 import {
   getPastEvents,
   getRelatedEvents,

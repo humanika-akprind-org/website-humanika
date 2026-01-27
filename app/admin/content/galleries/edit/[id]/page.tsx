@@ -1,11 +1,8 @@
 import GalleryForm from "@/presentation/components/admin/pages/gallery/Form";
 import AuthGuard from "@/presentation/components/admin/auth/google-oauth/AuthGuard";
 import { getGoogleAccessToken } from "@/infrastructure/external-services/google-drive/google-oauth";
-import type {
-  Gallery,
-  UpdateGalleryInput,
-} from "@/domain/entities/gallery";
-import type { Event } from "@/domain/entities/event";
+import type { Gallery, UpdateGalleryInput } from "@/domain/entities/gallery";
+import type { Event } from "@/domain/entities/event.entity";
 import type { Period } from "@/domain/entities/period";
 import { FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";

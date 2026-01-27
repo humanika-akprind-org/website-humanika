@@ -1,4 +1,4 @@
-import type { Event } from "@/domain/entities/event";
+import type { Event } from "@/domain/entities/event.entity";
 import type { EventCategory } from "@/domain/value-objects/event-category";
 
 export function truncateDescription(

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Trophy, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import PastEventCard from "../card/event/PastEventCard";
-import type { Event, ScheduleItem } from "@/domain/entities/event";
+import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
 
 interface FeaturedPastEventsProps {
   pastEvents: Event[];

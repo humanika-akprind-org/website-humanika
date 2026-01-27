@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import type { Event, ScheduleItem } from "@/domain/entities/event";
+import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
 
 export type EventTab = "upcoming" | "ongoing" | "past" | "all";
 export type ViewMode = "grid" | "calendar";

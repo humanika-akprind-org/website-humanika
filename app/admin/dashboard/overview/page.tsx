@@ -19,7 +19,7 @@ import { StructureApi } from "@/presentation/services/structure";
 import type { Document } from "@/domain/entities/document";
 import type { WorkProgram } from "@/domain/entities/work";
 import type { Finance } from "@/domain/entities/finance";
-import type { Event, ScheduleItem } from "@/domain/entities/event";
+import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
 import type { Article } from "@/domain/entities/article";
 
 import type { ActivityLog } from "@/domain/entities/activity-log";

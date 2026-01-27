@@ -1,4 +1,4 @@
-import type { ScheduleItem } from "@/domain/entities/event";
+import type { ScheduleItem } from "@/domain/entities/event.entity";
 
 /**
  * Helper function to get the earliest date from schedules

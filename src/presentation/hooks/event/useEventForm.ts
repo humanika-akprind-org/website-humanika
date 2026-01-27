@@ -4,7 +4,7 @@ import type {
   CreateEventInput,
   UpdateEventInput,
   ScheduleItem,
-} from "@/domain/entities/event";
+} from "@/domain/entities/event.entity";
 import { Department as DepartmentEnum, Status } from "@/domain/enums/enums";
 import { useFile } from "@/presentation/hooks/useFile";
 import { useWorkPrograms } from "@/presentation/hooks/work-program/useWorkPrograms";
