@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getArticleBySlug } from "@/infrastructure/repositories/article/article.service";
+import { getArticleBySlug } from "@/infrastructure/repositories/article.repository";
 
 /**
  * Article Slug API Route - uses slug for public URLs

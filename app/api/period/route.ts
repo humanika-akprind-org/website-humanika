@@ -3,7 +3,7 @@ import type { PeriodApiResponse } from "@/domain/entities/period.entity";
 import {
   getPeriods,
   createPeriod,
-} from "@/infrastructure/repositories/period/period.service";
+} from "@/infrastructure/repositories/period.repository";
 
 // Extract payload functions
 async function extractCreatePeriodBody(request: NextRequest) {

@@ -7,7 +7,7 @@ import {
   getStatistics,
   getActivePeriodStatistic,
   createStatistic,
-} from "@/infrastructure/repositories/statistic/statistic.service";
+} from "@/infrastructure/repositories/statistic.repository";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 // Extract payload functions

@@ -5,7 +5,7 @@ import {
   getDocument,
   updateDocument,
   deleteDocument,
-} from "@/infrastructure/repositories/document/document.service";
+} from "@/infrastructure/repositories/document.repository";
 
 export async function GET(
   _request: NextRequest,

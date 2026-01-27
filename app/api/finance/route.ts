@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getFinances,
   createFinance,
-} from "@/infrastructure/repositories/finance/finance.service";
+} from "@/infrastructure/repositories/finance.repository";
 
 function extractFinanceQueryParams(request: NextRequest) {
   const { searchParams } = new URL(request.url);

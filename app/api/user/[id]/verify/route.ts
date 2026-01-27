@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyUser } from "@/infrastructure/repositories/user/user.service";
+import { verifyUser } from "@/infrastructure/repositories/user.repository";
 
 // PATCH - Verify user account
 export async function PATCH(

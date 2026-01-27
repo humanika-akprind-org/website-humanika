@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import { ManagementService } from "@/infrastructure/repositories/management/management.service";
+import { ManagementService } from "@/infrastructure/repositories/management.repository";
 import type { ManagementServerData } from "@/domain/entities/management.entity";
 
 interface RouteParams {

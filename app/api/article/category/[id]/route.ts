@@ -5,7 +5,7 @@ import {
   getArticleCategoryById,
   updateArticleCategory,
   deleteArticleCategory,
-} from "@/infrastructure/repositories/article/article-category.service";
+} from "@/infrastructure/repositories/article-category.repository";
 
 export async function GET(
   _request: NextRequest,

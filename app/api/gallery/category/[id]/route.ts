@@ -4,7 +4,7 @@ import {
   getGalleryCategory,
   updateGalleryCategory,
   deleteGalleryCategory,
-} from "@/infrastructure/repositories/gallery/gallery-category.service";
+} from "@/infrastructure/repositories/gallery-category.repository";
 
 export async function GET(
   _request: NextRequest,

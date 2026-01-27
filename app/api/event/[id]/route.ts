@@ -5,7 +5,7 @@ import {
   getEvent,
   updateEvent,
   deleteEvent,
-} from "@/infrastructure/repositories/event/event.repository";
+} from "@/infrastructure/repositories/event.repository";
 
 export async function GET(
   _request: NextRequest,

@@ -1,10 +1,10 @@
 // Re-export everything from the modular services
-export { getApprovals } from "./approval-queries.service";
+export { getApprovals } from "./approval-queries.repository";
 export {
   createApproval,
   updateApproval,
   deleteApproval,
-} from "./approval-mutations.service";
+} from "./approval-mutations.repository";
 export type {
   UpdateApprovalData,
   CreateApprovalData,

@@ -5,7 +5,7 @@ import {
   getFinance,
   updateFinance,
   deleteFinance,
-} from "@/infrastructure/repositories/finance/finance.service";
+} from "@/infrastructure/repositories/finance.repository";
 
 export async function GET(
   _request: NextRequest,

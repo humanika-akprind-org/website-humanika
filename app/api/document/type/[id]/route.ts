@@ -5,7 +5,7 @@ import {
   getDocumentType,
   updateDocumentType,
   deleteDocumentType,
-} from "@/infrastructure/repositories/document/document-type.service";
+} from "@/infrastructure/repositories/document-type.repository";
 
 export async function GET(
   _request: NextRequest,

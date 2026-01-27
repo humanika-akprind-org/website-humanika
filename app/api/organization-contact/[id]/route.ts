@@ -4,7 +4,7 @@ import {
   getOrganizationContact,
   updateOrganizationContact,
   deleteOrganizationContact,
-} from "@/infrastructure/repositories/organization-contact/organization-contact.service";
+} from "@/infrastructure/repositories/organization-contact.repository";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 interface OrganizationContactParams {

@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getEventCategories,
   createEventCategory,
-} from "@/infrastructure/repositories/event/event-category.service";
+} from "@/infrastructure/repositories/event-category.repository";
 import type { CreateEventCategoryInput } from "@/domain/value-objects/event-category";
 
 // Validation functions

@@ -5,7 +5,7 @@ import {
   getDepartmentTask,
   updateDepartmentTask,
   deleteDepartmentTask,
-} from "@/infrastructure/repositories/task/task.service";
+} from "@/infrastructure/repositories/task-department.repository";
 
 export async function GET(
   _request: NextRequest,

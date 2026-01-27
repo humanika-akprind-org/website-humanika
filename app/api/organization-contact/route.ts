@@ -7,7 +7,7 @@ import {
   getOrganizationContacts,
   getActivePeriodOrganizationContact,
   createOrganizationContact,
-} from "@/infrastructure/repositories/organization-contact/organization-contact.service";
+} from "@/infrastructure/repositories/organization-contact.repository";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 // Extract payload functions

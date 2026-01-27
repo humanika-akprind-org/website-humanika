@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { clearAuthCookies } from "@/presentation/lib/clear-auth-cookies";
-import { logout } from "@/infrastructure/repositories/auth/logout.service";
+import { logout } from "@/infrastructure/repositories/auth/logout.repository";
 
 export async function POST() {
   try {

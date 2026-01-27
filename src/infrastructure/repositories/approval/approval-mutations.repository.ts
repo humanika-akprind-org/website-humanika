@@ -13,7 +13,7 @@ import {
   updateApprovalRecord,
   deleteApprovalRecord,
   findApprovalById,
-} from "./approval-queries.service";
+} from "./approval-queries.repository";
 import { updateEntityStatus } from "../entityStatusUpdater";
 
 export async function createApproval(

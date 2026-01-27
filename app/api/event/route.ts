@@ -17,7 +17,7 @@ import type { Department, Status } from "@/domain/enums/enums";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import { GetEventsUseCase } from "@/application/use-cases/event/get-events.usecase";
 import { CreateEventUseCase } from "@/application/use-cases/event/create-event.usecase";
-import { EventRepositoryPrisma } from "@/infrastructure/repositories/event/event.repository";
+import { EventRepositoryPrisma } from "@/infrastructure/repositories/event.repository";
 
 // ============================================================================
 // Payload Extraction Functions

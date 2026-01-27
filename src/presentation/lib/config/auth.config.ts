@@ -1,7 +1,7 @@
 import { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "../prisma";
-import { login as loginUser } from "../../../infrastructure/repositories/auth/login.service";
+import { login as loginUser } from "../../../infrastructure/repositories/auth/login.repository";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
 export const authOptions: NextAuthOptions = {

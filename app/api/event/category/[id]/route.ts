@@ -4,7 +4,7 @@ import {
   getEventCategory,
   updateEventCategory,
   deleteEventCategory,
-} from "@/infrastructure/repositories/event/event-category.service";
+} from "@/infrastructure/repositories/event-category.repository";
 
 export async function GET(
   _request: NextRequest,

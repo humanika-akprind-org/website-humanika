@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getLetters,
   createLetter,
-} from "@/infrastructure/repositories/letter/letter.service";
+} from "@/infrastructure/repositories/letter.repository";
 
 // Extract payload functions
 function extractLetterQueryParams(request: NextRequest) {

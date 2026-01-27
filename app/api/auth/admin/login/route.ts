@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { setAuthCookie } from "@/presentation/lib/auth-server";
-import { adminLogin } from "@/infrastructure/repositories/auth/admin-login.service";
+import { adminLogin } from "@/infrastructure/repositories/auth/admin-login.repository";
 
 export async function POST(request: Request) {
   try {
