@@ -10,6 +10,9 @@
 export type { ArticleWithRelatedArticles } from "./get-article-by-slug.repository";
 export * from "./get-articles.repository";
 
+// Export classes
+export { ArticleRepositoryPrisma } from "./article-repository-prisma";
+
 // Export functions
 export * from "./get-articles.repository";
 export * from "./get-article-by-id.repository";

@@ -20,3 +20,4 @@ export type {
   RadarChartResult,
   DepartmentActivityData,
 } from "./activity.repository.interface";
+export type { IArticleRepository } from "./article.repository.interface";

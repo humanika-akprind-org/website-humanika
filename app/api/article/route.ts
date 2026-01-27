@@ -1,17 +1,35 @@
+/**
+ * Article API Route - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ *
+ * This route demonstrates the hybrid pattern:
+ * - GET: Uses use case for complex read operations with validation
+ * - POST: Uses use case for complex write operations with validation
+ *
+ * Pattern Choice Rationale:
+ * - GET articles: Use case provides better separation for filtering/pagination
+ * - POST create: Use case provides validation, logging, and approval workflow
+ */
+
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateArticleInput } from "@/domain/entities/article.entity";
+import type {
+  CreateArticleInput,
+  ArticleFilter,
+} from "@/domain/entities/article.entity";
 import type { Status } from "@/domain/enums";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import {
-  getArticles,
-  createArticle,
-} from "@/infrastructure/repositories/article";
+import { GetArticlesUseCase } from "@/application/use-cases/article";
+import { CreateArticleUseCase } from "@/application/use-cases/article";
+import { ArticleRepositoryPrisma } from "@/infrastructure/repositories/article";
 
-// Extract payload functions
-function extractArticleQueryParams(request: NextRequest) {
+// ============================================================================
+// Payload Extraction Functions
+// ============================================================================
+
+function extractArticleQueryParams(request: NextRequest): ArticleFilter {
   const { searchParams } = new URL(request.url);
   return {
-    status: searchParams.get("status") as Status,
+    status: searchParams.get("status") as Status | undefined,
     periodId: searchParams.get("periodId") || undefined,
     categoryId: searchParams.get("categoryId") || undefined,
     authorId: searchParams.get("authorId") || undefined,
@@ -25,46 +43,72 @@ async function extractCreateArticleBody(
   return await request.json();
 }
 
-// Validation functions
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
 function validateCreateArticleInput(body: CreateArticleInput) {
-  if (!body.title || !body.content || !body.authorId || !body.categoryId) {
-    return { isValid: false, error: "Missing required fields" };
+  const errors: string[] = [];
+
+  if (!body.title || body.title.trim() === "") {
+    errors.push("Title is required");
   }
+
+  if (!body.content || body.content.trim() === "") {
+    errors.push("Content is required");
+  }
+
+  if (!body.authorId || body.authorId.trim() === "") {
+    errors.push("Author ID is required");
+  }
+
+  if (!body.categoryId || body.categoryId.trim() === "") {
+    errors.push("Category ID is required");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, error: errors.join(", ") };
+  }
+
   return { isValid: true };
 }
 
-export async function GET(request: NextRequest) {
-  /**
-   * 1. Extract payload --> tempat sendiri
-   * 2. Validasi --> tempat sendiri
-   * 3. Error handling
-   * 4. Response
-   */
-  try {
-    // Temporarily remove authentication check to allow public access for published articles
-    // const user = await getCurrentUser();
-    // if (!user) {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // }
+// ============================================================================
+// GET /api/articles - Use Case Pattern
+// ============================================================================
 
+export async function GET(request: NextRequest) {
+  try {
     // 1. Extract payload
     const queryParams = extractArticleQueryParams(request);
 
-    // 2. Validasi - no validation needed for GET request
+    // 2. Use use case for complex read with validation and pagination
+    const repo = new ArticleRepositoryPrisma();
+    const useCase = new GetArticlesUseCase(repo);
+    const result = await useCase.execute(queryParams);
 
-    // 3. Business logic
-    const articles = await getArticles(queryParams);
-
-    // 4. Response
-    return NextResponse.json(articles);
+    // 3. Response - consistent format
+    return NextResponse.json({
+      success: true,
+      data: result.articles,
+      pagination: result.pagination,
+    });
   } catch (error) {
     console.error("Error fetching articles:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Failed to fetch articles",
+        message: (error as Error).message,
+      },
       { status: 500 },
     );
   }
 }
+
+// ============================================================================
+// POST /api/articles - Use Case Pattern
+// ============================================================================
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,21 +120,44 @@ export async function POST(request: NextRequest) {
     // 1. Extract payload
     const body = await extractCreateArticleBody(request);
 
-    // 2. Validasi
+    // 2. Basic validation (use case will do deeper validation)
     const validation = validateCreateArticleInput(body);
     if (!validation.isValid) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // 3. Business logic
-    const article = await createArticle(body, user);
+    // 3. Use use case for complex write with validation, logging, and approval
+    const repo = new ArticleRepositoryPrisma();
+    const useCase = new CreateArticleUseCase(repo);
+    const article = await useCase.execute(body, { id: user.id });
 
     // 4. Response
-    return NextResponse.json(article, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: article,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("Error creating article:", error);
+
+    // Handle validation errors specifically
+    if ((error as Error).message.includes("Validation failed")) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: (error as Error).message,
+        },
+        { status: 400 },
+      );
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+      },
       { status: 500 },
     );
   }
