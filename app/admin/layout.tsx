@@ -9,7 +9,7 @@ import {
 } from "@/infrastructure/external-services/google-drive/google-oauth";
 import AuthGuard from "@/presentation/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/presentation/components/admin/layout/UserInfo";
-import { geistSans, geistMono } from "@/presentation/app/ui/fonts";
+import { geistSans, geistMono } from "../ui/fonts";
 import SidebarMobile from "@/presentation/components/admin/layout/SidebarMobile";
 import RefreshHandler from "@/presentation/components/admin/ui/RefreshHandler";
 import GoogleDriveStatus from "@/presentation/components/admin/google-drive/GoogleDriveStatus";

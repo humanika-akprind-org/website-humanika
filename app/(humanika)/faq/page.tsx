@@ -1,11 +1,11 @@
 "use client";
 
-import HeroSection from "../../../components/public/sections/faq/HeroSection";
-import SearchSection from "../../../components/public/sections/faq/SearchSection";
-import FAQGrid from "../../../components/public/pages/faq/FAQGrid";
-import ContactCTA from "../../../components/public/pages/faq/ContactCTA";
-import QuickLinks from "../../../components/public/pages/faq/QuickLinks";
-import { useFAQ } from "../../../hooks/faq/useFAQ";
+import HeroSection from "@/presentation/components/public/sections/faq/HeroSection";
+import SearchSection from "@/presentation/components/public/sections/faq/SearchSection";
+import FAQGrid from "@/presentation/components/public/pages/faq/FAQGrid";
+import ContactCTA from "@/presentation/components/public/pages/faq/ContactCTA";
+import QuickLinks from "@/presentation/components/public/pages/faq/QuickLinks";
+import { useFAQ } from "@/presentation/hooks/faq/useFAQ";
 
 export default function FAQPage() {
   const {

@@ -4,7 +4,7 @@ import type { Article } from "@/domain/entities/article";
 import {
   formatArticleDate,
   truncateContent,
-} from "../../../../hooks/article/utils";
+} from "@/presentation/hooks/article/utils";
 
 interface ArticleGridProps {
   articles: Article[];

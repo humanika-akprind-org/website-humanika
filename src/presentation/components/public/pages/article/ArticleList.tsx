@@ -6,7 +6,7 @@ import type { Article } from "@/domain/entities/article";
 import {
   formatArticleDate,
   truncateContent,
-} from "../../../../hooks/article/utils";
+} from "@/presentation/hooks/article/utils";
 
 // Helper function to get preview URL from image (file ID or URL)
 function getPreviewUrl(image: string | null | undefined): string {

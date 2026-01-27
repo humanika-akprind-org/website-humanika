@@ -7,7 +7,7 @@ import {
 import {
   loadFolderFromLocalStorage,
   saveFolderToLocalStorage,
-} from "@/presentation/app/utils/google-drive";
+} from "app/utils/google-drive";
 import type {
   LoadingStateTable,
   BreadcrumbItem,

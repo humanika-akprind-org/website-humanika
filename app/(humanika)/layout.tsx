@@ -4,7 +4,7 @@ import Header from "@/presentation/components/public/layout/Header";
 import Footer from "@/presentation/components/public/layout/Footer";
 import AIButton from "@/presentation/components/public/ui/AIButton";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import { geistSans, geistMono } from "@/presentation/app/ui/fonts";
+import { geistSans, geistMono } from "../ui/fonts";
 
 export const metadata: Metadata = {
   title: "HUMANIKA",
