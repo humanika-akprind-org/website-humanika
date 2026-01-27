@@ -4,7 +4,7 @@ import {
   getStatistic,
   updateStatistic,
   deleteStatistic,
-} from "@/infrastructure/repositories/statistic.repository";
+} from "@/infrastructure/repositories/statistic";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 interface StatisticParams {
