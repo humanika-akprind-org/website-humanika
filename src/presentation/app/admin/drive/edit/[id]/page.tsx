@@ -1,8 +1,8 @@
 import DriveForm from "@/src/presentation/components/admin/pages/drive/Form";
 import PageHeader from "@/src/presentation/components/admin/pages/drive/PageHeader";
-import { getGoogleDriveFile } from "@/src/presentation/lib/google-drive/google-drive";
+import { getGoogleDriveFile } from "@/src/infrastructure/external-services/google-drive/google-drive";
 import AuthGuard from "@/src/presentation/components/admin/auth/google-oauth/AuthGuard";
-import { getGoogleAccessToken } from "@/src/presentation/lib/google-drive/google-oauth";
+import { getGoogleAccessToken } from "@/src/infrastructure/external-services/google-drive/google-oauth";
 
 async function EditDriveFilePage({
   params,

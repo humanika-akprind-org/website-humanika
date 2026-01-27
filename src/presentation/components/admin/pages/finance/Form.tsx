@@ -24,7 +24,7 @@ import { useFinanceForm } from "@/src/presentation/hooks/finance/useFinanceForm"
 import {
   getGoogleDrivePreviewUrl,
   getFileIdFromFile,
-} from "@/src/presentation/lib/google-drive/file-utils";
+} from "@/src/infrastructure/external-services/google-drive/file-utils";
 
 interface FinanceFormProps {
   finance?: Finance;

@@ -1,4 +1,4 @@
-import { oauth2Client } from "@/src/presentation/lib/google-drive/google-oauth";
+import { oauth2Client } from "@/src/infrastructure/external-services/google-drive/google-oauth";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { isProduction } from "@/src/presentation/lib/config/config";

@@ -7,7 +7,7 @@ import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/src/presentation/lib/google-drive/file-utils";
+} from "@/src/infrastructure/external-services/google-drive/file-utils";
 
 interface UseLetterManagementOptions {
   addPath?: string;

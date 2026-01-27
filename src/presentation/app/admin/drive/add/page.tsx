@@ -1,7 +1,7 @@
 import DriveForm from "@/src/presentation/components/admin/pages/drive/Form";
 import PageHeader from "@/src/presentation/components/admin/pages/drive/PageHeader";
 import AuthGuard from "@/src/presentation/components/admin/auth/google-oauth/AuthGuard";
-import { getGoogleAccessToken } from "@/src/presentation/lib/google-drive/google-oauth";
+import { getGoogleAccessToken } from "@/src/infrastructure/external-services/google-drive/google-oauth";
 
 export default async function AddDriveFilePage() {
   const accessToken = await getGoogleAccessToken();

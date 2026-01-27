@@ -1,6 +1,6 @@
 import GalleryForm from "@/src/presentation/components/admin/pages/gallery/Form";
 import AuthGuard from "@/src/presentation/components/admin/auth/google-oauth/AuthGuard";
-import { getGoogleAccessToken } from "@/src/presentation/lib/google-drive/google-oauth";
+import { getGoogleAccessToken } from "@/src/infrastructure/external-services/google-drive/google-oauth";
 import type {
   Gallery,
   UpdateGalleryInput,

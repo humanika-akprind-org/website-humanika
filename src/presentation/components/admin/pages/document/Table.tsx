@@ -11,7 +11,7 @@ import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import { useRef, useState } from "react";
-import { getGoogleDriveDirectUrl } from "@/src/presentation/lib/google-drive/file-utils";
+import { getGoogleDriveDirectUrl } from "@/src/infrastructure/external-services/google-drive/file-utils";
 import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
 
 interface DocumentTableProps {

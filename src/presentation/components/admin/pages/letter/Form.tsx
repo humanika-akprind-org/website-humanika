@@ -26,7 +26,7 @@ import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEdi
 import {
   getGoogleDrivePreviewUrl,
   getFileIdFromFile,
-} from "@/src/presentation/lib/google-drive/file-utils";
+} from "@/src/infrastructure/external-services/google-drive/file-utils";
 
 interface LetterFormProps {
   letter?: Letter;

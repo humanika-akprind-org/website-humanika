@@ -1,4 +1,4 @@
-import { getGoogleAccessToken } from "@/src/presentation/lib/google-drive/google-oauth";
+import { getGoogleAccessToken } from "@/src/infrastructure/external-services/google-drive/google-oauth";
 import AuthGuard from "./AuthGuard";
 import type { ReactNode } from "react";
 

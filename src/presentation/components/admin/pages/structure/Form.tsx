@@ -19,7 +19,7 @@ import { FiBriefcase, FiCalendar } from "react-icons/fi";
 import {
   getGoogleDrivePreviewUrl,
   getFileIdFromFile,
-} from "@/src/presentation/lib/google-drive/file-utils";
+} from "@/src/infrastructure/external-services/google-drive/file-utils";
 
 interface StructureFormProps {
   structure?: OrganizationalStructure;

@@ -15,7 +15,7 @@ import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import AddButton from "../../ui/button/AddButton";
 import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
-import { getGoogleDriveDirectUrl } from "@/src/presentation/lib/google-drive/file-utils";
+import { getGoogleDriveDirectUrl } from "@/src/infrastructure/external-services/google-drive/file-utils";
 import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
 
 interface LetterTableProps {

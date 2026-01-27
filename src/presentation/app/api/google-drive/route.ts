@@ -1,4 +1,4 @@
-import { refreshGoogleAccessToken } from "@/src/presentation/lib/google-drive/google-oauth";
+import { refreshGoogleAccessToken } from "@/src/infrastructure/external-services/google-drive/google-oauth";
 import { google } from "googleapis";
 import { type NextRequest, NextResponse } from "next/server";
 import { Readable } from "stream";
