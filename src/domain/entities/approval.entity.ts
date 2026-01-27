@@ -1,5 +1,5 @@
-import { ApprovalType } from "../enums/enums";
-import { StatusApproval } from "@prisma/client";
+import { type ApprovalType } from "../enums/enums";
+import { type StatusApproval } from "@prisma/client";
 
 export interface Approval {
   id: string;
@@ -17,11 +17,41 @@ export interface Approval {
     role: string;
     department?: string;
   };
-  workProgram?: any;
-  event?: any;
-  finance?: any;
-  document?: any;
-  letter?: any;
+  workProgram?: {
+    id: string;
+    name: string;
+    department: string;
+    status: string;
+  } | null;
+  event?: {
+    id: string;
+    name: string;
+    department: string;
+    status: string;
+  } | null;
+  finance?: {
+    id: string;
+    name: string;
+    amount: number;
+    type: string;
+    status: string;
+  } | null;
+  document?: {
+    id: string;
+    name: string;
+    documentTypeId: string;
+    documentType?: {
+      id: string;
+      name: string;
+    } | null;
+    status: string;
+  } | null;
+  letter?: {
+    id: string;
+    regarding: string;
+    type: string;
+    status: string;
+  } | null;
 }
 
 export interface ApprovalsResponse {
@@ -68,7 +98,7 @@ export interface ApprovalFilters {
 }
 
 export interface ApprovalWithRelations {
-  nameApproval: any;
+  nameApproval: string;
   id: string;
   status: StatusApproval;
   note?: string | null;

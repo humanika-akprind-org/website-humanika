@@ -1,4 +1,4 @@
-import { UserRole, Department, Position } from "../enums/enums";
+import { type UserRole, type Department, type Position } from "../enums/enums";
 
 export interface User {
   id: string;

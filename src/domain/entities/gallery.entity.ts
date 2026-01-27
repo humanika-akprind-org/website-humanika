@@ -1,6 +1,6 @@
 import { type GalleryCategory } from "../value-objects/gallery-category";
-import { Event } from "./event.entity";
-import { Period } from "./period.entity";
+import { type Event } from "./event.entity";
+import { type Period } from "./period.entity";
 
 export interface Gallery {
   id: string;

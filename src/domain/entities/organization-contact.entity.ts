@@ -1,4 +1,4 @@
-import { Period } from "./period.entity";
+import { type Period } from "./period.entity";
 
 export interface MissionItem {
   icon?: string;
