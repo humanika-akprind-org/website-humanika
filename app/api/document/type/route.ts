@@ -4,7 +4,7 @@ import type { User } from "@/domain/entities/user.entity";
 import {
   getDocumentTypes,
   createDocumentType,
-} from "@/infrastructure/repositories/document-type.repository";
+} from "@/infrastructure/repositories/document-type";
 
 export async function GET(_request: NextRequest) {
   try {
