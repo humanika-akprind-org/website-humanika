@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   createDepartmentTask,
   getDepartmentTasks,
-} from "@/infrastructure/repositories/task-department.repository";
+} from "@/infrastructure/repositories/task-department";
 
 export async function GET(request: NextRequest) {
   try {
