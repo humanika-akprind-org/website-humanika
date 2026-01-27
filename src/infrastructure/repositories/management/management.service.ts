@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/src/presentation/lib/prisma";
 import type { Management, ManagementServerData } from "@/types/management";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 
@@ -43,7 +43,7 @@ export const ManagementService = {
 
   async createManagement(
     formData: ManagementServerData,
-    user: UserWithId
+    user: UserWithId,
   ): Promise<Management> {
     const { userId, periodId, position, department, photo } = formData;
 
@@ -70,7 +70,7 @@ export const ManagementService = {
 
     if (existingPosition) {
       throw new Error(
-        "This position in the department is already taken for this period"
+        "This position in the department is already taken for this period",
       );
     }
 
@@ -111,7 +111,7 @@ export const ManagementService = {
   async updateManagement(
     id: string,
     formData: ManagementServerData,
-    user: UserWithId
+    user: UserWithId,
   ): Promise<Management> {
     // Check if management exists
     const existingManagement = await prisma.management.findUnique({
@@ -148,7 +148,7 @@ export const ManagementService = {
 
     if (existingPositionManagement) {
       throw new Error(
-        "This position in the department is already taken for this period"
+        "This position in the department is already taken for this period",
       );
     }
 
@@ -195,7 +195,7 @@ export const ManagementService = {
 
   async updateManagementPhoto(
     id: string,
-    photoUrl: string
+    photoUrl: string,
   ): Promise<Management> {
     const management = await prisma.management.update({
       where: { id },

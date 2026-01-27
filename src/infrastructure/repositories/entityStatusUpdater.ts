@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/src/presentation/lib/prisma";
 import type { Status } from "@/types/enums";
 import { StatusApproval } from "@prisma/client";
 
@@ -12,7 +12,7 @@ export async function updateEntityStatus(
     document?: { id: string } | null;
     letter?: { id: string } | null;
   },
-  approvalStatus: StatusApproval
+  approvalStatus: StatusApproval,
 ) {
   const { entityType, entityId } = approval;
 

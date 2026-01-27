@@ -16,10 +16,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@/components/*": ["components/*"],
-      "@/lib/*": ["lib/*"],
+      "@/components/*": ["src/presentation/components/*"],
+      "@/lib/*": ["src/presentation/lib/*"],
       "@/types/*": ["types/*"],
-      "@/hooks/*": ["hooks/*"]
+      "@/hooks/*": ["src/presentation/hooks/*"]
     },
     "typeRoots": ["node_modules/@types", "types"],
     "plugins": [

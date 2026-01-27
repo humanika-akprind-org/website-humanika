@@ -1,0 +1,106 @@
+"use client";
+
+import DocumentForm from "@/src/presentation/components/admin/pages/document/Form";
+import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
+import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
+import WarningModal from "@/src/presentation/components/admin/ui/modal/WarningModal";
+import { useCreateDocument } from "@/src/presentation/hooks/document/useCreateDocument";
+import { useDocumentFormData } from "@/src/presentation/hooks/document/useDocumentFormData";
+import { useDocumentTypes } from "@/src/presentation/hooks/document-type/useDocumentTypes";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+export default function AddDocumentPage() {
+  const router = useRouter();
+  const [showWarningModal, setShowWarningModal] = useState(false);
+
+  const {
+    createDocument,
+    createDocumentForApproval,
+    handleBack,
+    isSubmitting,
+    error,
+    isLoading,
+  } = useCreateDocument("/admin/administration/accountability-reports");
+
+  const {
+    events,
+    letters,
+    periods,
+    loading: formDataLoading,
+    error: formDataError,
+  } = useDocumentFormData();
+
+  const {
+    documentTypes,
+    isLoading: documentTypesLoading,
+    error: documentTypesError,
+  } = useDocumentTypes();
+
+  // Check if ACCOUNTABILITY-REPORT document type exists
+  useEffect(() => {
+    if (!documentTypesLoading && documentTypes.length > 0) {
+      const accountabilityReportType = documentTypes.find(
+        (type) =>
+          type.name.toLowerCase().replace(/[\s\-]/g, "") ===
+          "accountabilityreport",
+      );
+      if (!accountabilityReportType) {
+        setShowWarningModal(true);
+      }
+    }
+  }, [documentTypes, documentTypesLoading]);
+
+  const combinedLoading =
+    isSubmitting || isLoading || formDataLoading || documentTypesLoading;
+  const loadError = error || formDataError || documentTypesError;
+
+  const handleRedirectToAddType = () => {
+    router.push("/admin/administration/documents/types/add");
+  };
+
+  // Check if ACCOUNTABILITY-REPORT document type exists
+  const accountabilityReportType = documentTypes.find(
+    (type) =>
+      type.name.toLowerCase().replace(/[\s\-]/g, "") === "accountabilityreport",
+  );
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Add New Accountability" onBack={handleBack} />
+
+      {loadError && <Alert type="error" message={loadError} />}
+
+      {combinedLoading ? (
+        <LoadingForm />
+      ) : accountabilityReportType ? (
+        <DocumentForm
+          onSubmit={createDocument}
+          onSubmitForApproval={createDocumentForApproval}
+          events={events}
+          letters={letters}
+          periods={periods}
+          loading={combinedLoading}
+          fixedDocumentType="accountabilityreport"
+        />
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+          <p className="text-gray-600">
+            Document type ACCOUNTABILITY REPORT is required to add
+            accountability reports.
+          </p>
+        </div>
+      )}
+
+      <WarningModal
+        isOpen={showWarningModal}
+        title="Document Type Not Found"
+        message="Document type ACCOUNTABILITY REPORT tidak ada, tambahkan terlebih dahulu"
+        onClose={() => setShowWarningModal(false)}
+        onRedirect={handleRedirectToAddType}
+        redirectText="Add Document Type"
+      />
+    </div>
+  );
+}

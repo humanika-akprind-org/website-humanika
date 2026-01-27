@@ -1,11 +1,11 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
   OrganizationalStructure,
 } from "@/types/structure";
 import type { Status } from "@/types/enums";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 
@@ -38,7 +38,7 @@ export const getStructures = async (filters: {
 };
 
 export const getStructure = async (
-  id: string
+  id: string,
 ): Promise<OrganizationalStructure> => {
   const structure = await prisma.organizationalStructure.findUnique({
     where: { id },
@@ -56,7 +56,7 @@ export const getStructure = async (
 
 export const createStructure = async (
   data: CreateOrganizationalStructureInput,
-  user: UserWithId
+  user: UserWithId,
 ): Promise<OrganizationalStructure> => {
   if (!data.name || !data.periodId) {
     throw new Error("Missing required fields");
@@ -100,7 +100,7 @@ export const createStructure = async (
 export const updateStructure = async (
   id: string,
   data: UpdateOrganizationalStructureInput,
-  user: UserWithId
+  user: UserWithId,
 ): Promise<OrganizationalStructure> => {
   // Check if structure exists
   const existingStructure = await prisma.organizationalStructure.findUnique({
@@ -157,7 +157,7 @@ export const updateStructure = async (
 
 export const deleteStructure = async (
   id: string,
-  user: UserWithId
+  user: UserWithId,
 ): Promise<void> => {
   // Check if structure exists
   const existingStructure = await prisma.organizationalStructure.findUnique({

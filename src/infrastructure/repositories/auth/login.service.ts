@@ -1,5 +1,5 @@
-import { comparePasswords, generateToken } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { comparePasswords, generateToken } from "@/src/presentation/lib/auth";
+import prisma from "@/src/presentation/lib/prisma";
 import type { User } from "@/types/user";
 
 interface LoginResult {
@@ -12,7 +12,7 @@ interface LoginResult {
 
 export async function login(
   usernameOrEmail: string,
-  password: string
+  password: string,
 ): Promise<LoginResult> {
   try {
     if (!usernameOrEmail?.trim() || !password?.trim()) {

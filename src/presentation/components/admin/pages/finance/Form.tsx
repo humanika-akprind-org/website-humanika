@@ -1,0 +1,268 @@
+"use client";
+
+import React from "react";
+import { useRouter } from "next/navigation";
+import type {
+  Finance,
+  CreateFinanceInput,
+  UpdateFinanceInput,
+} from "@/types/finance";
+import { FinanceType, Status } from "@/types/enums";
+import type { FinanceCategory } from "@/types/finance-category";
+import type { WorkProgram } from "@/types/work";
+import type { Period } from "@/types/period";
+import { FiBriefcase, FiCalendar } from "react-icons/fi";
+import TextEditor from "@/src/presentation/components/admin/ui/text-area/TextEditor";
+import TextInput from "@/src/presentation/components/admin/ui/input/TextInput";
+import SelectInput from "@/src/presentation/components/admin/ui/input/SelectInput";
+import CurrencyInput from "@/src/presentation/components/admin/ui/input/CurrencyInput";
+import DateInput from "@/src/presentation/components/admin/ui/date/DateInput";
+import FileUpload from "@/src/presentation/components/admin/ui/input/FileUpload";
+import SubmitButton from "@/src/presentation/components/admin/ui/button/SubmitButton";
+import CancelButton from "@/src/presentation/components/ui/CancelButton";
+import { useFinanceForm } from "@/src/presentation/hooks/finance/useFinanceForm";
+import {
+  getGoogleDrivePreviewUrl,
+  getFileIdFromFile,
+} from "@/src/presentation/lib/google-drive/file-utils";
+
+interface FinanceFormProps {
+  finance?: Finance;
+  onSubmit: (data: CreateFinanceInput | UpdateFinanceInput) => Promise<void>;
+  onSubmitForApproval?: (
+    data: CreateFinanceInput | UpdateFinanceInput,
+  ) => Promise<void>;
+  isLoading?: boolean;
+  accessToken?: string;
+  categories: FinanceCategory[];
+  workPrograms: WorkProgram[];
+  periods?: Period[];
+  isEditing?: boolean;
+}
+
+export default function FinanceForm({
+  finance,
+  onSubmit,
+  onSubmitForApproval,
+  accessToken,
+  categories,
+  workPrograms,
+  periods = [],
+  isEditing = false,
+}: FinanceFormProps) {
+  const router = useRouter();
+  const {
+    formData,
+    setFormData,
+    isLoadingState,
+    error,
+    existingDocument,
+    fileLoading,
+    errors,
+    ownerEmail,
+    handleInputChange,
+    handleFileChange,
+    removeDocument,
+    handleSubmit,
+  } = useFinanceForm({
+    finance,
+    onSubmit,
+    onSubmitForApproval,
+    accessToken,
+    categories,
+    workPrograms,
+  });
+
+  return (
+    <>
+      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
+            <h3 className="font-medium">Error</h3>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <TextInput
+              label="Transaction Name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Enter transaction name"
+              required
+              icon={<FiBriefcase className="text-gray-400" />}
+              error={errors.name}
+            />
+
+            <SelectInput
+              label="Type"
+              name="type"
+              value={formData.type}
+              onChange={(value: string) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  type: value as FinanceType,
+                }))
+              }
+              options={Object.values(FinanceType).map((type) => ({
+                value: type,
+                label: type === FinanceType.INCOME ? "Income" : "Expense",
+              }))}
+              required
+              icon={<FiBriefcase className="text-gray-400" />}
+            />
+
+            <CurrencyInput
+              label="Amount"
+              name="amount"
+              value={formData.amount}
+              onChange={(value: number) =>
+                setFormData((prev) => ({ ...prev, amount: value }))
+              }
+              placeholder="0"
+              required
+              icon={<FiBriefcase className="text-gray-400" />}
+              error={errors.amount}
+            />
+
+            <DateInput
+              label="Date"
+              value={formData.date}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, date: value }))
+              }
+              required
+              error={errors.date}
+            />
+
+            <SelectInput
+              label="Category"
+              name="categoryId"
+              value={formData.categoryId}
+              onChange={(value: string) =>
+                setFormData((prev) => ({ ...prev, categoryId: value }))
+              }
+              options={categories.map((category) => ({
+                value: category.id,
+                label: category.name,
+              }))}
+              required
+              icon={<FiBriefcase className="text-gray-400" />}
+              error={errors.categoryId}
+            />
+
+            <SelectInput
+              label="Work Program"
+              name="workProgramId"
+              value={formData.workProgramId}
+              onChange={(value: string) =>
+                setFormData((prev) => ({ ...prev, workProgramId: value }))
+              }
+              options={workPrograms.map((workProgram) => ({
+                value: workProgram.id,
+                label: workProgram.name,
+              }))}
+              placeholder="Select work program (optional)"
+              icon={<FiBriefcase className="text-gray-400" />}
+            />
+
+            <SelectInput
+              label="Status"
+              name="status"
+              value={formData.status}
+              onChange={(value: string) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  status: value as Status,
+                }))
+              }
+              options={Object.values(Status).map((status) => ({
+                value: status,
+                label: status,
+              }))}
+              icon={<FiBriefcase className="text-gray-400" />}
+            />
+
+            <SelectInput
+              label="Period"
+              name="periodId"
+              value={formData.periodId || ""}
+              onChange={(value: string) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  periodId: value || "",
+                }))
+              }
+              options={periods.map((period) => ({
+                value: period.id,
+                label: period.name,
+              }))}
+              placeholder="Select period (optional)"
+              icon={<FiCalendar className="text-gray-400" />}
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <TextEditor
+              value={formData.description}
+              onChange={(data) =>
+                setFormData((prev) => ({ ...prev, description: data }))
+              }
+              disabled={isLoadingState}
+              height="200px"
+            />
+          </div>
+
+          <div className="mb-6">
+            <FileUpload
+              label="Document File"
+              previewUrl={getGoogleDrivePreviewUrl(existingDocument)}
+              existingFile={existingDocument}
+              fileId={
+                isEditing
+                  ? (getFileIdFromFile(existingDocument) ?? undefined)
+                  : undefined
+              }
+              onRemoveFile={removeDocument}
+              onFileChange={(file) => {
+                const syntheticEvent = {
+                  target: { files: [file] as unknown as FileList },
+                } as unknown as React.ChangeEvent<HTMLInputElement>;
+                handleFileChange(syntheticEvent);
+              }}
+              isLoading={isLoadingState}
+              fileLoading={fileLoading}
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif"
+              helpText="Upload document (max 5MB, format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, PNG, GIF)"
+              loadingText="Uploading file..."
+              removeButtonText="Delete File"
+              error={errors.document}
+              ownerEmail={ownerEmail || undefined}
+              previewWidth={80}
+              previewHeight={80}
+              alt="Document preview"
+            />
+          </div>
+
+          <div className="flex justify-end space-x-3">
+            <CancelButton
+              onClick={() => router.back()}
+              disabled={isLoadingState}
+            />
+
+            <SubmitButton
+              isSubmitting={isLoadingState || fileLoading}
+              text={isEditing ? "Update Transaction" : "Create Transaction"}
+              loadingText="Saving..."
+            />
+          </div>
+        </form>
+      </div>
+    </>
+  );
+}

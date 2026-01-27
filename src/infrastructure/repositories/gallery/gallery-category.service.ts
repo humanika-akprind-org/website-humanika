@@ -1,9 +1,9 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateGalleryCategoryInput,
   UpdateGalleryCategoryInput,
 } from "@/types/gallery-category";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 
@@ -27,7 +27,7 @@ export const getGalleryCategory = async (id: string) => {
 
 export const createGalleryCategory = async (
   data: CreateGalleryCategoryInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const category = await prisma.galleryCategory.create({
     data,
@@ -54,7 +54,7 @@ export const createGalleryCategory = async (
 export const updateGalleryCategory = async (
   id: string,
   data: UpdateGalleryCategoryInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Get existing category for logging
   const existingCategory = await prisma.galleryCategory.findUnique({

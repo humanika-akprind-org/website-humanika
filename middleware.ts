@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "lib/auth-server";
+import { getCurrentUser } from "@/src/presentation/lib/auth-server";
 import { UserRole } from "@prisma/client";
 import NextRateLimit from "next-rate-limit";
 
@@ -347,7 +347,7 @@ export async function middleware(request: NextRequest) {
               "Content-Type": "application/json",
               ...Object.fromEntries(headers.entries()),
             },
-          }
+          },
         );
       }
 
@@ -373,7 +373,7 @@ export async function middleware(request: NextRequest) {
         user.role === UserRole.PENGURUS)
     ) {
       return NextResponse.redirect(
-        new URL("/admin/dashboard/overview", request.url)
+        new URL("/admin/dashboard/overview", request.url),
       );
     }
     // Allow access to login page if not logged in or not admin roles
@@ -392,7 +392,7 @@ export async function middleware(request: NextRequest) {
         user.role === UserRole.PENGURUS
       ) {
         return NextResponse.redirect(
-          new URL("/admin/dashboard/overview", request.url)
+          new URL("/admin/dashboard/overview", request.url),
         );
       }
     }

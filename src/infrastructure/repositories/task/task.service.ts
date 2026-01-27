@@ -1,11 +1,11 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
 } from "@/types/task";
 import type { Department, Status } from "@/types/enums";
 import type { Prisma } from "@prisma/client";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 
@@ -84,7 +84,7 @@ export const getDepartmentTask = async (id: string) => {
 
 export const createDepartmentTask = async (
   data: CreateDepartmentTaskInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const departmentTaskData: Prisma.DepartmentTaskCreateInput = {
     title: data.title,
@@ -143,7 +143,7 @@ export const createDepartmentTask = async (
 export const updateDepartmentTask = async (
   id: string,
   data: UpdateDepartmentTaskInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Get existing task for logging
   const existingTask = await prisma.departmentTask.findUnique({

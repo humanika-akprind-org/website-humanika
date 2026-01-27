@@ -1,0 +1,51 @@
+"use client";
+
+import DocumentForm from "@/src/presentation/components/admin/pages/document/Form";
+import LoadingForm from "@/src/presentation/components/admin/layout/loading/LoadingForm";
+import PageHeader from "@/src/presentation/components/admin/ui/PageHeader";
+import Alert from "@/src/presentation/components/admin/ui/alert/Alert";
+import { useCreateDocument } from "@/src/presentation/hooks/document/useCreateDocument";
+import { useDocumentFormData } from "@/src/presentation/hooks/document/useDocumentFormData";
+
+export default function AddDocumentPage() {
+  const {
+    createDocument,
+    createDocumentForApproval,
+    handleBack,
+    isSubmitting,
+    error,
+    isLoading,
+  } = useCreateDocument();
+
+  const {
+    events,
+    letters,
+    periods,
+    loading: formDataLoading,
+    error: formDataError,
+  } = useDocumentFormData();
+
+  const combinedLoading = isSubmitting || isLoading || formDataLoading;
+  const loadError = error || formDataError;
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <PageHeader title="Add New Document" onBack={handleBack} />
+
+      {loadError && <Alert type="error" message={loadError} />}
+
+      {combinedLoading ? (
+        <LoadingForm />
+      ) : (
+        <DocumentForm
+          onSubmit={createDocument}
+          onSubmitForApproval={createDocumentForApproval}
+          events={events}
+          letters={letters}
+          periods={periods}
+          loading={combinedLoading}
+        />
+      )}
+    </div>
+  );
+}

@@ -1,8 +1,8 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type { UserRole, Department, Position } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { randomColor } from "@/lib/random-color";
-import { logActivity } from "@/lib/activity-log";
+import { randomColor } from "@/src/presentation/lib/random-color";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 
 export const getUsers = async (filter: {

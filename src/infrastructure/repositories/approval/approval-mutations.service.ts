@@ -1,4 +1,4 @@
-import { logActivityFromRequest } from "@/lib/activity-log";
+import { logActivityFromRequest } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { NextRequest } from "next/server";
 import { StatusApproval } from "@/types/enums";
@@ -19,7 +19,7 @@ import { updateEntityStatus } from "../entityStatusUpdater";
 export async function createApproval(
   data: CreateApprovalData,
   userId: string,
-  request: NextRequest
+  request: NextRequest,
 ): Promise<ApprovalWithRelations> {
   const { entityType, entityId, userId: approvalUserId, status, note } = data;
 
@@ -27,7 +27,7 @@ export async function createApproval(
   const existingApproval = await findApprovalByEntity(
     entityType,
     entityId,
-    approvalUserId
+    approvalUserId,
   );
 
   if (existingApproval) {
@@ -67,7 +67,7 @@ export async function updateApproval(
   id: string,
   data: UpdateApprovalData,
   userId: string,
-  request: NextRequest
+  request: NextRequest,
 ): Promise<ApprovalWithRelations> {
   const { status, note } = data;
 
@@ -118,7 +118,7 @@ export async function updateApproval(
 export async function deleteApproval(
   id: string,
   userId: string,
-  request: NextRequest
+  request: NextRequest,
 ): Promise<void> {
   const approval = await findApprovalById(id);
 

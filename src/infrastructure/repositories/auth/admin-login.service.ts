@@ -1,6 +1,6 @@
-import { comparePasswords, generateToken } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { logActivity } from "@/lib/activity-log";
+import { comparePasswords, generateToken } from "@/src/presentation/lib/auth";
+import prisma from "@/src/presentation/lib/prisma";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 
@@ -14,7 +14,7 @@ interface AdminLoginResult {
 
 export async function adminLogin(
   usernameOrEmail: string,
-  password: string
+  password: string,
 ): Promise<AdminLoginResult> {
   try {
     if (!usernameOrEmail?.trim() || !password?.trim()) {

@@ -1,6 +1,6 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type { Period } from "@/types/period";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 
 type CreatePeriodInput = {
@@ -40,7 +40,7 @@ export const getPeriod = async (id: string): Promise<Period> => {
 };
 
 export const createPeriod = async (
-  data: CreatePeriodInput
+  data: CreatePeriodInput,
 ): Promise<Period> => {
   const { name, startYear, endYear, isActive = false } = data;
 
@@ -92,7 +92,7 @@ export const createPeriod = async (
 
 export const updatePeriod = async (
   id: string,
-  data: UpdatePeriodInput
+  data: UpdatePeriodInput,
 ): Promise<Period> => {
   // Check if period exists
   const existingPeriod = await prisma.period.findUnique({

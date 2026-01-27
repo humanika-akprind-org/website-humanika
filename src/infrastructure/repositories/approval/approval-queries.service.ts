@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/src/presentation/lib/prisma";
 import type { ApprovalType } from "@/types/enums";
 import type { StatusApproval } from "@prisma/client";
 import type {
@@ -8,7 +8,7 @@ import type {
 } from "@/types/approval";
 
 export async function getApprovals(
-  filters: ApprovalFilters
+  filters: ApprovalFilters,
 ): Promise<ApprovalsResponse> {
   const { status, entityType, page = 1, limit = 10 } = filters;
   const skip = (page - 1) * limit;
@@ -116,7 +116,7 @@ export async function getApprovals(
 }
 
 export async function findApprovalById(
-  id: string
+  id: string,
 ): Promise<ApprovalWithRelations | null> {
   const result = await prisma.approval.findUnique({
     where: { id },
@@ -193,7 +193,7 @@ export async function findApprovalById(
 export async function findApprovalByEntity(
   entityType: ApprovalType,
   entityId: string,
-  userId: string
+  userId: string,
 ) {
   return await prisma.approval.findFirst({
     where: {
@@ -286,7 +286,7 @@ export async function updateApprovalRecord(
   data: {
     status: StatusApproval;
     note?: string;
-  }
+  },
 ): Promise<ApprovalWithRelations> {
   const approval = await prisma.approval.update({
     where: { id },

@@ -1,10 +1,10 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateArticleCategoryInput,
   UpdateArticleCategoryInput,
   ArticleCategory,
 } from "@/types/article-category";
-import { logActivityFromRequest } from "@/lib/activity-log";
+import { logActivityFromRequest } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { NextRequest } from "next/server";
 
@@ -34,7 +34,7 @@ export async function getArticleCategoriesWithCount(): Promise<
 }
 
 export async function getArticleCategoryById(
-  id: string
+  id: string,
 ): Promise<ArticleCategory | null> {
   return await prisma.articleCategory.findUnique({
     where: { id },
@@ -44,7 +44,7 @@ export async function getArticleCategoryById(
 export async function createArticleCategory(
   data: CreateArticleCategoryInput,
   userId: string,
-  request: NextRequest
+  request: NextRequest,
 ): Promise<ArticleCategory> {
   const category = await prisma.articleCategory.create({
     data: {
@@ -74,7 +74,7 @@ export async function updateArticleCategory(
   id: string,
   data: UpdateArticleCategoryInput,
   userId: string,
-  request: NextRequest
+  request: NextRequest,
 ): Promise<ArticleCategory> {
   const existingCategory = await prisma.articleCategory.findUnique({
     where: { id },
@@ -124,7 +124,7 @@ export async function updateArticleCategory(
 export async function deleteArticleCategory(
   id: string,
   userId: string,
-  request: NextRequest
+  request: NextRequest,
 ): Promise<void> {
   const existingCategory = await prisma.articleCategory.findUnique({
     where: { id },

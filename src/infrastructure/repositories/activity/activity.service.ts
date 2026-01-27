@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 import type { ActivityType as PrismaActivityType } from "@prisma/client";
@@ -39,7 +39,7 @@ export interface ActivityResponse {
 
 export const getActivities = async (
   filters: ActivityFilters,
-  pagination: { page: number; limit: number }
+  pagination: { page: number; limit: number },
 ): Promise<ActivityResponse> => {
   const { page, limit } = pagination;
   const skip = (page - 1) * limit;
@@ -57,7 +57,7 @@ export const getActivities = async (
     // Validate activity type
     if (
       !Object.values(ActivityType).includes(
-        filters.activityType as ActivityType
+        filters.activityType as ActivityType,
       )
     ) {
       throw new Error("Invalid activity type");
@@ -114,7 +114,7 @@ export const createActivity = async (
   },
   user: Pick<User, "id"> | null,
   ipAddress: string,
-  userAgent: string
+  userAgent: string,
 ) => {
   // Validate required fields
   if (!data.activityType || !data.entityType || !data.description) {

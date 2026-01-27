@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
@@ -6,7 +6,7 @@ import type {
 import type { Status, Department } from "@/types/enums";
 import type { User } from "@/types/user";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 
 type UserWithId = Pick<User, "id">;
@@ -93,7 +93,7 @@ export const getWorkProgram = async (id: string) => {
 
 export const createWorkProgram = async (
   data: CreateWorkProgramInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   if (!data.name || !data.department || !data.periodId || !data.responsibleId) {
     throw new Error("Missing required fields");
@@ -178,7 +178,7 @@ export const createWorkProgram = async (
 export const updateWorkProgram = async (
   id: string,
   data: UpdateWorkProgramInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const existingWorkProgram = await prisma.workProgram.findUnique({
     where: { id },
@@ -389,14 +389,14 @@ export const deleteWorkProgram = async (id: string, user: UserWithId) => {
 
 export const bulkDeleteWorkPrograms = async (
   ids: string[],
-  user: UserWithId
+  user: UserWithId,
 ) => {
   if (!Array.isArray(ids) || ids.length === 0) {
     throw new Error("Invalid or missing IDs array");
   }
 
   const validIds = ids.filter(
-    (id) => typeof id === "string" && id.trim() !== "" && id !== "undefined"
+    (id) => typeof id === "string" && id.trim() !== "" && id !== "undefined",
   );
   if (validIds.length === 0) {
     throw new Error("No valid IDs provided");

@@ -1,11 +1,11 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateFinanceCategoryInput,
   UpdateFinanceCategoryInput,
 } from "@/types/finance-category";
 import type { FinanceType } from "@/types/enums";
 import type { Prisma } from "@prisma/client";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 
@@ -58,7 +58,7 @@ export const getFinanceCategory = async (id: string) => {
 
 export const createFinanceCategory = async (
   data: CreateFinanceCategoryInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const financeCategoryData: Prisma.FinanceCategoryCreateInput = {
     name: data.name,
@@ -99,7 +99,7 @@ export const createFinanceCategory = async (
 export const updateFinanceCategory = async (
   id: string,
   data: UpdateFinanceCategoryInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Check if finance category exists
   const existingFinanceCategory = await prisma.financeCategory.findUnique({

@@ -1,8 +1,8 @@
-import { hashPassword } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { hashPassword } from "@/src/presentation/lib/auth";
+import prisma from "@/src/presentation/lib/prisma";
 import { UserRole } from "@prisma/client";
-import { randomColor } from "@/lib/random-color";
-import { logActivity } from "@/lib/activity-log";
+import { randomColor } from "@/src/presentation/lib/random-color";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 
@@ -18,7 +18,7 @@ export async function register(
   name: string,
   email: string,
   username: string,
-  password: string
+  password: string,
 ): Promise<RegisterResult> {
   try {
     // Input validation

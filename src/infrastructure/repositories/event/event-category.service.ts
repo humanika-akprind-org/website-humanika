@@ -1,9 +1,9 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
 } from "@/types/event-category";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 
@@ -27,7 +27,7 @@ export const getEventCategory = async (id: string) => {
 
 export const createEventCategory = async (
   data: CreateEventCategoryInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const category = await prisma.eventCategory.create({
     data,
@@ -54,7 +54,7 @@ export const createEventCategory = async (
 export const updateEventCategory = async (
   id: string,
   data: UpdateEventCategoryInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Get existing category for logging
   const existingCategory = await prisma.eventCategory.findUnique({

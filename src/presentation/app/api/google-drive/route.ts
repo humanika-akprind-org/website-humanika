@@ -1,0 +1,381 @@
+import { refreshGoogleAccessToken } from "@/src/presentation/lib/google-drive/google-oauth";
+import { google } from "googleapis";
+import { type NextRequest, NextResponse } from "next/server";
+import { Readable } from "stream";
+
+export const dynamic = "force-dynamic"; // Required for Next.js API routes
+
+// Maximum file size limit (5MB)
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const accessToken = searchParams.get("accessToken");
+  const folderId = searchParams.get("folderId");
+  const pageToken = searchParams.get("pageToken");
+  const pageSizeParam = searchParams.get("pageSize");
+
+  if (!accessToken) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Access token is required",
+      },
+      { status: 401 },
+    );
+  }
+
+  try {
+    const drive = google.drive({
+      version: "v3",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    // Build query to fetch files in a specific folder
+    let query = "trashed = false";
+    if (folderId && folderId !== "root") {
+      query += ` and '${folderId}' in parents`;
+    } else {
+      // For root folder, only get files directly in root
+      query += ` and 'root' in parents`;
+    }
+
+    const pageSize = pageSizeParam ? parseInt(pageSizeParam, 10) : 20;
+
+    // Query to get files in the folder including shortcuts
+    // Shortcuts have mimeType 'application/vnd.google-apps.shortcut' and are returned with their target info
+    const { data } = await drive.files.list({
+      q: query,
+      fields:
+        "files(id,name,mimeType,size,modifiedTime,webViewLink,webContentLink,parents,shortcutDetails),nextPageToken",
+      orderBy: "name asc",
+      pageSize,
+      pageToken: pageToken || undefined,
+    });
+
+    return NextResponse.json({
+      success: true,
+      files: data.files || [],
+      folderId: folderId || "root",
+      nextPageToken: data.nextPageToken || null,
+    });
+  } catch (error: unknown) {
+    console.error("[DRIVE_FILES_ERROR]", error);
+
+    let message = "Failed to fetch files";
+    let statusCode = 500;
+
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const err = error as { response?: { status?: number; data?: unknown } };
+      statusCode = err.response?.status || 500;
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message,
+      },
+      { status: statusCode },
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const contentType = request.headers.get("content-type") || "";
+
+    // Handle file uploads
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      const file = formData.get("file") as File | null;
+      const action = formData.get("action") as string;
+      const accessToken = formData.get("accessToken") as string;
+      const folderId = formData.get("folderId") as string;
+      const fileName = formData.get("fileName") as string;
+
+      if (!accessToken) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Access token is required",
+          },
+          { status: 401 },
+        );
+      }
+
+      if (action !== "upload" || !file) {
+        throw new Error("Invalid upload request");
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `File size exceeds the maximum limit of 5MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+          },
+          { status: 400 },
+        );
+      }
+
+      const drive = google.drive({
+        version: "v3",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      // Convert file to stream
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const stream = Readable.from(buffer);
+
+      // Upload to Google Drive
+      const { data } = await drive.files
+        .create({
+          requestBody: {
+            name: fileName || file.name,
+            mimeType: file.type,
+            parents: folderId && folderId !== "root" ? [folderId] : undefined,
+          },
+          media: {
+            mimeType: file.type,
+            body: stream,
+          },
+          fields: "id,name,webViewLink,webContentLink,mimeType",
+        })
+        .catch(async (error: unknown) => {
+          const err = error as { response?: { status?: number } };
+          if (err.response?.status === 401) {
+            try {
+              const newAccessToken = await refreshGoogleAccessToken();
+              const refreshedDrive = google.drive({
+                version: "v3",
+                headers: { Authorization: `Bearer ${newAccessToken}` },
+              });
+              return await refreshedDrive.files.create({
+                requestBody: {
+                  name: fileName || file.name,
+                  mimeType: file.type,
+                  parents:
+                    folderId && folderId !== "root" ? [folderId] : undefined,
+                },
+                media: {
+                  mimeType: file.type,
+                  body: stream,
+                },
+                fields: "id,name,webViewLink,webContentLink,mimeType",
+              });
+            } catch (refreshError) {
+              if (
+                refreshError instanceof Error &&
+                refreshError.message === "No refresh token available"
+              ) {
+                throw new Error(
+                  "Authentication expired. Please re-authenticate with Google.",
+                );
+              }
+              throw refreshError;
+            }
+          }
+          throw error;
+        });
+
+      // Use direct image URL for Next.js Image component if it's an image
+      let imageUrl = data.webViewLink;
+      if (file.type.startsWith("image/")) {
+        imageUrl = `https://drive.google.com/uc?export=view&id=${data.id}`;
+      }
+
+      return NextResponse.json({
+        success: true,
+        file: {
+          id: data.id,
+          name: data.name,
+          url: imageUrl,
+          originalUrl: data.webViewLink,
+          downloadUrl: data.webContentLink,
+        },
+      });
+    }
+
+    // Handle other actions (rename, delete, etc.)
+    const { action, fileId, fileName, accessToken, permission, folderId } =
+      await request.json();
+
+    if (!accessToken) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Access token is required",
+        },
+        { status: 401 },
+      );
+    }
+
+    const drive = google.drive({
+      version: "v3",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    switch (action) {
+      case "rename":
+        if (!fileId || !fileName) {
+          throw new Error("Missing file ID or new name");
+        }
+        await drive.files.update({
+          fileId,
+          requestBody: { name: fileName },
+        });
+        return NextResponse.json({ success: true });
+
+      case "delete":
+        if (!fileId) {
+          throw new Error("Missing file ID");
+        }
+        await drive.files.delete({ fileId });
+        return NextResponse.json({ success: true });
+
+      case "trash":
+        if (!fileId) {
+          throw new Error("Missing file ID");
+        }
+        await drive.files.update({
+          fileId,
+          requestBody: { trashed: true },
+        });
+        return NextResponse.json({ success: true });
+
+      case "get":
+        if (!fileId) {
+          throw new Error("Missing file ID");
+        }
+        try {
+          // Get file details including owner email
+          const { data: fileData } = await drive.files.get({
+            fileId,
+            fields: "id,name,owners",
+          });
+          return NextResponse.json({
+            success: true,
+            file: {
+              id: fileData.id,
+              name: fileData.name,
+              owners: fileData.owners?.map((owner) => ({
+                emailAddress: owner.emailAddress,
+                displayName: owner.displayName,
+              })),
+            },
+          });
+        } catch (getError) {
+          // Handle 404 error - file not found
+          const err = getError as { response?: { status?: number } };
+          if (err.response?.status === 404) {
+            return NextResponse.json(
+              {
+                success: false,
+                message:
+                  "File not found in Google Drive. The file may have been deleted or moved.",
+                notFound: true,
+                fileId,
+              },
+              { status: 404 },
+            );
+          }
+          throw getError;
+        }
+
+      case "getUrl":
+        if (!fileId) {
+          throw new Error("Missing file ID");
+        }
+        // Ensure file is shared
+        await drive.permissions.create({
+          fileId,
+          requestBody: {
+            role: "reader",
+            type: "anyone",
+          },
+        });
+        const { data } = await drive.files.get({
+          fileId,
+          fields: "webViewLink,mimeType,thumbnailLink",
+        });
+
+        // Return direct image URL for Next.js Image component
+        let imageUrl =
+          data.webViewLink || `https://drive.google.com/file/d/${fileId}/view`;
+
+        // If it's an image, use the direct download URL format
+        if (data.mimeType && data.mimeType.startsWith("image/")) {
+          imageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+        }
+
+        return NextResponse.json({
+          success: true,
+          url: imageUrl,
+          originalUrl: data.webViewLink,
+        });
+
+      case "setPublicAccess":
+        if (!fileId || !permission) {
+          throw new Error("Missing file ID or permission");
+        }
+        await drive.permissions.create({
+          fileId,
+          requestBody: permission,
+        });
+        return NextResponse.json({ success: true });
+
+      case "createFolder":
+        if (!fileName) {
+          throw new Error("Missing folder name");
+        }
+        const { data: folderData } = await drive.files.create({
+          requestBody: {
+            name: fileName,
+            mimeType: "application/vnd.google-apps.folder",
+            parents: folderId && folderId !== "root" ? [folderId] : undefined,
+          },
+          fields: "id,name,mimeType",
+        });
+        return NextResponse.json({
+          success: true,
+          folder: {
+            id: folderData.id,
+            name: folderData.name,
+            mimeType: folderData.mimeType,
+          },
+        });
+
+      default:
+        throw new Error("Invalid action");
+    }
+  } catch (error: unknown) {
+    console.error("[DRIVE_API_ERROR]", error);
+
+    let message = "Operation failed";
+    let details = null;
+    let statusCode = 500;
+
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const err = error as { response?: { status?: number; data?: unknown } };
+      statusCode = err.response?.status || 500;
+      details = err.response?.data || null;
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message,
+        details,
+      },
+      { status: statusCode },
+    );
+  }
+}

@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type { CreateFinanceInput, UpdateFinanceInput } from "@/types/finance";
 import type { FinanceType, Status } from "@/types/enums";
 import type {
@@ -6,7 +6,7 @@ import type {
   Status as PrismaStatus,
   FinanceType as PrismaFinanceType,
 } from "@prisma/client";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 

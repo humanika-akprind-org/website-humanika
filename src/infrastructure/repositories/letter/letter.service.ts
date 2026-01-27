@@ -1,9 +1,9 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type { CreateLetterInput, UpdateLetterInput } from "@/types/letter";
 import type { LetterType, LetterPriority } from "@/types/enums";
 import { Status } from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 

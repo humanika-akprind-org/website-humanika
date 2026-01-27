@@ -1,7 +1,7 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type { CreateArticleInput, UpdateArticleInput } from "@/types/article";
 import type { Status } from "@/types/enums";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 
@@ -60,7 +60,7 @@ export async function getArticles(filter?: {
 
 export async function createArticle(
   data: CreateArticleInput,
-  user: { id: string }
+  user: { id: string },
 ): Promise<ArticleWithPartialAuthor> {
   // Generate slug from title
   const slug = data.title
@@ -237,7 +237,7 @@ export async function getArticleBySlug(slug: string): Promise<
 export async function updateArticle(
   id: string,
   data: UpdateArticleInput,
-  user: { id: string }
+  user: { id: string },
 ): Promise<ArticleWithPartialAuthor> {
   const existingArticle = await prisma.article.findUnique({
     where: { id },
@@ -311,7 +311,7 @@ export async function updateArticle(
 
 export async function deleteArticle(
   id: string,
-  user: { id: string }
+  user: { id: string },
 ): Promise<void> {
   const existingArticle = await prisma.article.findUnique({
     where: { id },

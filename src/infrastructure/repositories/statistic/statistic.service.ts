@@ -1,10 +1,10 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateStatisticInput,
   UpdateStatisticInput,
   StatisticFilter,
 } from "@/types/statistic";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 import type { Prisma } from "@prisma/client";
@@ -57,7 +57,7 @@ export const getActivePeriodStatistic = async () =>
 
 export const createStatistic = async (
   data: CreateStatisticInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const statistic = await prisma.statistic.create({
     data: {
@@ -97,7 +97,7 @@ export const createStatistic = async (
 export const updateStatistic = async (
   id: string,
   data: UpdateStatisticInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Get existing statistic
   const existingStatistic = await prisma.statistic.findUnique({

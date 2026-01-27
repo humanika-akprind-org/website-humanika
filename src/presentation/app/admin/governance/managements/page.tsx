@@ -1,0 +1,209 @@
+"use client";
+
+import ManagementStats from "@/src/presentation/components/admin/pages/management/Stats";
+import ManagementFilters from "@/src/presentation/components/admin/pages/management/Filters";
+import ManagementTable from "@/src/presentation/components/admin/pages/management/Table";
+import DeleteModal from "@/src/presentation/components/admin/ui/modal/DeleteModal";
+import ViewModal from "@/src/presentation/components/admin/ui/modal/ViewModal";
+import Loading from "@/src/presentation/components/admin/layout/loading/Loading";
+import Alert, {
+  type AlertType,
+} from "@/src/presentation/components/admin/ui/alert/Alert";
+import ManagementHeader from "@/src/presentation/components/admin/ui/ManagementHeader";
+import AddButton from "@/src/presentation/components/admin/ui/button/AddButton";
+import ManagementAvatar from "@/src/presentation/components/admin/ui/avatar/ManagementAvatar";
+import DepartmentChip from "@/src/presentation/components/admin/ui/chip/Department";
+import PositionChip from "@/src/presentation/components/admin/ui/chip/Position";
+import DateDisplay from "@/src/presentation/components/admin/ui/date/DateDisplay";
+import { useManagementManagement } from "@/src/presentation/hooks/management/useManagementManagement";
+import { useResourcePermission } from "@/src/presentation/hooks/usePermission";
+
+export default function ManagementsPage() {
+  const {
+    managements,
+    loading,
+    error,
+    success,
+    selectedManagements,
+    searchTerm,
+    currentPage,
+    totalPages,
+    filters,
+    showDeleteModal,
+    showViewModal,
+    currentManagement,
+    setSearchTerm,
+    setCurrentPage,
+    setShowDeleteModal,
+    setShowViewModal,
+    setCurrentManagement,
+    toggleManagementSelection,
+    toggleSelectAll,
+    handleViewManagement,
+    handleAddManagement,
+    handleEditManagement,
+    handleDelete,
+    confirmDelete,
+    handleFilterChange,
+  } = useManagementManagement();
+
+  const { canAdd, canDelete } = useResourcePermission("managements");
+
+  const alert: { type: AlertType; message: string } | null = error
+    ? { type: "error", message: error }
+    : success
+      ? { type: "success", message: success }
+      : null;
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  return (
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <ManagementHeader
+          title="Profile Management Structure"
+          description="Manage all profile management members and their positions"
+        />
+        {canAdd() && (
+          <AddButton
+            onClick={handleAddManagement}
+            text="Add Profile Management"
+          />
+        )}
+      </div>
+
+      <ManagementStats managements={managements} />
+
+      {alert && <Alert type={alert.type} message={alert.message} />}
+
+      <ManagementFilters
+        filters={filters}
+        searchTerm={searchTerm}
+        selectedManagements={selectedManagements}
+        onFilterChange={handleFilterChange}
+        onSearchChange={setSearchTerm}
+        onDeleteSelected={() => handleDelete()}
+        canDelete={canDelete}
+      />
+
+      <ManagementTable
+        managements={managements}
+        selectedManagements={selectedManagements}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onManagementSelect={toggleManagementSelection}
+        onSelectAll={toggleSelectAll}
+        onViewManagement={handleViewManagement}
+        onEditManagement={handleEditManagement}
+        onDeleteManagement={handleDelete}
+        onPageChange={setCurrentPage}
+        onAddManagement={handleAddManagement}
+      />
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        itemName={currentManagement?.user?.name}
+        selectedCount={selectedManagements.length}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCurrentManagement(null);
+        }}
+        onConfirm={confirmDelete}
+        requireGoogleDriveAuth={true}
+      />
+
+      <ViewModal
+        isOpen={showViewModal}
+        title="Profile Management Details"
+        onClose={() => {
+          setShowViewModal(false);
+          setCurrentManagement(null);
+        }}
+      >
+        {currentManagement && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <ManagementAvatar management={currentManagement} />
+              <div>
+                <h4 className="text-xl font-semibold text-gray-900">
+                  {currentManagement.user?.name}
+                </h4>
+                <p className="text-gray-600">
+                  {currentManagement.position} - {currentManagement.department}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  User
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentManagement.user?.name}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentManagement.user?.email}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Department
+                </label>
+                <div className="mt-1">
+                  <DepartmentChip department={currentManagement.department} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Position
+                </label>
+                <div className="mt-1">
+                  <PositionChip position={currentManagement.position} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Period
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  {currentManagement.period?.name}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Created At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentManagement.createdAt} />
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Updated At
+                </label>
+                <p className="mt-1 text-sm text-gray-900">
+                  <DateDisplay date={currentManagement.updatedAt} />
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </ViewModal>
+    </div>
+  );
+}

@@ -1,10 +1,10 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/src/presentation/lib/prisma";
 import type {
   CreateOrganizationContactInput,
   UpdateOrganizationContactInput,
   OrganizationContactFilter,
 } from "@/types/organization-contact";
-import { logActivity } from "@/lib/activity-log";
+import { logActivity } from "@/src/presentation/lib/activity-log";
 import { ActivityType } from "@/types/enums";
 import type { User } from "@/types/user";
 import type { Prisma } from "@prisma/client";
@@ -12,7 +12,7 @@ import type { Prisma } from "@prisma/client";
 type UserWithId = Pick<User, "id">;
 
 export const getOrganizationContacts = async (
-  filter?: OrganizationContactFilter
+  filter?: OrganizationContactFilter,
 ) => {
   const where: Prisma.OrganizationContactWhereInput = {};
 
@@ -59,7 +59,7 @@ export const getActivePeriodOrganizationContact = async () =>
 
 export const createOrganizationContact = async (
   data: CreateOrganizationContactInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   const organizationContact = await prisma.organizationContact.create({
     data: {
@@ -99,7 +99,7 @@ export const createOrganizationContact = async (
 export const updateOrganizationContact = async (
   id: string,
   data: UpdateOrganizationContactInput,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Get existing organization contact
   const existingOrganizationContact =
@@ -157,7 +157,7 @@ export const updateOrganizationContact = async (
 
 export const deleteOrganizationContact = async (
   id: string,
-  user: UserWithId
+  user: UserWithId,
 ) => {
   // Check if organization contact exists
   const existingOrganizationContact =
