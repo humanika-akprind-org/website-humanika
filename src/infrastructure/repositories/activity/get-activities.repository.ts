@@ -1,6 +1,10 @@
+/**
+ * Get Activities Repository - Read operations
+ * Part of Clean Architecture: Infrastructure Layer (Repository)
+ */
+
 import prisma from "@/presentation/lib/prisma";
 import { ActivityType } from "@/domain/enums";
-import type { User } from "@/domain/entities/user.entity";
 import type { ActivityType as PrismaActivityType } from "@prisma/client";
 
 export interface ActivityFilters {
@@ -37,6 +41,9 @@ export interface ActivityResponse {
   pagination: ActivityPagination;
 }
 
+/**
+ * Get all activities with optional filters and pagination
+ */
 export const getActivities = async (
   filters: ActivityFilters,
   pagination: { page: number; limit: number },
@@ -102,38 +109,4 @@ export const getActivities = async (
       totalPages: Math.ceil(total / limit),
     },
   };
-};
-
-export const createActivity = async (
-  data: {
-    activityType: ActivityType;
-    entityType: string;
-    entityId?: string;
-    description: string;
-    metadata?: unknown;
-  },
-  user: Pick<User, "id"> | null,
-  ipAddress: string,
-  userAgent: string,
-) => {
-  // Validate required fields
-  if (!data.activityType || !data.entityType || !data.description) {
-    throw new Error("Missing required fields");
-  }
-
-  const activity = await prisma.activityLog.create({
-    data: {
-      userId: user?.id || null,
-      activityType: data.activityType,
-      entityType: data.entityType,
-      entityId: data.entityId,
-      description: data.description,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      metadata: data.metadata as any,
-      ipAddress,
-      userAgent,
-    },
-  });
-
-  return activity;
 };

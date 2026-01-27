@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getArticles,
   createArticle,
-} from "@/infrastructure/repositories/article.repository";
+} from "@/infrastructure/repositories/article";
 
 // Extract payload functions
 function extractArticleQueryParams(request: NextRequest) {
