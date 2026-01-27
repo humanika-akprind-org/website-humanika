@@ -12,3 +12,11 @@ export type {
   EventPagination,
   EventPaginationResult,
 } from "./event.repository.interface";
+export type {
+  IActivityRepository,
+  ActivityFilters,
+  ActivityPagination,
+  ActivityPaginationResult,
+  RadarChartResult,
+  DepartmentActivityData,
+} from "./activity.repository.interface";
