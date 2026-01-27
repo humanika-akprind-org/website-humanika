@@ -1,4 +1,6 @@
-import { Department, Position } from "../enums/enums";
+import { type Department, type Position } from "../enums/enums";
+import { User } from "./user.entity";
+import { Period } from "./period.entity";
 
 export interface Management {
   isActive: unknown;

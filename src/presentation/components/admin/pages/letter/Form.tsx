@@ -7,13 +7,13 @@ import type {
   Letter,
   CreateLetterInput,
   UpdateLetterInput,
-} from "@/domain/entities/letter";
+} from "@/domain/entities/letter.entity";
 import {
   LetterType,
   LetterPriority,
   LetterClassification,
 } from "@/domain/enums/enums";
-import type { Period } from "@/domain/entities/period";
+import type { Period } from "@/domain/entities/period.entity";
 import type { Event } from "@/domain/entities/event.entity";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";
 import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";

@@ -3,7 +3,7 @@ import type {
   Document,
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/domain/entities/document";
+} from "@/domain/entities/document.entity";
 import { Status } from "@/domain/enums/enums";
 import { useFile } from "@/presentation/hooks/useFile";
 import {
@@ -325,7 +325,7 @@ export function useDocumentForm({
         ...dataToSend,
         documentTypeId: finalDocumentTypeId,
         document: documentUrl,
-        letterId: formData.letterId ? formData.letterId : null,
+        letterId: formData.letterId ? formData.letterId : undefined,
       };
 
       if (onSubmitForApproval) {

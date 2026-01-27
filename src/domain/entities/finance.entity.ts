@@ -1,9 +1,9 @@
-import { Department, Status, FinanceType } from "../enums/enums";
-import { User } from "./user";
-import { FinanceCategory } from "../value-objects/finance-category";
-import { Approval } from "./approval";
-import { WorkProgram } from "./work";
-import { Period } from "./period";
+import { type Status, type FinanceType } from "../enums/enums";
+import { type User } from "./user.entity";
+import { type FinanceCategory } from "../value-objects/finance-category";
+import { type Approval } from "./approval.entity";
+import { type WorkProgram } from "./work-program.entity";
+import { type Period } from "./period.entity";
 
 export interface Finance {
   id: string;

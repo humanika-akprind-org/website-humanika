@@ -2,7 +2,7 @@ import prisma from "@/presentation/lib/prisma";
 import type {
   CreateArticleInput,
   UpdateArticleInput,
-} from "@/domain/entities/article";
+} from "@/domain/entities/article.entity";
 import type { Status } from "@/domain/enums/enums";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";

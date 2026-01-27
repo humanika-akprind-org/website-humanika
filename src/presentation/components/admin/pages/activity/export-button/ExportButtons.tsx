@@ -4,7 +4,7 @@ import { FileText, FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { ActivityLog } from "@/domain/entities/activity-log";
+import type { ActivityLog } from "@/domain/entities/activity-log.entity";
 
 interface ExportButtonsProps {
   activities: ActivityLog[];

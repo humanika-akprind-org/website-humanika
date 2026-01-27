@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import type { Management } from "@/domain/entities/management";
+import type { Management } from "@/domain/entities/management.entity";
 import { Department, Position } from "@/domain/enums/enums";
 import { useFileOperations } from "@/presentation/hooks/drive/form/useFileOperations";
 import { ManagementApi } from "@/presentation/services/management";

@@ -1,4 +1,4 @@
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 import type { SortOption } from "./constants";
 import { type ArticleCategory } from "@/domain/value-objects/article-category";
 

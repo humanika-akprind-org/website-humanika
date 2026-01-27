@@ -3,10 +3,10 @@ import type {
   CreateStatisticInput,
   UpdateStatisticInput,
   StatisticFilter,
-} from "@/domain/entities/statistic";
+} from "@/domain/entities/statistic.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 import type { Prisma } from "@prisma/client";
 
 type UserWithId = Pick<User, "id">;

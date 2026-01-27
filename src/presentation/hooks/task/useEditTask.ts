@@ -9,8 +9,8 @@ import { useWorkPrograms } from "@/presentation/hooks/work-program/useWorkProgra
 import type {
   DepartmentTask,
   UpdateDepartmentTaskInput,
-} from "@/domain/entities/task";
-import type { User } from "@/domain/entities/user";
+} from "@/domain/entities/task-department.entity";
+import type { User } from "@/domain/entities/user.entity";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

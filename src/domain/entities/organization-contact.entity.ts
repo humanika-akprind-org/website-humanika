@@ -1,4 +1,4 @@
-import { Period } from "./period";
+import { Period } from "./period.entity";
 
 export interface MissionItem {
   icon?: string;
@@ -28,8 +28,7 @@ export interface CreateOrganizationContactInput {
   periodId: string;
 }
 
-export interface UpdateOrganizationContactInput
-  extends Partial<CreateOrganizationContactInput> {}
+export interface UpdateOrganizationContactInput extends Partial<CreateOrganizationContactInput> {}
 
 export interface OrganizationContactFilter {
   periodId?: string;

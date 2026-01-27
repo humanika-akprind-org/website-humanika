@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPeriod, updatePeriod } from "@/presentation/services/period";
-import type { Period, PeriodFormData } from "@/domain/entities/period";
+import type { Period, PeriodFormData } from "@/domain/entities/period.entity";
 import type { AlertType } from "@/presentation/components/admin/ui/alert/Alert";
 
 export function usePeriodSubmit(isEdit: boolean, period?: Period) {

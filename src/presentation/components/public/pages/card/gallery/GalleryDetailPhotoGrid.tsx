@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Camera, ArrowLeft } from "lucide-react";
 import GalleryGrid from "@/presentation/components/public/pages/card/gallery/GalleryGrid";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 
 interface GalleryDetailPhotoGridProps {
   galleries: Gallery[];

@@ -4,7 +4,7 @@ import { ManagementApi } from "@/presentation/services/management";
 import type {
   Management,
   ManagementServerData,
-} from "@/domain/entities/management";
+} from "@/domain/entities/management.entity";
 
 type AlertType = "error" | "success" | "warning" | "info";
 

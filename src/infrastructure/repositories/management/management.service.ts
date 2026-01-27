@@ -2,10 +2,10 @@ import { prisma } from "@/presentation/lib/prisma";
 import type {
   Management,
   ManagementServerData,
-} from "@/domain/entities/management";
+} from "@/domain/entities/management.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
 
@@ -25,7 +25,7 @@ export const ManagementService = {
       },
     });
 
-    return managements as Management[];
+    return managements as unknown as Management[];
   },
 
   async getManagement(id: string): Promise<Management> {
@@ -41,7 +41,7 @@ export const ManagementService = {
       throw new Error("Management not found");
     }
 
-    return management as Management;
+    return management as unknown as Management;
   },
 
   async createManagement(
@@ -108,7 +108,7 @@ export const ManagementService = {
       },
     });
 
-    return management as Management;
+    return management as unknown as Management;
   },
 
   async updateManagement(
@@ -193,7 +193,7 @@ export const ManagementService = {
       },
     });
 
-    return management as Management;
+    return management as unknown as Management;
   },
 
   async updateManagementPhoto(
@@ -209,7 +209,7 @@ export const ManagementService = {
       },
     });
 
-    return management as Management;
+    return management as unknown as Management;
   },
 
   async deleteManagement(id: string, user: UserWithId): Promise<void> {

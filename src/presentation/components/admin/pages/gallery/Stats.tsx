@@ -1,7 +1,7 @@
 "use client";
 
 import { FiImage, FiFolder, FiInbox } from "react-icons/fi";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 import StatCard from "../../ui/card/StatCard";
 
 interface StatsProps {

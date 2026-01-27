@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export interface Period {
   id: string;
   name: string;

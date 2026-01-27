@@ -6,7 +6,7 @@ import { LatestGalleryGrid } from "../../pages/card/gallery/LatestGalleryGrid";
 import AlbumGrid from "../../pages/card/album/AlbumGrid";
 import { getGalleries } from "@/presentation/services/gallery";
 import { getEvents } from "@/presentation/services/event";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
 
 import {

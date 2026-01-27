@@ -2,7 +2,7 @@
 
 import { FiTrendingUp, FiTrendingDown } from "react-icons/fi";
 import { Wallet } from "lucide-react";
-import type { Finance } from "@/domain/entities/finance";
+import type { Finance } from "@/domain/entities/finance.entity";
 import { FinanceType } from "@/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 

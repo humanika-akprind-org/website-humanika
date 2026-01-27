@@ -5,7 +5,7 @@ import type {
   ApprovalFilters,
   ApprovalsResponse,
   ApprovalWithRelations,
-} from "@/domain/entities/approval";
+} from "@/domain/entities/approval.entity";
 
 export async function getApprovals(
   filters: ApprovalFilters,

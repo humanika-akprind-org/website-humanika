@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import type {
   CreateStatisticInput,
   StatisticFilter,
-} from "@/domain/entities/statistic";
+} from "@/domain/entities/statistic.entity";
 import {
   getStatistics,
   getActivePeriodStatistic,

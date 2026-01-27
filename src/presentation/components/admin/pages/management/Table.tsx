@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEye, FiEdit, FiTrash } from "react-icons/fi";
 import { UserCog } from "lucide-react";
-import type { Management } from "@/domain/entities/management";
+import type { Management } from "@/domain/entities/management.entity";
 import ManagementAvatar from "../../ui/avatar/ManagementAvatar";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import DepartmentChip from "../../ui/chip/Department";

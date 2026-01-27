@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/presentation/components/ui/dialog";
 import { Button } from "@/presentation/components/ui/button";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 import type { ScheduleItem } from "@/domain/entities/event.entity";
 import { motion } from "framer-motion";
 

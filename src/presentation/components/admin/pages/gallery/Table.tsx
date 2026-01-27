@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEdit, FiEye, FiTrash } from "react-icons/fi";
 import { Images } from "lucide-react";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import EmptyState from "../../ui/EmptyState";

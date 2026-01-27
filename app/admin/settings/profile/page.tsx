@@ -6,7 +6,7 @@ import { useToast } from "@/presentation/hooks/use-toast";
 import type { Department, Position } from "@/domain/enums/enums";
 import LoadingProfile from "@/presentation/components/admin/layout/loading/LoadingProfile";
 import { UserApi, formatEnumValue } from "@/presentation/services/user";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 interface UpdateUserData {
   name?: string;

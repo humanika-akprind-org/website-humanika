@@ -1,4 +1,4 @@
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 interface AvatarProps {
   user: User;

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateOrganizationalStructureInput } from "@/domain/entities/structure";
+import type { UpdateOrganizationalStructureInput } from "@/domain/entities/organizational-structure.entity";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getStructure,

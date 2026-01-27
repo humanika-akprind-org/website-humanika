@@ -4,7 +4,7 @@ import { UserApi } from "@/presentation/services/user";
 import type {
   User,
   UserFilters as UserFiltersType,
-} from "@/domain/entities/user";
+} from "@/domain/entities/user.entity";
 
 export function useUnverifiedUserManagement() {
   const router = useRouter();

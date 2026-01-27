@@ -1,6 +1,6 @@
 "use client";
 
-import { type Statistic } from "@/domain/entities/statistic";
+import { type Statistic } from "@/domain/entities/statistic.entity";
 
 interface StatisticStatsProps {
   statistics: Statistic[];

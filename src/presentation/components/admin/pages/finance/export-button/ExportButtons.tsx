@@ -4,7 +4,7 @@ import { FileText, FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { Finance } from "@/domain/entities/finance";
+import type { Finance } from "@/domain/entities/finance.entity";
 
 interface ExportButtonsProps {
   finances: Finance[];

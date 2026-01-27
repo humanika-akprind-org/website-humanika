@@ -4,7 +4,7 @@ import type {
   CreateApprovalInput,
   UpdateApprovalInput,
   ApprovalWithRelations,
-} from "@/domain/entities/approval";
+} from "@/domain/entities/approval.entity";
 
 class ApprovalApi {
   private static API_URL = apiUrl;

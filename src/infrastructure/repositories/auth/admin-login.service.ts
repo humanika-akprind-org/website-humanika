@@ -2,7 +2,7 @@ import { comparePasswords, generateToken } from "@/presentation/lib/auth";
 import prisma from "@/presentation/lib/prisma";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 interface AdminLoginResult {
   success: boolean;

@@ -3,7 +3,7 @@ import type {
   CreateDocumentInput,
   UpdateDocumentInput,
   DocumentFilter,
-} from "@/domain/entities/document";
+} from "@/domain/entities/document.entity";
 import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;

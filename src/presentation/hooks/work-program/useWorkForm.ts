@@ -3,9 +3,9 @@ import type {
   WorkProgram,
   CreateWorkProgramInput,
   UpdateWorkProgramInput,
-} from "@/domain/entities/work";
-import type { User } from "@/domain/entities/user";
-import type { Period } from "@/domain/entities/period";
+} from "@/domain/entities/work-program.entity";
+import type { User } from "@/domain/entities/user.entity";
+import type { Period } from "@/domain/entities/period.entity";
 import { Department } from "@/domain/enums/enums";
 import { UserApi } from "@/presentation/services/user";
 import { getPeriods } from "@/presentation/services/period";

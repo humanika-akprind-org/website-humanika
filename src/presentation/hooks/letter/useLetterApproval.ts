@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { ApprovalApi } from "@/presentation/services/approval";
-import type { ApprovalWithRelations } from "@/domain/entities/approval";
+import type { ApprovalWithRelations } from "@/domain/entities/approval.entity";
 import { StatusApproval } from "@/domain/enums/enums";
 
 interface AlertState {

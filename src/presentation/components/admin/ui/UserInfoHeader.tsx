@@ -1,5 +1,5 @@
 import { FiMail } from "react-icons/fi";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 import Avatar from "./avatar/Avatar";
 
 interface UserInfoHeaderProps {

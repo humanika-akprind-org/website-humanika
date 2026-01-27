@@ -1,5 +1,5 @@
 import { Department } from "../enums/enums";
-import type { Prisma } from "@prisma/client";
+import { Status } from "../enums/enums";
 
 export interface DepartmentTask {
   id: string;
@@ -9,7 +9,7 @@ export interface DepartmentTask {
   department: Department;
   userId?: string;
   workProgramId?: string;
-  status: Prisma.Status;
+  status: Status;
   createdAt: Date;
   updatedAt: Date;
   user?: {
@@ -30,14 +30,14 @@ export interface CreateDepartmentTaskInput {
   department: Department;
   userId?: string;
   workProgramId?: string;
-  status?: Prisma.Status;
+  status?: Status;
 }
 
 export interface UpdateDepartmentTaskInput extends Partial<CreateDepartmentTaskInput> {}
 
 export interface DepartmentTaskFilter {
   department?: Department;
-  status?: Prisma.Status;
+  status?: Status;
   userId?: string;
   search?: string;
 }

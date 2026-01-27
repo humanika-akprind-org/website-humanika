@@ -4,7 +4,7 @@ import { createArticle } from "@/presentation/services/article";
 import type {
   CreateArticleInput,
   UpdateArticleInput,
-} from "@/domain/entities/article";
+} from "@/domain/entities/article.entity";
 
 export function useCreateArticle() {
   const router = useRouter();

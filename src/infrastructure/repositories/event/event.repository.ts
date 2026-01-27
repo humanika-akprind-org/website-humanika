@@ -21,7 +21,7 @@ import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType, type Status } from "@/domain/enums/enums";
 import type { Department } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
 

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import { ManagementService } from "@/infrastructure/repositories/management/management.service";
-import type { ManagementServerData } from "@/domain/entities/management";
+import type { ManagementServerData } from "@/domain/entities/management.entity";
 
 interface RouteParams {
   params: Promise<{ id: string }>;

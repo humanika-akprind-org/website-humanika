@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateStatisticInput } from "@/domain/entities/statistic";
+import type { UpdateStatisticInput } from "@/domain/entities/statistic.entity";
 import {
   getStatistic,
   updateStatistic,

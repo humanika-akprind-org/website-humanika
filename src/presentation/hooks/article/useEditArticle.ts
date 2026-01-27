@@ -5,7 +5,7 @@ import type {
   CreateArticleInput,
   UpdateArticleInput,
   Article,
-} from "@/domain/entities/article";
+} from "@/domain/entities/article.entity";
 
 export function useEditArticle(articleId: string) {
   const router = useRouter();

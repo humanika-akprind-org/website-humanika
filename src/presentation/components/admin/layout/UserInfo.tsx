@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { LogoutButton } from "@/presentation/components/admin/auth/LogoutButton";
 import Avatar from "../ui/avatar/Avatar";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 export default function UserInfo() {
   const [user, setUser] = useState<User | null>(null);

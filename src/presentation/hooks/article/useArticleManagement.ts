@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 import { getArticles, deleteArticle } from "@/presentation/services/article";
 import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {

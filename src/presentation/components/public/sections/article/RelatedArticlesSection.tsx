@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Newspaper } from "lucide-react";
 import ArticleCard from "@/presentation/components/public/pages/card/article/ArticleCard";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 
 interface RelatedArticlesSectionProps {
   relatedArticles: Article[];

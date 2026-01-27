@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getEventBySlug, getEvents } from "@/presentation/services/event";
 import { getGalleries } from "@/presentation/services/gallery";
 import type { Event } from "@/domain/entities/event.entity";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 import { Status } from "@/domain/enums/enums";
 
 export interface AlbumData {

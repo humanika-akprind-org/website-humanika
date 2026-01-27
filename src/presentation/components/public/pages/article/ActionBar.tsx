@@ -3,7 +3,7 @@
 import React from "react";
 import { Bookmark } from "lucide-react";
 import ShareButton from "@/presentation/components/public/ui/ShareButton";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 
 interface ActionBarProps {
   article: Article;

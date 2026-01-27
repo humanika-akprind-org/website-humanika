@@ -5,7 +5,7 @@ import type {
 } from "@/domain/value-objects/event-category";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
 

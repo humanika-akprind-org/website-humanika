@@ -1,7 +1,6 @@
-import { Status } from "../enums/enums";
-import { GalleryCategory } from "../value-objects/gallery-category";
+import { type GalleryCategory } from "../value-objects/gallery-category";
 import { Event } from "./event.entity";
-import { Period } from "./period";
+import { Period } from "./period.entity";
 
 export interface Gallery {
   id: string;

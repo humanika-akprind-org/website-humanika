@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ManagementApi } from "@/presentation/services/management";
-import type { ManagementServerData } from "@/domain/entities/management";
+import type { ManagementServerData } from "@/domain/entities/management.entity";
 
 export function useCreateManagement() {
   const router = useRouter();

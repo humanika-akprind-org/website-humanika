@@ -1,6 +1,6 @@
 import { FiEdit, FiTrash, FiEye, FiDownload } from "react-icons/fi";
 import { SquareLibrary, BookText, BookCheck } from "lucide-react";
-import type { Document } from "@/domain/entities/document";
+import type { Document } from "@/domain/entities/document.entity";
 
 import Checkbox from "../../ui/checkbox/Checkbox";
 import StatusChip from "../../ui/chip/Status";

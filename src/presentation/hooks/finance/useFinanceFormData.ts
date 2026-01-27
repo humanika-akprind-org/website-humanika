@@ -3,8 +3,8 @@ import { getFinanceCategories } from "@/presentation/services/finance-category";
 import { getWorkPrograms } from "@/presentation/services/work";
 import { getPeriods } from "@/presentation/services/period";
 import type { FinanceCategory } from "@/domain/value-objects/finance-category";
-import type { WorkProgram } from "@/domain/entities/work";
-import type { Period } from "@/domain/entities/period";
+import type { WorkProgram } from "@/domain/entities/work-program.entity";
+import type { Period } from "@/domain/entities/period.entity";
 
 export function useFinanceFormData() {
   const [categories, setCategories] = useState<FinanceCategory[]>([]);

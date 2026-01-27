@@ -3,10 +3,10 @@ import { Department, Status } from "@/domain/enums/enums";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
-} from "@/domain/entities/task";
+} from "@/domain/entities/task-department.entity";
 import type { AlertType } from "@/presentation/components/admin/ui/alert/Alert";
-import type { User } from "@/domain/entities/user";
-import type { WorkProgram } from "@/domain/entities/work";
+import type { User } from "@/domain/entities/user.entity";
+import type { WorkProgram } from "@/domain/entities/work-program.entity";
 import { UserApi } from "@/presentation/services/user";
 import { getWorkPrograms } from "@/presentation/services/work";
 

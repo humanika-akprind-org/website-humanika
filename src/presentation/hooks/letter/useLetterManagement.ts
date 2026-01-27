@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { Letter } from "@/domain/entities/letter";
+import type { Letter } from "@/domain/entities/letter.entity";
 import { useToast } from "@/presentation/hooks/use-toast";
 import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {

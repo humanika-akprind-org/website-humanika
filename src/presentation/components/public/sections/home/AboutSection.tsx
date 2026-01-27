@@ -6,7 +6,7 @@ import * as FiIcons from "react-icons/fi";
 import { ArrowRight, Users, Code, Target, CheckCircle } from "lucide-react";
 import { useActivePeriodOrganizationContact } from "@/presentation/hooks/organization-contact/useOrganizationContacts";
 import { useActivePeriodStatistic } from "@/presentation/hooks/statistic/useStatistics";
-import type { MissionItem } from "@/domain/entities/organization-contact";
+import type { MissionItem } from "@/domain/entities/organization-contact.entity";
 
 // Icon mapping - map database icon names to react-icons/fi components
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {

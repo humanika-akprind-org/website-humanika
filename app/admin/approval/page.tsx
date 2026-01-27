@@ -12,7 +12,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { ApprovalApi } from "@/presentation/services/approval";
-import type { ApprovalWithRelations } from "@/domain/entities/approval";
+import type { ApprovalWithRelations } from "@/domain/entities/approval.entity";
 
 enum StatusApproval {
   PENDING = "PENDING",

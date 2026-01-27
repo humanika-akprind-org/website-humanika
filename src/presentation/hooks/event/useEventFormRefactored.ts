@@ -10,8 +10,8 @@ import { useFile } from "@/presentation/hooks/useFile";
 import { useWorkPrograms } from "@/presentation/hooks/work-program/useWorkPrograms";
 import { useEventCategories } from "@/presentation/hooks/event-category/useEventCategories";
 import { eventThumbnailFolderId } from "@/presentation/lib/config/config";
-import type { User } from "@/domain/entities/user";
-import type { Period } from "@/domain/entities/period";
+import type { User } from "@/domain/entities/user.entity";
+import type { Period } from "@/domain/entities/period.entity";
 import { useUserManagement } from "@/presentation/hooks/user/useUserManagement";
 import { usePeriodManagement } from "@/presentation/hooks/period/usePeriodManagement";
 

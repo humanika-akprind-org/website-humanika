@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type {
   Management,
   ManagementServerData,
-} from "@/domain/entities/management";
+} from "@/domain/entities/management.entity";
 import { Department, Position } from "@/domain/enums/enums";
 import { formatEnumValue } from "@/presentation/lib/utils";
 import { useManagementForm } from "@/presentation/hooks/management/useManagementForm";

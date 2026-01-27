@@ -4,7 +4,7 @@ import { UserRole } from "@prisma/client";
 import { randomColor } from "@/presentation/lib/random-color";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 interface RegisterResult {
   success: boolean;

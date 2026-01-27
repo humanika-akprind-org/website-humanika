@@ -4,7 +4,7 @@ import { createGallery } from "@/presentation/services/gallery";
 import type {
   CreateGalleryInput,
   UpdateGalleryInput,
-} from "@/domain/entities/gallery";
+} from "@/domain/entities/gallery.entity";
 
 export function useCreateGallery() {
   const router = useRouter();

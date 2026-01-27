@@ -4,7 +4,7 @@ import { StructureApi } from "@/presentation/services/structure";
 import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
-} from "@/domain/entities/structure";
+} from "@/domain/entities/organizational-structure.entity";
 
 export function useCreateStructure() {
   const router = useRouter();

@@ -6,7 +6,7 @@ import {
   FiTrendingUp,
   FiArchive,
 } from "react-icons/fi";
-import type { Document } from "@/domain/entities/document";
+import type { Document } from "@/domain/entities/document.entity";
 import { Status } from "@/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 

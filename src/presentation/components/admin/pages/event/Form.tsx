@@ -8,8 +8,8 @@ import type {
   UpdateEventInput,
 } from "@/domain/entities/event.entity";
 import { Department as DepartmentEnum } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
-import type { Period } from "@/domain/entities/period";
+import type { User } from "@/domain/entities/user.entity";
+import type { Period } from "@/domain/entities/period.entity";
 import { FiBriefcase, FiUser, FiFolder } from "react-icons/fi";
 import TextEditor from "@/presentation/components/admin/ui/text-area/TextEditor";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";

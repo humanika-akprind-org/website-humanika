@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { FiEye, FiEdit, FiTrash, FiDownload } from "react-icons/fi";
 import { Network } from "lucide-react";
 import Image from "next/image";
-import type { OrganizationalStructure } from "@/domain/entities/structure";
+import type { OrganizationalStructure } from "@/domain/entities/organizational-structure.entity";
 import StatusChip from "../../ui/chip/Status";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";
 import Checkbox from "../../ui/checkbox/Checkbox";

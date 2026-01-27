@@ -1,13 +1,13 @@
 import { type Department, type Status } from "../enums/enums";
-import { type User } from "./user";
-import { type Period } from "./period";
-import { type WorkProgram } from "./work";
-import { type Approval } from "./approval";
+import { type User } from "./user.entity";
+import { type Period } from "./period.entity";
+import { type WorkProgram } from "./work-program.entity";
+import { type Approval } from "./approval.entity";
 import { type EventCategory } from "../value-objects/event-category";
-import { type Gallery } from "./gallery";
-import { type Finance } from "./finance";
-import { type Letter } from "./letter";
-import { type Document } from "./document";
+import { type Gallery } from "./gallery.entity";
+import { type Finance } from "./finance.entity";
+import { type Letter } from "./letter.entity";
+import { type Document } from "./document.entity";
 
 /**
  * Represents a single schedule item within an event.

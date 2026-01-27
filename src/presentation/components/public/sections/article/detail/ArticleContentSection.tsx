@@ -3,7 +3,7 @@ import Image from "next/image";
 import { FileText } from "lucide-react";
 import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
 import ActionBar from "@/presentation/components/public/pages/article/ActionBar";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 import { getPreviewUrl } from "@/presentation/lib/utils";
 
 interface ArticleContentSectionProps {

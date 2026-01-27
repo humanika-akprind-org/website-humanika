@@ -4,7 +4,7 @@ import { getGalleryCategories } from "@/presentation/services/gallery-category";
 import { getPeriods } from "@/presentation/services/period";
 import type { Event } from "@/domain/entities/event.entity";
 import type { GalleryCategory } from "@/domain/value-objects/gallery-category";
-import type { Period } from "@/domain/entities/period";
+import type { Period } from "@/domain/entities/period.entity";
 
 export function useGalleryFormData() {
   const [events, setEvents] = useState<Event[]>([]);

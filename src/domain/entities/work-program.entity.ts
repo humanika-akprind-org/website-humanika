@@ -1,7 +1,11 @@
-import { Department, Status, UserRole, Position } from "../enums/enums";
-import { User } from "./user";
-import { Period } from "./period";
-import { Approval } from "./approval";
+import {
+  type Department,
+  type Status,
+  type UserRole,
+  type Position,
+} from "../enums/enums";
+import { type Period } from "./period.entity";
+import { type Approval } from "./approval.entity";
 
 export interface WorkProgram {
   id: string;

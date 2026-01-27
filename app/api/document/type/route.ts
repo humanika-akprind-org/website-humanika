@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 import {
   getDocumentTypes,
   createDocumentType,

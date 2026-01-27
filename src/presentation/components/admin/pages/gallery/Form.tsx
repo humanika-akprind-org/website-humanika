@@ -6,9 +6,9 @@ import type {
   Gallery,
   CreateGalleryInput,
   UpdateGalleryInput,
-} from "@/domain/entities/gallery";
+} from "@/domain/entities/gallery.entity";
 import type { Event } from "@/domain/entities/event.entity";
-import type { Period } from "@/domain/entities/period";
+import type { Period } from "@/domain/entities/period.entity";
 import { FiImage, FiCalendar } from "react-icons/fi";
 import TextInput from "@/presentation/components/admin/ui/input/TextInput";
 import SelectInput from "@/presentation/components/admin/ui/input/SelectInput";

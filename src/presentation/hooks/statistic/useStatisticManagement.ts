@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { deleteStatistic } from "@/presentation/services/statistic";
-import type { Statistic } from "@/domain/entities/statistic";
+import type { Statistic } from "@/domain/entities/statistic.entity";
 import { useStatistics } from "./useStatistics";
 import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import { getCurrentUserAction } from "@/presentation/lib/actions/getCurrentUser";

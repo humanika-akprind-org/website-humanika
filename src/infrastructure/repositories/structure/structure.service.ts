@@ -3,7 +3,7 @@ import type {
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
   OrganizationalStructure,
-} from "@/domain/entities/structure";
+} from "@/domain/entities/organizational-structure.entity";
 import type { Status } from "@/domain/enums/enums";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";

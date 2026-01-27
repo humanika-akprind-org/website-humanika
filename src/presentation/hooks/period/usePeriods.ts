@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getPeriods } from "@/presentation/services/period";
-import type { Period } from "@/domain/entities/period";
+import type { Period } from "@/domain/entities/period.entity";
 
 export function usePeriods() {
   const [periods, setPeriods] = useState<Period[]>([]);

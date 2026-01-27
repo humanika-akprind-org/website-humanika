@@ -6,8 +6,8 @@ import { UserApi } from "@/presentation/services/user";
 import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
-} from "@/domain/entities/task";
-import type { User } from "@/domain/entities/user";
+} from "@/domain/entities/task-department.entity";
+import type { User } from "@/domain/entities/user.entity";
 
 export function useCreateTask() {
   const router = useRouter();

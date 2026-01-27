@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Clock, Tag } from "lucide-react";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 import {
   formatArticleDate,
   truncateContent,

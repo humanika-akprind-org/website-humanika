@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { StructureApi } from "@/presentation/services/structure";
 import { PeriodApi } from "@/presentation/services/period";
-import type { OrganizationalStructure } from "@/domain/entities/structure";
-import type { Period } from "@/domain/entities/period";
+import type { OrganizationalStructure } from "@/domain/entities/organizational-structure.entity";
+import type { Period } from "@/domain/entities/period.entity";
 import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,

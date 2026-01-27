@@ -1,4 +1,4 @@
-import type { Period } from "@/domain/entities/period";
+import type { Period } from "@/domain/entities/period.entity";
 import { FiUsers, FiClock, FiCheckCircle, FiCalendar } from "react-icons/fi";
 import StatCard from "../../ui/card/StatCard";
 

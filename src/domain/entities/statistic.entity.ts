@@ -1,4 +1,4 @@
-import { Period } from "./period";
+import { Period } from "./period.entity";
 
 export interface Statistic {
   id: string;

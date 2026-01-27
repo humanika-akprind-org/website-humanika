@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import type { Period, PeriodFormData } from "@/domain/entities/period";
+import type { Period, PeriodFormData } from "@/domain/entities/period.entity";
 import { usePeriodForm } from "./usePeriodForm";
 import { usePeriodSubmit } from "./usePeriodSubmit";
 import { usePeriodFormSubmit } from "./usePeriodFormSubmit";

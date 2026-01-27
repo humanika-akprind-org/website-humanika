@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 
 interface ShareButtonsProps {
   article: Article;

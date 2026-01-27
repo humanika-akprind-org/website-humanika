@@ -6,7 +6,7 @@ import {
   LetterPriority,
   LetterClassification,
 } from "@/domain/enums/enums";
-import type { LetterFilter } from "@/domain/entities/letter";
+import type { LetterFilter } from "@/domain/entities/letter.entity";
 import { PeriodApi } from "@/presentation/services/period";
 import SearchInput from "../../ui/input/SearchInput";
 import SelectFilter from "../../ui/input/SelectFilter";

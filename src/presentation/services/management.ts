@@ -2,7 +2,7 @@ import type {
   Management,
   ManagementServerData,
   ManagementApiResponse,
-} from "@/domain/entities/management";
+} from "@/domain/entities/management.entity";
 // import { ApiResponseStatus } from "@/types/enums";
 import { apiUrl } from "@/presentation/lib/config/config";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { FiFileText, FiEye, FiTrendingUp, FiArchive } from "react-icons/fi";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 import { Status } from "@/domain/enums/enums";
 import StatCard from "../../ui/card/StatCard";
 

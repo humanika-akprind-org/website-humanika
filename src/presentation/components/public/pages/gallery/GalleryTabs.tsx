@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Grid3x3, Sparkles, TrendingUp } from "lucide-react";
 import type { Album } from "@/presentation/lib/gallery-utils";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 import { GALLERY_TAB_CONFIGS, ANIMATION_DELAYS } from "./constants";
 
 interface GalleryTabsProps {

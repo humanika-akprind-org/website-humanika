@@ -6,7 +6,7 @@ import {
   FiTrendingUp,
   FiTrendingDown,
 } from "react-icons/fi";
-import type { WorkProgram } from "@/domain/entities/work";
+import type { WorkProgram } from "@/domain/entities/work-program.entity";
 import { formatCurrency } from "@/presentation/lib/utils";
 import StatCard from "../../ui/card/StatCard";
 

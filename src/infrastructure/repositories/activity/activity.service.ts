@@ -1,6 +1,6 @@
 import prisma from "@/presentation/lib/prisma";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 import type { ActivityType as PrismaActivityType } from "@prisma/client";
 
 export interface ActivityFilters {

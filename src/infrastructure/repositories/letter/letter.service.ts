@@ -2,13 +2,13 @@ import prisma from "@/presentation/lib/prisma";
 import type {
   CreateLetterInput,
   UpdateLetterInput,
-} from "@/domain/entities/letter";
+} from "@/domain/entities/letter.entity";
 import type { LetterType, LetterPriority } from "@/domain/enums/enums";
 import { Status } from "@/domain/enums/enums";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
 

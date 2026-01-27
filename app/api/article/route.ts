@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateArticleInput } from "@/domain/entities/article";
+import type { CreateArticleInput } from "@/domain/entities/article.entity";
 import type { Status } from "@/domain/enums/enums";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {

@@ -2,7 +2,7 @@ import prisma from "@/presentation/lib/prisma";
 import type {
   CreateFinanceInput,
   UpdateFinanceInput,
-} from "@/domain/entities/finance";
+} from "@/domain/entities/finance.entity";
 import type { FinanceType, Status } from "@/domain/enums/enums";
 import type {
   Prisma,
@@ -11,7 +11,7 @@ import type {
 } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
 

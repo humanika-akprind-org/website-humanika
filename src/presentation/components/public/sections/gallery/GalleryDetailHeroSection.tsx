@@ -13,7 +13,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 import type { AlbumData } from "@/presentation/hooks/gallery/useGalleryDetail";
 import JSZip from "jszip";
 import ShareButton from "@/presentation/components/public/ui/ShareButton";

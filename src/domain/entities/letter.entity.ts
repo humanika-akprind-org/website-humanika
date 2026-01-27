@@ -1,9 +1,14 @@
-import { LetterType, LetterPriority, Status } from "../enums/enums";
-import { Approval } from "./approval";
-import type { User } from "./user";
-import type { Period } from "./period";
+import {
+  type LetterType,
+  type LetterPriority,
+  type Status,
+  type LetterClassification,
+} from "../enums/enums";
+import { type Approval } from "./approval.entity";
+import type { User } from "./user.entity";
+import type { Period } from "./period.entity";
 import type { Event } from "./event.entity";
-import type { Document } from "./document";
+import type { Document } from "./document.entity";
 
 export interface Letter {
   id: string;
@@ -76,26 +81,4 @@ export interface LetterFilter {
   periodId?: string;
   eventId?: string;
   search?: string;
-}
-
-// Placeholder interfaces for relations
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface Period {
-  id: string;
-  name: string;
-}
-
-interface Event {
-  id: string;
-  name: string;
-}
-
-interface Document {
-  id: string;
-  name: string;
 }

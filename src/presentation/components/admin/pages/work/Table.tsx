@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
 import { MonitorCog } from "lucide-react";
-import type { WorkProgram } from "@/domain/entities/work";
+import type { WorkProgram } from "@/domain/entities/work-program.entity";
 import SortIcon from "../../ui/SortIcon";
 import StatusChip from "../../ui/chip/Status";
 import Checkbox from "../../ui/checkbox/Checkbox";

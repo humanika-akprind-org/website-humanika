@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
 import { CalendarClock } from "lucide-react";
-import type { Period } from "@/domain/entities/period";
+import type { Period } from "@/domain/entities/period.entity";
 import ActiveChip from "../../ui/chip/Active";
 import Checkbox from "../../ui/checkbox/Checkbox";
 import DropdownMenu, { DropdownMenuItem } from "../../ui/dropdown/DropdownMenu";

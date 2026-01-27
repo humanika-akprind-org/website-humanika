@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { deleteOrganizationContact } from "@/presentation/services/organization-contact";
-import type { OrganizationContact } from "@/domain/entities/organization-contact";
+import type { OrganizationContact } from "@/domain/entities/organization-contact.entity";
 import { useOrganizationContacts } from "./useOrganizationContacts";
 import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import { getCurrentUserAction } from "@/presentation/lib/actions/getCurrentUser";

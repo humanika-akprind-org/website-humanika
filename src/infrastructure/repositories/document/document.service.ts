@@ -2,7 +2,7 @@ import prisma from "@/presentation/lib/prisma";
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/domain/entities/document";
+} from "@/domain/entities/document.entity";
 import {
   type Status,
   type DocumentType as DocumentTypeEnum,
@@ -11,7 +11,7 @@ import {
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
 

@@ -1,5 +1,5 @@
 import type { Album } from "@/presentation/lib/gallery-utils";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 
 export const GALLERY_TAB_CONFIGS = [
   {

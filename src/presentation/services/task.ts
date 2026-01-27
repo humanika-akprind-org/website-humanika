@@ -3,7 +3,7 @@ import type {
   CreateDepartmentTaskInput,
   UpdateDepartmentTaskInput,
   DepartmentTaskFilter,
-} from "@/domain/entities/task";
+} from "@/domain/entities/task-department.entity";
 import { Department, Status } from "@/domain/enums/enums";
 import { apiUrl } from "@/presentation/lib/config/config";
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Document } from "@/domain/entities/document";
+import type { Document } from "@/domain/entities/document.entity";
 import type { Status, DocumentType } from "@/domain/enums/enums";
 
 export interface UseDocumentTableProps {

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import type {
   CreateFinanceInput,
   UpdateFinanceInput,
-} from "@/domain/entities/finance";
+} from "@/domain/entities/finance.entity";
 import { Status } from "@/domain/enums/enums";
 
 export function useCreateFinance() {

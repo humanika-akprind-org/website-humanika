@@ -1,7 +1,7 @@
 import type {
   CreateDocumentInput,
   UpdateDocumentInput,
-} from "@/domain/entities/document";
+} from "@/domain/entities/document.entity";
 import { Status, ApprovalType } from "@/domain/enums/enums";
 import { StatusApproval } from "@/domain/enums/enums";
 import prisma from "@/presentation/lib/prisma";

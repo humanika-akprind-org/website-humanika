@@ -6,7 +6,7 @@ import {
 import SearchInput from "../../../ui/input/SearchInput";
 import FilterButton from "../../../ui/button/FilterButton";
 import SelectFilter from "../../../ui/input/SelectFilter";
-import type { UserFilters } from "@/domain/entities/user";
+import type { UserFilters } from "@/domain/entities/user.entity";
 
 interface FiltersProps {
   searchTerm: string;

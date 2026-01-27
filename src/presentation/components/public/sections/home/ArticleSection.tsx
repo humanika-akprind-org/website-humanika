@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import ArticleCard from "../../pages/card/article/ArticleCard";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 import { motion } from "framer-motion";
 import {
   Newspaper,

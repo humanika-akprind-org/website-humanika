@@ -13,7 +13,7 @@
 
 import type { IEventRepository } from "@/application/interface/event.repository.interface";
 import type { CreateEventInput, Event } from "@/domain/entities/event.entity";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums/enums";
 

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { UserApi } from "@/presentation/services/user";
 import { PeriodApi } from "@/presentation/services/period";
-import type { User } from "@/domain/entities/user";
-import type { Period } from "@/domain/entities/period";
+import type { User } from "@/domain/entities/user.entity";
+import type { Period } from "@/domain/entities/period.entity";
 
 export function useArticleFormData(): {
   users: User[];

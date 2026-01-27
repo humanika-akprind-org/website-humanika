@@ -4,9 +4,9 @@ import type {
   OrganizationalStructure,
   CreateOrganizationalStructureInput,
   UpdateOrganizationalStructureInput,
-} from "@/domain/entities/structure";
+} from "@/domain/entities/organizational-structure.entity";
 import { Status } from "@/domain/enums/enums";
-import type { Period } from "@/domain/entities/period";
+import type { Period } from "@/domain/entities/period.entity";
 import { useFile } from "@/presentation/hooks/useFile";
 import {
   structureFolderId,

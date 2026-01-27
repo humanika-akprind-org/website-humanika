@@ -1,7 +1,7 @@
 "use server";
 
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 export async function getCurrentUserAction(): Promise<User | null> {
   const user = await getCurrentUser();

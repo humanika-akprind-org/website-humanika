@@ -4,7 +4,7 @@ import type {
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
 } from "@/domain/value-objects/document-type";
-import type { User } from "@/domain/entities/user";
+import type { User } from "@/domain/entities/user.entity";
 
 const prisma = new PrismaClient();
 

@@ -5,7 +5,7 @@ import {
   deleteWorkProgram,
   deleteWorkPrograms,
 } from "@/presentation/services/work";
-import type { WorkProgram } from "@/domain/entities/work";
+import type { WorkProgram } from "@/domain/entities/work-program.entity";
 import { type Department, type Status } from "@/domain/enums/enums";
 
 export function useWorkManagement() {

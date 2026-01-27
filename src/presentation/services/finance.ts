@@ -3,7 +3,7 @@ import type {
   CreateFinanceInput,
   UpdateFinanceInput,
   FinanceFilter,
-} from "@/domain/entities/finance";
+} from "@/domain/entities/finance.entity";
 import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;

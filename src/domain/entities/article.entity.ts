@@ -1,7 +1,7 @@
-import { Status } from "../enums/enums";
-import { User } from "./user";
-import { Period } from "./period";
-import { ArticleCategory } from "../value-objects/article-category";
+import { type Status } from "../enums/enums";
+import { type User } from "./user.entity";
+import { type Period } from "./period.entity";
+import { type ArticleCategory } from "../value-objects/article-category";
 
 export interface Article {
   viewCount: number;

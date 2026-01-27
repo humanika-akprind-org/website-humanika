@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import type { PeriodFormData } from "@/domain/entities/period";
+import type { PeriodFormData } from "@/domain/entities/period.entity";
 
 interface UsePeriodFormSubmitProps {
   validateForm: () => boolean;

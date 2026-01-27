@@ -1,5 +1,5 @@
 import { Status } from "../enums/enums";
-import { Period } from "./period";
+import { Period } from "./period.entity";
 
 export interface OrganizationalStructure {
   id: string;

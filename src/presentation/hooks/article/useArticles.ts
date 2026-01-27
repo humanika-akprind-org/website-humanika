@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getArticles } from "@/presentation/services/article";
-import type { Article, ArticleFilter } from "@/domain/entities/article";
+import type { Article, ArticleFilter } from "@/domain/entities/article.entity";
 
 export function useArticles(filter?: ArticleFilter) {
   const [articles, setArticles] = useState<Article[]>([]);

@@ -1,13 +1,12 @@
-import { Status, DocumentType as DocumentTypeEnum } from "../enums/enums";
-import { User } from "./user";
-import type { Event } from "./event.entity";
-import { Letter } from "./letter";
-import { Approval } from "./approval";
-import { DocumentType } from "../value-objects/document-type";
-import { Period } from "./period";
+import { type Status } from "../enums/enums";
+import { type User } from "./user.entity";
+import { type Letter } from "./letter.entity";
+import { type Approval } from "./approval.entity";
+import { type DocumentType } from "../value-objects/document-type";
+import { type Period } from "./period.entity";
 
 export interface Document {
-  type: any;
+  type: string;
   id: string;
   name: string;
   letterId?: string | null;
@@ -37,7 +36,7 @@ export interface CreateDocumentInput {
 
 export interface UpdateDocumentInput extends Partial<CreateDocumentInput> {
   status?: Status;
-  letterId?: string | null;
+  letterId?: string;
 }
 
 export interface DocumentFilter {

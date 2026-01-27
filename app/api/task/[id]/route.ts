@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import type { UpdateDepartmentTaskInput } from "@/domain/entities/task";
+import type { UpdateDepartmentTaskInput } from "@/domain/entities/task-department.entity";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
   getDepartmentTask,

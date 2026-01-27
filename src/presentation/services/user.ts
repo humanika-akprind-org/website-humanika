@@ -5,7 +5,7 @@ import type {
   UpdateUserData,
   UsersResponse,
   ApiResponse,
-} from "@/domain/entities/user";
+} from "@/domain/entities/user.entity";
 import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;

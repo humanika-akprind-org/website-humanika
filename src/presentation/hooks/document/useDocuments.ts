@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { getDocuments, deleteDocument } from "@/presentation/services/document";
-import type { Document, DocumentFilter } from "@/domain/entities/document";
+import type {
+  Document,
+  DocumentFilter,
+} from "@/domain/entities/document.entity";
 import { useToast } from "@/presentation/hooks/use-toast";
 
 export function useDocuments(filter?: DocumentFilter) {

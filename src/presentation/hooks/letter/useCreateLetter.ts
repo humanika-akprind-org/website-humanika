@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import type {
   CreateLetterInput,
   UpdateLetterInput,
-} from "@/domain/entities/letter";
+} from "@/domain/entities/letter.entity";
 
 export function useCreateLetter() {
   const router = useRouter();

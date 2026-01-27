@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { StructureApi } from "@/presentation/services/structure";
-import type { OrganizationalStructure } from "@/domain/entities/structure";
+import type { OrganizationalStructure } from "@/domain/entities/organizational-structure.entity";
 
 export function useStructures() {
   const [structures, setStructures] = useState<OrganizationalStructure[]>([]);

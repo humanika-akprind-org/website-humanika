@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import type { Article } from "@/domain/entities/article";
+import type { Article } from "@/domain/entities/article.entity";
 import HtmlRenderer from "@/presentation/components/admin/ui/HtmlRenderer";
 import { Calendar, ArrowRight, Clock, Tag, FileText } from "lucide-react";
 import { motion } from "framer-motion";

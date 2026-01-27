@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Letter } from "@/domain/entities/letter";
+import type { Letter } from "@/domain/entities/letter.entity";
 
 export function useLetterTable(letters: Letter[]) {
   const [searchTerm, setSearchTerm] = useState("");

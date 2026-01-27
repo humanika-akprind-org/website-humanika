@@ -1,5 +1,5 @@
 import type { Event } from "@/domain/entities/event.entity";
-import type { Gallery } from "@/domain/entities/gallery";
+import type { Gallery } from "@/domain/entities/gallery.entity";
 import { getGoogleDrivePreviewUrl } from "@/infrastructure/external-services/google-drive/file-utils";
 import { getEarliestScheduleDate } from "@/presentation/lib/event-utils";
 
