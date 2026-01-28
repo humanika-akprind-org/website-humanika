@@ -9,7 +9,10 @@
 // Export types
 export type { DepartmentTaskFilter } from "./get-department-tasks.repository";
 
-// Export functions
+// Export class-based repository
+export { TaskDepartmentRepositoryPrisma } from "./task-department-repository-prisma";
+
+// Export functions (legacy)
 export * from "./get-department-tasks.repository";
 export * from "./get-department-task-by-id.repository";
 export * from "./create-department-task.repository";
