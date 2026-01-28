@@ -15,7 +15,7 @@ import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
-} from "@/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google/file-utils";
 
 const getFolderIdForDocumentType = (
   documentTypeName: string | undefined,

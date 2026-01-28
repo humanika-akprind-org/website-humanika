@@ -1,8 +1,8 @@
-import { getGoogleDriveFiles } from "@/infrastructure/external-services/google-drive/google-drive";
+import { getGoogleDriveFiles } from "@/infrastructure/external-services/google/google-drive";
 import DriveGrid from "@/presentation/components/admin/pages/drive/Grid";
 import PageHeader from "@/presentation/components/admin/pages/drive/PageHeader";
 import AuthGuard from "@/presentation/components/admin/auth/google-oauth/AuthGuard";
-import { getGoogleAccessToken } from "@/infrastructure/external-services/google-drive/google-oauth";
+import { getGoogleAccessToken } from "@/infrastructure/external-services/google/google-oauth";
 
 export default async function DashboardPage() {
   const accessToken = await getGoogleAccessToken();

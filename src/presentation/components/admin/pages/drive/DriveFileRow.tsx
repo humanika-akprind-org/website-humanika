@@ -10,7 +10,7 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 import type { DriveFileRowProps } from "@/domain/value-objects/google-drive";
-import { getGoogleDriveDirectUrl } from "@/infrastructure/external-services/google-drive/file-utils";
+import { getGoogleDriveDirectUrl } from "@/infrastructure/external-services/google/file-utils";
 
 const DriveFileRow: React.FC<DriveFileRowProps> = ({
   file,

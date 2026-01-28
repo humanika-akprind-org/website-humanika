@@ -16,7 +16,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import {
   getGoogleAccessToken,
   refreshGoogleAccessToken,
-} from "@/infrastructure/external-services/google-drive/google-oauth";
+} from "@/infrastructure/external-services/google/google-oauth";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 
 // ============================================================================

@@ -6,7 +6,7 @@ import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
-} from "@/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google/file-utils";
 import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import { LetterApi } from "@/presentation/services/letter";
 

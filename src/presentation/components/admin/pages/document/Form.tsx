@@ -26,7 +26,7 @@ import {
 import {
   getGoogleDrivePreviewUrl,
   getFileIdFromFile,
-} from "@/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google/file-utils";
 
 interface DocumentFormProps {
   document?: Document;

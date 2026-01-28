@@ -6,7 +6,7 @@ import "./admin.css";
 import {
   getGoogleAccessToken,
   getGoogleUserEmail,
-} from "@/infrastructure/external-services/google-drive/google-oauth";
+} from "@/infrastructure/external-services/google/google-oauth";
 import AuthGuard from "@/presentation/components/admin/auth/google-oauth/AuthGuard";
 import UserInfo from "@/presentation/components/admin/layout/UserInfo";
 import { geistSans, geistMono } from "../ui/fonts";

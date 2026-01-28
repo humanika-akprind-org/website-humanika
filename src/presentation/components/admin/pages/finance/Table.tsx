@@ -12,7 +12,7 @@ import SortIcon from "../../ui/SortIcon";
 import Pagination from "../../ui/pagination/Pagination";
 import StatusChip from "../../ui/chip/Status";
 import StatusApproval from "../../ui/chip/StatusApproval";
-import { getGoogleDriveDirectUrl } from "@/infrastructure/external-services/google-drive/file-utils";
+import { getGoogleDriveDirectUrl } from "@/infrastructure/external-services/google/file-utils";
 import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface FinanceTableProps {

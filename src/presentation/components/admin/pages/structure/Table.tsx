@@ -16,7 +16,7 @@ import ViewModal from "../../ui/modal/ViewModal";
 import {
   getGoogleDriveDirectUrl,
   getFileIdFromFile,
-} from "@/infrastructure/external-services/google-drive/file-utils";
+} from "@/infrastructure/external-services/google/file-utils";
 import { useResourcePermission } from "@/presentation/hooks/usePermission";
 
 interface StructureTableProps {

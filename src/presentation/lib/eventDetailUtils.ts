@@ -1,5 +1,5 @@
 import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
-import { getGoogleDrivePreviewUrl } from "@/infrastructure/external-services/google-drive/file-utils";
+import { getGoogleDrivePreviewUrl } from "@/infrastructure/external-services/google/file-utils";
 
 /**
  * Generates a preview URL for an image based on its source

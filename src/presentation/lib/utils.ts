@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-import { getGoogleDrivePreviewUrl } from "@/infrastructure/external-services/google-drive/file-utils";
+import { getGoogleDrivePreviewUrl } from "@/infrastructure/external-services/google/file-utils";
 
 // Helper function to get preview URL from image (file ID or URL)
 export function getPreviewUrl(image: string | null | undefined): string {
