@@ -97,7 +97,18 @@ export interface IActivityRepository {
   /**
    * Create a new activity log
    */
-  create(data: Omit<ActivityLog, "id" | "createdAt">): Promise<ActivityLog>;
+  create(
+    data: {
+      activityType: string;
+      entityType: string;
+      entityId?: string;
+      description: string;
+      metadata?: unknown;
+      ipAddress: string;
+      userAgent: string;
+    },
+    user: { id: string },
+  ): Promise<ActivityLog>;
 
   /**
    * Delete activity by ID

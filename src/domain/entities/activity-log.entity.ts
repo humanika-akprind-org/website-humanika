@@ -13,7 +13,7 @@ export interface ActivityMetadata {
 
 export interface ActivityLog {
   id: string;
-  userId: string;
+  userId: string | null;
   activityType: ActivityType;
   entityType: string;
   entityId?: string;

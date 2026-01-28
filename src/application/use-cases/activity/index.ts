@@ -6,4 +6,9 @@
  */
 
 // Read operations
-export { GetActivitiesRadarChartUseCase } from "./get-activities.usecase";
+export { GetActivitiesRadarChartUseCase } from "./get-activities-radar-chart.usecase";
+export { GetActivitiesUseCase } from "./get-activities.usecase";
+export type { GetActivitiesResult } from "./get-activities.usecase";
+
+// Write operations
+export { CreateActivityUseCase } from "./create-activity.usecase";

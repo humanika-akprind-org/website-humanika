@@ -2,116 +2,93 @@
  * Get Activities Use Case - Complex read operation
  * Part of Clean Architecture: Application Layer (Use Cases)
  *
- * This use case handles fetching activities for radar chart visualization
- * with role-based filtering and department aggregation.
+ * This use case handles fetching activities with filtering and pagination.
  */
 
-import type { RadarChartResult } from "@/application/interface/activity.repository.interface";
-import { UserRole, Department } from "@/domain/enums";
-import { getActivitiesForRadarChart } from "@/infrastructure/repositories/activity";
+import type { ActivityLog } from "@/domain/entities/activity-log.entity";
+import type {
+  ActivityFilters,
+  ActivityPaginationResult,
+  IActivityRepository,
+} from "@/application/interface/activity.repository.interface";
 
 /**
- * Input for the get activities radar chart use case
+ * Filter for querying activities
  */
-export interface GetActivitiesRadarChartInput {
-  allowedRoles?: UserRole[];
-  allowedDepartments?: Department[];
+export interface ActivityFilterInput {
+  activityType?: string | "ALL";
+  startDate?: string;
+  endDate?: string;
 }
 
 /**
- * Result of the get activities radar chart use case
+ * Pagination input
  */
-export interface GetActivitiesRadarChartResult {
-  data: RadarChartResult[];
+export interface ActivityPaginationInput {
+  page?: number;
+  limit?: number;
 }
 
 /**
- * Default allowed roles for activity tracking
+ * Result type for GetActivitiesUseCase
  */
-const DEFAULT_ALLOWED_ROLES: UserRole[] = [
-  UserRole.DPO,
-  UserRole.BPH,
-  UserRole.PENGURUS,
-];
+export interface GetActivitiesResult {
+  activities: ActivityLog[];
+  pagination: ActivityPaginationResult;
+}
 
 /**
- * Default allowed departments for radar chart visualization
+ * Get Activities Use Case
+ * Part of Clean Architecture: Application Layer (Use Case)
+ *
+ * Encapsulates the business logic for fetching activities with filtering.
+ * Following Single Responsibility Principle - one use case per operation.
  */
-const DEFAULT_ALLOWED_DEPARTMENTS: Department[] = [
-  Department.BPH,
-  Department.INFOKOM,
-  Department.LITBANG,
-  Department.KWU,
-  Department.PSDM,
-];
+export class GetActivitiesUseCase {
+  constructor(private readonly activityRepository: IActivityRepository) {}
 
-/**
- * Get Activities Radar Chart Use Case
- *
- * This use case fetches activities filtered by specific roles
- * and aggregates them by department for radar chart visualization.
- *
- * Use this when you need:
- * - Complex read operations with business logic
- * - Filtering by user roles
- * - Data aggregation for visualization
- */
-export class GetActivitiesRadarChartUseCase {
   /**
-   * Execute the use case to get activities for radar chart
-   *
-   * @param input - Optional input parameters for filtering
-   * @returns Radar chart data with department activity counts
+   * Execute the use case
+   * @param filter - Filter criteria for activities
+   * @param pagination - Pagination parameters
+   * @returns Promise resolving to filtered activities with pagination info
    */
   async execute(
-    input?: GetActivitiesRadarChartInput,
-  ): Promise<GetActivitiesRadarChartResult> {
-    // Use provided values or defaults
-    const allowedRoles = input?.allowedRoles || DEFAULT_ALLOWED_ROLES;
-    const allowedDepartments =
-      input?.allowedDepartments || DEFAULT_ALLOWED_DEPARTMENTS;
+    filter?: ActivityFilterInput,
+    pagination?: ActivityPaginationInput,
+  ): Promise<GetActivitiesResult> {
+    // Set default pagination values
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
 
-    // Validate inputs
-    if (allowedRoles.length === 0) {
-      throw new Error("At least one role must be specified");
-    }
+    // Sanitize and validate filter parameters
+    const sanitizedFilter = this.sanitizeFilter(filter);
 
-    if (allowedDepartments.length === 0) {
-      throw new Error("At least one department must be specified");
-    }
+    // Execute repository call
+    const result = await this.activityRepository.findMany(sanitizedFilter, {
+      page,
+      limit,
+    });
 
-    // Execute the repository function
-    const radarData = await getActivitiesForRadarChart(
-      allowedRoles,
-      allowedDepartments,
-    );
-
+    // Return structured result with pagination
     return {
-      data: radarData,
+      activities: result.activities,
+      pagination: result.pagination,
     };
   }
 
   /**
-   * Execute with custom roles and departments
-   * Useful for flexible querying based on different criteria
+   * Sanitize and validate filter parameters
    */
-  async executeWithCustomFilters(
-    roles: UserRole[],
-    departments: Department[],
-  ): Promise<GetActivitiesRadarChartResult> {
-    // Validate inputs
-    if (roles.length === 0) {
-      throw new Error("At least one role must be specified");
-    }
-
-    if (departments.length === 0) {
-      throw new Error("At least one department must be specified");
-    }
-
-    const radarData = await getActivitiesForRadarChart(roles, departments);
+  private sanitizeFilter(
+    filter?: ActivityFilterInput,
+  ): ActivityFilters | undefined {
+    if (!filter) return undefined;
 
     return {
-      data: radarData,
+      activityType: filter.activityType,
+      startDate: filter.startDate?.trim() || undefined,
+      endDate: filter.endDate?.trim() || undefined,
     };
   }
 }
