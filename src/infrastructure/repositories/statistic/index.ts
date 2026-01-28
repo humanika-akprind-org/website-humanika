@@ -6,6 +6,9 @@
  * for convenient imports throughout the application.
  */
 
+// Export repository class
+export { StatisticRepositoryPrisma } from "./statistic-repository-prisma";
+
 // Export types
 export type { StatisticFilter } from "@/domain/entities/statistic.entity";
 
