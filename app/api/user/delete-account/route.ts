@@ -1,30 +1,59 @@
+/**
+ * Delete Account API Route - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ */
+
 import { type NextRequest, NextResponse } from "next/server";
 import {
   getCurrentUser,
   clearAuthCookies,
 } from "@/presentation/lib/auth-server";
-import { deleteAccount } from "@/infrastructure/repositories/user";
+import { DeleteAccountUseCase } from "@/application/use-cases/user";
+import { UserRepositoryPrisma } from "@/infrastructure/repositories/user";
+
+// ============================================================================
+// DELETE /api/user/delete-account - Delete user account
+// ============================================================================
 
 export async function DELETE(_request: NextRequest) {
   try {
+    // 1. Get current user
     const currentUser = await getCurrentUser();
     if (!currentUser || !currentUser.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
     }
 
-    await deleteAccount(currentUser.id);
+    // 2. Use use case for account deletion
+    const repo = new UserRepositoryPrisma();
+    const useCase = new DeleteAccountUseCase(repo);
+    await useCase.execute(currentUser.id);
 
-    // Log out the user after deletion
+    // 3. Log out the user after deletion
     await clearAuthCookies();
 
-    return NextResponse.json({ message: "Account deleted successfully" });
+    // 4. Response
+    return NextResponse.json({
+      success: true,
+      message: "Account deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting account:", error);
-    if (error instanceof Error && error.message === "User not found") {
-      return NextResponse.json({ error: error.message }, { status: 404 });
+
+    if ((error as Error).message === "User not found") {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 },
+      );
     }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+      },
       { status: 500 },
     );
   }

@@ -1,13 +1,43 @@
-// app/api/user/[id]/route.ts
-import { type NextRequest, NextResponse } from "next/server";
-import { type UserRole, type Department, type Position } from "@prisma/client";
-import {
-  getUser,
-  updateUser,
-  deleteUser,
-} from "@/infrastructure/repositories/user";
+/**
+ * User by ID API Route - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ */
 
-// GET - Get user by ID
+import { type NextRequest, NextResponse } from "next/server";
+import type { UserRole, Department } from "@prisma/client";
+import {
+  GetUserByIdUseCase,
+  UpdateUserUseCase,
+  DeleteUserUseCase,
+} from "@/application/use-cases/user";
+import { UserRepositoryPrisma } from "@/infrastructure/repositories/user";
+import type { UpdateUserInput } from "@/application/interface/user.repository.interface";
+
+// ============================================================================
+// Payload Extraction Functions
+// ============================================================================
+
+async function extractUpdateUserBody(
+  request: NextRequest,
+): Promise<UpdateUserInput> {
+  const body = await request.json();
+  return {
+    name: body.name,
+    email: body.email,
+    username: body.username,
+    password: body.password,
+    role: body.role as UserRole,
+    department: body.department as Department,
+    position: body.position,
+    isActive: body.isActive,
+    verifiedAccount: body.verifiedAccount,
+  };
+}
+
+// ============================================================================
+// GET /api/user/[id] - Get user by ID
+// ============================================================================
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -15,71 +45,98 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const user = await getUser(id);
+    // Use use case for read
+    const repo = new UserRepositoryPrisma();
+    const useCase = new GetUserByIdUseCase(repo);
+    const user = await useCase.execute(id);
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 },
+      );
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json({
+      success: true,
+      data: user,
+    });
   } catch (error) {
     console.error("Error fetching user:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Failed to fetch user",
+        message: (error as Error).message,
+      },
       { status: 500 },
     );
   }
 }
 
-// PUT - Update user
+// ============================================================================
+// PUT /api/user/[id] - Update user
+// ============================================================================
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
-    const body = await request.json();
-    const {
-      name,
-      email,
-      username,
-      password,
-      role,
-      department,
-      position,
-      isActive,
-      verifiedAccount,
-    } = body;
 
-    const updatedUser = await updateUser(id, {
-      name,
-      email,
-      username,
-      password,
-      role: role as UserRole,
-      department: department as Department,
-      position: position as Position,
-      isActive,
-      verifiedAccount,
+    // 1. Extract payload
+    const body = await extractUpdateUserBody(request);
+
+    // 2. Use use case for complex write with validation, logging
+    const repo = new UserRepositoryPrisma();
+    const useCase = new UpdateUserUseCase(repo);
+    const updatedUser = await useCase.execute(id, body);
+
+    // 3. Response
+    return NextResponse.json({
+      success: true,
+      data: updatedUser,
     });
-
-    return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Error updating user:", error);
-    if (error instanceof Error && error.message === "User not found") {
-      return NextResponse.json({ error: error.message }, { status: 404 });
+
+    // Handle specific errors
+    if ((error as Error).message === "User not found") {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 },
+      );
     }
-    if (error instanceof Error && error.message.includes("already taken")) {
-      return NextResponse.json({ error: error.message }, { status: 409 });
+
+    if ((error as Error).message.includes("Validation failed")) {
+      return NextResponse.json(
+        { success: false, error: (error as Error).message },
+        { status: 400 },
+      );
     }
+
+    if ((error as Error).message.includes("already taken")) {
+      return NextResponse.json(
+        { success: false, error: (error as Error).message },
+        { status: 409 },
+      );
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+      },
       { status: 500 },
     );
   }
 }
 
-// DELETE - Delete user
+// ============================================================================
+// DELETE /api/user/[id] - Delete user
+// ============================================================================
+
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -87,16 +144,30 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    await deleteUser(id);
+    // Use use case for delete
+    const repo = new UserRepositoryPrisma();
+    const useCase = new DeleteUserUseCase(repo);
+    await useCase.execute(id);
 
-    return NextResponse.json({ message: "User deleted successfully" });
+    return NextResponse.json({
+      success: true,
+      message: "User deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting user:", error);
-    if (error instanceof Error && error.message === "User not found") {
-      return NextResponse.json({ error: error.message }, { status: 404 });
+
+    if ((error as Error).message === "User not found") {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 },
+      );
     }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+      },
       { status: 500 },
     );
   }

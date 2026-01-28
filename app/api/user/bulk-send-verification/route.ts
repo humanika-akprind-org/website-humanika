@@ -1,4 +1,13 @@
+/**
+ * Bulk Send Verification Emails API Route - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ *
+ * This route handles sending verification emails to multiple users
+ */
+
 import { type NextRequest, NextResponse } from "next/server";
+import { bulkSendVerificationEmails } from "@/infrastructure/repositories/user";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 import prisma from "@/presentation/lib/prisma";
 import { appConfig } from "@/presentation/lib/config/config";
 import { Resend } from "resend";
@@ -8,6 +17,55 @@ let resend: Resend | null = null;
 if (appConfig.resendApiKey) {
   resend = new Resend(appConfig.resendApiKey);
 }
+
+// ============================================================================
+// Local Types
+// ============================================================================
+
+interface BulkSendVerificationBody {
+  userIds: string[];
+  batchSize?: number;
+}
+
+// ============================================================================
+// Payload Extraction Functions
+// ============================================================================
+
+async function extractBulkSendVerificationBody(
+  request: NextRequest,
+): Promise<BulkSendVerificationBody> {
+  return await request.json();
+}
+
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
+function validateBulkSendVerificationInput(body: BulkSendVerificationBody) {
+  const errors: string[] = [];
+
+  if (
+    !body.userIds ||
+    !Array.isArray(body.userIds) ||
+    body.userIds.length === 0
+  ) {
+    errors.push("userIds array is required");
+  }
+
+  if (body.batchSize !== undefined && body.batchSize < 1) {
+    errors.push("batchSize must be at least 1");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, error: errors.join(", ") };
+  }
+
+  return { isValid: true };
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
 
 // Helper function to send emails in batches to avoid rate limits
 async function sendEmailsInBatches(
@@ -88,52 +146,63 @@ async function sendEmailsInBatches(
   return results;
 }
 
-// POST - Bulk send verification emails
+// ============================================================================
+// POST /api/user/bulk-send-verification - Bulk send verification emails
+// ============================================================================
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { userIds, batchSize = 10 } = body;
-
-    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+    // 1. Authenticate user
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json(
-        { error: "userIds array is required" },
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    // 2. Extract payload
+    const body = await extractBulkSendVerificationBody(request);
+
+    // 3. Basic validation
+    const validation = validateBulkSendVerificationInput(body);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { success: false, error: validation.error },
         { status: 400 },
       );
     }
 
-    // Check if all users exist
+    // 4. Use repository for validation
+    await bulkSendVerificationEmails(body.userIds);
+
+    // 5. Get users for email sending
     const users = await prisma.user.findMany({
       where: {
-        id: { in: userIds },
+        id: { in: body.userIds },
       },
       select: { id: true, email: true, name: true },
     });
 
-    if (users.length !== userIds.length) {
-      return NextResponse.json(
-        { error: "Some users not found" },
-        { status: 404 },
-      );
-    }
-
-    // Check if Resend is configured
+    // 6. Check if Resend is configured
     if (!resend) {
       console.warn("Resend API key not configured. Skipping bulk email send.");
       return NextResponse.json({
+        success: true,
         count: users.length,
         message: `Users found but emails not sent - API key not configured`,
-        users: users.map((u) => ({ id: u.id, email: u.email })),
+        data: users.map((u) => ({ id: u.id, email: u.email })),
       });
     }
 
     console.log(
-      `Starting bulk email send to ${users.length} users in batches of ${batchSize}`,
+      `Starting bulk email send to ${users.length} users in batches of ${body.batchSize || 10}`,
     );
 
-    // Send emails in batches to handle rate limits and organizational domain restrictions
-    const results = await sendEmailsInBatches(users, batchSize);
+    // 7. Send emails in batches to handle rate limits and organizational domain restrictions
+    const results = await sendEmailsInBatches(users, body.batchSize || 10);
 
-    // Count successful sends
+    // 8. Count successful sends
     const successful = results.filter((r) => r.success).length;
     const failed = results.filter((r) => !r.success).length;
 
@@ -141,18 +210,38 @@ export async function POST(request: NextRequest) {
       `Bulk email send completed: ${successful} successful, ${failed} failed`,
     );
 
+    // 9. Response
     return NextResponse.json({
+      success: true,
       count: users.length,
       successful,
       failed,
-      batchSize,
+      batchSize: body.batchSize || 10,
       message: `Emails sent: ${successful} successful, ${failed} failed`,
-      results,
+      data: results,
     });
   } catch (error) {
     console.error("Error bulk sending verification emails:", error);
+
+    if ((error as Error).message.includes("userIds array is required")) {
+      return NextResponse.json(
+        { success: false, error: "userIds array is required" },
+        { status: 400 },
+      );
+    }
+
+    if ((error as Error).message.includes("Some users not found")) {
+      return NextResponse.json(
+        { success: false, error: "Some users not found" },
+        { status: 404 },
+      );
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+      },
       { status: 500 },
     );
   }

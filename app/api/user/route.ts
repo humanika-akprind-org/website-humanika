@@ -1,95 +1,169 @@
-// app/api/user/route.ts
-import { type NextRequest, NextResponse } from "next/server";
-import { type UserRole, type Department, type Position } from "@prisma/client";
-import { getUsers, createUser } from "@/infrastructure/repositories/user";
-import { getCurrentUser } from "@/presentation/lib/auth-server";
+/**
+ * User API Route - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ *
+ * This route demonstrates the hybrid pattern:
+ * - GET: Uses use case for complex read operations with validation
+ * - POST: Uses use case for complex write operations with validation
+ */
 
-// GET - Get all users
+import { type NextRequest, NextResponse } from "next/server";
+import type { UserRole, Department } from "@prisma/client";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
+import {
+  GetUsersUseCase,
+  CreateUserUseCase,
+} from "@/application/use-cases/user";
+import { UserRepositoryPrisma } from "@/infrastructure/repositories/user";
+import type {
+  UserFilter,
+  CreateUserInput,
+} from "@/application/interface/user.repository.interface";
+
+// ============================================================================
+// Payload Extraction Functions
+// ============================================================================
+
+function extractUserQueryParams(
+  request: NextRequest,
+): Omit<UserFilter, "excludeUserId"> {
+  const { searchParams } = new URL(request.url);
+  return {
+    page: searchParams.get("page")
+      ? parseInt(searchParams.get("page") || "1")
+      : undefined,
+    limit: searchParams.get("limit")
+      ? parseInt(searchParams.get("limit") || "10")
+      : undefined,
+    search: searchParams.get("search") || undefined,
+    role: (searchParams.get("role") as UserRole) || undefined,
+    department: (searchParams.get("department") as Department) || undefined,
+    isActive:
+      searchParams.get("isActive") !== null
+        ? searchParams.get("isActive") === "true"
+        : undefined,
+    verifiedAccount:
+      searchParams.get("verifiedAccount") !== null
+        ? searchParams.get("verifiedAccount") === "true"
+        : undefined,
+    allUsers: searchParams.get("allUsers") === "true",
+  };
+}
+
+async function extractCreateUserBody(
+  request: NextRequest,
+): Promise<CreateUserInput> {
+  const body = await request.json();
+  return {
+    name: body.name,
+    email: body.email,
+    username: body.username,
+    password: body.password,
+    role: body.role as UserRole,
+    department: body.department as Department,
+    position: body.position,
+    isActive: body.isActive,
+    verifiedAccount: body.verifiedAccount,
+  };
+}
+
+// ============================================================================
+// GET /api/user - Use Case Pattern
+// ============================================================================
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const search = searchParams.get("search") || "";
-    const role = searchParams.get("role") || "";
-    const department = searchParams.get("department") || "";
-    const isActive = searchParams.get("isActive");
-    const verifiedAccount = searchParams.get("verifiedAccount");
-    const allUsers = searchParams.get("allUsers");
-
-    // Get current user to exclude from results
+    // 1. Get current user to exclude from results
     const currentUser = await getCurrentUser();
 
-    // When search is provided, automatically fetch all users without pagination
-    // This enables proper search functionality in select inputs
-    const shouldFetchAll = !!search || allUsers === "true";
+    // 2. Extract payload
+    const queryParams = extractUserQueryParams(request);
 
-    const result = await getUsers({
-      page: shouldFetchAll ? undefined : page,
-      limit: shouldFetchAll ? undefined : limit,
-      search: search || undefined,
-      role: (role as UserRole) || undefined,
-      department: (department as Department) || undefined,
-      isActive: isActive ? isActive === "true" : undefined,
-      verifiedAccount: verifiedAccount ? verifiedAccount === "true" : undefined,
-      allUsers: shouldFetchAll,
+    // 3. When search is provided, automatically fetch all users without pagination
+    const shouldFetchAll = !!queryParams.search || queryParams.allUsers;
+
+    // 4. Use use case for complex read with validation and pagination
+    const repo = new UserRepositoryPrisma();
+    const useCase = new GetUsersUseCase(repo);
+    const filter: UserFilter = {
+      ...queryParams,
+      page: shouldFetchAll ? undefined : queryParams.page,
+      limit: shouldFetchAll ? undefined : queryParams.limit,
       excludeUserId: currentUser?.id,
-    });
+    };
+    const result = await useCase.execute(filter);
 
-    return NextResponse.json(result);
+    // 5. Response - consistent format
+    return NextResponse.json({
+      success: true,
+      data: result.users,
+      pagination: result.pagination,
+    });
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Failed to fetch users",
+        message: (error as Error).message,
+      },
       { status: 500 },
     );
   }
 }
 
-// POST - Create new user
+// ============================================================================
+// POST /api/user - Use Case Pattern
+// ============================================================================
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const {
-      name,
-      email,
-      username,
-      password,
-      role,
-      department,
-      position,
-      isActive,
-      verifiedAccount,
-    } = body;
+    // 1. Extract payload
+    const body = await extractCreateUserBody(request);
 
-    // Validation
-    if (!name || !email || !username || !password) {
+    // 2. Use use case for complex write with validation, logging, and approval
+    const repo = new UserRepositoryPrisma();
+    const useCase = new CreateUserUseCase(repo);
+    const user = await useCase.execute(body, { id: "system" });
+
+    // 3. Response
+    return NextResponse.json(
+      {
+        success: true,
+        data: user,
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    console.error("Error creating user:", error);
+
+    // Handle validation errors specifically
+    if ((error as Error).message.includes("Validation failed")) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        {
+          success: false,
+          error: (error as Error).message,
+        },
         { status: 400 },
       );
     }
 
-    const user = await createUser({
-      name,
-      email,
-      username,
-      password,
-      role: role as UserRole,
-      department: department as Department,
-      position: position as Position,
-      isActive,
-      verifiedAccount,
-    });
-
-    return NextResponse.json(user, { status: 201 });
-  } catch (error) {
-    console.error("Error creating user:", error);
-    if (error instanceof Error && error.message.includes("already exists")) {
-      return NextResponse.json({ error: error.message }, { status: 409 });
+    // Handle duplicate error specifically
+    if ((error as Error).message.includes("already exists")) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: (error as Error).message,
+        },
+        { status: 409 },
+      );
     }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+      },
       { status: 500 },
     );
   }

@@ -9,6 +9,12 @@ if (appConfig.resendApiKey) {
   resend = new Resend(appConfig.resendApiKey);
 }
 
+// POST - Send verification email to user
+// Note: This operation combines user verification with email sending.
+// While it involves two concerns (DB update + email), both are straightforward
+// and don't require complex business logic or validation.
+// For more complex operations with business rules, consider using a use case class.
+
 export async function POST(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
