@@ -3,6 +3,7 @@
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  */
 
+import { type DepartmentTask } from "@/domain/entities/task-department.entity";
 import prisma from "@/presentation/lib/prisma";
 
 /**
@@ -32,5 +33,5 @@ export async function getDepartmentTask(id: string) {
     throw new Error("Department task not found");
   }
 
-  return departmentTask;
+  return departmentTask as DepartmentTask;
 }

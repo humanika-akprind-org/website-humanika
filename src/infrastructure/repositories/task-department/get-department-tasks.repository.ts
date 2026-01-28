@@ -6,6 +6,7 @@
 import prisma from "@/presentation/lib/prisma";
 import type { Department, Status } from "@/domain/enums";
 import type { Prisma } from "@prisma/client";
+import { type DepartmentTask } from "@/domain/entities/task-department.entity";
 
 export type DepartmentTaskFilter = {
   department?: Department;
@@ -53,5 +54,5 @@ export async function getDepartmentTasks(filter: DepartmentTaskFilter) {
     orderBy: { createdAt: "desc" },
   });
 
-  return departmentTasks;
+  return departmentTasks as DepartmentTask[];
 }

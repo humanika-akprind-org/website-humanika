@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { UpdateDepartmentTaskInput } from "@/domain/entities/task-department.entity";
+import type {
+  DepartmentTask,
+  UpdateDepartmentTaskInput,
+} from "@/domain/entities/task-department.entity";
 import type { Prisma } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
@@ -91,5 +94,5 @@ export async function updateDepartmentTask(
     },
   });
 
-  return departmentTask;
+  return departmentTask as DepartmentTask;
 }
