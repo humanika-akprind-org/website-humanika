@@ -14,8 +14,6 @@ export const getFinanceCategories = async (
   const params = new URLSearchParams();
 
   if (filter?.type) params.append("type", filter.type);
-  if (filter?.isActive !== undefined)
-    params.append("isActive", filter.isActive.toString());
   if (filter?.search) params.append("search", filter.search);
 
   const response = await fetch(

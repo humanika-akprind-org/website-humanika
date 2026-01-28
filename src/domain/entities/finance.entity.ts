@@ -51,6 +51,6 @@ export interface FinanceFilter {
   workProgramId?: string;
   periodId?: string;
   search?: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string;
+  endDate?: string;
 }

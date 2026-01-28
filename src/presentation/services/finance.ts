@@ -21,9 +21,9 @@ export const getFinances = async (
   }
   if (filter?.search) params.append("search", filter.search);
   if (filter?.startDate) {
-    params.append("startDate", filter.startDate.toISOString());
+    params.append("startDate", filter.startDate);
   }
-  if (filter?.endDate) params.append("endDate", filter.endDate.toISOString());
+  if (filter?.endDate) params.append("endDate", filter.endDate);
 
   const response = await fetch(`${API_URL}/finance?${params.toString()}`, {
     method: "GET",

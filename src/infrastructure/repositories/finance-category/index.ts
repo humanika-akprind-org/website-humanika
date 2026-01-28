@@ -9,6 +9,9 @@
 // Export types
 export type { GetFinanceCategoriesFilter } from "./get-finance-categories.repository";
 
+// Export repository classes
+export { FinanceCategoryRepositoryPrisma } from "./finance-category-repository-prisma";
+
 // Export functions
 export * from "./get-finance-categories.repository";
 export * from "./get-finance-category-by-id.repository";

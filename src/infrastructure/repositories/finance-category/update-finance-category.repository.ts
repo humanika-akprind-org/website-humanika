@@ -33,7 +33,6 @@ export async function updateFinanceCategory(
   if (data.name !== undefined) updateData.name = data.name;
   if (data.description !== undefined) updateData.description = data.description;
   if (data.type) updateData.type = data.type;
-  if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
   const financeCategory = await prisma.financeCategory.update({
     where: { id },

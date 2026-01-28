@@ -3,9 +3,8 @@ import { FinanceType } from "../enums";
 export interface FinanceCategory {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   type: FinanceType;
-  isActive?: boolean;
   createdAt: Date;
   updatedAt: Date;
   _count?: {
@@ -19,12 +18,9 @@ export interface CreateFinanceCategoryInput {
   type: FinanceType;
 }
 
-export interface UpdateFinanceCategoryInput extends Partial<CreateFinanceCategoryInput> {
-  isActive?: boolean;
-}
+export interface UpdateFinanceCategoryInput extends Partial<CreateFinanceCategoryInput> {}
 
 export interface FinanceCategoryFilter {
   type?: FinanceType;
-  isActive?: boolean;
   search?: string;
 }

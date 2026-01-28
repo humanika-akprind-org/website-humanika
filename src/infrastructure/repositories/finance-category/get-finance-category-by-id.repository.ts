@@ -8,7 +8,7 @@ import prisma from "@/presentation/lib/prisma";
 /**
  * Get a single finance category by ID
  */
-export async function getFinanceCategory(id: string) {
+export async function getFinanceCategoryById(id: string) {
   const financeCategory = await prisma.financeCategory.findUnique({
     where: { id },
     include: {

@@ -15,3 +15,6 @@ export * from "./get-finance-by-id.repository";
 export * from "./create-finance.repository";
 export * from "./update-finance.repository";
 export * from "./delete-finance.repository";
+
+// Export class (for use case pattern)
+export { FinanceRepositoryPrisma } from "./finance-repository-prisma";

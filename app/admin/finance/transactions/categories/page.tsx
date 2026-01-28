@@ -138,15 +138,6 @@ export default function FinanceCategoriesPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Status
-              </label>
-              <p className="mt-1 text-sm text-gray-900">
-                {currentCategory.isActive ? "Active" : "Inactive"}
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
                 Created At
               </label>
               <p className="mt-1 text-sm text-gray-900">
