@@ -14,7 +14,7 @@ import type {
   EmailOptions,
   EmailValidationResult,
 } from "@/domain/entities/email.entity";
-import { sendEmail } from "@/infrastructure/external-services/resend/resend";
+import { sendEmail } from "@/infrastructure/external-services/resend/resend-email";
 
 /**
  * Default sender address for emails
