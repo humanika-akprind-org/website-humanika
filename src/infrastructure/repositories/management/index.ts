@@ -6,6 +6,9 @@
  * for convenient imports throughout the application.
  */
 
+// Export Prisma repository implementation
+export { ManagementRepositoryPrisma } from "./management-repository-prisma";
+
 // Export functions
 export * from "./get-managements.repository";
 export * from "./get-management-by-id.repository";
