@@ -6,5 +6,17 @@
  * for convenient imports throughout the application.
  */
 
+// Export types
+export type { ArticleWithRelatedArticles } from "./get-article-by-slug.repository";
+export * from "./get-articles.repository";
+
+// Export functions
+export * from "./get-articles.repository";
+export * from "./get-article-by-id.repository";
+export * from "./get-article-by-slug.repository";
+export * from "./create-article.repository";
+export * from "./update-article.repository";
+export * from "./delete-article.repository";
+
 // Export class (for use case pattern)
 export { ArticleRepositoryPrisma } from "./article-repository-prisma";
