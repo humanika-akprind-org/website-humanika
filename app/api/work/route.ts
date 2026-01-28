@@ -24,7 +24,6 @@ import {
   GetWorkProgramsUseCase,
   type GetWorkProgramsResult,
   CreateWorkProgramUseCase,
-  BulkDeleteWorkProgramsUseCase,
 } from "@/application/use-cases/work-program";
 import { WorkProgramRepositoryPrisma } from "@/infrastructure/repositories/work-program";
 
@@ -61,12 +60,6 @@ async function extractCreateWorkProgramBody(
   return await request.json();
 }
 
-async function extractBulkDeleteBody(
-  request: NextRequest,
-): Promise<{ ids: string[] }> {
-  return await request.json();
-}
-
 // ============================================================================
 // Validation Functions
 // ============================================================================
@@ -99,32 +92,6 @@ function validateCreateWorkProgramInput(body: CreateWorkProgramInput): {
 
   if (body.funds !== undefined && body.funds < 0) {
     errors.push("Funds cannot be negative");
-  }
-
-  if (errors.length > 0) {
-    return { isValid: false, error: errors.join(", ") };
-  }
-
-  return { isValid: true };
-}
-
-function validateBulkDeleteInput(body: { ids: string[] }): {
-  isValid: boolean;
-  error?: string;
-} {
-  const errors: string[] = [];
-
-  if (!Array.isArray(body.ids) || body.ids.length === 0) {
-    errors.push("IDs array is required and must not be empty");
-  }
-
-  if (body.ids && body.ids.length > 0) {
-    const invalidIds = body.ids.filter(
-      (id) => typeof id !== "string" || id.trim() === "" || id === "undefined",
-    );
-    if (invalidIds.length > 0) {
-      errors.push("All IDs must be non-empty strings");
-    }
   }
 
   if (errors.length > 0) {
@@ -214,67 +181,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Error creating work program:", error);
-
-    // Handle validation errors specifically
-    if ((error as Error).message.includes("Validation failed")) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: (error as Error).message,
-        },
-        { status: 400 },
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
-      { status: 500 },
-    );
-  }
-}
-
-// ============================================================================
-// DELETE /api/work - Use Case Pattern (Bulk Delete)
-// ============================================================================
-
-export async function DELETE(request: NextRequest) {
-  try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 },
-      );
-    }
-
-    // 1. Extract payload
-    const body = await extractBulkDeleteBody(request);
-
-    // 2. Basic validation (use case will do deeper validation)
-    const validation = validateBulkDeleteInput(body);
-    if (!validation.isValid) {
-      return NextResponse.json(
-        { success: false, error: validation.error },
-        { status: 400 },
-      );
-    }
-
-    // 3. Use use case for bulk delete with validation and logging
-    const repo = new WorkProgramRepositoryPrisma();
-    const useCase = new BulkDeleteWorkProgramsUseCase(repo);
-    const result = await useCase.execute(body.ids, { id: user.id });
-
-    // 4. Response
-    return NextResponse.json({
-      success: true,
-      message: `Successfully deleted ${result.count} work programs`,
-      deletedCount: result.count,
-    });
-  } catch (error) {
-    console.error("Error deleting work programs:", error);
 
     // Handle validation errors specifically
     if ((error as Error).message.includes("Validation failed")) {

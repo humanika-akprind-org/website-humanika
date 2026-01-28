@@ -128,5 +128,5 @@ export async function updateUser(
     });
   }
 
-  return updatedUser as User;
+  return updatedUser as unknown as User;
 }

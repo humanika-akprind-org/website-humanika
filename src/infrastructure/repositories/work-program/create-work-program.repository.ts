@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { CreateWorkProgramInput } from "@/domain/entities/work-program.entity";
+import type {
+  CreateWorkProgramInput,
+  WorkProgram,
+} from "@/domain/entities/work-program.entity";
 import type { User } from "@/domain/entities/user.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
@@ -95,5 +98,5 @@ export async function createWorkProgram(
     });
   }
 
-  return workProgram;
+  return workProgram as unknown as WorkProgram;
 }

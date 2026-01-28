@@ -92,7 +92,7 @@ export type User = {
 // ============================================================================
 
 export interface IUserRepository {
-  getUsers(filter: UserFilter): Promise<UsersResult>;
+  getUsers(filter: UserFilter): Promise<User[]>;
   getUserById(id: string): Promise<User | null>;
   createUser(data: CreateUserInput): Promise<User>;
   updateUser(id: string, data: UpdateUserInput): Promise<User>;

@@ -9,7 +9,6 @@
 import type {
   IUserRepository,
   UserFilter,
-  UsersResult,
   CreateUserInput,
   UpdateUserInput,
   User,
@@ -35,8 +34,8 @@ export class UserRepositoryPrisma implements IUserRepository {
   /**
    * Get users with optional filters and pagination
    */
-  async getUsers(filter: UserFilter): Promise<UsersResult> {
-    return await getUsers({
+  async getUsers(filter: UserFilter): Promise<User[]> {
+    const users = await getUsers({
       page: filter.page,
       limit: filter.limit,
       search: filter.search,
@@ -47,6 +46,7 @@ export class UserRepositoryPrisma implements IUserRepository {
       allUsers: filter.allUsers,
       excludeUserId: filter.excludeUserId,
     });
+    return users as unknown as User[];
   }
 
   /**

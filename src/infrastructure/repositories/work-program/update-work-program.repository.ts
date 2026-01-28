@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { UpdateWorkProgramInput } from "@/domain/entities/work-program.entity";
+import type {
+  UpdateWorkProgramInput,
+  WorkProgram,
+} from "@/domain/entities/work-program.entity";
 import type { User } from "@/domain/entities/user.entity";
 import type { Prisma } from "@prisma/client";
 import { logActivity } from "@/presentation/lib/activity-log";
@@ -182,5 +185,5 @@ export async function updateWorkProgram(
     },
   });
 
-  return workProgram;
+  return workProgram as unknown as WorkProgram;
 }

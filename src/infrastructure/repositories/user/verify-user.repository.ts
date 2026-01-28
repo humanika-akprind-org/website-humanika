@@ -39,5 +39,5 @@ export async function verifyUser(id: string) {
     },
   });
 
-  return updatedUser as User;
+  return updatedUser as unknown as User;
 }

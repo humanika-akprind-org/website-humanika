@@ -96,8 +96,7 @@ export async function GET(request: NextRequest) {
     // 5. Response - consistent format
     return NextResponse.json({
       success: true,
-      data: result.users,
-      pagination: result.pagination,
+      data: result,
     });
   } catch (error) {
     console.error("Error fetching users:", error);

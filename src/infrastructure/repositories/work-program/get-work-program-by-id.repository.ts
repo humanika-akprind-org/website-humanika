@@ -3,6 +3,7 @@
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  */
 
+import { type WorkProgram } from "@/domain/entities/work-program.entity";
 import prisma from "@/presentation/lib/prisma";
 
 /**
@@ -35,5 +36,5 @@ export async function getWorkProgram(id: string) {
     },
   });
 
-  return workProgram;
+  return workProgram as unknown as WorkProgram;
 }

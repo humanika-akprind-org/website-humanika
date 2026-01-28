@@ -9,13 +9,12 @@
 // Export types
 export type { GetWorkProgramsFilter } from "./get-work-programs.repository";
 
-// Export repository class
+// Export repository class (new wrapper implementation)
 export { WorkProgramRepositoryPrisma } from "./work-program-repository-prisma";
 
-// Export functions (legacy support - prefer using repository class)
+// Export functions
 export * from "./get-work-programs.repository";
 export * from "./get-work-program-by-id.repository";
 export * from "./create-work-program.repository";
 export * from "./update-work-program.repository";
 export * from "./delete-work-program.repository";
-export * from "./bulk-delete-work-programs.repository";

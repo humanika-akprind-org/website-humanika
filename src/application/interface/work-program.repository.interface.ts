@@ -49,14 +49,6 @@ export interface IWorkProgramRepository {
    * Delete a single work program by its ID
    */
   deleteWorkProgram(id: string, user: { id: string }): Promise<void>;
-
-  /**
-   * Delete multiple work programs by their IDs
-   */
-  bulkDeleteWorkPrograms(
-    ids: string[],
-    user: { id: string },
-  ): Promise<{ count: number }>;
 }
 
 // ============================================================================

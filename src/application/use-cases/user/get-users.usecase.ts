@@ -6,13 +6,13 @@
 import type {
   IUserRepository,
   UserFilter,
-  UsersResult,
+  User,
 } from "@/application/interface/user.repository.interface";
 
 export class GetUsersUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async execute(filter?: UserFilter): Promise<UsersResult> {
+  async execute(filter?: UserFilter): Promise<User[]> {
     const sanitizedFilter = this.sanitizeFilter(filter);
     const result = await this.userRepository.getUsers(
       sanitizedFilter || { allUsers: true },

@@ -91,5 +91,5 @@ export async function createUser(data: CreateUserInput) {
     },
   });
 
-  return user as User;
+  return user as unknown as User;
 }

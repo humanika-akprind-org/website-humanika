@@ -30,5 +30,5 @@ export async function getUser(id: string) {
     },
   });
 
-  return user as User;
+  return user as unknown as User;
 }
