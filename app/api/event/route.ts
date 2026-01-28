@@ -12,22 +12,27 @@
  */
 
 import { type NextRequest, NextResponse } from "next/server";
-import type { CreateEventInput } from "@/domain/entities/event.entity";
+import type {
+  CreateEventInput,
+  EventFilter,
+} from "@/domain/entities/event.entity";
 import type { Department, Status } from "@/domain/enums";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
-import { GetEventsUseCase } from "@/application/use-cases/event";
-import { CreateEventUseCase } from "@/application/use-cases/event";
+import {
+  GetEventsUseCase,
+  CreateEventUseCase,
+} from "@/application/use-cases/event";
 import { EventRepositoryPrisma } from "@/infrastructure/repositories/event";
 
 // ============================================================================
 // Payload Extraction Functions
 // ============================================================================
 
-function extractEventQueryParams(request: NextRequest) {
+function extractEventQueryParams(request: NextRequest): EventFilter {
   const { searchParams } = new URL(request.url);
   return {
     department: searchParams.get("department") as Department | undefined,
-    status: searchParams.get("status") as unknown as Status | undefined,
+    status: searchParams.get("status") as Status | undefined,
     periodId: searchParams.get("periodId") || undefined,
     workProgramId: searchParams.get("workProgramId") || undefined,
     search: searchParams.get("search") || undefined,
@@ -119,7 +124,10 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
     }
 
     // 1. Extract payload
@@ -128,7 +136,10 @@ export async function POST(request: NextRequest) {
     // 2. Basic validation (use case will do deeper validation)
     const validation = validateCreateEventInput(body);
     if (!validation.isValid) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: validation.error },
+        { status: 400 },
+      );
     }
 
     // 3. Use use case for complex write with validation, logging, and approval
@@ -137,20 +148,32 @@ export async function POST(request: NextRequest) {
     const event = await useCase.execute(body, { id: user.id });
 
     // 4. Response
-    return NextResponse.json(event, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: event,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("Error creating event:", error);
 
     // Handle validation errors specifically
     if ((error as Error).message.includes("Validation failed")) {
       return NextResponse.json(
-        { error: (error as Error).message },
+        {
+          success: false,
+          error: (error as Error).message,
+        },
         { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+      },
       { status: 500 },
     );
   }

@@ -67,7 +67,7 @@ export async function GET(
 
     if (!categoryId) {
       return NextResponse.json(
-        { error: "Category ID is required" },
+        { success: false, error: "Category ID is required" },
         { status: 400 },
       );
     }
