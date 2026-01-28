@@ -12,6 +12,9 @@ export type {
   LetterWithRelations,
 } from "./get-letters.repository";
 
+// Export class-based repository
+export { LetterRepositoryPrisma } from "./letter-repository-prisma";
+
 // Export functions
 export * from "./get-letters.repository";
 export * from "./get-letter-by-id.repository";
