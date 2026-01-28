@@ -1,133 +1,111 @@
+/**
+ * Drive Image Metadata API Route - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ *
+ * This route demonstrates the hybrid pattern:
+ * - GET: Uses use case for complex read operations with validation
+ *
+ * Pattern Choice Rationale:
+ * - GET: Use case provides better separation for validation,
+ *        multiple fallback strategies, and consistent response format
+ */
+
 import { type NextRequest, NextResponse } from "next/server";
+import type { DriveImageMetadataInput } from "@/domain/entities/drive-image.entity";
+import { GetDriveImageMetadataUseCase } from "@/application/use-cases/drive-image";
 
-// Calculate size in human-readable format
-const formatSize = (bytes: number) => {
-  if (bytes === 0) return "0 B";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-};
+// ============================================================================
+// Payload Extraction Functions
+// ============================================================================
 
-// Get format from mimeType
-const getFormat = (mimeType: string) => {
-  const format = mimeType.split("/")[1]?.toUpperCase();
-  return format || "JPEG";
-};
-
-export async function GET(request: NextRequest) {
+/**
+ * Extract drive image metadata parameters from query string
+ * @param request - The incoming request
+ * @returns Drive image metadata input parameters
+ */
+function extractMetadataParams(request: NextRequest): DriveImageMetadataInput {
   const { searchParams } = new URL(request.url);
-  const fileId = searchParams.get("fileId");
-  const accessToken = searchParams.get("accessToken");
+  return {
+    fileId: searchParams.get("fileId") || "",
+    accessToken: searchParams.get("accessToken") || undefined,
+  };
+}
 
-  if (!fileId) {
-    return NextResponse.json(
-      { error: "Missing fileId parameter" },
-      { status: 400 },
-    );
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
+/**
+ * Validate drive image metadata input parameters
+ * @param input - The input parameters to validate
+ * @returns Validation result with isValid flag and error message
+ */
+function validateMetadataInput(input: DriveImageMetadataInput): {
+  isValid: boolean;
+  error?: string;
+} {
+  const errors: string[] = [];
+
+  if (!input.fileId || input.fileId.trim() === "") {
+    errors.push("File ID is required");
   }
 
+  if (input.fileId && input.fileId.length < 5) {
+    errors.push("Invalid file ID format");
+  }
+
+  // Validate file ID format (Google Drive IDs are typically 44+ chars)
+  if (input.fileId && !/^[a-zA-Z0-9_-]+$/.test(input.fileId)) {
+    errors.push("File ID contains invalid characters");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, error: errors.join(", ") };
+  }
+
+  return { isValid: true };
+}
+
+// ============================================================================
+// GET /api/drive-image/metadata - Use Case Pattern
+// ============================================================================
+
+export async function GET(request: NextRequest) {
   try {
-    // Fetch file metadata from Google Drive API v3
-    const metadataUrl = new URL(
-      `https://www.googleapis.com/drive/v3/files/${fileId}`,
-    );
-    metadataUrl.searchParams.set(
-      "fields",
-      "fileSize,mimeType,imageMediaMetadata",
-    );
+    // 1. Extract payload
+    const params = extractMetadataParams(request);
 
-    // Check for authentication
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-    let response: Response | null = null;
-
-    // Try with API key first (for public files)
-    if (apiKey) {
-      metadataUrl.searchParams.set("key", apiKey);
-      response = await fetch(metadataUrl.toString());
+    // 2. Basic validation (use case will do deeper validation)
+    const validation = validateMetadataInput(params);
+    if (!validation.isValid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // Try with OAuth token if API key failed or not available
-    if ((!response || !response.ok) && accessToken) {
-      metadataUrl.searchParams.delete("key");
-      response = await fetch(metadataUrl.toString(), {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-    }
+    // 3. Use use case for complex read with validation and fallback strategies
+    const useCase = new GetDriveImageMetadataUseCase();
+    const result = await useCase.execute(params);
 
-    // If we have a successful response, use the metadata
-    if (response && response.ok) {
-      const metadata = await response.json();
-
-      const fileSize = metadata.fileSize || 0;
-      const mimeType = metadata.mimeType || "image/jpeg";
-      const imageMetadata = metadata.imageMediaMetadata || {};
-      const width = imageMetadata.width || 0;
-      const height = imageMetadata.height || 0;
-
-      return NextResponse.json({
-        resolution: width > 0 && height > 0 ? `${width} × ${height}` : null,
-        format: getFormat(mimeType),
-        size: fileSize > 0 ? formatSize(fileSize) : null,
-      });
-    }
-
-    // Fallback: Get metadata directly from image URL headers
-    const imageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-    const headResponse = await fetch(imageUrl, { method: "HEAD" });
-
-    if (headResponse.ok) {
-      const contentLength = headResponse.headers.get("Content-Length");
-      const contentType =
-        headResponse.headers.get("Content-Type") || "image/jpeg";
-
-      const fileSize = contentLength ? parseInt(contentLength, 10) : 0;
-
-      return NextResponse.json({
-        resolution: null,
-        format: getFormat(contentType),
-        size: fileSize > 0 ? formatSize(fileSize) : null,
-      });
-    }
-
-    // If all else fails, try the direct Google Drive download URL
-    const directUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-    let directResponse: Response;
-
-    if (accessToken) {
-      directResponse = await fetch(directUrl, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-    } else {
-      directResponse = await fetch(directUrl);
-    }
-
-    if (directResponse.ok) {
-      const contentLength = directResponse.headers.get("Content-Length");
-      const contentType =
-        directResponse.headers.get("Content-Type") || "image/jpeg";
-
-      const fileSize = contentLength ? parseInt(contentLength, 10) : 0;
-
-      return NextResponse.json({
-        resolution: null,
-        format: getFormat(contentType),
-        size: fileSize > 0 ? formatSize(fileSize) : null,
-      });
-    }
-
-    // Return null values if we can't get any metadata
+    // 4. Response - consistent format
     return NextResponse.json({
-      resolution: null,
-      format: null,
-      size: null,
+      success: result.success,
+      resolution: result.resolution,
+      format: result.format,
+      size: result.size,
     });
   } catch (error) {
-    console.error("Drive image metadata error:", error);
+    console.error("Error fetching drive image metadata:", error);
+
+    // Handle validation errors specifically
+    if ((error as Error).message.includes("Validation failed")) {
+      return NextResponse.json(
+        { error: (error as Error).message },
+        { status: 400 },
+      );
+    }
+
     // Return null values on error - frontend should handle this
     return NextResponse.json({
+      success: false,
       resolution: null,
       format: null,
       size: null,

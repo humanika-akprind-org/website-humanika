@@ -1,84 +1,126 @@
+/**
+ * Drive Image API Route - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ *
+ * This route demonstrates the hybrid pattern:
+ * - GET: Uses use case for complex read operations with validation
+ *
+ * Pattern Choice Rationale:
+ * - GET: Use case provides better separation for validation, error handling,
+ *        and fallback logic (placeholder images)
+ */
+
 import { type NextRequest, NextResponse } from "next/server";
+import type { DriveImageInput } from "@/domain/entities/drive-image.entity";
+import { GetDriveImageUseCase } from "@/application/use-cases/drive-image";
 
-export async function GET(request: NextRequest) {
+// ============================================================================
+// Payload Extraction Functions
+// ============================================================================
+
+/**
+ * Extract drive image parameters from query string
+ * @param request - The incoming request
+ * @returns Drive image input parameters
+ */
+function extractDriveImageParams(request: NextRequest): DriveImageInput {
   const { searchParams } = new URL(request.url);
-  const fileId = searchParams.get("fileId");
-  const accessToken = searchParams.get("accessToken");
+  return {
+    fileId: searchParams.get("fileId") || "",
+    accessToken: searchParams.get("accessToken") || undefined,
+  };
+}
 
-  if (!fileId) {
-    return NextResponse.json(
-      { error: "Missing fileId parameter" },
-      { status: 400 }
-    );
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
+/**
+ * Validate drive image input parameters
+ * @param input - The input parameters to validate
+ * @returns Validation result with isValid flag and error message
+ */
+function validateDriveImageInput(input: DriveImageInput): {
+  isValid: boolean;
+  error?: string;
+} {
+  const errors: string[] = [];
+
+  if (!input.fileId || input.fileId.trim() === "") {
+    errors.push("File ID is required");
   }
 
+  if (input.fileId && input.fileId.length < 5) {
+    errors.push("Invalid file ID format");
+  }
+
+  // Validate file ID format (Google Drive IDs are typically 44+ chars)
+  if (input.fileId && !/^[a-zA-Z0-9_-]+$/.test(input.fileId)) {
+    errors.push("File ID contains invalid characters");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, error: errors.join(", ") };
+  }
+
+  return { isValid: true };
+}
+
+// ============================================================================
+// GET /api/drive-image - Use Case Pattern
+// ============================================================================
+
+export async function GET(request: NextRequest) {
   try {
-    let response: Response;
+    // 1. Extract payload
+    const params = extractDriveImageParams(request);
 
-    if (accessToken) {
-      // For private files, use Google Drive API
-      response = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-    } else {
-      // For public files, use direct download URL
-      response = await fetch(
-        `https://drive.google.com/uc?export=view&id=${fileId}`
-      );
+    // 2. Basic validation (use case will do deeper validation)
+    const validation = validateDriveImageInput(params);
+    if (!validation.isValid) {
+      return new NextResponse(validation.error, {
+        status: 400,
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
     }
 
-    if (!response.ok) {
-      console.error(`Google Drive API response status: ${response.status}`);
-      console.error(
-        `Response headers:`,
-        Object.fromEntries(response.headers.entries())
-      );
+    // 3. Use use case for complex read with validation, error handling, and fallback
+    const useCase = new GetDriveImageUseCase({
+      cacheControl: "public, max-age=86400",
+      enablePlaceholder: true,
+    });
+    const result = await useCase.execute(params);
 
-      // If file not found (404), return a default placeholder image
-      if (response.status === 404) {
-        // Return a simple SVG placeholder as a data URL
-        const placeholderSvg = `
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="64" height="64" fill="#E5E7EB"/>
-            <circle cx="32" cy="24" r="8" fill="#9CA3AF"/>
-            <path d="M16 48c0-8.8 7.2-16 16-16s16 7.2 16 16" fill="#9CA3AF"/>
-          </svg>
-        `;
-        const svgBuffer = Buffer.from(placeholderSvg);
-
-        return new NextResponse(svgBuffer, {
-          status: 200,
-          headers: {
-            "Content-Type": "image/svg+xml",
-            "Cache-Control": "public, max-age=86400",
-          },
-        });
-      }
-
-      throw new Error(
-        `Failed to fetch image: ${response.status} ${response.statusText}`
-      );
-    }
-
-    const imageBuffer = await response.arrayBuffer();
-
-    return new NextResponse(imageBuffer, {
+    // 4. Response - binary data with appropriate headers
+    return new NextResponse(result.data as unknown as BodyInit, {
       status: 200,
       headers: {
-        "Content-Type": response.headers.get("Content-Type") || "image/jpeg",
-        "Cache-Control": "public, max-age=86400",
+        "Content-Type": result.contentType,
+        "Cache-Control": useCase.getCacheControl(),
+        "X-Placeholder": result.isPlaceholder ? "true" : "false",
       },
     });
   } catch (error) {
-    console.error("Drive image proxy error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch image" },
-      { status: 500 }
-    );
+    console.error("Error fetching drive image:", error);
+
+    // Handle validation errors specifically
+    if ((error as Error).message.includes("Validation failed")) {
+      return new NextResponse((error as Error).message, {
+        status: 400,
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
+    }
+
+    // Return a simple error response for other errors
+    return new NextResponse("Failed to fetch image", {
+      status: 500,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
   }
 }
