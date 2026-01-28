@@ -6,6 +6,9 @@
  * for convenient imports throughout the application.
  */
 
+// Export class-based repository
+export { GalleryCategoryRepositoryPrisma } from "./gallery-category-repository-prisma";
+
 // Export functions
 export * from "./get-gallery-categories.repository";
 export * from "./get-gallery-category-by-id.repository";

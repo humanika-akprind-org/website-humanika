@@ -11,6 +11,9 @@ export type { GetGalleriesFilter } from "./get-galleries.repository";
 export type { CreateGalleryInput } from "./create-gallery.repository";
 export type { UpdateGalleryInput } from "./update-gallery.repository";
 
+// Export class-based repository
+export { GalleryRepositoryPrisma } from "./gallery-repository-prisma";
+
 // Export functions
 export * from "./get-galleries.repository";
 export * from "./get-gallery-by-id.repository";
