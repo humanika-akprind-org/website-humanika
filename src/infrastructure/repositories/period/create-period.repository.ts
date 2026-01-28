@@ -6,6 +6,7 @@
 import prisma from "@/presentation/lib/prisma";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
+import { type Period } from "@/domain/entities/period.entity";
 
 type CreatePeriodInput = {
   name: string;
@@ -63,5 +64,5 @@ export async function createPeriod(data: CreatePeriodInput) {
     },
   });
 
-  return period;
+  return period as Period;
 }

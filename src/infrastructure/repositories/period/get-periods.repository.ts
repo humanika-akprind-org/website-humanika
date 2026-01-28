@@ -3,6 +3,7 @@
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  */
 
+import { type Period } from "@/domain/entities/period.entity";
 import prisma from "@/presentation/lib/prisma";
 
 /**
@@ -15,5 +16,5 @@ export async function getPeriods() {
     },
   });
 
-  return periods;
+  return periods as Period[];
 }

@@ -6,6 +6,7 @@
 import prisma from "@/presentation/lib/prisma";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
+import { type Period } from "@/domain/entities/period.entity";
 
 type UpdatePeriodInput = {
   name?: string;
@@ -82,5 +83,5 @@ export async function updatePeriod(id: string, data: UpdatePeriodInput) {
     },
   });
 
-  return period;
+  return period as Period;
 }
