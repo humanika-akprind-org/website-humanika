@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteStatistic } from "@/presentation/services/statistic";
+import {
+  StatisticApi,
+  deleteStatistic,
+} from "@/presentation/services/statistic";
 import type { Statistic } from "@/domain/entities/statistic.entity";
 import { useStatistics } from "./useStatistics";
-import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
-import { getCurrentUserAction } from "@/presentation/lib/actions/getCurrentUser";
 
 export function useStatisticManagement() {
   const router = useRouter();
@@ -82,11 +83,6 @@ export function useStatisticManagement() {
 
   const confirmDelete = async () => {
     try {
-      const user = await getCurrentUserAction();
-      if (!user) {
-        throw new Error("User not found");
-      }
-
       if (currentStatistic) {
         // Single statistic deletion
         await deleteStatistic(currentStatistic.id);
@@ -113,22 +109,7 @@ export function useStatisticManagement() {
 
   const handleCreateStatistic = async (data: Partial<Statistic>) => {
     try {
-      const token = await getAccessTokenAction();
-      const response = await fetch("/api/statistics", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create statistic");
-      }
-
-      const newStatistic = await response.json();
+      const newStatistic = await StatisticApi.createStatistic(data as any);
       setSuccess("Statistic created successfully");
       refetch();
       return newStatistic;
@@ -143,22 +124,10 @@ export function useStatisticManagement() {
     data: Partial<Statistic>,
   ) => {
     try {
-      const token = await getAccessTokenAction();
-      const response = await fetch(`/api/statistics/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update statistic");
-      }
-
-      const updatedStatistic = await response.json();
+      const updatedStatistic = await StatisticApi.updateStatistic(
+        id,
+        data as any,
+      );
       setSuccess("Statistic updated successfully");
       refetch();
       return updatedStatistic;

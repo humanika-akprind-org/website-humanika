@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { UserApi } from "@/presentation/services/user";
 import { PeriodApi } from "@/presentation/services/period";
+import { AuthApi } from "@/presentation/services/auth";
 import type { User } from "@/domain/entities/user.entity";
 import type { Period } from "@/domain/entities/period.entity";
 
@@ -24,12 +25,12 @@ export function useArticleFormData(): {
           await Promise.all([
             UserApi.getUsers({ allUsers: true }),
             PeriodApi.getPeriods(),
-            fetch("/api/auth/me").then((res) => (res.ok ? res.json() : null)),
+            AuthApi.getCurrentUser(),
           ]);
 
         setUsers(usersResponse.data?.users || []);
         setPeriods(periodsResponse || []);
-        setCurrentUser(currentUserResponse);
+        setCurrentUser(currentUserResponse.data || null);
       } catch (err) {
         console.error("Error loading form data:", err);
         setError(

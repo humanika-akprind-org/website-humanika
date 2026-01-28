@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Letter } from "@/domain/entities/letter.entity";
 import { useToast } from "@/presentation/hooks/use-toast";
-import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import {
   isGoogleDriveFile,
   getFileIdFromFile,
   deleteGoogleDriveFile,
 } from "@/infrastructure/external-services/google-drive/file-utils";
+import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
+import { LetterApi } from "@/presentation/services/letter";
 
 interface UseLetterManagementOptions {
   addPath?: string;
@@ -43,19 +44,8 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch("/api/letter");
-      if (response.ok) {
-        const data = await response.json();
-        setLetters(data || []);
-      } else {
-        const errorMsg = "Failed to fetch letters";
-        setError(errorMsg);
-        toast({
-          title: "Error",
-          description: errorMsg,
-          variant: "destructive",
-        });
-      }
+      const data = await LetterApi.getLetters();
+      setLetters(data || []);
     } catch (error) {
       console.error("Error fetching letters:", error);
       const errorMsg = "Failed to fetch letters";
@@ -193,26 +183,13 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
           }
         }
 
-        const response = await fetch(`/api/letter/${currentLetter.id}`, {
-          method: "DELETE",
+        await LetterApi.deleteLetter(currentLetter.id);
+        setSuccess("Letter deleted successfully");
+        toast({
+          title: "Success",
+          description: "Letter deleted successfully",
         });
-
-        if (response.ok) {
-          setSuccess("Letter deleted successfully");
-          toast({
-            title: "Success",
-            description: "Letter deleted successfully",
-          });
-          fetchLetters();
-        } else {
-          const errorMsg = "Failed to delete letter";
-          setError(errorMsg);
-          toast({
-            title: "Error",
-            description: errorMsg,
-            variant: "destructive",
-          });
-        }
+        fetchLetters();
       } else if (selectedLetters.length > 0) {
         let successCount = 0;
         let errorCount = 0;
@@ -255,14 +232,8 @@ export function useLetterManagement(options: UseLetterManagementOptions = {}) {
               }
             }
 
-            const response = await fetch(`/api/letter/${letterId}`, {
-              method: "DELETE",
-            });
-            if (response.ok) {
-              successCount++;
-            } else {
-              errorCount++;
-            }
+            await LetterApi.deleteLetter(letterId);
+            successCount++;
           } catch {
             errorCount++;
           }

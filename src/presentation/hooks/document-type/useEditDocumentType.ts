@@ -4,6 +4,7 @@ import type {
   DocumentType,
   UpdateDocumentTypeInput,
 } from "@/domain/value-objects/document-type";
+import { DocumentTypeApi } from "@/presentation/services/document-type";
 
 export function useEditDocumentType(id: string) {
   const router = useRouter();
@@ -15,11 +16,7 @@ export function useEditDocumentType(id: string) {
   useEffect(() => {
     const fetchDocumentType = async () => {
       try {
-        const response = await fetch(`/api/document/type/${id}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch document type");
-        }
-        const data = await response.json();
+        const data = await DocumentTypeApi.getDocumentType(id);
         setDocumentType(data);
       } catch (err) {
         console.error("Error fetching document type:", err);
@@ -39,18 +36,7 @@ export function useEditDocumentType(id: string) {
     setError("");
 
     try {
-      const response = await fetch(`/api/document/type/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update document type");
-      }
-
+      await DocumentTypeApi.updateDocumentType(id, formData);
       router.push("/admin/administration/documents/types");
     } catch (err) {
       console.error("Submission error:", err);

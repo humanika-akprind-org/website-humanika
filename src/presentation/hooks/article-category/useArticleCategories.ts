@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { ArticleCategory } from "@/domain/value-objects/article-category";
+import { ArticleCategoryApi } from "@/presentation/services/article-category";
 
 export const useArticleCategories = () => {
   const [categories, setCategories] = useState<ArticleCategory[]>([]);
@@ -10,14 +11,8 @@ export const useArticleCategories = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/article/category?withCount=true");
-        if (!response.ok) {
-          throw new Error("Failed to fetch categories");
-        }
-        const responseData = await response.json();
-        // Extract categories from the response (API returns { success, data: [...] })
-        const categoriesData = responseData?.data;
-        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+        const data = await ArticleCategoryApi.getArticleCategoriesWithCount();
+        setCategories(Array.isArray(data) ? data : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {

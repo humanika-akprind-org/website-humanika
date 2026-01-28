@@ -20,9 +20,7 @@ export default function EditDocumentPage() {
     updateDocument,
     updateDocumentForApproval,
     handleBack,
-  } = useEditDocument(id, {
-    redirectPath: "/admin/administration/proposals",
-  });
+  } = useEditDocument(id, "/admin/administration/proposals");
 
   const {
     events,

@@ -4,26 +4,26 @@ import type {
   UpdateDocumentInput,
   Document,
 } from "@/domain/entities/document.entity";
+import { DocumentApi } from "@/presentation/services/document";
+import { Status } from "@/domain/enums/status.enum";
 
-interface UseEditDocumentProps {
-  redirectPath?: string;
-}
-
-export function useEditDocument(id: string, props: UseEditDocumentProps = {}) {
+export function useEditDocument(
+  id: string,
+  redirectPath: string = "/admin/administration/documents",
+) {
   const router = useRouter();
-  const { redirectPath = "/admin/administration/documents" } = props;
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDocument = async () => {
+      if (!id) return;
       try {
-        const response = await fetch(`/api/document/${id}`);
-        if (!response.ok) throw new Error("Failed to fetch document");
-        const data = await response.json();
-        setDocument(data);
+        setLoading(true);
+        const doc = await DocumentApi.getDocument(id);
+        setDocument(doc);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -31,19 +31,15 @@ export function useEditDocument(id: string, props: UseEditDocumentProps = {}) {
       }
     };
 
-    if (id) fetchDocument();
+    fetchDocument();
   }, [id]);
 
   const updateDocument = async (data: UpdateDocumentInput) => {
+    if (!document) return;
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch(`/api/document/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to update document");
+      await DocumentApi.updateDocument(document.id, data);
       router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -53,17 +49,14 @@ export function useEditDocument(id: string, props: UseEditDocumentProps = {}) {
   };
 
   const updateDocumentForApproval = async (data: UpdateDocumentInput) => {
+    if (!document) return;
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch(`/api/document/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, status: "PENDING" }),
+      await DocumentApi.updateDocument(document.id, {
+        ...data,
+        status: Status.PENDING,
       });
-      if (!response.ok) {
-        throw new Error("Failed to update document for approval");
-      }
       router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");

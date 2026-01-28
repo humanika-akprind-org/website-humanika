@@ -4,9 +4,12 @@ import type {
   CreateFinanceInput,
   UpdateFinanceInput,
 } from "@/domain/entities/finance.entity";
-import { Status } from "@/domain/enums";
+import { FinanceApi } from "@/presentation/services/finance";
+import { FinanceType } from "@/domain/enums";
 
-export function useCreateFinance() {
+export function useCreateFinance(
+  redirectPath: string = "/admin/finance/transactions",
+) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,16 +21,20 @@ export function useCreateFinance() {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch("/api/finance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          status: Status.DRAFT,
-        }),
-      });
-      if (!response.ok) throw new Error("Failed to create finance transaction");
-      router.push("/admin/finance/transactions");
+      // Build input with required fields, using defaults for optional missing fields
+      const input: CreateFinanceInput = {
+        name: data.name ?? "",
+        amount: data.amount ?? 0,
+        description: data.description ?? "",
+        date: data.date ?? new Date(),
+        categoryId: data.categoryId ?? null,
+        type: data.type ?? FinanceType.EXPENSE,
+        proof: data.proof ?? undefined,
+        workProgramId: data.workProgramId ?? undefined,
+        periodId: data.periodId ?? undefined,
+      };
+      await FinanceApi.createFinance(input);
+      router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -41,18 +48,20 @@ export function useCreateFinance() {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch("/api/finance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          status: Status.PENDING,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create finance transaction for approval");
-      }
-      router.push("/admin/finance/transactions");
+      // Build input with required fields, using defaults for optional missing fields
+      const input: CreateFinanceInput = {
+        name: data.name ?? "",
+        amount: data.amount ?? 0,
+        description: data.description ?? "",
+        date: data.date ?? new Date(),
+        categoryId: data.categoryId ?? null,
+        type: data.type ?? FinanceType.EXPENSE,
+        proof: data.proof ?? undefined,
+        workProgramId: data.workProgramId ?? undefined,
+        periodId: data.periodId ?? undefined,
+      };
+      await FinanceApi.createFinance(input);
+      router.push(redirectPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -61,7 +70,7 @@ export function useCreateFinance() {
   };
 
   const handleBack = () => {
-    router.push("/admin/finance/transactions");
+    router.push(redirectPath);
   };
 
   return {

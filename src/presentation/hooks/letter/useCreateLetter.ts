@@ -4,6 +4,9 @@ import type {
   CreateLetterInput,
   UpdateLetterInput,
 } from "@/domain/entities/letter.entity";
+import { LetterApi } from "@/presentation/services/letter";
+import { Status } from "@/domain/enums/status.enum";
+import { LetterType, LetterPriority } from "@/domain/enums";
 
 export function useCreateLetter() {
   const router = useRouter();
@@ -15,15 +18,24 @@ export function useCreateLetter() {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch("/api/letter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          status: "DRAFT",
-        }),
-      });
-      if (!response.ok) throw new Error("Failed to create letter");
+      // Build input with required fields, using defaults for optional missing fields
+      const input: CreateLetterInput = {
+        number: data.number ?? undefined,
+        regarding: data.regarding ?? "",
+        origin: data.origin ?? "",
+        destination: data.destination ?? "",
+        classification: data.classification ?? undefined,
+        date: data.date ?? new Date(),
+        type: data.type ?? LetterType.OUTGOING,
+        priority: data.priority ?? LetterPriority.NORMAL,
+        body: data.body ?? undefined,
+        letter: data.letter ?? undefined,
+        notes: data.notes ?? undefined,
+        periodId: data.periodId ?? undefined,
+        eventId: data.eventId ?? undefined,
+        status: Status.DRAFT,
+      };
+      await LetterApi.createLetter(input);
       router.push("/admin/administration/letters");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -38,17 +50,24 @@ export function useCreateLetter() {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch("/api/letter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          status: "PENDING",
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create letter for approval");
-      }
+      // Build input with required fields, using defaults for optional missing fields
+      const input: CreateLetterInput = {
+        number: data.number ?? undefined,
+        regarding: data.regarding ?? "",
+        origin: data.origin ?? "",
+        destination: data.destination ?? "",
+        classification: data.classification ?? undefined,
+        date: data.date ?? new Date(),
+        type: data.type ?? LetterType.OUTGOING,
+        priority: data.priority ?? LetterPriority.NORMAL,
+        body: data.body ?? undefined,
+        letter: data.letter ?? undefined,
+        notes: data.notes ?? undefined,
+        periodId: data.periodId ?? undefined,
+        eventId: data.eventId ?? undefined,
+        status: Status.PENDING,
+      };
+      await LetterApi.createLetter(input);
       router.push("/admin/administration/letters");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");

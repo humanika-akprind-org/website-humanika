@@ -20,9 +20,7 @@ export default function EditDocumentPage() {
     updateDocument,
     updateDocumentForApproval,
     handleBack,
-  } = useEditDocument(id, {
-    redirectPath: "/admin/administration/accountability-reports",
-  });
+  } = useEditDocument(id, "/admin/administration/accountability-reports");
 
   const {
     events,

@@ -4,6 +4,7 @@ import type {
   UpdateLetterInput,
   Letter,
 } from "@/domain/entities/letter.entity";
+import { LetterApi } from "@/presentation/services/letter";
 
 export function useEditLetter(id: string) {
   const router = useRouter();
@@ -15,9 +16,7 @@ export function useEditLetter(id: string) {
   useEffect(() => {
     const fetchLetter = async () => {
       try {
-        const response = await fetch(`/api/letter/${id}`);
-        if (!response.ok) throw new Error("Failed to fetch letter");
-        const data = await response.json();
+        const data = await LetterApi.getLetter(id);
         setLetter(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -33,12 +32,7 @@ export function useEditLetter(id: string) {
     setIsSubmitting(true);
     setError(null);
     try {
-      const response = await fetch(`/api/letter/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to update letter");
+      await LetterApi.updateLetter(id, data);
       router.push("/admin/administration/letters");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");

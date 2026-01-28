@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deleteOrganizationContact } from "@/presentation/services/organization-contact";
+import {
+  OrganizationContactApi,
+  deleteOrganizationContact,
+} from "@/presentation/services/organization-contact";
 import type { OrganizationContact } from "@/domain/entities/organization-contact.entity";
 import { useOrganizationContacts } from "./useOrganizationContacts";
-import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
-import { getCurrentUserAction } from "@/presentation/lib/actions/getCurrentUser";
 
 export function useOrganizationContactManagement() {
   const router = useRouter();
@@ -87,11 +88,6 @@ export function useOrganizationContactManagement() {
 
   const confirmDelete = async () => {
     try {
-      const user = await getCurrentUserAction();
-      if (!user) {
-        throw new Error("User not found");
-      }
-
       if (currentContact) {
         // Single contact deletion
         await deleteOrganizationContact(currentContact.id);
@@ -120,24 +116,9 @@ export function useOrganizationContactManagement() {
     data: Partial<OrganizationContact>,
   ) => {
     try {
-      const token = await getAccessTokenAction();
-      const response = await fetch("/api/organization-contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Failed to create organization contact",
-        );
-      }
-
-      const newContact = await response.json();
+      const newContact = await OrganizationContactApi.createOrganizationContact(
+        data as any,
+      );
       setSuccess("Organization contact created successfully");
       refetch();
       return newContact;
@@ -152,24 +133,8 @@ export function useOrganizationContactManagement() {
     data: Partial<OrganizationContact>,
   ) => {
     try {
-      const token = await getAccessTokenAction();
-      const response = await fetch(`/api/organization-contact/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Failed to update organization contact",
-        );
-      }
-
-      const updatedContact = await response.json();
+      const updatedContact =
+        await OrganizationContactApi.updateOrganizationContact(id, data as any);
       setSuccess("Organization contact updated successfully");
       refetch();
       return updatedContact;

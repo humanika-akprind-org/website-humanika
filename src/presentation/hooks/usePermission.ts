@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { hasPermission, type ActionType } from "@/presentation/lib/permissions";
+import { AuthApi } from "@/presentation/services/auth";
 
 interface UsePermissionReturn {
   userRole: string | null;
@@ -24,10 +25,9 @@ export function usePermission(): UsePermissionReturn {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("/api/auth/me");
-        if (response.ok) {
-          const user = await response.json();
-          setUserRole(user.role);
+        const { data } = await AuthApi.getCurrentUser();
+        if (data) {
+          setUserRole(data.role);
         }
       } catch (error) {
         console.error("Failed to fetch user role:", error);

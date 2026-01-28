@@ -1,30 +1,25 @@
 import { useState, useEffect } from "react";
+import { getPeriods } from "@/presentation/services/period";
+import { EventApi } from "@/presentation/services/event";
+import type { Period } from "@/domain/entities/period.entity";
+import type { Event } from "@/domain/entities/event.entity";
 
 export function useLetterFormData() {
-  const [periods, setPeriods] = useState([]);
-  const [events, setEvents] = useState([]);
+  const [periods, setPeriods] = useState<Period[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [periodsRes, eventsRes] = await Promise.allSettled([
-          fetch("/api/period"),
-          fetch("/api/event"),
+        const [periodsRes, eventsRes] = await Promise.all([
+          getPeriods(),
+          EventApi.getEvents(),
         ]);
 
-        const periodsData =
-          periodsRes.status === "fulfilled"
-            ? await periodsRes.value.json()
-            : null;
-        const eventsData =
-          eventsRes.status === "fulfilled"
-            ? await eventsRes.value.json()
-            : null;
-
-        setPeriods(periodsData?.data || []);
-        setEvents(eventsData?.data || []);
+        setPeriods(periodsRes || []);
+        setEvents(eventsRes || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
