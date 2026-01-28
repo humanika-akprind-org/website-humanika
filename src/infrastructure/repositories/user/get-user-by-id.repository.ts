@@ -3,6 +3,7 @@
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  */
 
+import { type User } from "@/domain/entities/user.entity";
 import prisma from "@/presentation/lib/prisma";
 
 /**
@@ -29,5 +30,5 @@ export async function getUser(id: string) {
     },
   });
 
-  return user;
+  return user as User;
 }

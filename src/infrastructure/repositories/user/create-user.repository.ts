@@ -9,6 +9,7 @@ import bcrypt from "bcryptjs";
 import { randomColor } from "@/presentation/lib/random-color";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
+import { type User } from "@/domain/entities/user.entity";
 
 type CreateUserInput = {
   name: string;
@@ -90,5 +91,5 @@ export async function createUser(data: CreateUserInput) {
     },
   });
 
-  return user;
+  return user as User;
 }

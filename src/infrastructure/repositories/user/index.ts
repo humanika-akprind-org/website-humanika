@@ -3,29 +3,20 @@
  * Part of Clean Architecture: Infrastructure Layer
  */
 
-import { UserRepositoryPrisma } from "./user-repository-prisma";
+// Export types
+export type { UserFilter } from "./get-users.repository";
 
-// Helper functions for API routes
-export async function verifyUser(id: string) {
-  const repo = new UserRepositoryPrisma();
-  return repo.verifyUser(id);
-}
+// Export standalone repository functions
+export * from "./get-users.repository";
+export * from "./get-user-by-id.repository";
+export * from "./create-user.repository";
+export * from "./update-user.repository";
+export * from "./delete-user.repository";
+export * from "./delete-account.repository";
+export * from "./change-password.repository";
+export * from "./verify-user.repository";
+export * from "./bulk-verify-users.repository";
+export * from "./bulk-send-verification-emails.repository";
 
-export async function bulkSendVerificationEmails(userIds: string[]) {
-  const repo = new UserRepositoryPrisma();
-  const users = await repo.getUsersForVerification(userIds);
-  // In a real implementation, you would send emails here
-  // For now, just return the users
-  return users;
-}
-
-export async function changePassword(
-  userId: string,
-  currentPassword: string,
-  newPassword: string,
-) {
-  const repo = new UserRepositoryPrisma();
-  return repo.changePassword(userId, currentPassword, newPassword);
-}
-
-export { UserRepositoryPrisma };
+// Export Prisma Repository Implementation
+export { UserRepositoryPrisma } from "./user-repository-prisma";

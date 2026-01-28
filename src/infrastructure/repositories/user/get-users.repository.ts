@@ -5,6 +5,7 @@
 
 import prisma from "@/presentation/lib/prisma";
 import type { UserRole, Department } from "@prisma/client";
+import type { UsersResult } from "@/application/interface/user.repository.interface";
 
 export type UserFilter = {
   page?: number;
@@ -16,31 +17,6 @@ export type UserFilter = {
   verifiedAccount?: boolean;
   allUsers?: boolean;
   excludeUserId?: string;
-};
-
-export type UsersResult = {
-  users: Array<{
-    id: string;
-    name: string;
-    email: string;
-    username: string;
-    role: UserRole;
-    department: Department | null;
-    position: string | null;
-    isActive: boolean;
-    verifiedAccount: boolean;
-    attemptLogin: number | null;
-    blockExpires: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-    avatarColor: string;
-  }>;
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
 };
 
 /**
@@ -127,13 +103,15 @@ export async function getUsers(filter: UserFilter): Promise<UsersResult> {
     prisma.user.count({ where }),
   ]);
 
+  const pages = Math.ceil(total / limit);
+
   return {
     users,
     pagination: {
       page,
       limit,
       total,
-      pages: shouldPaginate ? Math.ceil(total / limit) : 1,
+      pages,
     },
   };
 }

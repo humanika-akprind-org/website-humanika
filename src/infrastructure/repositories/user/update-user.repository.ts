@@ -8,6 +8,7 @@ import type { UserRole, Department, Position } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
+import type { User } from "@/domain/entities/user.entity";
 
 type UpdateUserInput = {
   name?: string;
@@ -21,10 +22,16 @@ type UpdateUserInput = {
   verifiedAccount?: boolean;
 };
 
+type UserWithId = Pick<User, "id">;
+
 /**
  * Update an existing user
  */
-export async function updateUser(id: string, data: UpdateUserInput) {
+export async function updateUser(
+  id: string,
+  data: UpdateUserInput,
+  user?: UserWithId,
+) {
   // Check if user exists
   const existingUser = await prisma.user.findUnique({
     where: { id },
@@ -88,36 +95,38 @@ export async function updateUser(id: string, data: UpdateUserInput) {
     },
   });
 
-  // Log activity
-  await logActivity({
-    userId: "system", // Since this is user update, no authenticated user context
-    activityType: ActivityType.UPDATE,
-    entityType: "User",
-    entityId: updatedUser.id,
-    description: `Updated user: ${updatedUser.name}`,
-    metadata: {
-      oldData: {
-        name: existingUser.name,
-        email: existingUser.email,
-        username: existingUser.username,
-        role: existingUser.role,
-        department: existingUser.department,
-        position: existingUser.position,
-        isActive: existingUser.isActive,
-        verifiedAccount: existingUser.verifiedAccount,
+  // Log activity only if user context is provided
+  if (user) {
+    await logActivity({
+      userId: user.id,
+      activityType: ActivityType.UPDATE,
+      entityType: "User",
+      entityId: updatedUser.id,
+      description: `Updated user: ${updatedUser.name}`,
+      metadata: {
+        oldData: {
+          name: existingUser.name,
+          email: existingUser.email,
+          username: existingUser.username,
+          role: existingUser.role,
+          department: existingUser.department,
+          position: existingUser.position,
+          isActive: existingUser.isActive,
+          verifiedAccount: existingUser.verifiedAccount,
+        },
+        newData: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          username: updatedUser.username,
+          role: updatedUser.role,
+          department: updatedUser.department,
+          position: updatedUser.position,
+          isActive: updatedUser.isActive,
+          verifiedAccount: updatedUser.verifiedAccount,
+        },
       },
-      newData: {
-        name: updatedUser.name,
-        email: updatedUser.email,
-        username: updatedUser.username,
-        role: updatedUser.role,
-        department: updatedUser.department,
-        position: updatedUser.position,
-        isActive: updatedUser.isActive,
-        verifiedAccount: updatedUser.verifiedAccount,
-      },
-    },
-  });
+    });
+  }
 
-  return updatedUser;
+  return updatedUser as User;
 }
