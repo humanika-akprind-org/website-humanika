@@ -6,6 +6,9 @@
  * for convenient imports throughout the application.
  */
 
+// Export repository class
+export { OrganizationContactRepositoryPrisma } from "./organization-contact-repository-prisma";
+
 // Export functions
 export * from "./get-organization-contacts.repository";
 export * from "./get-organization-contact-by-id.repository";
