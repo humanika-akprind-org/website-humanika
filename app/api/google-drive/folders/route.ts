@@ -1,39 +1,87 @@
-import { google } from "googleapis";
-import { type NextRequest, NextResponse } from "next/server";
+/**
+ * Google Drive Folders API Route
+ * Part of Clean Architecture: Presentation Layer (API)
+ *
+ * This route lists all folders from Google Drive.
+ * Pattern: Use Case Pattern (for consistency with main route)
+ *
+ * Rationale: Using the use case provides consistency with the main route
+ * and better separation for potential future filtering/sorting needs.
+ */
 
-export const dynamic = "force-dynamic"; // Required for Next.js API routes
+import { type NextRequest, NextResponse } from "next/server";
+import { ListDriveFilesUseCase } from "@/application/use-cases/google-drive";
+import { GoogleDriveRepository } from "@/infrastructure/repositories/google-drive";
+import { DriveSortOrder } from "@/domain/entities/google-drive.entity";
+
+// ============================================================================
+// Payload Extraction Functions
+// ============================================================================
+
+/**
+ * Extract query parameters for listing folders
+ */
+function extractFoldersQueryParams(request: NextRequest): {
+  accessToken: string;
+} {
+  return {
+    accessToken: request.nextUrl.searchParams.get("accessToken") || "",
+  };
+}
+
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
+/**
+ * Validate access token is present
+ */
+function validateAccessToken(accessToken: string): {
+  isValid: boolean;
+  error?: string;
+} {
+  if (!accessToken || accessToken.trim() === "") {
+    return { isValid: false, error: "Missing access token" };
+  }
+  return { isValid: true };
+}
+
+// ============================================================================
+// GET /api/google-drive/folders - Use Case Pattern
+// ============================================================================
 
 export async function GET(request: NextRequest) {
   try {
-    // Validate access token
-    const accessToken = request.nextUrl.searchParams.get("accessToken");
-    if (!accessToken) {
+    // 1. Extract payload
+    const { accessToken } = extractFoldersQueryParams(request);
+
+    // 2. Basic validation
+    const tokenValidation = validateAccessToken(accessToken);
+    if (!tokenValidation.isValid) {
       return NextResponse.json(
-        { success: false, message: "Missing access token" },
-        { status: 401 }
+        { success: false, error: tokenValidation.error },
+        { status: 401 },
       );
     }
 
-    // Initialize Google Drive API
-    const drive = google.drive({
-      version: "v3",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
+    // 3. Use use case for consistent folder listing
+    const repo = new GoogleDriveRepository();
+    const useCase = new ListDriveFilesUseCase(repo);
+    const result = await useCase.execute({
+      accessToken,
+      // Filter for folders only via query - folders use mimeType='application/vnd.google-apps.folder'
+      sortOrder: DriveSortOrder.NAME_ASC,
     });
 
-    // Retrieve folders with specific fields
-    const { data } = await drive.files.list({
-      q: "mimeType='application/vnd.google-apps.folder' and trashed=false",
-      fields: "files(id, name, createdTime, modifiedTime)",
-      orderBy: "name_natural",
-      pageSize: 100,
-    });
-
+    // 4. Response - simplified format for folders
     return NextResponse.json({
       success: true,
-      folders: data.files || [],
+      folders: result.files.map((file) => ({
+        id: file.id,
+        name: file.name,
+        createdTime: file.modifiedTime,
+        modifiedTime: file.modifiedTime,
+      })),
     });
   } catch (error: unknown) {
     console.error("[DRIVE_FOLDERS_ERROR]", error);
@@ -43,10 +91,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: errorMessage,
-        details: null,
+        error: errorMessage,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
