@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { UpdateOrganizationalStructureInput } from "@/domain/entities/organizational-structure.entity";
+import type {
+  UpdateOrganizationalStructureInput,
+  OrganizationalStructure,
+} from "@/domain/entities/organizational-structure.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
@@ -69,5 +72,5 @@ export async function updateStructure(
     },
   });
 
-  return structure;
+  return structure as OrganizationalStructure;
 }

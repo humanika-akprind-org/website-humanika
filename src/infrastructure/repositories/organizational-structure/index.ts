@@ -15,3 +15,6 @@ export * from "./get-structure-by-id.repository";
 export * from "./create-structure.repository";
 export * from "./update-structure.repository";
 export * from "./delete-structure.repository";
+
+// Export Prisma Repository Implementation
+export { OrganizationalStructureRepositoryPrisma } from "./organizational-structure-repository-prisma";

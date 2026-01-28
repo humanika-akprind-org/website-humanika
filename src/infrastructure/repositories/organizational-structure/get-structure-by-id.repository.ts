@@ -4,6 +4,7 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
+import type { OrganizationalStructure } from "@/domain/entities/organizational-structure.entity";
 
 /**
  * Get a single organizational structure by ID
@@ -20,5 +21,5 @@ export async function getStructure(id: string) {
     throw new Error("Organizational structure not found");
   }
 
-  return structure;
+  return structure as OrganizationalStructure;
 }

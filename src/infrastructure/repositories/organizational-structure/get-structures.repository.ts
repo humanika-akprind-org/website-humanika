@@ -6,6 +6,7 @@
 import prisma from "@/presentation/lib/prisma";
 import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import type { Status } from "@/domain/enums";
+import type { OrganizationalStructure } from "@/domain/entities/organizational-structure.entity";
 
 export type GetStructuresFilter = {
   status?: Status;
@@ -35,5 +36,5 @@ export async function getStructures(filter: GetStructuresFilter) {
     orderBy: { createdAt: "desc" },
   });
 
-  return structures;
+  return structures as OrganizationalStructure[];
 }
