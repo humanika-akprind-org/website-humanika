@@ -1,7 +1,24 @@
+/**
+ * OAuth2 Callback API Route - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ *
+ * This route handles Google OAuth2 callback authentication.
+ * Since this is a simple operation (token exchange and cookie storage),
+ * no use case is needed - direct service calls are appropriate here.
+ *
+ * Pattern Choice Rationale:
+ * - Direct service call for OAuth2 callback: Simple operation with no business logic
+ * - Cookie-based token storage: Stateless authentication with refresh token support
+ */
+
 import { NextResponse } from "next/server";
 import { oauth2Client } from "@/infrastructure/external-services/google/google-oauth";
 import { cookies } from "next/headers";
 import { isProduction } from "@/presentation/lib/config/config";
+
+// ============================================================================
+// GET /api/oauth2/callback - Direct Service Pattern
+// ============================================================================
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -46,7 +63,7 @@ export async function GET(req: Request) {
       httpOnly: true, // for security, the cookie is accessible only by the server
       secure: isProduction, // send cookie over HTTPS only in production
       path: "/", // cookie is available on every route
-      maxAge: 60 * 60, // 1 hour (access token expires in 1 hour)
+      maxAge: 60 * 60 * 3, // 3 hour (access token expires in 3 hour)
     });
 
     // Store refresh token for long-term access
