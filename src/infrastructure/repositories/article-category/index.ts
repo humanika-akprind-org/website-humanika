@@ -9,9 +9,5 @@
 // Export types
 export type { ArticleCategory } from "@/domain/value-objects/article-category";
 
-// Export functions
-export * from "./get-article-categories.repository";
-export * from "./get-article-category-by-id.repository";
-export * from "./create-article-category.repository";
-export * from "./update-article-category.repository";
-export * from "./delete-article-category.repository";
+// Export class (for use case pattern)
+export { ArticleCategoryRepositoryPrisma } from "./article-category-repository-prisma";

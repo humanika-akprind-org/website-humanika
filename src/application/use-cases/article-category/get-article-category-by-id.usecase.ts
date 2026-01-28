@@ -30,6 +30,11 @@ export class GetArticleCategoryByIdUseCase {
     const category =
       await this.categoryRepository.getArticleCategoryById(sanitizedId);
 
+    // Throw error if category not found
+    if (!category) {
+      throw new Error("Article category not found");
+    }
+
     return category;
   }
 }

@@ -29,6 +29,11 @@ export class GetArticleBySlugUseCase {
     const article =
       await this.articleRepository.getArticleBySlug(sanitizedSlug);
 
+    // Throw error if article not found
+    if (!article) {
+      throw new Error("Article not found");
+    }
+
     return article;
   }
 }

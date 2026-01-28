@@ -28,6 +28,11 @@ export class GetArticleByIdUseCase {
     // Execute repository call
     const article = await this.articleRepository.getArticleById(sanitizedId);
 
+    // Throw error if article not found
+    if (!article) {
+      throw new Error("Article not found");
+    }
+
     return article;
   }
 }

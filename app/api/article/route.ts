@@ -19,9 +19,11 @@ import type {
 import type { Status } from "@/domain/enums";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import {
-  getArticles,
-  createArticle,
-} from "@/infrastructure/repositories/article";
+  GetArticlesUseCase,
+  type GetArticlesResult,
+  CreateArticleUseCase,
+} from "@/application/use-cases/article";
+import { ArticleRepositoryPrisma } from "@/infrastructure/repositories/article";
 
 // ============================================================================
 // Payload Extraction Functions
@@ -49,9 +51,28 @@ async function extractCreateArticleBody(
 // ============================================================================
 
 function validateCreateArticleInput(body: CreateArticleInput) {
-  if (!body.title || !body.content || !body.authorId || !body.categoryId) {
-    return { isValid: false, error: "Missing required fields" };
+  const errors: string[] = [];
+
+  if (!body.title || body.title.trim() === "") {
+    errors.push("Title is required");
   }
+
+  if (!body.content || body.content.trim() === "") {
+    errors.push("Content is required");
+  }
+
+  if (!body.authorId || body.authorId.trim() === "") {
+    errors.push("Author ID is required");
+  }
+
+  if (!body.categoryId || body.categoryId.trim() === "") {
+    errors.push("Category ID is required");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, error: errors.join(", ") };
+  }
+
   return { isValid: true };
 }
 
@@ -64,13 +85,16 @@ export async function GET(request: NextRequest) {
     // 1. Extract payload
     const queryParams = extractArticleQueryParams(request);
 
-    // 2. Use repository directly
-    const articles = await getArticles(queryParams);
+    // 2. Use use case for complex read with validation and pagination
+    const repo = new ArticleRepositoryPrisma();
+    const useCase = new GetArticlesUseCase(repo);
+    const result: GetArticlesResult = await useCase.execute(queryParams);
 
     // 3. Response - consistent format
     return NextResponse.json({
       success: true,
-      data: articles,
+      data: result.articles,
+      pagination: result.pagination,
     });
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -93,7 +117,10 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
     }
 
     // 1. Extract payload
@@ -102,11 +129,16 @@ export async function POST(request: NextRequest) {
     // 2. Basic validation (use case will do deeper validation)
     const validation = validateCreateArticleInput(body);
     if (!validation.isValid) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: validation.error },
+        { status: 400 },
+      );
     }
 
-    // 3. Use repository directly
-    const article = await createArticle(body, user);
+    // 3. Use use case for complex write with validation, logging, and approval
+    const repo = new ArticleRepositoryPrisma();
+    const useCase = new CreateArticleUseCase(repo);
+    const article = await useCase.execute(body, { id: user.id });
 
     // 4. Response
     return NextResponse.json(

@@ -3,26 +3,34 @@
  * Part of Clean Architecture: Presentation Layer (API)
  *
  * This route demonstrates the pattern:
- * - GET: Uses repository directly for single read operation
- * - PUT: Uses repository directly for write operations
- * - DELETE: Uses repository directly for delete operation
+ * - GET: Uses use case for single read operation with validation
+ * - PUT: Uses use case for write operations with validation
+ * - DELETE: Uses use case for delete operations with validation
  *
  * Pattern Choice Rationale:
- * - Direct repository calls for simpler operations
+ * - Use cases provide better separation for validation and business logic
  */
 
 import { type NextRequest, NextResponse } from "next/server";
 import type { UpdateArticleInput } from "@/domain/entities/article.entity";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
+import { ArticleRepositoryPrisma } from "@/infrastructure/repositories/article";
 import {
-  getArticleById,
-  updateArticle,
-  deleteArticle,
-} from "@/infrastructure/repositories/article";
+  GetArticleByIdUseCase,
+  UpdateArticleUseCase,
+  DeleteArticleUseCase,
+} from "@/application/use-cases/article";
 
 // ============================================================================
 // Payload Extraction Functions
 // ============================================================================
+
+async function extractIdParam(
+  params: Promise<{ id: string }>,
+): Promise<string> {
+  const { id } = await params;
+  return id;
+}
 
 async function extractUpdateArticleBody(
   request: NextRequest,
@@ -34,7 +42,23 @@ async function extractUpdateArticleBody(
 // Validation Functions
 // ============================================================================
 
-function validateUpdateArticleInput(body: UpdateArticleInput) {
+function validateIdParam(id: string): { isValid: boolean; error?: string } {
+  if (!id || id.trim() === "") {
+    return { isValid: false, error: "Article ID is required" };
+  }
+
+  // Basic ID format validation (UUID-like)
+  if (!/^[a-zA-Z0-9-]+$/.test(id)) {
+    return { isValid: false, error: "Invalid ID format" };
+  }
+
+  return { isValid: true };
+}
+
+function validateUpdateArticleInput(body: UpdateArticleInput): {
+  isValid: boolean;
+  error?: string;
+} {
   // At least one field must be provided
   if (
     !body.title &&
@@ -51,7 +75,7 @@ function validateUpdateArticleInput(body: UpdateArticleInput) {
 }
 
 // ============================================================================
-// GET /api/articles/:id
+// GET /api/articles/:id - Use Case Pattern
 // ============================================================================
 
 export async function GET(
@@ -59,12 +83,36 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const id = (await params).id;
+    // 1. Extract payload
+    const id = await extractIdParam(params);
 
-    // Use repository directly
-    const article = await getArticleById(id);
+    // 2. Basic validation
+    const validation = validateIdParam(id);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: validation.error,
+        },
+        { status: 400 },
+      );
+    }
 
-    if (!article) {
+    // 3. Use use case for read operation with validation
+    const repo = new ArticleRepositoryPrisma();
+    const useCase = new GetArticleByIdUseCase(repo);
+    const article = await useCase.execute(id);
+
+    // 4. Response - consistent format
+    return NextResponse.json({
+      success: true,
+      data: article,
+    });
+  } catch (error) {
+    console.error("Error fetching article:", error);
+
+    // Handle not found error
+    if ((error as Error).message === "Article not found") {
       return NextResponse.json(
         {
           success: false,
@@ -74,12 +122,6 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: article,
-    });
-  } catch (error) {
-    console.error("Error fetching article:", error);
     return NextResponse.json(
       {
         success: false,
@@ -92,7 +134,7 @@ export async function GET(
 }
 
 // ============================================================================
-// PUT /api/articles/:id
+// PUT /api/articles/:id - Use Case Pattern
 // ============================================================================
 
 export async function PUT(
@@ -108,26 +150,62 @@ export async function PUT(
       );
     }
 
-    const id = (await params).id;
+    // 1. Extract payload
+    const id = await extractIdParam(params);
     const body = await extractUpdateArticleBody(request);
 
-    const validation = validateUpdateArticleInput(body);
-    if (!validation.isValid) {
+    // 2. Basic validation
+    const idValidation = validateIdParam(id);
+    if (!idValidation.isValid) {
       return NextResponse.json(
-        { success: false, error: validation.error },
+        { success: false, error: idValidation.error },
         { status: 400 },
       );
     }
 
-    // Use repository directly with user
-    const article = await updateArticle(id, body, { id: user.id });
+    const bodyValidation = validateUpdateArticleInput(body);
+    if (!bodyValidation.isValid) {
+      return NextResponse.json(
+        { success: false, error: bodyValidation.error },
+        { status: 400 },
+      );
+    }
 
+    // 3. Use use case for write operation with validation
+    const repo = new ArticleRepositoryPrisma();
+    const useCase = new UpdateArticleUseCase(repo);
+    const article = await useCase.execute(id, body, { id: user.id });
+
+    // 4. Response
     return NextResponse.json({
       success: true,
       data: article,
     });
   } catch (error) {
     console.error("Error updating article:", error);
+
+    // Handle not found error
+    if ((error as Error).message === "Article not found") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Article not found",
+        },
+        { status: 404 },
+      );
+    }
+
+    // Handle validation errors
+    if ((error as Error).message.includes("Validation failed")) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: (error as Error).message,
+        },
+        { status: 400 },
+      );
+    }
+
     return NextResponse.json(
       {
         success: false,
@@ -140,7 +218,7 @@ export async function PUT(
 }
 
 // ============================================================================
-// DELETE /api/articles/:id
+// DELETE /api/articles/:id - Use Case Pattern
 // ============================================================================
 
 export async function DELETE(
@@ -156,17 +234,56 @@ export async function DELETE(
       );
     }
 
-    const id = (await params).id;
+    // 1. Extract payload
+    const id = await extractIdParam(params);
 
-    // Use repository directly with user
-    await deleteArticle(id, { id: user.id });
+    // 2. Basic validation
+    const validation = validateIdParam(id);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: validation.error,
+        },
+        { status: 400 },
+      );
+    }
 
+    // 3. Use use case for delete operation with validation
+    const repo = new ArticleRepositoryPrisma();
+    const useCase = new DeleteArticleUseCase(repo);
+    await useCase.execute(id, { id: user.id });
+
+    // 4. Response
     return NextResponse.json({
       success: true,
       message: "Article deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting article:", error);
+
+    // Handle not found error
+    if ((error as Error).message === "Article not found") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Article not found",
+        },
+        { status: 404 },
+      );
+    }
+
+    // Handle validation errors
+    if ((error as Error).message.includes("Validation failed")) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: (error as Error).message,
+        },
+        { status: 400 },
+      );
+    }
+
     return NextResponse.json(
       {
         success: false,
