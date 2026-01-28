@@ -9,7 +9,10 @@
 // Export types
 export type { GetWorkProgramsFilter } from "./get-work-programs.repository";
 
-// Export functions
+// Export repository class
+export { WorkProgramRepositoryPrisma } from "./work-program-repository-prisma";
+
+// Export functions (legacy support - prefer using repository class)
 export * from "./get-work-programs.repository";
 export * from "./get-work-program-by-id.repository";
 export * from "./create-work-program.repository";
