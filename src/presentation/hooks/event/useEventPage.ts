@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
+import { EventApi } from "@/presentation/services/event";
 
 export type EventTab = "upcoming" | "ongoing" | "past" | "all";
 export type ViewMode = "grid" | "calendar";
@@ -52,12 +53,7 @@ export function useEventData() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      // Use relative URL to work in both development and production
-      const res = await fetch("/api/event?status=PUBLISH", {
-        cache: "no-store",
-      });
-      const response = await res.json();
-      const events: Event[] = response.data || [];
+      const events = await EventApi.getPublishedEvents();
       setAllEvents(events);
     } catch (error) {
       console.error("Error fetching events:", error);

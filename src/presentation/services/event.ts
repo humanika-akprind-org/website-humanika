@@ -132,6 +132,24 @@ export const deleteEvent = async (id: string): Promise<void> => {
   }
 };
 
+// Helper function for getting published events (public use)
+export const getPublishedEvents = async (): Promise<Event[]> => {
+  const response = await fetch(`${API_URL}/event?status=PUBLISH`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch published events");
+  }
+
+  const responseData = await response.json();
+  return responseData.data || [];
+};
+
 export const EventApi = {
   getEvents,
   getEvent,
@@ -139,4 +157,5 @@ export const EventApi = {
   createEvent,
   updateEvent,
   deleteEvent,
+  getPublishedEvents,
 };

@@ -12,12 +12,8 @@ export function useStructures() {
       try {
         setIsLoading(true);
         setError(null);
-        const response = await StructureApi.getStructures();
-        if (response.error) {
-          setError(response.error);
-        } else if (response.data) {
-          setStructures(response.data);
-        }
+        const data = await StructureApi.getStructures();
+        setStructures(data);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to fetch structures",
@@ -39,12 +35,8 @@ export function useStructures() {
         try {
           setIsLoading(true);
           setError(null);
-          const response = await StructureApi.getStructures();
-          if (response.error) {
-            setError(response.error);
-          } else if (response.data) {
-            setStructures(response.data);
-          }
+          const data = await StructureApi.getStructures();
+          setStructures(data);
         } catch (err) {
           setError(
             err instanceof Error ? err.message : "Failed to fetch structures",

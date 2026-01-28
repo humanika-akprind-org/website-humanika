@@ -3,6 +3,10 @@
 import { ChevronDown, Cloudy, CloudOff } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
 import { useState, useRef, useEffect } from "react";
+import {
+  getGoogleDriveAuthUrl,
+  logoutGoogleDrive,
+} from "@/presentation/services/google-drive";
 
 interface GoogleDriveStatusProps {
   accessToken: string;
@@ -20,8 +24,7 @@ export default function GoogleDriveStatus({
   const handleConnect = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/google-drive/auth");
-      const { url } = await response.json();
+      const { url } = await getGoogleDriveAuthUrl();
       window.location.href = url;
     } catch (error) {
       console.error("Connection error:", error);
@@ -32,7 +35,7 @@ export default function GoogleDriveStatus({
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      await fetch("/api/google-drive/logout", { method: "POST" });
+      await logoutGoogleDrive();
       window.location.reload();
     } catch (error) {
       console.error("Logout error:", error);

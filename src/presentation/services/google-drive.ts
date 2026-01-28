@@ -1,10 +1,14 @@
 import { type ApiRequestBody } from "@/domain/value-objects/google-drive";
+import { apiUrl } from "@/presentation/lib/config/config";
+
+const API_URL = apiUrl;
 
 export const callApi = async (body: ApiRequestBody, formData?: FormData) => {
   try {
-    const res = await fetch("/api/google-drive", {
+    const res = await fetch(`${API_URL}/google-drive`, {
       method: "POST",
       headers: formData ? undefined : { "Content-Type": "application/json" },
+      credentials: "include",
       body: formData ?? JSON.stringify(body),
     });
 
@@ -20,7 +24,12 @@ export const callApi = async (body: ApiRequestBody, formData?: FormData) => {
 };
 
 export const fetchDriveFiles = async (accessToken: string) => {
-  const res = await fetch(`/api/google-drive/files?accessToken=${accessToken}`);
+  const res = await fetch(
+    `${API_URL}/google-drive/files?accessToken=${accessToken}`,
+    {
+      credentials: "include",
+    },
+  );
   const data = await res.json();
 
   if (!res.ok) {
@@ -32,7 +41,10 @@ export const fetchDriveFiles = async (accessToken: string) => {
 
 export const fetchDriveFolders = async (accessToken: string) => {
   const res = await fetch(
-    `/api/google-drive/folders?accessToken=${accessToken}`,
+    `${API_URL}/google-drive/folders?accessToken=${accessToken}`,
+    {
+      credentials: "include",
+    },
   );
   const data = await res.json();
 
@@ -41,4 +53,26 @@ export const fetchDriveFolders = async (accessToken: string) => {
   }
 
   return data.folders || [];
+};
+
+export const getGoogleDriveAuthUrl = async (): Promise<{ url: string }> => {
+  const res = await fetch(`${API_URL}/google-drive/auth`, {
+    credentials: "include",
+  });
+  return res.json();
+};
+
+export const logoutGoogleDrive = async (): Promise<void> => {
+  await fetch(`${API_URL}/google-drive/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+};
+
+export const GoogleDriveApi = {
+  callApi,
+  fetchDriveFiles,
+  fetchDriveFolders,
+  getGoogleDriveAuthUrl,
+  logoutGoogleDrive,
 };

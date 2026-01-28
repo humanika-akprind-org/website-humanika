@@ -3,9 +3,12 @@ import type {
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
 } from "@/domain/value-objects/document-type";
+import { apiUrl } from "@/presentation/lib/config/config";
+
+const API_URL = apiUrl;
 
 export async function getDocumentTypes(): Promise<DocumentType[]> {
-  const response = await fetch("/api/document/type");
+  const response = await fetch(`${API_URL}/document/type`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch document types");
@@ -15,7 +18,7 @@ export async function getDocumentTypes(): Promise<DocumentType[]> {
 }
 
 export async function getDocumentType(id: string): Promise<DocumentType> {
-  const response = await fetch(`/api/document/type/${id}`);
+  const response = await fetch(`${API_URL}/document/type/${id}`);
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -30,11 +33,12 @@ export async function getDocumentType(id: string): Promise<DocumentType> {
 export async function createDocumentType(
   data: CreateDocumentTypeInput,
 ): Promise<DocumentType> {
-  const response = await fetch("/api/document/type", {
+  const response = await fetch(`${API_URL}/document/type`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
@@ -50,11 +54,12 @@ export async function updateDocumentType(
   id: string,
   data: UpdateDocumentTypeInput,
 ): Promise<DocumentType> {
-  const response = await fetch(`/api/document/type/${id}`, {
+  const response = await fetch(`${API_URL}/document/type/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
@@ -67,8 +72,9 @@ export async function updateDocumentType(
 }
 
 export async function deleteDocumentType(id: string): Promise<void> {
-  const response = await fetch(`/api/document/type/${id}`, {
+  const response = await fetch(`${API_URL}/document/type/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -76,3 +82,11 @@ export async function deleteDocumentType(id: string): Promise<void> {
     throw new Error(error.error || "Failed to delete document type");
   }
 }
+
+export const DocumentTypeApi = {
+  getDocumentTypes,
+  getDocumentType,
+  createDocumentType,
+  updateDocumentType,
+  deleteDocumentType,
+};

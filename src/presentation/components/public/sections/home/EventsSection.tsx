@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import SectionHeaderSkeleton from "@/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
 import EventsControlSkeleton from "@/presentation/components/public/ui/skeleton/EventsControlSkeleton";
 import CardSkeleton from "@/presentation/components/public/ui/skeleton/CardSkeleton";
+import { getPublishedEvents } from "@/presentation/services/event";
 
 // Helper function to get the earliest schedule date from an event
 function getEarliestScheduleDate(
@@ -48,12 +49,7 @@ export default function EventsSection() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        // Use relative URL to work in both development and production
-        const res = await fetch("/api/event?status=PUBLISH", {
-          cache: "no-store",
-        });
-        const response = await res.json();
-        const events: Event[] = response.data || [];
+        const events = await getPublishedEvents();
         setAllEvents(events);
       } catch (error) {
         console.error("Error fetching events:", error);

@@ -3,6 +3,7 @@ import type { OrganizationalStructure } from "@/domain/entities/organizational-s
 import StructureAvatar from "@/presentation/components/admin/ui/avatar/ImageView";
 import { Users, BarChart3, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { getPublishedStructures } from "@/presentation/services/structure";
 
 export default function OrganizationalStructureSection() {
   const [structures, setStructures] = useState<OrganizationalStructure[]>([]);
@@ -12,13 +13,8 @@ export default function OrganizationalStructureSection() {
   useEffect(() => {
     const fetchStructures = async () => {
       try {
-        const response = await fetch("/api/structure?status=PUBLISH");
-        if (response.ok) {
-          const data = await response.json();
-          setStructures(data || []);
-        } else {
-          setError("Failed to load organizational structure");
-        }
+        const data = await getPublishedStructures();
+        setStructures(data || []);
       } catch (_err) {
         setError("Failed to load organizational structure");
       } finally {

@@ -178,7 +178,7 @@ export default function OverviewPage() {
           "No active period";
 
         // Get recent activities (last 3)
-        const recentActivities = activities
+        const recentActivities = activities.activities
           .sort(
             (a: ActivityLog, b: ActivityLog) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -188,7 +188,7 @@ export default function OverviewPage() {
         // Calculate new metrics
         const totalPeriods = periods.length;
         const totalManagements = managements.length;
-        const totalStructures = structures.data?.length || 0;
+        const totalStructures = structures.length;
         const totalTasks = tasks.length;
 
         // Calculate proposals and accountability reports from documents

@@ -13,10 +13,11 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { type ArticleCategory } from "@/domain/value-objects/article-category";
-import { Status } from "@/domain/enums";
 import SectionHeaderSkeleton from "@/presentation/components/public/ui/skeleton/SectionHeaderSkeleton";
 import CardSkeleton from "@/presentation/components/public/ui/skeleton/CardSkeleton";
 import CategoryPillsSkeleton from "@/presentation/components/public/ui/skeleton/CategoryPillsSkeleton";
+import { getPublishedArticles } from "@/presentation/services/article";
+import { getPublishedCategories } from "@/presentation/services/article-category";
 
 interface ArticleSectionType extends React.FC {
   fetchArticles?: () => void;
@@ -36,17 +37,8 @@ const ArticleSection: ArticleSectionType = () => {
     try {
       setLoading(true);
       setRefreshing(true);
-      const response = await fetch(`/api/article?status=${Status.PUBLISH}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch articles");
-      }
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setArticles(data);
-      } else {
-        console.warn("Unexpected data format from articles API:", data);
-        setArticles([]);
-      }
+      const data = await getPublishedArticles();
+      setArticles(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -57,17 +49,8 @@ const ArticleSection: ArticleSectionType = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("/api/article/category?withCount=true");
-      if (!response.ok) {
-        throw new Error("Failed to fetch categories");
-      }
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setCategories(data);
-      } else {
-        console.warn("Unexpected data format from categories API:", data);
-        setCategories([]);
-      }
+      const data = await getPublishedCategories();
+      setCategories(data);
     } catch (err) {
       console.error("Error fetching categories:", err);
       setCategories([]);

@@ -30,6 +30,7 @@ import Image from "next/image";
 import NavLink from "@/presentation/components/admin/layout/NavLink";
 import NavDropdown from "@/presentation/components/admin/layout/NavDropdown";
 import NavDropdownItem from "@/presentation/components/admin/layout/NavDropdownItem";
+import { AuthApi } from "@/presentation/services/auth";
 import { UserRole } from "@/domain/enums";
 
 export default function SidebarMobile() {
@@ -39,10 +40,9 @@ export default function SidebarMobile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("/api/auth/me");
-        if (response.ok) {
-          const user = await response.json();
-          setUserRole(user.role);
+        const { data: user, error } = await AuthApi.getCurrentUser();
+        if (!error && user) {
+          setUserRole(user.role as UserRole);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);

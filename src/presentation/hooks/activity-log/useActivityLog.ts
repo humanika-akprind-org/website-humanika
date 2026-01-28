@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { type ActivityType } from "@/domain/enums";
-
 import { type ActivityMetadata } from "@/domain/entities/activity-log.entity";
+import { ActivityApi } from "@/presentation/services/activity";
 
 interface LogActivityParams {
   activityType: ActivityType;
@@ -21,25 +21,13 @@ export function useActivityLog() {
       metadata,
     }: LogActivityParams) => {
       try {
-        const response = await fetch("/api/system/activity", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            activityType,
-            entityType,
-            entityId,
-            description,
-            metadata,
-          }),
+        await ActivityApi.logActivity({
+          activityType,
+          entityType,
+          entityId,
+          description,
+          metadata,
         });
-
-        if (!response.ok) {
-          throw new Error("Failed to log activity");
-        }
-
-        return await response.json();
       } catch (error) {
         console.error("Error logging activity:", error);
         throw error;
@@ -63,19 +51,13 @@ export function useActivityLog() {
       limit?: number;
     } = {}) => {
       try {
-        const params = new URLSearchParams();
-        if (activityType) params.append("activityType", activityType);
-        if (startDate) params.append("startDate", startDate);
-        if (endDate) params.append("endDate", endDate);
-        params.append("page", String(page));
-        params.append("limit", String(limit));
-
-        const response = await fetch(`/api/system/activity?${params}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch activity logs");
-        }
-
-        return await response.json();
+        return await ActivityApi.getActivities({
+          activityType,
+          startDate,
+          endDate,
+          page,
+          limit,
+        });
       } catch (error) {
         console.error("Error fetching activity logs:", error);
         throw error;

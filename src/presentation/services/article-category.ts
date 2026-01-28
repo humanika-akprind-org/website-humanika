@@ -4,6 +4,9 @@ import type {
   UpdateArticleCategoryInput,
 } from "@/domain/value-objects/article-category";
 
+// Re-export the type for convenience
+export type { ArticleCategory } from "@/domain/value-objects/article-category";
+
 import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
@@ -108,4 +111,36 @@ export const deleteArticleCategory = async (id: string): Promise<void> => {
   if (!response.ok) {
     throw new Error("Failed to delete article category");
   }
+};
+
+// Helper function for getting categories with article count
+export const getArticleCategoriesWithCount = async (): Promise<
+  ArticleCategory[]
+> => {
+  const response = await fetch(`${API_URL}/article/category?withCount=true`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch article categories");
+  }
+
+  const responseData = await response.json();
+  return responseData?.data || responseData || [];
+};
+
+// Alias for getArticleCategoriesWithCount for public use
+export const getPublishedCategories = getArticleCategoriesWithCount;
+
+export const ArticleCategoryApi = {
+  getArticleCategories,
+  getArticleCategory,
+  createArticleCategory,
+  updateArticleCategory,
+  deleteArticleCategory,
+  getArticleCategoriesWithCount,
 };

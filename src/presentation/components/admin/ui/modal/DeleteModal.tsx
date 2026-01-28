@@ -2,6 +2,7 @@ import { FiX } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { getAccessTokenAction } from "@/presentation/lib/actions/accessToken";
 import { Loader2 } from "lucide-react";
+import { getGoogleDriveAuthUrl } from "@/presentation/services/google-drive";
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -63,8 +64,7 @@ export default function DeleteModal({
     }
     setIsConnecting(true);
     try {
-      const response = await fetch("/api/google-drive/auth");
-      const { url } = await response.json();
+      const { url } = await getGoogleDriveAuthUrl();
       window.location.href = url;
     } catch (error) {
       console.error("Connection error:", error);

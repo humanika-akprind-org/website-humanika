@@ -1,90 +1,129 @@
 import type {
   OrganizationalStructure,
-  CreateOrganizationalStructureInput,
-  UpdateOrganizationalStructureInput,
   OrganizationalStructureFilter,
 } from "@/domain/entities/organizational-structure.entity";
 import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
 
-// Fungsi fetch dasar yang dapat digunakan oleh semua fungsi API
-async function fetchApi<T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<{ error?: string; data?: T }> {
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
-      credentials: "include",
-      cache: "no-store",
-      ...options,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { error: data.error || "An error occurred" };
-    }
-
-    return { data };
-  } catch (_error) {
-    return { error: "Network error occurred" };
-  }
-}
-
-export const getOrganizationalStructures = async (
+export const getStructures = async (
   filter?: OrganizationalStructureFilter,
-): Promise<{ error?: string; data?: OrganizationalStructure[] }> => {
+): Promise<OrganizationalStructure[]> => {
   const params = new URLSearchParams();
 
   if (filter?.status) params.append("status", filter.status.toString());
   if (filter?.periodId) params.append("periodId", filter.periodId);
   if (filter?.search) params.append("search", filter.search);
 
-  const queryString = params.toString();
-  const endpoint = `/structure${queryString ? `?${queryString}` : ""}`;
+  const response = await fetch(`${API_URL}/structure?${params.toString()}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
 
-  return fetchApi<OrganizationalStructure[]>(endpoint);
+  if (!response.ok) {
+    throw new Error("Failed to fetch organizational structures");
+  }
+
+  return response.json();
 };
 
-export const getOrganizationalStructure = async (
+export const getStructure = async (
   id: string,
-): Promise<{ error?: string; data?: OrganizationalStructure }> =>
-  fetchApi<OrganizationalStructure>(`/structure/${id}`);
+): Promise<OrganizationalStructure> => {
+  const response = await fetch(`${API_URL}/structure/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
 
-export const createOrganizationalStructure = async (
-  data: CreateOrganizationalStructureInput,
-): Promise<{ error?: string; data?: OrganizationalStructure }> =>
-  fetchApi<OrganizationalStructure>("/structure", {
+  if (!response.ok) {
+    throw new Error("Failed to fetch organizational structure");
+  }
+
+  return response.json();
+};
+
+export const createStructure = async (
+  data: Partial<OrganizationalStructure>,
+): Promise<OrganizationalStructure> => {
+  const response = await fetch(`${API_URL}/structure`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
-export const updateOrganizationalStructure = async (
+  if (!response.ok) {
+    throw new Error("Failed to create organizational structure");
+  }
+
+  return response.json();
+};
+
+export const updateStructure = async (
   id: string,
-  data: UpdateOrganizationalStructureInput,
-): Promise<{ error?: string; data?: OrganizationalStructure }> =>
-  fetchApi<OrganizationalStructure>(`/structure/${id}`, {
+  data: Partial<OrganizationalStructure>,
+): Promise<OrganizationalStructure> => {
+  const response = await fetch(`${API_URL}/structure/${id}`, {
     method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
-export const deleteOrganizationalStructure = async (
-  id: string,
-): Promise<{ error?: string; data?: { message: string } }> =>
-  fetchApi<{ message: string }>(`/structure/${id}`, {
+  if (!response.ok) {
+    throw new Error("Failed to update organizational structure");
+  }
+
+  return response.json();
+};
+
+export const deleteStructure = async (id: string): Promise<void> => {
+  const response = await fetch(`${API_URL}/structure/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
-// Export API object for consistency with other API files
+  if (!response.ok) {
+    throw new Error("Failed to delete organizational structure");
+  }
+};
+
+// Helper function for getting published structures (public use)
+export const getPublishedStructures = async (): Promise<
+  OrganizationalStructure[]
+> => {
+  const response = await fetch(`${API_URL}/structure?status=PUBLISH`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch published structures");
+  }
+
+  return response.json();
+};
+
 export const StructureApi = {
-  getStructures: getOrganizationalStructures,
-  getStructure: getOrganizationalStructure,
-  createStructure: createOrganizationalStructure,
-  updateStructure: updateOrganizationalStructure,
-  deleteStructure: deleteOrganizationalStructure,
+  getStructures,
+  getStructure,
+  createStructure,
+  updateStructure,
+  deleteStructure,
+  getPublishedStructures,
 };

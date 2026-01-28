@@ -25,12 +25,8 @@ export function useEditStructure(structureId: string) {
       try {
         setLoading(true);
         setError(null);
-        const response = await StructureApi.getStructure(structureId);
-        if (response.error) {
-          setError(response.error);
-        } else if (response.data) {
-          setStructure(response.data);
-        }
+        const data = await StructureApi.getStructure(structureId);
+        setStructure(data);
       } catch (_error) {
         setError("Failed to fetch structure data");
       } finally {

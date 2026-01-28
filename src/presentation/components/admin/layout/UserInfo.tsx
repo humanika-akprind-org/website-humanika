@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LogoutButton } from "@/presentation/components/admin/auth/LogoutButton";
 import Avatar from "../ui/avatar/Avatar";
 import type { User } from "@/domain/entities/user.entity";
+import { AuthApi } from "@/presentation/services/auth";
 
 export default function UserInfo() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,12 +15,8 @@ export default function UserInfo() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/auth/me");
-        if (res.ok) {
-          const responseData = await res.json();
-          // API returns { success, data: user } format
-          setUser(responseData?.data || null);
-        }
+        const { data } = await AuthApi.getCurrentUser();
+        setUser(data || null);
       } catch (error) {
         console.error("Failed to fetch user:", error);
       } finally {

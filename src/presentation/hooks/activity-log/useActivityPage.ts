@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { type ActivityType } from "@/domain/enums";
-import { useActivityLog } from "@/presentation/hooks/activity-log/useActivityLog";
+import { ActivityApi } from "@/presentation/services/activity";
 
 interface ActivityLogData {
   id: string;
@@ -34,32 +34,31 @@ export const useActivityPage = () => {
   const [pagination, setPagination] = useState<PaginationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { getActivityLogs } = useActivityLog();
+  const fetchActivities = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const result = await ActivityApi.getActivities({
+        activityType:
+          filter.activityType === "ALL"
+            ? undefined
+            : (filter.activityType as ActivityType),
+        startDate: filter.startDate || undefined,
+        endDate: filter.endDate || undefined,
+        page,
+      });
+
+      setActivities(result.activities as unknown as ActivityLogData[]);
+      setPagination(result.pagination);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [filter, page]);
 
   useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getActivityLogs({
-          activityType:
-            filter.activityType === "ALL"
-              ? undefined
-              : (filter.activityType as ActivityType),
-          startDate: filter.startDate || undefined,
-          endDate: filter.endDate || undefined,
-          page,
-        });
-        setActivities(data.activities);
-        setPagination(data.pagination);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchActivities();
-  }, [filter, page, getActivityLogs]);
+  }, [fetchActivities]);
 
   const handleFilterChange = (newFilter: typeof filter) => {
     setFilter(newFilter);

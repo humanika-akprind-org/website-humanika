@@ -4,6 +4,7 @@ import type {
   UpdateArticleInput,
   ArticleFilter,
 } from "@/domain/entities/article.entity";
+import type { ArticleCategory } from "@/domain/value-objects/article-category";
 import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
@@ -156,6 +157,42 @@ export const deleteArticle = async (id: string): Promise<void> => {
   }
 };
 
+// Helper function for getting published articles (public use)
+export const getPublishedArticles = async (): Promise<Article[]> => {
+  const response = await fetch(`${API_URL}/article?status=PUBLISH`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch published articles");
+  }
+
+  const responseData = await response.json();
+  return responseData?.data || responseData || [];
+};
+
+// Helper function for getting published categories with article count
+export const getPublishedCategories = async (): Promise<ArticleCategory[]> => {
+  const response = await fetch(`${API_URL}/article/category?withCount=true`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+
+  const responseData = await response.json();
+  return responseData?.data || responseData || [];
+};
+
 export const ArticleApi = {
   getArticles,
   getArticle,
@@ -163,4 +200,6 @@ export const ArticleApi = {
   createArticle,
   updateArticle,
   deleteArticle,
+  getPublishedArticles,
+  getPublishedCategories,
 };

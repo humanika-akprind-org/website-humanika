@@ -26,6 +26,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { sendEmail } from "@/presentation/services/email";
 
 // Define form schema
 const formSchema = z.object({
@@ -66,49 +67,16 @@ export default function ContactFormSection() {
         other: "Lainnya",
       };
 
-      const html = `
-      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 30px;">
-          <h2 style="color: #0070f3; text-align: center;">Pesan Kontak dari Website HUMANIKA</h2>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <div style="margin-bottom: 15px;">
-            <strong>Nama:</strong> <span>${values.name}</span>
-          </div>
-          <div style="margin-bottom: 15px;">
-            <strong>Email:</strong> <span>${values.email}</span>
-          </div>
-          <div style="margin-bottom: 15px;">
-            <strong>Subjek:</strong> <span>${
-              subjectMap[values.subject] || values.subject
-            }</span>
-          </div>
-          <div style="margin-top: 25px;">
-            <strong>Pesan:</strong>
-            <p style="white-space: pre-wrap; line-height: 1.5; margin-top: 8px;">${values.message.replace(
-              /\n/g,
-              "<br>",
-            )}</p>
-          </div>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0 10px 0;" />
-          <p style="font-size: 12px; color: gray; text-align: center;">Ini adalah pesan otomatis yang dikirim dari website HUMANIKA.</p>
-        </div>
-      </div>
-      `;
-
-      const response = await fetch("/api/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "humanika@akprind.ac.id",
-          subject: subjectMap[values.subject] || values.subject,
-          html,
-        }),
+      const result = await sendEmail({
+        name: values.name,
+        email: values.email,
+        subject: subjectMap[values.subject] || values.subject,
+        message: values.message,
       });
 
-      if (!response.ok) {
-        if (response.status >= 400 && response.status < 500) {
+      if (!result.success) {
+        if (result.error) {
+          // Check if error is related to client-side validation (4xx) or server-side (5xx)
           setErrorMsg(
             "Terjadi kesalahan pada data yang Anda kirim. Mohon periksa kembali dan coba lagi.",
           );
@@ -116,19 +84,13 @@ export default function ContactFormSection() {
             description:
               "Periksa dan pastikan informasi yang Anda masukkan benar.",
           });
-        } else if (response.status >= 500) {
+        } else {
           setErrorMsg(
             "Terjadi kesalahan pada server. Silakan coba beberapa saat lagi.",
           );
           toast.error("Gagal Mengirim Pesan: Kesalahan Server", {
             description:
               "Server saat ini tidak bisa memproses permintaan Anda.",
-          });
-        } else {
-          setErrorMsg("Gagal mengirim pesan. Silakan coba lagi.");
-          toast.error("Gagal Mengirim Pesan", {
-            description:
-              "Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.",
           });
         }
         setLoading(false);

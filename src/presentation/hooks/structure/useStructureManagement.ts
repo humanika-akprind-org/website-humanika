@@ -45,30 +45,26 @@ export function useStructureManagement() {
       setError("");
 
       // Fetch structures and periods
-      const [structuresResponse, periodsResponse] = await Promise.all([
+      const [structuresData, periodsResponse] = await Promise.all([
         StructureApi.getStructures(),
         PeriodApi.getPeriods(),
       ]);
 
-      if (structuresResponse.error) {
-        setError(structuresResponse.error);
-      } else if (structuresResponse.data) {
-        const periods: Period[] = Array.isArray(periodsResponse)
-          ? periodsResponse
-          : periodsResponse
-            ? [periodsResponse]
-            : [];
+      const periods: Period[] = Array.isArray(periodsResponse)
+        ? periodsResponse
+        : periodsResponse
+          ? [periodsResponse]
+          : [];
 
-        // Enhance structures with period data
-        const enhancedStructures = structuresResponse.data.map(
-          (structure: OrganizationalStructure) => ({
-            ...structure,
-            period: periods.find((period) => period.id === structure.periodId),
-          }),
-        );
+      // Enhance structures with period data
+      const enhancedStructures = structuresData.map(
+        (structure: OrganizationalStructure) => ({
+          ...structure,
+          period: periods.find((period) => period.id === structure.periodId),
+        }),
+      );
 
-        setAllStructures(enhancedStructures);
-      }
+      setAllStructures(enhancedStructures);
     } catch (_error) {
       setError("Failed to fetch structures");
     } finally {
@@ -206,15 +202,9 @@ export function useStructureManagement() {
             await deleteGoogleDriveFile(fileId, accessToken);
           }
         }
-        const response = await StructureApi.deleteStructure(
-          currentStructure.id,
-        );
-        if (response.error) {
-          setError(response.error);
-        } else {
-          setSuccess("Structure deleted successfully");
-          fetchAllStructures();
-        }
+        await StructureApi.deleteStructure(currentStructure.id);
+        setSuccess("Structure deleted successfully");
+        fetchAllStructures();
       } else if (selectedStructures.length > 0) {
         // Bulk deletion: Delete files from Google Drive first, then delete database records
         for (const structureId of selectedStructures) {

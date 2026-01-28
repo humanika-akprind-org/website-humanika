@@ -2,6 +2,7 @@
 import { Loader2 } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
 import { useState } from "react";
+import { getGoogleDriveAuthUrl } from "@/presentation/services/google-drive";
 
 export default function GoogleDriveConnect() {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,8 +11,7 @@ export default function GoogleDriveConnect() {
     setIsLoading(true);
     try {
       // Move the auth logic to API route
-      const response = await fetch("/api/google-drive/auth");
-      const { url } = await response.json();
+      const { url } = await getGoogleDriveAuthUrl();
       window.location.href = url;
     } catch (error) {
       console.error("Connection error:", error);

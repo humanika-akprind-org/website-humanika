@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import type { Article } from "@/domain/entities/article.entity";
+import { ArticleApi } from "@/presentation/services/article";
 
 export const useArticleData = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -11,22 +12,8 @@ export const useArticleData = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("/api/article?status=PUBLISH");
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch articles");
-      }
-
-      const data = await response.json();
-
-      if (Array.isArray(data)) {
-        setArticles(data);
-      } else if (Array.isArray(data?.data)) {
-        setArticles(data.data);
-      } else {
-        console.warn("Unexpected data format from articles API:", data);
-        setArticles([]);
-      }
+      const data = await ArticleApi.getPublishedArticles();
+      setArticles(data);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "An error occurred";
