@@ -41,11 +41,11 @@ export default function Avatar({ user, size = "md" }: AvatarProps) {
           className={`${currentSize.avatar} flex items-center justify-center text-white font-semibold ${currentSize.text}`}
         >
           {user.name
-            .split(" ")
+            ?.split(" ")
             .map((n) => n[0])
             .join("")
             .toUpperCase()
-            .slice(0, 2)}
+            .slice(0, 2) || "?"}
         </span>
       </div>
     </div>

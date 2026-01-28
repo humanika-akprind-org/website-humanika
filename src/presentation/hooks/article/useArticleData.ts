@@ -21,6 +21,8 @@ export const useArticleData = () => {
 
       if (Array.isArray(data)) {
         setArticles(data);
+      } else if (Array.isArray(data?.data)) {
+        setArticles(data.data);
       } else {
         console.warn("Unexpected data format from articles API:", data);
         setArticles([]);

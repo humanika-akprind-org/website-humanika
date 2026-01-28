@@ -22,7 +22,9 @@ export const getArticleCategories = async (): Promise<ArticleCategory[]> => {
     throw new Error("Failed to fetch article categories");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  // API returns { success, data: [...] } format, extract the data array
+  return responseData?.data || responseData || [];
 };
 
 export const getArticleCategory = async (

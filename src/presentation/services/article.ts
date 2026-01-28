@@ -32,7 +32,9 @@ export const getArticles = async (
     throw new Error("Failed to fetch articles");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  // API returns { success, data: [...] } format, extract the data array
+  return responseData?.data || responseData || [];
 };
 
 export const getArticle = async (id: string): Promise<Article> => {

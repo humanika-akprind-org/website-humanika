@@ -16,8 +16,9 @@ export default function UserInfo() {
       try {
         const res = await fetch("/api/auth/me");
         if (res.ok) {
-          const data = await res.json();
-          setUser(data);
+          const responseData = await res.json();
+          // API returns { success, data: user } format
+          setUser(responseData?.data || null);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);

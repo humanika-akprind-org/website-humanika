@@ -14,8 +14,10 @@ export const useArticleCategories = () => {
         if (!response.ok) {
           throw new Error("Failed to fetch categories");
         }
-        const data = await response.json();
-        setCategories(data);
+        const responseData = await response.json();
+        // Extract categories from the response (API returns { success, data: [...] })
+        const categoriesData = responseData?.data;
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {

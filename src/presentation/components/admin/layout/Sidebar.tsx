@@ -39,8 +39,10 @@ export default function Sidebar() {
       try {
         const response = await fetch("/api/auth/me");
         if (response.ok) {
-          const user = await response.json();
-          setUserRole(user.role);
+          const responseData = await response.json();
+          // API returns { success, data: user } format
+          const userData = responseData?.data;
+          setUserRole(userData?.role || null);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
