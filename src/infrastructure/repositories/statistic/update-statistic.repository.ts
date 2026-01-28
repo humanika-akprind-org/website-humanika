@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { UpdateStatisticInput } from "@/domain/entities/statistic.entity";
+import type {
+  Statistic,
+  UpdateStatisticInput,
+} from "@/domain/entities/statistic.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
@@ -71,5 +74,5 @@ export async function updateStatistic(
     },
   });
 
-  return statistic;
+  return statistic as Statistic;
 }

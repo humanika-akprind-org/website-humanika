@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { StatisticFilter } from "@/domain/entities/statistic.entity";
+import type {
+  Statistic,
+  StatisticFilter,
+} from "@/domain/entities/statistic.entity";
 import type { Prisma } from "@prisma/client";
 
 /**
@@ -17,11 +20,13 @@ export async function getStatistics(filter?: StatisticFilter) {
     where.periodId = filter.periodId;
   }
 
-  return prisma.statistic.findMany({
+  const statistics = await prisma.statistic.findMany({
     where,
     include: {
       period: true,
     },
     orderBy: { createdAt: "desc" },
   });
+
+  return statistics as Statistic[];
 }

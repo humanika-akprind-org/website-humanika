@@ -4,7 +4,10 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { CreateStatisticInput } from "@/domain/entities/statistic.entity";
+import type {
+  CreateStatisticInput,
+  Statistic,
+} from "@/domain/entities/statistic.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
@@ -50,5 +53,5 @@ export async function createStatistic(
     },
   });
 
-  return statistic;
+  return statistic as Statistic;
 }
