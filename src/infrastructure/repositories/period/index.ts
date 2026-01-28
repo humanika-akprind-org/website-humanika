@@ -6,6 +6,9 @@
  * for convenient imports throughout the application.
  */
 
+// Export repository class
+export { PeriodRepositoryPrisma } from "./period-repository-prisma";
+
 // Export functions
 export * from "./get-periods.repository";
 export * from "./get-period-by-id.repository";

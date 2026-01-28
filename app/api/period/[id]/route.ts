@@ -1,35 +1,76 @@
+/**
+ * Period API Route [id] - Clean Architecture Hybrid Pattern
+ * Part of Clean Architecture: Presentation Layer (API)
+ *
+ * This route demonstrates the hybrid pattern:
+ * - GET: Uses use case for read operations
+ * - PUT: Uses use case for update operations with validation
+ * - DELETE: Uses use case for delete operations
+ */
+
 import { type NextRequest, NextResponse } from "next/server";
-import type { PeriodApiResponse } from "@/domain/entities/period.entity";
-import { ObjectId } from "mongodb";
+import type { PeriodFormData } from "@/domain/entities/period.entity";
 import {
-  getPeriod,
-  updatePeriod,
-  deletePeriod,
-} from "@/infrastructure/repositories/period";
+  GetPeriodByIdUseCase,
+  UpdatePeriodUseCase,
+  DeletePeriodUseCase,
+} from "@/application/use-cases/period";
+import { PeriodRepositoryPrisma } from "@/infrastructure/repositories/period";
 
 interface Context {
   params: Promise<{ id: string }>;
 }
 
+// ============================================================================
+// Validation Functions
+// ============================================================================
+
+function validateUpdatePeriodInput(body: Partial<PeriodFormData>) {
+  const errors: string[] = [];
+
+  // Validate year range if both are provided
+  if (
+    body.startYear !== undefined &&
+    body.endYear !== undefined &&
+    body.startYear >= body.endYear
+  ) {
+    errors.push("Start year must be less than end year");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, error: errors.join(", ") };
+  }
+
+  return { isValid: true };
+}
+
+// ============================================================================
+// GET /api/periods/[id] - Use Case Pattern
+// ============================================================================
+
 export async function GET(
   _request: NextRequest,
   context: Context,
-): Promise<NextResponse<PeriodApiResponse>> {
+): Promise<NextResponse> {
   try {
     const { id } = await context.params;
 
-    if (!ObjectId.isValid(id)) {
+    // 1. Use use case for read operation
+    const repo = new PeriodRepositoryPrisma();
+    const useCase = new GetPeriodByIdUseCase(repo);
+    const period = await useCase.execute(id);
+
+    if (!period) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid period ID",
+          error: "Period not found",
         },
-        { status: 400 },
+        { status: 404 },
       );
     }
 
-    const period = await getPeriod(id);
-
+    // 2. Response - consistent format
     return NextResponse.json({
       success: true,
       data: period,
@@ -47,42 +88,33 @@ export async function GET(
   }
 }
 
+// ============================================================================
+// PUT /api/periods/[id] - Use Case Pattern
+// ============================================================================
+
 export async function PUT(
   request: NextRequest,
   context: Context,
-): Promise<NextResponse<PeriodApiResponse>> {
+): Promise<NextResponse> {
   try {
     const { id } = await context.params;
-
-    if (!ObjectId.isValid(id)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid period ID",
-        },
-        { status: 400 },
-      );
-    }
-
     const body = await request.json();
 
-    // Validation
-    if (
-      body.startYear !== undefined &&
-      body.endYear !== undefined &&
-      body.startYear >= body.endYear
-    ) {
+    // 1. Basic validation (use case will do deeper validation)
+    const validation = validateUpdatePeriodInput(body);
+    if (!validation.isValid) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Start year must be less than end year",
-        },
+        { success: false, error: validation.error },
         { status: 400 },
       );
     }
 
-    const period = await updatePeriod(id, body);
+    // 2. Use use case for update with validation and logging
+    const repo = new PeriodRepositoryPrisma();
+    const useCase = new UpdatePeriodUseCase(repo);
+    const period = await useCase.execute(id, body);
 
+    // 3. Response
     return NextResponse.json({
       success: true,
       data: period,
@@ -90,77 +122,95 @@ export async function PUT(
     });
   } catch (error) {
     console.error("Error updating period:", error);
-    if (error instanceof Error && error.message === "Period not found") {
+
+    // Cast error to Error type
+    const err = error as Error;
+
+    // Handle validation errors
+    if (err.message.includes("Validation failed")) {
       return NextResponse.json(
         {
           success: false,
-          error: error.message,
+          error: err.message,
+        },
+        { status: 400 },
+      );
+    }
+
+    // Handle not found errors
+    if (err.message === "Period not found") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: err.message,
         },
         { status: 404 },
       );
     }
+
     return NextResponse.json(
       {
         success: false,
         error: "Failed to update period",
-        message: (error as Error).message,
+        message: err.message,
       },
       { status: 500 },
     );
   }
 }
 
+// ============================================================================
+// DELETE /api/periods/[id] - Use Case Pattern
+// ============================================================================
+
 export async function DELETE(
   _request: NextRequest,
   context: Context,
-): Promise<NextResponse<PeriodApiResponse>> {
+): Promise<NextResponse> {
   try {
     const { id } = await context.params;
 
-    if (!ObjectId.isValid(id)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid period ID",
-        },
-        { status: 400 },
-      );
-    }
+    // 1. Use use case for delete with validation
+    const repo = new PeriodRepositoryPrisma();
+    const useCase = new DeletePeriodUseCase(repo);
+    await useCase.execute(id);
 
-    await deletePeriod(id);
-
+    // 2. Response
     return NextResponse.json({
       success: true,
       message: "Period deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting period:", error);
-    if (error instanceof Error && error.message === "Period not found") {
+
+    // Handle not found errors
+    const err = error as Error;
+    if (err.message === "Period not found") {
       return NextResponse.json(
         {
           success: false,
-          error: error.message,
+          error: err.message,
         },
         { status: 404 },
       );
     }
-    if (
-      error instanceof Error &&
-      error.message === "Cannot delete period with related data"
-    ) {
+
+    // Handle related data errors
+    if (err.message === "Cannot delete period with related data") {
       return NextResponse.json(
         {
           success: false,
-          error: error.message,
+          error: err.message,
         },
         { status: 400 },
       );
     }
+
     return NextResponse.json(
       {
         success: false,
         error: "Failed to delete period",
-        message: (error as Error).message,
+        message: err.message,
       },
       { status: 500 },
     );
