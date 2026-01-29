@@ -1,8 +1,3 @@
-/**
- * Create Statistic Repository - Write operation
- * Part of Clean Architecture: Infrastructure Layer (Repository)
- */
-
 import prisma from "@/presentation/lib/prisma";
 import type {
   CreateStatisticInput,
@@ -13,6 +8,11 @@ import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
+
+/**
+ * Create Statistic Repository - Write operation
+ * Part of Clean Architecture: Infrastructure Layer (Repository)
+ */
 
 /**
  * Create a new statistic

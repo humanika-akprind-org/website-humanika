@@ -45,7 +45,7 @@ export class GetGalleriesUseCase {
     const result = await this.galleryRepo.findMany(filters, { page, limit });
 
     return {
-      galleries: result.galleries,
+      galleries: result.records,
       pagination: result.pagination,
     };
   }

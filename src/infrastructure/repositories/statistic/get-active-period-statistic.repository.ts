@@ -1,10 +1,10 @@
+import { type Statistic } from "@/domain/entities/statistic.entity";
+import prisma from "@/presentation/lib/prisma";
+
 /**
  * Get Active Period Statistic Repository - Read operation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  */
-
-import { type Statistic } from "@/domain/entities/statistic.entity";
-import prisma from "@/presentation/lib/prisma";
 
 /**
  * Get statistic for the active period

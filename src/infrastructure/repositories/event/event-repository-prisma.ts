@@ -187,4 +187,30 @@ export class EventRepositoryPrisma implements IEventRepository {
       },
     });
   }
+
+  // Aliases for backward compatibility with existing use cases
+  async getEventById(id: string): Promise<Event | null> {
+    return this.findById(id);
+  }
+
+  async getEventBySlug(slug: string): Promise<Event | null> {
+    return this.findBySlug(slug);
+  }
+
+  async getEvents(filter?: EventFilters): Promise<Event[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async createEvent(data: CreateEventInput): Promise<Event> {
+    return this.create(data);
+  }
+
+  async updateEvent(id: string, data: UpdateEventInput): Promise<Event> {
+    return this.update(id, data);
+  }
+
+  async deleteEvent(id: string): Promise<void> {
+    return this.delete(id);
+  }
 }

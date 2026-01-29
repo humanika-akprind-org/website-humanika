@@ -44,6 +44,19 @@ export interface IWorkProgramRepository {
 
   /** Count work programs with optional filter */
   count(where?: BaseFilter): Promise<number>;
+
+  // Aliases for backward compatibility with existing use cases
+  getWorkProgramById(id: string): Promise<WorkProgram | null>;
+  getWorkPrograms(filter?: WorkProgramFilter): Promise<WorkProgram[]>;
+  createWorkProgram(
+    data: CreateWorkProgramInput,
+    user: { id: string },
+  ): Promise<WorkProgram>;
+  updateWorkProgram(
+    id: string,
+    data: UpdateWorkProgramInput,
+  ): Promise<WorkProgram>;
+  deleteWorkProgram(id: string, user: { id: string }): Promise<void>;
 }
 
 // Re-export for convenience

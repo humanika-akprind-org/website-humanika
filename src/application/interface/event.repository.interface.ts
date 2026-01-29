@@ -24,11 +24,6 @@ export interface EventFilters extends BaseFilter {
   location?: string;
 }
 
-// Re-export base types with Event-specific names for convenience
-export type { BasePagination as EventPagination };
-export type { BasePaginationResult as EventPaginationResult };
-export type { BaseStats as EventStats };
-
 // Event-specific repository interface
 export interface IEventRepository {
   /** Find all events */
@@ -69,6 +64,14 @@ export interface IEventRepository {
 
   /** Create approval record for an event */
   createApproval(eventId: string, userId: string, note: string): Promise<void>;
+
+  // Aliases for backward compatibility with existing use cases
+  getEventById(id: string): Promise<Event | null>;
+  getEventBySlug(slug: string): Promise<Event | null>;
+  getEvents(filter?: EventFilters): Promise<Event[]>;
+  createEvent(data: CreateEventInput): Promise<Event>;
+  updateEvent(id: string, data: UpdateEventInput): Promise<Event>;
+  deleteEvent(id: string): Promise<void>;
 }
 
 // Filter types for Event queries
@@ -83,3 +86,8 @@ export interface EventFilters extends BaseFilter {
   date?: string;
   location?: string;
 }
+
+// Re-export base types with Event-specific names for convenience
+export type { BasePagination as EventPagination };
+export type { BasePaginationResult as EventPaginationResult };
+export type { BaseStats as EventStats };

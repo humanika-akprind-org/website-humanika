@@ -190,4 +190,37 @@ export class OrganizationContactRepositoryPrisma implements IOrganizationContact
     });
     return organizationContacts.length;
   }
+
+  // Aliases for backward compatibility with existing use cases
+  async getOrganizationContactById(
+    id: string,
+  ): Promise<OrganizationContact | null> {
+    return this.findById(id);
+  }
+
+  async getOrganizationContacts(
+    filter?: OrganizationContactFilter,
+  ): Promise<OrganizationContact[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async createOrganizationContact(
+    data: CreateOrganizationContactInput,
+    userId: string,
+  ): Promise<OrganizationContact> {
+    return this.create(data, userId);
+  }
+
+  async updateOrganizationContact(
+    id: string,
+    data: UpdateOrganizationContactInput,
+    userId: string,
+  ): Promise<OrganizationContact> {
+    return this.update(id, data, userId);
+  }
+
+  async deleteOrganizationContact(id: string, userId: string): Promise<void> {
+    return this.delete(id, userId);
+  }
 }

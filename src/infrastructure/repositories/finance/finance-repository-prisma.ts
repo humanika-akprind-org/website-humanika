@@ -166,4 +166,32 @@ export class FinanceRepositoryPrisma implements IFinanceRepository {
     const records = await getFinances(filterParam);
     return records.length;
   }
+
+  // Aliases for backward compatibility with existing use cases
+  async getFinanceById(id: string): Promise<Finance | null> {
+    return this.findById(id);
+  }
+
+  async getFinances(filter?: FinanceFilter): Promise<Finance[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async createFinance(
+    data: CreateFinanceInput,
+    user: UserWithId,
+  ): Promise<Finance> {
+    return this.create(data, user);
+  }
+
+  async updateFinance(
+    id: string,
+    data: Partial<CreateFinanceInput>,
+  ): Promise<Finance> {
+    return this.update(id, data);
+  }
+
+  async deleteFinance(id: string): Promise<void> {
+    return this.delete(id);
+  }
 }

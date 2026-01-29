@@ -6,14 +6,14 @@
  * Use this for write operations that require validation, logging, and error handling.
  */
 
-import type { IEventCategoryRepositoryExtended } from "@/application/interface/event-category.repository.interface";
+import type { IEventCategoryRepository } from "@/application/interface/event-category.repository.interface";
 import type {
   EventCategory,
   CreateEventCategoryInput,
 } from "@/domain/value-objects/event-category";
 
 export class CreateEventCategoryUseCase {
-  constructor(private eventCategoryRepo: IEventCategoryRepositoryExtended) {}
+  constructor(private eventCategoryRepo: IEventCategoryRepository) {}
 
   /**
    * Execute the use case to create a new event category

@@ -1,10 +1,10 @@
+import { type Statistic } from "@/domain/entities/statistic.entity";
+import prisma from "@/presentation/lib/prisma";
+
 /**
  * Get Statistic By Period Repository - Read operation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  */
-
-import { type Statistic } from "@/domain/entities/statistic.entity";
-import prisma from "@/presentation/lib/prisma";
 
 /**
  * Get a statistic by period ID

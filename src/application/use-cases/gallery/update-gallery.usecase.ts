@@ -35,7 +35,7 @@ export class UpdateGalleryUseCase {
     this.validateInput(input);
 
     // 3. Update the gallery
-    const gallery = await this.galleryRepo.update(id, input);
+    const gallery = await this.galleryRepo.update(id, input, user.id);
 
     // 4. Log activity
     await this.logUpdate(user, gallery, existingGallery);

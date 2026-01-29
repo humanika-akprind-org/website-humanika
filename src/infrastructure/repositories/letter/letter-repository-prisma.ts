@@ -187,4 +187,30 @@ export class LetterRepositoryPrisma implements ILetterRepository {
   ): Promise<void> {
     await createLetterApproval(letterId, userId, note);
   }
+
+  // Aliases for backward compatibility with existing use cases
+  async getLetters(filter?: LetterFilter): Promise<Letter[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async getLetterById(id: string): Promise<Letter | null> {
+    return this.findById(id);
+  }
+
+  async createLetter(data: CreateLetterInput, userId: string): Promise<Letter> {
+    return this.create(data, userId);
+  }
+
+  async updateLetter(
+    id: string,
+    data: UpdateLetterInput,
+    userId: string,
+  ): Promise<Letter> {
+    return this.update(id, data, userId);
+  }
+
+  async deleteLetter(id: string, userId: string): Promise<void> {
+    return this.delete(id, userId);
+  }
 }

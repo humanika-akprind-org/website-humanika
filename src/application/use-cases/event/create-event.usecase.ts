@@ -87,11 +87,11 @@ export class CreateEventUseCase {
    * Check for duplicate events (same name in same period)
    */
   private async checkDuplicate(input: CreateEventInput): Promise<void> {
-    const events = await this.eventRepo.findMany({
+    const result = await this.eventRepo.findMany({
       periodId: input.periodId,
     });
 
-    const duplicate = events.events.find(
+    const duplicate = result.records.find(
       (event) => event.name.toLowerCase() === input.name.toLowerCase(),
     );
 

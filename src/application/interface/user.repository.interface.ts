@@ -10,6 +10,11 @@ import type {
   UpdateUserData,
 } from "@/domain/entities/user.entity";
 
+// Type aliases for backward compatibility
+export type CreateUserInput = CreateUserData;
+export type UpdateUserInput = UpdateUserData;
+export type { User };
+
 // User-specific repository interface
 export interface IUserRepository {
   /** Find all users */
@@ -53,6 +58,13 @@ export interface IUserRepository {
   getUsersForVerification(
     userIds: string[],
   ): Promise<Array<{ id: string; email: string; name: string }>>;
+
+  // Aliases for backward compatibility with existing use cases
+  getUserById(id: string): Promise<User | null>;
+  getUsers(filter?: UserFilter): Promise<User[]>;
+  createUser(data: CreateUserInput): Promise<User>;
+  updateUser(id: string, data: UpdateUserInput): Promise<User>;
+  deleteUser(id: string): Promise<void>;
 }
 
 // Filter types for User queries

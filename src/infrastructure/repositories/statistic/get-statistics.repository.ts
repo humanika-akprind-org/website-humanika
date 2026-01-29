@@ -1,14 +1,14 @@
-/**
- * Get Statistics Repository - Read operations
- * Part of Clean Architecture: Infrastructure Layer (Repository)
- */
-
 import prisma from "@/presentation/lib/prisma";
 import type {
   Statistic,
   StatisticFilter,
 } from "@/domain/entities/statistic.entity";
 import type { Prisma } from "@prisma/client";
+
+/**
+ * Get Statistics Repository - Read operations
+ * Part of Clean Architecture: Infrastructure Layer (Repository)
+ */
 
 /**
  * Get all statistics with optional filter

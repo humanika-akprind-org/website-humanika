@@ -167,4 +167,41 @@ export class ArticleCategoryRepositoryPrisma implements IArticleCategoryReposito
     const categories = await this.prisma.articleCategory.findMany();
     return categories.length;
   }
+
+  // Aliases for backward compatibility with existing use cases
+  async getArticleCategoryById(id: string): Promise<ArticleCategory | null> {
+    return this.findById(id);
+  }
+
+  async getArticleCategories(
+    filter?: ArticleCategoryFilter,
+  ): Promise<ArticleCategory[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async getArticleCategoriesWithCount(
+    filter?: ArticleCategoryFilter,
+  ): Promise<ArticleCategory[]> {
+    const result = await this.findMany({ ...filter, withCount: true });
+    return result.records;
+  }
+
+  async createArticleCategory(
+    data: CreateArticleCategoryInput,
+    userId: string,
+  ): Promise<ArticleCategory> {
+    return this.create(data, userId);
+  }
+
+  async updateCategory(
+    id: string,
+    data: Partial<CreateArticleCategoryInput>,
+  ): Promise<ArticleCategory> {
+    return this.update(id, data);
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    return this.delete(id);
+  }
 }

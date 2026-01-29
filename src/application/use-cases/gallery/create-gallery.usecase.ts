@@ -33,7 +33,7 @@ export class CreateGalleryUseCase {
     this.validateInput(input);
 
     // 2. Create the gallery
-    const gallery = await this.galleryRepo.create(input);
+    const gallery = await this.galleryRepo.create(input, user.id);
 
     // 3. Log activity
     await this.logCreation(user, gallery);

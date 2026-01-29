@@ -12,7 +12,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/presentation/lib/auth-server";
 import { redirect, notFound } from "next/navigation";
 import {
-  getGallery,
+  getGalleryById,
   updateGallery,
   getEventsForGalleryForm,
   getPeriodsForForm,
@@ -29,7 +29,7 @@ async function EditGalleryPage({
   try {
     const [events, gallery, periods] = await Promise.all([
       getEventsForGalleryForm(),
-      getGallery(id),
+      getGalleryById(id),
       getPeriodsForForm(),
     ]);
 

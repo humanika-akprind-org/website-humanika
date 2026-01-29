@@ -49,6 +49,7 @@ export interface IOrganizationContactRepository {
   update(
     id: string,
     data: UpdateOrganizationContactInput,
+    userId: string,
   ): Promise<OrganizationContact>;
 
   /** Delete an organization contact */

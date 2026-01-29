@@ -141,4 +141,34 @@ export class FinanceCategoryRepositoryPrisma implements IFinanceCategoryReposito
     const records = await getFinanceCategories(filterParam);
     return records.length;
   }
+
+  // Aliases for backward compatibility with existing use cases
+  async getFinanceCategoryById(id: string): Promise<FinanceCategory | null> {
+    return this.findById(id);
+  }
+
+  async getFinanceCategories(
+    filter?: FinanceCategoryFilter,
+  ): Promise<FinanceCategory[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async createFinanceCategory(
+    data: CreateFinanceCategoryInput,
+    user: UserWithId,
+  ): Promise<FinanceCategory> {
+    return this.create(data, user);
+  }
+
+  async updateFinanceCategory(
+    id: string,
+    data: UpdateFinanceCategoryInput,
+  ): Promise<FinanceCategory> {
+    return this.update(id, data);
+  }
+
+  async deleteFinanceCategory(id: string): Promise<void> {
+    return this.delete(id);
+  }
 }

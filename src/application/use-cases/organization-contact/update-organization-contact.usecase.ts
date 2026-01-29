@@ -18,7 +18,9 @@ import type {
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
 
-type UserWithId = Pick<{ id: string }, "id">;
+import type { User } from "@/domain/entities/user.entity";
+
+type UserWithId = Pick<User, "id">;
 
 export class UpdateOrganizationContactUseCase {
   constructor(

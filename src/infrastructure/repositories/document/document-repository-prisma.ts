@@ -185,4 +185,32 @@ export class DocumentRepositoryPrisma implements IDocumentRepository {
       },
     });
   }
+
+  // Aliases for backward compatibility with existing use cases
+  async getDocumentById(id: string): Promise<Document | null> {
+    return this.findById(id);
+  }
+
+  async getDocuments(filter?: DocumentFilters): Promise<Document[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async createDocument(
+    data: CreateDocumentInput,
+    user?: UserWithId,
+  ): Promise<Document> {
+    return this.create(data, user);
+  }
+
+  async updateDocument(
+    id: string,
+    data: UpdateDocumentInput,
+  ): Promise<Document> {
+    return this.update(id, data);
+  }
+
+  async deleteDocument(id: string): Promise<void> {
+    return this.delete(id);
+  }
 }

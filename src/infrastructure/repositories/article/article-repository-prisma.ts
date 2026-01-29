@@ -12,7 +12,6 @@ import type {
   Article,
   ArticleFilter,
   CreateArticleInput,
-  UpdateArticleInput,
 } from "@/domain/entities/article.entity";
 import {
   getArticles,
@@ -99,8 +98,10 @@ export class ArticleRepositoryPrisma implements IArticleRepository {
   /**
    * Create a new article
    */
-  async create(data: CreateArticleInput, userId: string): Promise<Article> {
-    const user: UserWithId = { id: userId };
+  async create(
+    data: CreateArticleInput,
+    user: { id: string },
+  ): Promise<Article> {
     return await createArticle(data, user);
   }
 
@@ -109,19 +110,16 @@ export class ArticleRepositoryPrisma implements IArticleRepository {
    */
   async update(
     id: string,
-    data: UpdateArticleInput,
-    userId: string,
+    data: Partial<CreateArticleInput>,
   ): Promise<Article> {
-    const user: UserWithId = { id: userId };
-    return await updateArticle(id, data, user);
+    return await updateArticle(id, data, { id: "" });
   }
 
   /**
    * Delete an article
    */
-  async delete(id: string, userId: string): Promise<void> {
-    const user: UserWithId = { id: userId };
-    await deleteArticle(id, user);
+  async delete(id: string): Promise<void> {
+    await deleteArticle(id, { id: "" });
   }
 
   /**
@@ -171,5 +169,37 @@ export class ArticleRepositoryPrisma implements IArticleRepository {
     }
 
     return stats;
+  }
+
+  // Aliases for backward compatibility with existing use cases
+  async getArticleById(id: string): Promise<Article | null> {
+    return this.findById(id);
+  }
+
+  async getArticleBySlug(slug: string): Promise<Article | null> {
+    return this.findBySlug(slug);
+  }
+
+  async getArticles(filter?: ArticleFilter): Promise<Article[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async createArticle(
+    data: CreateArticleInput,
+    user: { id: string },
+  ): Promise<Article> {
+    return this.create(data, user);
+  }
+
+  async updateArticle(
+    id: string,
+    data: Partial<CreateArticleInput>,
+  ): Promise<Article> {
+    return this.update(id, data);
+  }
+
+  async deleteArticle(id: string): Promise<void> {
+    return this.delete(id);
   }
 }

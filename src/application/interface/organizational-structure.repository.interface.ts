@@ -43,6 +43,7 @@ export interface IOrganizationalStructureRepository {
   update(
     id: string,
     data: UpdateOrganizationalStructureInput,
+    user: { id: string },
   ): Promise<OrganizationalStructure>;
 
   /** Delete an organizational structure */
@@ -50,6 +51,22 @@ export interface IOrganizationalStructureRepository {
 
   /** Count organizational structures with optional filter */
   count(where?: BaseFilter): Promise<number>;
+
+  // Aliases for backward compatibility with existing use cases
+  getStructureById(id: string): Promise<OrganizationalStructure | null>;
+  getStructures(
+    filter?: OrganizationalStructureFilter,
+  ): Promise<OrganizationalStructure[]>;
+  createStructure(
+    data: CreateOrganizationalStructureInput,
+    user: { id: string },
+  ): Promise<OrganizationalStructure>;
+  updateStructure(
+    id: string,
+    data: UpdateOrganizationalStructureInput,
+    user: { id: string },
+  ): Promise<OrganizationalStructure>;
+  deleteStructure(id: string, user: { id: string }): Promise<void>;
 }
 
 // Re-export for convenience

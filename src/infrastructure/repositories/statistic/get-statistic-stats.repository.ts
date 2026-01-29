@@ -1,11 +1,11 @@
+import prisma from "@/presentation/lib/prisma";
+import type { StatisticStats } from "@/application/interface/statistic.repository.interface";
+import type { Prisma } from "@prisma/client";
+
 /**
  * Get Statistic Stats Repository - Aggregate statistics
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  */
-
-import prisma from "@/presentation/lib/prisma";
-import type { StatisticStats } from "@/application/interface/statistic.repository.interface";
-import type { Prisma } from "@prisma/client";
 
 /**
  * Get aggregated statistics

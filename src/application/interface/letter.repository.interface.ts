@@ -62,6 +62,17 @@ export interface ILetterRepository {
 
   /** Create approval record for a letter */
   createApproval(letterId: string, userId: string, note: string): Promise<void>;
+
+  // Aliases for backward compatibility with existing use cases
+  getLetters(filter?: LetterFilter): Promise<Letter[]>;
+  getLetterById(id: string): Promise<Letter | null>;
+  createLetter(data: CreateLetterInput, userId: string): Promise<Letter>;
+  updateLetter(
+    id: string,
+    data: UpdateLetterInput,
+    userId: string,
+  ): Promise<Letter>;
+  deleteLetter(id: string, userId: string): Promise<void>;
 }
 
 // Filter types for Letter queries

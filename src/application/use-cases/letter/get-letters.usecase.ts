@@ -50,7 +50,7 @@ export class GetLettersUseCase {
     const result = await this.letterRepo.findMany(filters, { page, limit });
 
     return {
-      letters: result.letters,
+      letters: result.records,
       pagination: result.pagination,
     };
   }

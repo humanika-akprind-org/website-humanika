@@ -46,6 +46,20 @@ export interface ITaskDepartmentRepository {
 
   /** Count department tasks with optional filter */
   count(where?: BaseFilter): Promise<number>;
+
+  // Aliases for backward compatibility with existing use cases
+  getDepartmentTaskById(id: string): Promise<DepartmentTask | null>;
+  getDepartmentTasks(filter?: DepartmentTaskFilter): Promise<DepartmentTask[]>;
+  createDepartmentTask(
+    data: CreateDepartmentTaskInput,
+    user: { id: string },
+  ): Promise<DepartmentTask>;
+  updateDepartmentTask(
+    id: string,
+    data: Partial<CreateDepartmentTaskInput>,
+    user: { id: string },
+  ): Promise<DepartmentTask>;
+  deleteDepartmentTask(id: string, user: { id: string }): Promise<void>;
 }
 
 // Re-export for convenience

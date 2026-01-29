@@ -39,7 +39,11 @@ export interface IEventCategoryRepository {
   ): Promise<EventCategory>;
 
   /** Update an existing event category */
-  update(id: string, data: UpdateEventCategoryInput): Promise<EventCategory>;
+  update(
+    id: string,
+    data: UpdateEventCategoryInput,
+    userId: string,
+  ): Promise<EventCategory>;
 
   /** Delete an event category */
   delete(id: string, userId: string): Promise<void>;

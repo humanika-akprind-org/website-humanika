@@ -24,11 +24,6 @@ export interface DocumentFilters extends BaseFilter {
   periodId?: string;
 }
 
-// Re-export base types with Document-specific names for convenience
-export type { BasePagination as DocumentPagination };
-export type { BasePaginationResult as DocumentPaginationResult };
-export type { BaseStats as DocumentStats };
-
 // Extend the base interface for Document entity
 export interface IDocumentRepository {
   /** Find all documents */
@@ -75,14 +70,19 @@ export interface IDocumentRepository {
     entityType: ApprovalType,
     note: string,
   ): Promise<void>;
+
+  // Aliases for backward compatibility with existing use cases
+  getDocumentById(id: string): Promise<Document | null>;
+  getDocuments(filter?: DocumentFilters): Promise<Document[]>;
+  createDocument(data: CreateDocumentInput): Promise<Document>;
+  updateDocument(id: string, data: UpdateDocumentInput): Promise<Document>;
+  deleteDocument(id: string): Promise<void>;
 }
 
-// Filter types for Document queries
-export interface DocumentFilters extends BaseFilter {
-  status?: Status;
-  userId?: string;
-  letterId?: string;
-  documentTypeId?: string;
-  search?: string;
-  periodId?: string;
-}
+// Re-export for convenience
+export type { DocumentFilters as DocumentFilter };
+
+// Re-export base types with Document-specific names for convenience
+export type { BasePagination as DocumentPagination };
+export type { BasePaginationResult as DocumentPaginationResult };
+export type { BaseStats as DocumentStats };

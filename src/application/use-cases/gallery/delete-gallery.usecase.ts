@@ -30,7 +30,7 @@ export class DeleteGalleryUseCase {
     };
 
     // 3. Delete the gallery
-    await this.galleryRepo.delete(id);
+    await this.galleryRepo.delete(id, user.id);
 
     // 4. Log activity
     await this.logDeletion(user, galleryData);

@@ -47,7 +47,7 @@ export class GetEventsUseCase {
     const result = await this.eventRepo.findMany(filters, { page, limit });
 
     return {
-      events: result.events,
+      events: result.records,
       pagination: result.pagination,
     };
   }

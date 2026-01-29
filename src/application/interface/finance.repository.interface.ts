@@ -40,6 +40,19 @@ export interface IFinanceRepository {
 
   /** Count finances with optional filter */
   count(where?: BaseFilter): Promise<number>;
+
+  // Aliases for backward compatibility with existing use cases
+  getFinanceById(id: string): Promise<Finance | null>;
+  getFinances(filter?: FinanceFilter): Promise<Finance[]>;
+  createFinance(
+    data: CreateFinanceInput,
+    user: { id: string },
+  ): Promise<Finance>;
+  updateFinance(
+    id: string,
+    data: Partial<CreateFinanceInput>,
+  ): Promise<Finance>;
+  deleteFinance(id: string): Promise<void>;
 }
 
 // Re-export for convenience

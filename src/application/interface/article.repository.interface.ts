@@ -43,6 +43,20 @@ export interface IArticleRepository {
 
   /** Count articles with optional filter */
   count(where?: BaseFilter): Promise<number>;
+
+  // Aliases for backward compatibility with existing use cases
+  getArticleById(id: string): Promise<Article | null>;
+  getArticleBySlug(slug: string): Promise<Article | null>;
+  getArticles(filter?: ArticleFilter): Promise<Article[]>;
+  createArticle(
+    data: CreateArticleInput,
+    user: { id: string },
+  ): Promise<Article>;
+  updateArticle(
+    id: string,
+    data: Partial<CreateArticleInput>,
+  ): Promise<Article>;
+  deleteArticle(id: string): Promise<void>;
 }
 
 // Re-export ArticleFilter for convenience

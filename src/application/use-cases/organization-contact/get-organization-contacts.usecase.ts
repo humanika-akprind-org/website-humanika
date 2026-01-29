@@ -6,9 +6,9 @@
  * Use this for complex read operations that require business logic.
  */
 
+import type { BasePagination } from "@/application/interface/base.repository.interface";
 import type {
   IOrganizationContactRepository,
-  OrganizationContactPaginationInput,
   OrganizationContactPaginationResult,
 } from "@/application/interface/organization-contact.repository.interface";
 import type {
@@ -17,7 +17,7 @@ import type {
 } from "@/domain/entities/organization-contact.entity";
 
 interface OrganizationContactResult {
-  organizationContacts: OrganizationContact[];
+  records: OrganizationContact[];
   pagination: OrganizationContactPaginationResult;
 }
 
@@ -35,7 +35,7 @@ export class GetOrganizationContactsUseCase {
    */
   async execute(
     filters?: OrganizationContactFilter,
-    pagination?: OrganizationContactPaginationInput,
+    pagination?: BasePagination,
   ): Promise<OrganizationContactResult> {
     // Apply default pagination if not provided
     const page = pagination?.page || 1;
@@ -51,7 +51,7 @@ export class GetOrganizationContactsUseCase {
       const activeContact =
         await this.organizationContactRepo.findActivePeriod();
       return {
-        organizationContacts: activeContact ? [activeContact] : [],
+        records: activeContact ? [activeContact] : [],
         pagination: {
           page: 1,
           limit: 1,
@@ -68,7 +68,7 @@ export class GetOrganizationContactsUseCase {
     });
 
     return {
-      organizationContacts: result.organizationContacts,
+      records: result.records,
       pagination: result.pagination,
     };
   }
@@ -85,7 +85,7 @@ export class GetOrganizationContactsUseCase {
       period: searchParams.get("period") || undefined,
     };
 
-    const pagination: OrganizationContactPaginationInput = {
+    const pagination: BasePagination = {
       page: parseInt(searchParams.get("page") || "1", 10) || undefined,
       limit: parseInt(searchParams.get("limit") || "10", 10) || undefined,
     };

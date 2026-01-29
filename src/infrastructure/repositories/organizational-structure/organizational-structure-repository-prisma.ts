@@ -127,4 +127,34 @@ export class OrganizationalStructureRepositoryPrisma implements IOrganizationalS
     });
     return structures.length;
   }
+
+  // Aliases for backward compatibility with existing use cases
+  async getStructureById(id: string): Promise<OrganizationalStructure | null> {
+    return this.findById(id);
+  }
+
+  async getStructures(
+    filter?: OrganizationalStructureFilter,
+  ): Promise<OrganizationalStructure[]> {
+    const result = await this.findMany(filter);
+    return result.records;
+  }
+
+  async createStructure(
+    data: CreateOrganizationalStructureInput,
+    user: { id: string },
+  ): Promise<OrganizationalStructure> {
+    return this.create(data, user);
+  }
+
+  async updateStructure(
+    id: string,
+    data: UpdateOrganizationalStructureInput,
+  ): Promise<OrganizationalStructure> {
+    return this.update(id, data);
+  }
+
+  async deleteStructure(id: string): Promise<void> {
+    return this.delete(id);
+  }
 }

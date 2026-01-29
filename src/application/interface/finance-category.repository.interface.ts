@@ -46,6 +46,21 @@ export interface IFinanceCategoryRepository {
 
   /** Count finance categories with optional filter */
   count(where?: BaseFilter): Promise<number>;
+
+  // Aliases for backward compatibility with existing use cases
+  getFinanceCategoryById(id: string): Promise<FinanceCategory | null>;
+  getFinanceCategories(
+    filter?: FinanceCategoryFilter,
+  ): Promise<FinanceCategory[]>;
+  createFinanceCategory(
+    data: CreateFinanceCategoryInput,
+    user: { id: string },
+  ): Promise<FinanceCategory>;
+  updateFinanceCategory(
+    id: string,
+    data: Partial<CreateFinanceCategoryInput>,
+  ): Promise<FinanceCategory>;
+  deleteFinanceCategory(id: string): Promise<void>;
 }
 
 // Re-export for convenience

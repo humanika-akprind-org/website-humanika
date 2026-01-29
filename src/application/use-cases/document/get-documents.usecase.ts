@@ -47,7 +47,7 @@ export class GetDocumentsUseCase {
     const result = await this.documentRepo.findMany(filters, { page, limit });
 
     return {
-      documents: result.documents,
+      documents: result.records,
       pagination: result.pagination,
     };
   }

@@ -1,14 +1,14 @@
-/**
- * Delete Statistic Repository - Write operation
- * Part of Clean Architecture: Infrastructure Layer (Repository)
- */
-
 import prisma from "@/presentation/lib/prisma";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
+
+/**
+ * Delete Statistic Repository - Write operation
+ * Part of Clean Architecture: Infrastructure Layer (Repository)
+ */
 
 /**
  * Delete a statistic
