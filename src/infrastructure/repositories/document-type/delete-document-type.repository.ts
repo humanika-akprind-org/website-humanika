@@ -6,6 +6,8 @@
 import prisma from "@/presentation/lib/prisma";
 import type { User } from "@/domain/entities/user.entity";
 
+type UserWithId = Pick<User, "id">;
+
 /**
  * Delete a document type
  * @throws Error if document type is not found
@@ -13,7 +15,7 @@ import type { User } from "@/domain/entities/user.entity";
  */
 export async function deleteDocumentType(
   id: string,
-  _user: User,
+  _user: UserWithId,
 ): Promise<void> {
   // Check if document type exists
   const existingDocumentType = await prisma.documentType.findUnique({

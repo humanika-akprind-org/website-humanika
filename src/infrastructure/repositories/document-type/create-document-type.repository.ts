@@ -10,13 +10,15 @@ import type {
 } from "@/domain/value-objects/document-type";
 import type { User } from "@/domain/entities/user.entity";
 
+type UserWithId = Pick<User, "id">;
+
 /**
  * Create a new document type
  * @throws Error if document type with the same name already exists
  */
 export async function createDocumentType(
   data: CreateDocumentTypeInput,
-  _user: User,
+  _user: UserWithId,
 ): Promise<DocumentType> {
   // Check if document type with same name already exists
   const existingDocumentType = await prisma.documentType.findFirst({

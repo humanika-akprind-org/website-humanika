@@ -19,3 +19,6 @@ export * from "./get-document-type.repository";
 export * from "./create-document-type.repository";
 export * from "./update-document-type.repository";
 export * from "./delete-document-type.repository";
+
+// Export Prisma repository implementation
+export { DocumentTypeRepositoryPrisma } from "./document-type-repository-prisma";

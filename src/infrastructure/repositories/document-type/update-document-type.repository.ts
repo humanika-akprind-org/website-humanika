@@ -10,6 +10,8 @@ import type {
 } from "@/domain/value-objects/document-type";
 import type { User } from "@/domain/entities/user.entity";
 
+type UserWithId = Pick<User, "id">;
+
 /**
  * Update an existing document type
  * @throws Error if document type is not found
@@ -18,7 +20,7 @@ import type { User } from "@/domain/entities/user.entity";
 export async function updateDocumentType(
   id: string,
   data: UpdateDocumentTypeInput,
-  _user: User,
+  _user: UserWithId,
 ): Promise<DocumentType> {
   // Check if document type exists
   const existingDocumentType = await prisma.documentType.findUnique({
