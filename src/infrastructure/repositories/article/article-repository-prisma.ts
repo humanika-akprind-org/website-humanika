@@ -1,248 +1,175 @@
 /**
- * Article Repository Prisma - Class-based repository implementation
+ * Article Repository Prisma Implementation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  *
- * This file contains the ArticleRepositoryPrisma class that implements
- * IArticleRepository interface for use with the use case pattern.
+ * This repository implements the IArticleRepository interface
+ * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
-import prisma from "@/presentation/lib/prisma";
 import type { IArticleRepository } from "@/application/interface/article.repository.interface";
 import type {
-  CreateArticleInput,
   Article,
   ArticleFilter,
+  CreateArticleInput,
+  UpdateArticleInput,
 } from "@/domain/entities/article.entity";
-import type { Prisma } from "@prisma/client";
-import type { Status } from "@/domain/enums";
+import {
+  getArticles,
+  getArticleById,
+  getArticleBySlug,
+  createArticle,
+  updateArticle,
+  deleteArticle,
+} from "./index";
 
+// Type alias for user context
+type UserWithId = { id: string };
+
+/**
+ * Article Repository Prisma Implementation
+ *
+ * This class implements the IArticleRepository interface
+ * for Clean Architecture compliance.
+ */
 export class ArticleRepositoryPrisma implements IArticleRepository {
-  private prisma = prisma;
+  /**
+   * Get all articles
+   */
+  async findAll(): Promise<Article[]> {
+    return (await getArticles()) as Article[];
+  }
 
   /**
-   * Get all articles with optional filters
+   * Get all articles with optional filtering and pagination
    */
-  async getArticles(filter?: ArticleFilter): Promise<Article[]> {
-    const where: Prisma.ArticleWhereInput = {};
+  async findMany(
+    filter?: ArticleFilter,
+    pagination?: { page?: number; limit?: number },
+  ): Promise<{
+    records: Article[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }> {
+    const records = await getArticles(filter);
 
-    if (filter?.status) {
-      where.status = { equals: filter.status as unknown as Status };
-    }
-    if (filter?.periodId) where.periodId = filter.periodId;
-    if (filter?.categoryId) where.categoryId = filter.categoryId;
-    if (filter?.authorId) where.authorId = filter.authorId;
-    if (filter?.search) {
-      where.OR = [
-        { title: { contains: filter.search, mode: "insensitive" } },
-        { content: { contains: filter.search, mode: "insensitive" } },
-      ];
-    }
+    // Get total count for pagination
+    const total = records.length;
 
-    const articles = await this.prisma.article.findMany({
-      where,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
+    // Apply default pagination if not provided
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Get paginated articles
+    const paginatedRecords = records.slice(skip, skip + limit);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      records: paginatedRecords as Article[],
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
       },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return articles as unknown as Article[];
+    };
   }
 
   /**
    * Get a single article by ID
    */
-  async getArticleById(id: string): Promise<Article | null> {
-    const article = await this.prisma.article.findUnique({
-      where: { id },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
-      },
-    });
-
-    return article as unknown as Article | null;
+  async findById(id: string): Promise<Article | null> {
+    return (await getArticleById(id)) as Article | null;
   }
 
   /**
    * Get a single article by slug
    */
-  async getArticleBySlug(slug: string): Promise<Article | null> {
-    const article = await this.prisma.article.findUnique({
-      where: { slug },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
-      },
-    });
-
-    return article as unknown as Article | null;
+  async findBySlug(slug: string): Promise<Article | null> {
+    return (await getArticleBySlug(slug)) as Article | null;
   }
 
   /**
    * Create a new article
    */
-  async createArticle(data: CreateArticleInput): Promise<Article> {
-    // Generate slug from title
-    const slug = data.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-
-    const articleData: Prisma.ArticleCreateInput = {
-      title: data.title,
-      slug,
-      thumbnail: data.thumbnail,
-      content: data.content,
-      author: { connect: { id: data.authorId } },
-      category: { connect: { id: data.categoryId } },
-    };
-
-    // Only include periodId if it's provided and not empty
-    if (data.periodId && data.periodId.trim() !== "") {
-      articleData.period = { connect: { id: data.periodId } };
-    }
-
-    const article = await this.prisma.article.create({
-      data: articleData,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
-      },
-    });
-
-    return article as unknown as Article;
+  async create(data: CreateArticleInput, userId: string): Promise<Article> {
+    const user: UserWithId = { id: userId };
+    return await createArticle(data, user);
   }
 
   /**
    * Update an existing article
    */
-  async updateArticle(
+  async update(
     id: string,
-    data: Partial<CreateArticleInput>,
+    data: UpdateArticleInput,
+    userId: string,
   ): Promise<Article> {
-    const updateData: Prisma.ArticleUpdateInput = {
-      title: data.title,
-      content: data.content,
-      thumbnail: data.thumbnail,
-    };
-
-    // Update slug if title changed
-    if (data.title) {
-      (updateData as Prisma.ArticleUpdateInput).slug = data.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-    }
-
-    if (data.categoryId) {
-      updateData.category = { connect: { id: data.categoryId } };
-    }
-
-    if (data.periodId && data.periodId.trim() !== "") {
-      updateData.period = { connect: { id: data.periodId } };
-    } else if (data.periodId === "") {
-      updateData.period = { disconnect: true };
-    }
-
-    const article = await this.prisma.article.update({
-      where: { id },
-      data: updateData,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
-      },
-    });
-
-    return article as unknown as Article;
+    const user: UserWithId = { id: userId };
+    return await updateArticle(id, data, user);
   }
 
   /**
    * Delete an article
    */
-  async deleteArticle(id: string): Promise<void> {
-    await this.prisma.article.delete({
-      where: { id },
-    });
+  async delete(id: string, userId: string): Promise<void> {
+    const user: UserWithId = { id: userId };
+    await deleteArticle(id, user);
   }
 
   /**
-   * Base repository method - find all articles
+   * Count articles with optional filter
    */
-  async findAll(): Promise<Article[]> {
-    const articles = await this.prisma.article.findMany({
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
-      },
-      orderBy: { createdAt: "desc" },
+  async count(where?: Record<string, unknown>): Promise<number> {
+    const articles = await getArticles({
+      status: where?.status as import("@/domain/enums").Status,
+      periodId: where?.periodId as string,
+      categoryId: where?.categoryId as string,
+      authorId: where?.authorId as string,
     });
-
-    return articles as unknown as Article[];
+    return articles.length;
   }
 
   /**
-   * Base repository method - find by ID
+   * Get aggregated article statistics
    */
-  async findById(id: string): Promise<Article | null> {
-    const article = await this.prisma.article.findUnique({
-      where: { id },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        category: true,
-        period: true,
-      },
+  async getStats(
+    where?: Record<string, unknown>,
+  ): Promise<{ total: number; [key: string]: number | string | unknown }> {
+    const articles = await getArticles({
+      status: where?.status as import("@/domain/enums").Status,
+      periodId: where?.periodId as string,
+      categoryId: where?.categoryId as string,
     });
 
-    return article as unknown as Article | null;
+    // Basic stats - can be extended with more aggregations
+    const stats: {
+      total: number;
+      published: number;
+      draft: number;
+      [key: string]: number | string | unknown;
+    } = {
+      total: articles.length,
+      published: 0,
+      draft: 0,
+    };
+
+    // Count by status
+    for (const article of articles) {
+      if (article.status === "PUBLISH") {
+        stats.published++;
+      } else if (article.status === "DRAFT") {
+        stats.draft++;
+      }
+    }
+
+    return stats;
   }
 }
