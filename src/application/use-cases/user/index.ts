@@ -12,6 +12,3 @@ export { ChangePasswordUseCase } from "./change-password.usecase";
 export { DeleteAccountUseCase } from "./delete-account.usecase";
 export { BulkVerifyUsersUseCase } from "./bulk-verify-users.usecase";
 export { GetUsersForVerificationUseCase } from "./get-users-for-verification.usecase";
-
-// Export types
-export type { UsersResult } from "@/application/interface/user.repository.interface";

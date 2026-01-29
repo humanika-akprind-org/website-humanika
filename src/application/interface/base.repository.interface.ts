@@ -6,12 +6,38 @@
  * Use this as a base for entity-specific repositories.
  */
 
+// Generic types for base repository
+export type BaseFilter = Record<string, unknown>;
+
+export interface BasePagination {
+  page?: number;
+  limit?: number;
+}
+
+export interface BasePaginationResult {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface BaseStats {
+  total: number;
+  [key: string]: number | string | unknown;
+}
+
 export interface IBaseRepository<T, TId, TCreate, TUpdate> {
   /** Find all records */
   findAll(): Promise<T[]>;
 
   /** Find a record by ID */
   findById(id: TId): Promise<T | null>;
+
+  /** Find records with filters and pagination */
+  findMany(
+    filters?: BaseFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: T[]; pagination: BasePaginationResult }>;
 
   /** Create a new record */
   create(data: TCreate): Promise<T>;
@@ -23,5 +49,8 @@ export interface IBaseRepository<T, TId, TCreate, TUpdate> {
   delete(id: TId): Promise<void>;
 
   /** Count records with optional filter */
-  count(where?: unknown): Promise<number>;
+  count(where?: BaseFilter): Promise<number>;
+
+  /** Get statistics/filters */
+  getStats(filters?: BaseFilter): Promise<BaseStats>;
 }

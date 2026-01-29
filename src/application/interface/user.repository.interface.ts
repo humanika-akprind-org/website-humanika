@@ -1,110 +1,82 @@
 /**
- * User Repository Interface
+ * User Repository Interface - Entity-specific repository
  * Part of Clean Architecture: Application Layer (Interface)
+ *
+ * This interface defines User-specific operations.
  */
 
-import type { UserRole, Department, Position } from "@prisma/client";
+import type {
+  User,
+  CreateUserData,
+  UpdateUserData,
+} from "@/domain/entities/user.entity";
 
-// ============================================================================
-// Filter and Input Types
-// ============================================================================
-
-export type UserFilter = {
-  page?: number;
-  limit?: number;
-  search?: string;
-  role?: UserRole;
-  department?: Department;
-  isActive?: boolean;
-  verifiedAccount?: boolean;
-  allUsers?: boolean;
-  excludeUserId?: string;
-};
-
-export type UsersResult = {
-  users: Array<{
-    id: string;
-    name: string;
-    email: string;
-    username: string;
-    role: UserRole;
-    department: Department | null;
-    position: string | null;
-    isActive: boolean;
-    verifiedAccount: boolean;
-    attemptLogin: number | null;
-    blockExpires: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-    avatarColor: string;
-  }>;
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
-};
-
-export type CreateUserInput = {
-  name: string;
-  email: string;
-  username: string;
-  password: string;
-  role?: UserRole;
-  department?: Department;
-  position?: Position;
-  isActive?: boolean;
-  verifiedAccount?: boolean;
-};
-
-export type UpdateUserInput = {
-  name?: string;
-  email?: string;
-  username?: string;
-  password?: string;
-  role?: UserRole;
-  department?: Department;
-  position?: Position;
-  isActive?: boolean;
-  verifiedAccount?: boolean;
-};
-
-export type User = {
-  id: string;
-  name: string;
-  email: string;
-  username: string;
-  role: UserRole;
-  department: Department | null;
-  position: Position | null;
-  isActive: boolean;
-  verifiedAccount: boolean;
-  attemptLogin: number | null;
-  blockExpires: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  avatarColor: string;
-};
-
-// ============================================================================
-// Repository Interface
-// ============================================================================
-
+// User-specific repository interface
 export interface IUserRepository {
-  getUsers(filter: UserFilter): Promise<User[]>;
-  getUserById(id: string): Promise<User | null>;
-  createUser(data: CreateUserInput): Promise<User>;
-  updateUser(id: string, data: UpdateUserInput): Promise<User>;
-  deleteUser(id: string): Promise<void>;
+  /** Find all users */
+  findAll(): Promise<User[]>;
+
+  /** Find a user by ID */
+  findById(id: string): Promise<User | null>;
+
+  /** Find users with filters and pagination */
+  findMany(
+    filters?: UserFilter,
+    pagination?: UserPagination,
+  ): Promise<{ users: User[]; pagination: UserPaginationResult }>;
+
+  /** Create a user */
+  create(data: CreateUserData): Promise<User>;
+
+  /** Update an existing user */
+  update(id: string, data: UpdateUserData): Promise<User>;
+
+  /** Delete a user */
+  delete(id: string): Promise<void>;
+
+  /** Count users with optional filter */
+  count(where?: unknown): Promise<number>;
+
+  /** Change user password */
   changePassword(
     userId: string,
     currentPassword: string,
     newPassword: string,
   ): Promise<void>;
+
+  /** Delete user account (soft delete) */
   deleteAccount(userId: string): Promise<void>;
+
+  /** Bulk verify users */
   bulkVerifyUsers(userIds: string[]): Promise<{ count: number }>;
+
+  /** Get users for verification */
   getUsersForVerification(
     userIds: string[],
   ): Promise<Array<{ id: string; email: string; name: string }>>;
+}
+
+// Filter types for User queries
+export interface UserFilter {
+  search?: string;
+  role?: string;
+  department?: string;
+  isActive?: boolean;
+  verifiedAccount?: boolean;
+  allUsers?: boolean;
+  excludeUserId?: string;
+}
+
+// Pagination input
+export interface UserPagination {
+  page?: number;
+  limit?: number;
+}
+
+// Pagination result
+export interface UserPaginationResult {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
