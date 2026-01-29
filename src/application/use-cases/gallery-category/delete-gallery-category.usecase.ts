@@ -30,7 +30,7 @@ export class DeleteGalleryCategoryUseCase {
     };
 
     // 3. Delete the category
-    await this.categoryRepo.delete(id);
+    await this.categoryRepo.delete(id, user.id);
 
     // 4. Log activity
     await this.logDeletion(user, categoryData);

@@ -40,7 +40,7 @@ export class UpdateGalleryCategoryUseCase {
     }
 
     // 4. Update the category
-    const category = await this.categoryRepo.update(id, input);
+    const category = await this.categoryRepo.update(id, input, user.id);
 
     // 5. Log activity
     await this.logUpdate(user, category, existingCategory);

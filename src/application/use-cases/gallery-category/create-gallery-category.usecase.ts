@@ -31,7 +31,7 @@ export class CreateGalleryCategoryUseCase {
     await this.checkDuplicate(input);
 
     // 3. Create the category
-    const category = await this.categoryRepo.create(input);
+    const category = await this.categoryRepo.create(input, user.id);
 
     // 4. Log activity
     await this.logCreation(user, category);
