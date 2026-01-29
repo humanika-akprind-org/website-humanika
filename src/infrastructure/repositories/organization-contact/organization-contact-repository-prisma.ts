@@ -2,14 +2,15 @@
  * Organization Contact Repository Prisma Implementation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  *
- * This repository wraps existing organization contact functions
- * and implements the IOrganizationContactRepository interface.
+ * This repository implements the IOrganizationContactRepository interface
+ * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
 import type {
   IOrganizationContactRepository,
-  OrganizationContactPaginationInput,
-  OrganizationContactResult,
+  OrganizationContactPagination,
+  OrganizationContactPaginationResult,
 } from "@/application/interface/organization-contact.repository.interface";
 import type {
   OrganizationContact,
@@ -58,40 +59,56 @@ function toOrganizationContact(
 /**
  * Organization Contact Repository Prisma Implementation
  *
- * This class wraps existing repository functions to implement
- * the standardized repository interface for Clean Architecture.
+ * This class implements the IOrganizationContactRepository interface
+ * for Clean Architecture compliance.
  */
 export class OrganizationContactRepositoryPrisma implements IOrganizationContactRepository {
+  /**
+   * Get all organization contacts
+   */
+  async findAll(): Promise<OrganizationContact[]> {
+    const organizationContacts = await getOrganizationContacts();
+
+    // Transform results to ensure proper typing
+    return organizationContacts.map((contact) =>
+      toOrganizationContact(contact as NonNullable<typeof contact>),
+    );
+  }
+
   /**
    * Get all organization contacts with optional filtering and pagination
    */
   async findMany(
-    filter?: OrganizationContactFilter,
-    pagination?: OrganizationContactPaginationInput,
-  ): Promise<OrganizationContactResult> {
-    // Apply default pagination if not provided
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-
+    filters?: OrganizationContactFilter,
+    pagination?: OrganizationContactPagination,
+  ): Promise<{
+    records: OrganizationContact[];
+    pagination: OrganizationContactPaginationResult;
+  }> {
     // Get all contacts (the existing function doesn't support pagination)
-    const organizationContacts = await getOrganizationContacts(filter);
+    const organizationContacts = await getOrganizationContacts(filters);
 
     // Transform results to ensure proper typing
     const typedContacts = organizationContacts.map((contact) =>
       toOrganizationContact(contact as NonNullable<typeof contact>),
     );
 
-    // Calculate pagination metadata
+    // Get total count for pagination
     const total = typedContacts.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
 
-    // Apply pagination to results
-    const paginatedContacts = typedContacts.slice(startIndex, endIndex);
+    // Apply default pagination if not provided
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Get paginated organization contacts
+    const paginatedContacts = typedContacts.slice(skip, skip + limit);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
 
     return {
-      organizationContacts: paginatedContacts,
+      records: paginatedContacts,
       pagination: {
         page,
         limit,
@@ -148,11 +165,10 @@ export class OrganizationContactRepositoryPrisma implements IOrganizationContact
   async update(
     id: string,
     data: UpdateOrganizationContactInput,
-    userId: string,
   ): Promise<OrganizationContact> {
     // The existing update function expects a user object with id
     const result = await updateOrganizationContact(id, data, {
-      id: userId,
+      id: "system",
     } as { id: string });
     return toOrganizationContact(result);
   }
@@ -163,5 +179,15 @@ export class OrganizationContactRepositoryPrisma implements IOrganizationContact
   async delete(id: string, userId: string): Promise<void> {
     // The existing delete function expects a user object with id
     await deleteOrganizationContact(id, { id: userId } as { id: string });
+  }
+
+  /**
+   * Count organization contacts with optional filter
+   */
+  async count(where?: Record<string, unknown>): Promise<number> {
+    const organizationContacts = await getOrganizationContacts({
+      periodId: where?.periodId as string,
+    });
+    return organizationContacts.length;
   }
 }

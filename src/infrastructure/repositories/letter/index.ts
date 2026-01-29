@@ -18,6 +18,8 @@ export { LetterRepositoryPrisma } from "./letter-repository-prisma";
 // Export functions
 export * from "./get-letters.repository";
 export * from "./get-letter-by-id.repository";
+export * from "./get-letter-by-number.repository";
 export * from "./create-letter.repository";
 export * from "./update-letter.repository";
 export * from "./delete-letter.repository";
+export * from "./create-letter-approval.repository";

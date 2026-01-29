@@ -50,7 +50,7 @@ export class UpdateLetterUseCase {
     }
 
     // 4. Update the letter
-    const letter = await this.letterRepo.update(id, input);
+    const letter = await this.letterRepo.update(id, input, user.id);
 
     // 5. Log activity
     await this.logUpdate(user, letter, existingLetter);

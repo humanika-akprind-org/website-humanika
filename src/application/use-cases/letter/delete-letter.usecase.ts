@@ -39,7 +39,7 @@ export class DeleteLetterUseCase {
     };
 
     // 3. Delete the letter
-    await this.letterRepo.delete(id);
+    await this.letterRepo.delete(id, user.id);
 
     // 4. Log activity
     await this.logDeletion(user, letterData);

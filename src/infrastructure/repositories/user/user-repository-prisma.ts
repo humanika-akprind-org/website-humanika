@@ -9,10 +9,14 @@
 import type {
   IUserRepository,
   UserFilter,
-  CreateUserInput,
-  UpdateUserInput,
-  User,
+  UserPagination,
+  UserPaginationResult,
 } from "@/application/interface/user.repository.interface";
+import type {
+  User,
+  CreateUserData,
+  UpdateUserData,
+} from "@/domain/entities/user.entity";
 import {
   getUsers,
   getUser,
@@ -25,32 +29,74 @@ import {
   bulkVerifyUsers,
   bulkSendVerificationEmails,
 } from "./index";
-import { type Department, type Position, type UserRole } from "@/domain/enums";
+import type { Department, Position, UserRole } from "@/domain/enums";
 
 /**
  * User Repository Prisma Implementation
+ *
+ * This class implements the IUserRepository interface
+ * for Clean Architecture compliance.
  */
 export class UserRepositoryPrisma implements IUserRepository {
   /**
-   * Get users with optional filters and pagination
+   * Get all users
    */
-  async getUsers(filter: UserFilter): Promise<User[]> {
-    const users = await getUsers({
-      page: filter.page,
-      limit: filter.limit,
-      search: filter.search,
-      role: filter.role,
-      department: filter.department,
-      isActive: filter.isActive,
-      verifiedAccount: filter.verifiedAccount,
-      allUsers: filter.allUsers,
-      excludeUserId: filter.excludeUserId,
+  async findAll(): Promise<User[]> {
+    return (await getUsers({})) as unknown as User[];
+  }
+
+  /**
+   * Get all users with optional filtering and pagination
+   */
+  async findMany(
+    filter?: UserFilter,
+    pagination?: UserPagination,
+  ): Promise<{ records: User[]; pagination: UserPaginationResult }> {
+    const records = await getUsers({
+      search: filter?.search,
+      role: filter?.role as UserRole | undefined,
+      department: filter?.department as Department | undefined,
+      isActive: filter?.isActive,
+      verifiedAccount: filter?.verifiedAccount,
+      allUsers: filter?.allUsers,
+      excludeUserId: filter?.excludeUserId,
     });
-    return users as unknown as User[];
+
+    // Get total count for pagination
+    const total = records.length;
+
+    // Apply default pagination if not provided
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Get paginated users
+    const paginatedRecords = records.slice(skip, skip + limit);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      records: paginatedRecords as unknown as User[],
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
   }
 
   /**
    * Get a single user by ID
+   */
+  async findById(id: string): Promise<User | null> {
+    const user = await getUser(id);
+    return user as unknown as User | null;
+  }
+
+  /**
+   * Get a single user by ID (legacy method for backward compatibility)
    */
   async getUserById(id: string): Promise<{
     id: string;
@@ -72,7 +118,39 @@ export class UserRepositoryPrisma implements IUserRepository {
   }
 
   /**
+   * Get users with optional filters (legacy method for backward compatibility)
+   */
+  async getUsers(filter: UserFilter): Promise<User[]> {
+    const users = await getUsers({
+      search: filter.search,
+      role: filter.role as UserRole | undefined,
+      department: filter.department as Department | undefined,
+      isActive: filter.isActive,
+      verifiedAccount: filter.verifiedAccount,
+      allUsers: filter.allUsers,
+      excludeUserId: filter.excludeUserId,
+    });
+    return users as unknown as User[];
+  }
+
+  /**
    * Create a new user
+   */
+  async create(data: CreateUserData): Promise<User> {
+    return (await createUser({
+      name: data.name,
+      email: data.email,
+      username: data.username,
+      password: data.password,
+      role: data.role,
+      department: data.department,
+      position: data.position,
+      isActive: data.isActive,
+    })) as unknown as User;
+  }
+
+  /**
+   * Create a new user (legacy method for backward compatibility)
    */
   async createUser(data: CreateUserInput): Promise<User> {
     return (await createUser({
@@ -84,12 +162,27 @@ export class UserRepositoryPrisma implements IUserRepository {
       department: data.department,
       position: data.position,
       isActive: data.isActive,
-      verifiedAccount: data.verifiedAccount,
     })) as unknown as User;
   }
 
   /**
    * Update an existing user
+   */
+  async update(id: string, data: UpdateUserData): Promise<User> {
+    return (await updateUser(id, {
+      name: data.name,
+      email: data.email,
+      username: data.username,
+      password: data.password,
+      role: data.role,
+      department: data.department,
+      position: data.position,
+      isActive: data.isActive,
+    })) as unknown as User;
+  }
+
+  /**
+   * Update an existing user (legacy method for backward compatibility)
    */
   async updateUser(id: string, data: UpdateUserInput): Promise<User> {
     return (await updateUser(id, {
@@ -101,12 +194,18 @@ export class UserRepositoryPrisma implements IUserRepository {
       department: data.department,
       position: data.position,
       isActive: data.isActive,
-      verifiedAccount: data.verifiedAccount,
     })) as unknown as User;
   }
 
   /**
    * Delete a user
+   */
+  async delete(id: string): Promise<void> {
+    await deleteUser(id);
+  }
+
+  /**
+   * Delete a user (legacy method for backward compatibility)
    */
   async deleteUser(id: string): Promise<void> {
     await deleteUser(id);
@@ -152,9 +251,29 @@ export class UserRepositoryPrisma implements IUserRepository {
   }
 
   /**
-   * Verify a single user
+   * Verify a single user (legacy method for backward compatibility)
    */
   async verifyUser(id: string): Promise<User> {
     return (await verifyUser(id)) as User;
   }
+
+  /**
+   * Count users with optional filter
+   */
+  async count(where?: Record<string, unknown>): Promise<number> {
+    const users = await getUsers({
+      search: where?.search as string,
+      role: where?.role as UserRole | undefined,
+      department: where?.department as Department | undefined,
+      isActive: where?.isActive as boolean,
+      verifiedAccount: where?.verifiedAccount as boolean,
+      allUsers: where?.allUsers as boolean,
+      excludeUserId: where?.excludeUserId as string,
+    });
+    return users.length;
+  }
 }
+
+// Type aliases for backward compatibility
+type CreateUserInput = CreateUserData;
+type UpdateUserInput = UpdateUserData;

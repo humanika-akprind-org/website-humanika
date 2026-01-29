@@ -4,9 +4,9 @@
  *
  * This file contains the LetterRepositoryPrisma class that implements
  * ILetterRepository interface for use with the use case pattern.
+ * Following the statistic repository pattern - delegates to exported functions.
  */
 
-import prisma from "@/presentation/lib/prisma";
 import type {
   ILetterRepository,
   LetterFilter,
@@ -17,616 +17,174 @@ import type {
   CreateLetterInput,
   UpdateLetterInput,
 } from "@/domain/entities/letter.entity";
-import type { Prisma, Status as PrismaStatus } from "@prisma/client";
 import type { LetterType, LetterPriority, Status } from "@/domain/enums";
 import type { Letter } from "@/domain/entities/letter.entity";
+import {
+  getLetters,
+  getLetter,
+  getLetterByNumber,
+  createLetter,
+  updateLetter,
+  deleteLetter,
+  createLetterApproval,
+} from "./index";
 
+// Type alias for user context
+type UserWithId = { id: string };
+
+/**
+ * Letter Repository Prisma Implementation
+ *
+ * This class implements the ILetterRepository interface
+ * for Clean Architecture compliance.
+ * Follows the statistic pattern - delegates to exported functions.
+ */
 export class LetterRepositoryPrisma implements ILetterRepository {
-  private prisma = prisma;
+  /**
+   * Get all letters
+   */
+  async findAll(): Promise<Letter[]> {
+    return (await getLetters({})) as unknown as Letter[];
+  }
 
+  /**
+   * Get all letters with optional filtering and pagination
+   */
   async findMany(
-    filters?: LetterFilter,
+    filter?: LetterFilter,
     pagination?: LetterPagination,
-  ): Promise<{ letters: Letter[]; pagination: LetterPaginationResult }> {
+  ): Promise<{ records: Letter[]; pagination: LetterPaginationResult }> {
+    const records = await getLetters(filter || {});
+
+    // Get total count for pagination
+    const total = records.length;
+
+    // Apply default pagination if not provided
     const page = pagination?.page || 1;
     const limit = pagination?.limit || 10;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.LetterWhereInput = {};
+    // Get paginated records
+    const paginatedRecords = records.slice(skip, skip + limit);
 
-    if (filters?.type) where.type = { equals: filters.type };
-    if (filters?.priority) where.priority = { equals: filters.priority };
-    if (filters?.classification) {
-      where.classification = { equals: filters.classification };
-    }
-    if (filters?.status) {
-      where.status = { equals: filters.status as unknown as PrismaStatus };
-    }
-    if (filters?.periodId) where.periodId = filters.periodId;
-    if (filters?.eventId) where.eventId = filters.eventId;
-
-    const orConditions: Prisma.LetterWhereInput[] = [];
-
-    if (filters?.search) {
-      orConditions.push(
-        { regarding: { contains: filters.search, mode: "insensitive" } },
-        { number: { contains: filters.search, mode: "insensitive" } },
-        { origin: { contains: filters.search, mode: "insensitive" } },
-        { destination: { contains: filters.search, mode: "insensitive" } },
-      );
-    }
-
-    if (orConditions.length > 0) {
-      where.OR = orConditions;
-    }
-
-    const [letters, total] = await Promise.all([
-      this.prisma.letter.findMany({
-        where,
-        include: {
-          period: true,
-          event: true,
-          createdBy: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          approvedBy: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          attachments: {
-            select: {
-              id: true,
-              name: true,
-              document: true,
-            },
-          },
-          approvals: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: { date: "desc" },
-        skip,
-        take: limit,
-      }),
-      this.prisma.letter.count({ where }),
-    ]);
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
 
     return {
-      letters: letters as unknown as Letter[],
+      records: paginatedRecords as unknown as Letter[],
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages,
       },
     };
   }
 
-  async findByNumber(number: string): Promise<Letter | null> {
-    const letter = await this.prisma.letter.findUnique({
-      where: { number },
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    return letter as unknown as Letter | null;
-  }
-
-  async findByType(type: LetterType): Promise<Letter[]> {
-    const letters = await this.prisma.letter.findMany({
-      where: { type },
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: { date: "desc" },
-    });
-    return letters as unknown as Letter[];
-  }
-
-  async findByPriority(priority: LetterPriority): Promise<Letter[]> {
-    const letters = await this.prisma.letter.findMany({
-      where: { priority },
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: { date: "desc" },
-    });
-    return letters as unknown as Letter[];
-  }
-
-  async findByStatus(status: Status): Promise<Letter[]> {
-    const letters = await this.prisma.letter.findMany({
-      where: { status },
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: { date: "desc" },
-    });
-    return letters as unknown as Letter[];
-  }
-
-  async findByPeriod(periodId: string): Promise<Letter[]> {
-    const letters = await this.prisma.letter.findMany({
-      where: { periodId },
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: { date: "desc" },
-    });
-    return letters as unknown as Letter[];
-  }
-
-  async findByEvent(eventId: string): Promise<Letter[]> {
-    const letters = await this.prisma.letter.findMany({
-      where: { eventId },
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: { date: "desc" },
-    });
-    return letters as unknown as Letter[];
-  }
-
-  async create(data: CreateLetterInput, userId: string): Promise<Letter> {
-    const letterData: Prisma.LetterCreateInput = {
-      regarding: data.regarding,
-      origin: data.origin,
-      destination: data.destination,
-      date: new Date(data.date),
-      type: data.type,
-      priority: data.priority,
-      status: (data.status as unknown as PrismaStatus) || "DRAFT",
-      body: data.body || null,
-      letter: data.letter || null,
-      notes: data.notes || null,
-      createdBy: { connect: { id: userId } },
-    };
-
-    // Optional fields
-    if (data.number) letterData.number = data.number;
-    if (data.classification) letterData.classification = data.classification;
-    if (data.periodId) letterData.period = { connect: { id: data.periodId } };
-    if (data.eventId) letterData.event = { connect: { id: data.eventId } };
-
-    const letter = await this.prisma.letter.create({
-      data: letterData,
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return letter as unknown as Letter;
-  }
-
-  async update(id: string, data: UpdateLetterInput): Promise<Letter> {
-    const updateData: Prisma.LetterUpdateInput = {
-      regarding: data.regarding,
-      origin: data.origin,
-      destination: data.destination,
-      date: data.date ? new Date(data.date) : undefined,
-      type: data.type,
-      priority: data.priority,
-      status: data.status,
-      body: data.body,
-      letter: data.letter,
-      notes: data.notes,
-      number: data.number,
-      classification: data.classification,
-    };
-
-    if (data.periodId) {
-      updateData.period = { connect: { id: data.periodId } };
-    }
-    if (data.eventId) {
-      updateData.event = { connect: { id: data.eventId } };
-    }
-    if (data.approvedById) {
-      updateData.approvedBy = { connect: { id: data.approvedById } };
-    }
-
-    const letter = await this.prisma.letter.update({
-      where: { id },
-      data: updateData,
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return letter as unknown as Letter;
-  }
-
-  async delete(id: string): Promise<void> {
-    await this.prisma.letter.delete({
-      where: { id },
-    });
-  }
-
-  // Base repository methods
-  async findAll(): Promise<Letter[]> {
-    const letters = await this.prisma.letter.findMany({
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: { date: "desc" },
-    });
-    return letters as unknown as Letter[];
-  }
-
+  /**
+   * Get a single letter by ID
+   */
   async findById(id: string): Promise<Letter | null> {
-    const letter = await this.prisma.letter.findUnique({
-      where: { id },
-      include: {
-        period: true,
-        event: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvedBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        attachments: {
-          select: {
-            id: true,
-            name: true,
-            document: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    return letter as unknown as Letter | null;
+    return (await getLetter(id)) as Letter | null;
   }
 
-  async count(where?: unknown): Promise<number> {
-    return await this.prisma.letter.count({
-      where: where as Prisma.LetterWhereInput,
-    });
+  /**
+   * Get letter by number
+   */
+  async findByNumber(number: string): Promise<Letter | null> {
+    return (await getLetterByNumber(number)) as Letter | null;
   }
 
-  // Additional helper method for creating approval
+  /**
+   * Get letters by type
+   */
+  async findByType(type: LetterType): Promise<Letter[]> {
+    const letters = await getLetters({ type });
+    return letters as unknown as Letter[];
+  }
+
+  /**
+   * Get letters by priority
+   */
+  async findByPriority(priority: LetterPriority): Promise<Letter[]> {
+    const letters = await getLetters({ priority });
+    return letters as unknown as Letter[];
+  }
+
+  /**
+   * Get letters by status
+   */
+  async findByStatus(status: Status): Promise<Letter[]> {
+    const letters = await getLetters({ status });
+    return letters as unknown as Letter[];
+  }
+
+  /**
+   * Get letters by period
+   */
+  async findByPeriod(periodId: string): Promise<Letter[]> {
+    const letters = await getLetters({ periodId });
+    return letters as unknown as Letter[];
+  }
+
+  /**
+   * Get letters by event
+   */
+  async findByEvent(eventId: string): Promise<Letter[]> {
+    const letters = await getLetters({ eventId });
+    return letters as unknown as Letter[];
+  }
+
+  /**
+   * Create a new letter
+   */
+  async create(data: CreateLetterInput, userId: string): Promise<Letter> {
+    const user: UserWithId = { id: userId };
+    return (await createLetter(data, user)) as unknown as Letter;
+  }
+
+  /**
+   * Update an existing letter
+   */
+  async update(
+    id: string,
+    data: UpdateLetterInput,
+    userId: string,
+  ): Promise<Letter> {
+    const user: UserWithId = { id: userId };
+    return (await updateLetter(id, data, user)) as unknown as Letter;
+  }
+
+  /**
+   * Delete a letter
+   */
+  async delete(id: string, userId: string): Promise<void> {
+    const user: UserWithId = { id: userId };
+    await deleteLetter(id, user);
+  }
+
+  /**
+   * Count letters with optional filter
+   */
+  async count(where?: Record<string, unknown>): Promise<number> {
+    const letters = await getLetters({
+      periodId: where?.periodId as string,
+      eventId: where?.eventId as string,
+      type: where?.type as LetterType,
+      priority: where?.priority as LetterPriority,
+      status: where?.status as Status,
+    });
+    return letters.length;
+  }
+
+  /**
+   * Create approval record for a letter
+   */
   async createApproval(
     letterId: string,
     userId: string,
     note: string,
   ): Promise<void> {
-    await this.prisma.approval.create({
-      data: {
-        entityType: "LETTER",
-        entityId: letterId,
-        userId,
-        status: "PENDING",
-        note,
-      },
-    });
+    await createLetterApproval(letterId, userId, note);
   }
 }
