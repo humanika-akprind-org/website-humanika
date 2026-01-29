@@ -16,11 +16,8 @@ import type {
   Management,
   ManagementServerData,
 } from "@/domain/entities/management.entity";
-import type { User } from "@/domain/entities/user.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
-
-type UserWithId = Pick<User, "id">;
 
 export class CreateManagementUseCase {
   constructor(private managementRepo: IManagementRepository) {}
@@ -29,12 +26,12 @@ export class CreateManagementUseCase {
    * Execute the use case to create a new management position
    *
    * @param input - Validated management input data
-   * @param user - The user creating the management position
+   * @param userId - The ID of the user creating the management position
    * @returns The created management
    */
   async execute(
     input: ManagementServerData,
-    user: UserWithId,
+    userId: string,
   ): Promise<Management> {
     // 1. Validate input
     this.validateInput(input);
@@ -46,10 +43,10 @@ export class CreateManagementUseCase {
     await this.checkPositionTaken(input);
 
     // 4. Create the management
-    const management = await this.managementRepo.create(input);
+    const management = await this.managementRepo.create(input, userId);
 
     // 5. Log activity
-    await this.logCreation(user, management);
+    await this.logCreation(userId, management);
 
     return management;
   }
@@ -116,38 +113,17 @@ export class CreateManagementUseCase {
   /**
    * Log the management creation activity
    */
-  private async logActivity(
+  private async logCreation(
     userId: string,
-    activityType: ActivityType,
-    entityType: string,
-    entityId: string,
-    description: string,
-    metadata?: Record<string, unknown>,
+    management: Management,
   ): Promise<void> {
     await logActivity({
       userId,
-      activityType,
-      entityType,
-      entityId,
-      description,
-      metadata,
-    });
-  }
-
-  /**
-   * Log the creation activity
-   */
-  private async logCreation(
-    user: UserWithId,
-    management: Management,
-  ): Promise<void> {
-    await this.logActivity(
-      user.id,
-      ActivityType.CREATE,
-      "Management",
-      management.id,
-      `Created management: ${management.user?.name || "Unknown"}`,
-      {
+      activityType: ActivityType.CREATE,
+      entityType: "Management",
+      entityId: management.id,
+      description: `Created management: ${management.user?.name || "Unknown"}`,
+      metadata: {
         newData: {
           userId: management.userId,
           position: management.position,
@@ -156,6 +132,6 @@ export class CreateManagementUseCase {
           photo: management.photo,
         },
       },
-    );
+    });
   }
 }

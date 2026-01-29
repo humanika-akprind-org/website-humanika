@@ -52,10 +52,10 @@ export interface ILetterRepository {
   create(data: CreateLetterInput, userId: string): Promise<Letter>;
 
   /** Update an existing letter */
-  update(id: string, data: UpdateLetterInput): Promise<Letter>;
+  update(id: string, data: UpdateLetterInput, userId: string): Promise<Letter>;
 
   /** Delete a letter */
-  delete(id: string): Promise<void>;
+  delete(id: string, userId: string): Promise<void>;
 
   /** Count letters with optional filter */
   count(where?: BaseFilter): Promise<number>;

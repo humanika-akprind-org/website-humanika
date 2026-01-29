@@ -12,11 +12,8 @@
 
 import type { IManagementRepository } from "@/application/interface/management.repository.interface";
 import type { Management } from "@/domain/entities/management.entity";
-import type { User } from "@/domain/entities/user.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
-
-type UserWithId = Pick<User, "id">;
 
 export class DeleteManagementUseCase {
   constructor(private managementRepo: IManagementRepository) {}
@@ -25,9 +22,9 @@ export class DeleteManagementUseCase {
    * Execute the use case to delete a management position
    *
    * @param id - The management ID
-   * @param user - The user deleting the management position
+   * @param userId - The ID of the user deleting the management position
    */
-  async execute(id: string, user: UserWithId): Promise<void> {
+  async execute(id: string, userId: string): Promise<void> {
     // 1. Validate ID format
     this.validateId(id);
 
@@ -38,10 +35,10 @@ export class DeleteManagementUseCase {
     }
 
     // 3. Delete the management
-    await this.managementRepo.delete(id);
+    await this.managementRepo.delete(id, userId);
 
     // 4. Log activity
-    await this.logDeletion(user, existingManagement);
+    await this.logDeletion(userId, existingManagement);
   }
 
   /**
@@ -61,40 +58,19 @@ export class DeleteManagementUseCase {
   }
 
   /**
-   * Log the activity
-   */
-  private async logActivity(
-    userId: string,
-    activityType: ActivityType,
-    entityType: string,
-    entityId: string,
-    description: string,
-    metadata?: Record<string, unknown>,
-  ): Promise<void> {
-    await logActivity({
-      userId,
-      activityType,
-      entityType,
-      entityId,
-      description,
-      metadata,
-    });
-  }
-
-  /**
    * Log the deletion activity
    */
   private async logDeletion(
-    user: UserWithId,
+    userId: string,
     management: Management,
   ): Promise<void> {
-    await this.logActivity(
-      user.id,
-      ActivityType.DELETE,
-      "Management",
-      management.id,
-      `Deleted management: ${management.user?.name || "Unknown"}`,
-      {
+    await logActivity({
+      userId,
+      activityType: ActivityType.DELETE,
+      entityType: "Management",
+      entityId: management.id,
+      description: `Deleted management: ${management.user?.name || "Unknown"}`,
+      metadata: {
         oldData: {
           userId: management.userId,
           position: management.position,
@@ -103,6 +79,6 @@ export class DeleteManagementUseCase {
           photo: management.photo,
         },
       },
-    );
+    });
   }
 }

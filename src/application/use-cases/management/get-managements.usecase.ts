@@ -16,7 +16,7 @@ import type { Management } from "@/domain/entities/management.entity";
 import type { Department, Position } from "@/domain/enums";
 
 interface ManagementResult {
-  managements: Management[];
+  records: Management[];
   pagination: ManagementPaginationResult;
 }
 
@@ -50,7 +50,7 @@ export class GetManagementsUseCase {
     });
 
     return {
-      managements: result.managements,
+      records: result.records,
       pagination: result.pagination,
     };
   }

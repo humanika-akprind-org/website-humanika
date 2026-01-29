@@ -275,7 +275,7 @@ export async function PUT(
     // 3. Use use case for complex write with validation and logging
     const repo = new ManagementRepositoryPrisma();
     const useCase = new UpdateManagementUseCase(repo);
-    const management = await useCase.execute(id, body, { id: user.id });
+    const management = await useCase.execute(id, body, user.id);
 
     // 4. Response - consistent format
     return NextResponse.json({
@@ -387,7 +387,7 @@ export async function DELETE(
 
     // 5. Use use case for complex write with validation and logging
     const deleteUseCase = new DeleteManagementUseCase(repo);
-    await deleteUseCase.execute(id, { id: user.id });
+    await deleteUseCase.execute(id, user.id);
 
     // 6. Response - consistent format
     return NextResponse.json({

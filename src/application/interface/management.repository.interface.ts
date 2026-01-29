@@ -38,19 +38,23 @@ export interface IManagementRepository {
   ): Promise<Management | null>;
 
   /** Create a new management */
-  create(data: ManagementServerData): Promise<Management>;
+  create(data: ManagementServerData, userId: string): Promise<Management>;
 
   /** Update an existing management */
-  update(id: string, data: ManagementServerData): Promise<Management>;
+  update(
+    id: string,
+    data: ManagementServerData,
+    userId: string,
+  ): Promise<Management>;
 
   /** Delete a management */
-  delete(id: string): Promise<void>;
+  delete(id: string, userId: string): Promise<void>;
 
   /** Count managements with optional filter */
   count(where?: BaseFilter): Promise<number>;
 
   /** Update management photo */
-  updatePhoto(id: string, photo: string): Promise<Management>;
+  updatePhoto(id: string, photo: string, userId: string): Promise<Management>;
 }
 
 // Filter types for Management queries

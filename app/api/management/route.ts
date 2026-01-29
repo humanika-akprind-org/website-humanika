@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
     // 3. Response - consistent format
     return NextResponse.json({
       success: true,
-      data: result.managements,
+      data: result.records,
       pagination: result.pagination,
     });
   } catch (error) {
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
     // 3. Use use case for complex write with validation, logging, and duplicate checking
     const repo = new ManagementRepositoryPrisma();
     const useCase = new CreateManagementUseCase(repo);
-    const management = await useCase.execute(body, { id: user.id });
+    const management = await useCase.execute(body, user.id);
 
     // 4. Response
     return NextResponse.json(

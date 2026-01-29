@@ -16,11 +16,8 @@ import type {
   Management,
   ManagementServerData,
 } from "@/domain/entities/management.entity";
-import type { User } from "@/domain/entities/user.entity";
 import { logActivity } from "@/presentation/lib/activity-log";
 import { ActivityType } from "@/domain/enums";
-
-type UserWithId = Pick<User, "id">;
 
 export class UpdateManagementUseCase {
   constructor(private managementRepo: IManagementRepository) {}
@@ -30,13 +27,13 @@ export class UpdateManagementUseCase {
    *
    * @param id - The management ID
    * @param input - Validated management input data
-   * @param user - The user updating the management position
+   * @param userId - The ID of the user updating the management position
    * @returns The updated management
    */
   async execute(
     id: string,
     input: ManagementServerData,
-    user: UserWithId,
+    userId: string,
   ): Promise<Management> {
     // 1. Validate ID format
     this.validateId(id);
@@ -68,10 +65,10 @@ export class UpdateManagementUseCase {
     }
 
     // 6. Update the management
-    const management = await this.managementRepo.update(id, input);
+    const management = await this.managementRepo.update(id, input, userId);
 
     // 7. Log activity
-    await this.logUpdate(user, existingManagement, management);
+    await this.logUpdate(userId, existingManagement, management);
 
     return management;
   }
@@ -152,41 +149,20 @@ export class UpdateManagementUseCase {
   }
 
   /**
-   * Log the activity
-   */
-  private async logActivity(
-    userId: string,
-    activityType: ActivityType,
-    entityType: string,
-    entityId: string,
-    description: string,
-    metadata?: Record<string, unknown>,
-  ): Promise<void> {
-    await logActivity({
-      userId,
-      activityType,
-      entityType,
-      entityId,
-      description,
-      metadata,
-    });
-  }
-
-  /**
    * Log the update activity
    */
   private async logUpdate(
-    user: UserWithId,
+    userId: string,
     oldManagement: Management,
     newManagement: Management,
   ): Promise<void> {
-    await this.logActivity(
-      user.id,
-      ActivityType.UPDATE,
-      "Management",
-      newManagement.id,
-      `Updated management: ${newManagement.user?.name || "Unknown"}`,
-      {
+    await logActivity({
+      userId,
+      activityType: ActivityType.UPDATE,
+      entityType: "Management",
+      entityId: newManagement.id,
+      description: `Updated management: ${newManagement.user?.name || "Unknown"}`,
+      metadata: {
         oldData: {
           userId: oldManagement.userId,
           position: oldManagement.position,
@@ -200,6 +176,6 @@ export class UpdateManagementUseCase {
           periodId: newManagement.periodId,
         },
       },
-    );
+    });
   }
 }

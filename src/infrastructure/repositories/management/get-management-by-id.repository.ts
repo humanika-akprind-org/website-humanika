@@ -9,7 +9,9 @@ import type { Management } from "@/domain/entities/management.entity";
 /**
  * Get a single management by ID
  */
-export async function getManagement(id: string): Promise<Management> {
+export async function getManagementById(
+  id: string,
+): Promise<Management | null> {
   const management = await prisma.management.findUnique({
     where: { id },
     include: {
@@ -19,7 +21,7 @@ export async function getManagement(id: string): Promise<Management> {
   });
 
   if (!management) {
-    throw new Error("Management not found");
+    return null;
   }
 
   return management as unknown as Management;

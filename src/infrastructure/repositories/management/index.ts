@@ -6,8 +6,11 @@
  * for convenient imports throughout the application.
  */
 
-// Export Prisma repository implementation
+// Export repository class
 export { ManagementRepositoryPrisma } from "./management-repository-prisma";
+
+// Export types
+export type { ManagementFilter } from "./get-managements.repository";
 
 // Export functions
 export * from "./get-managements.repository";
