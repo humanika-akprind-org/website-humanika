@@ -8,7 +8,7 @@ import prisma from "@/presentation/lib/prisma";
 /**
  * Get a single gallery by ID
  */
-export async function getGallery(id: string) {
+export async function getGalleryById(id: string) {
   const gallery = await prisma.gallery.findUnique({
     where: { id },
     include: {

@@ -9,7 +9,18 @@ import type {
   CreateGalleryInput,
   UpdateGalleryInput,
 } from "@/domain/entities/gallery.entity";
-import type { GalleryFilter } from "@/domain/entities/gallery.entity";
+
+/**
+ * Gallery Category Filter
+ */
+export interface GalleryFilter extends BaseFilter {
+  search?: string;
+}
+
+// Define Gallery-specific type aliases
+export type GalleryPagination = BasePagination;
+export type GalleryPaginationResult = BasePaginationResult;
+export type GalleryStats = BaseStats;
 
 /**
  * Gallery Repository Interface - Entity-specific repository
@@ -21,14 +32,14 @@ export interface IGalleryRepository {
   /** Find all galleries */
   findAll(): Promise<Gallery[]>;
 
-  /** Find a gallery by ID */
-  findById(id: string): Promise<Gallery | null>;
-
   /** Find galleries with filters and pagination */
   findMany(
     filters?: GalleryFilter,
-    pagination?: BasePagination,
-  ): Promise<{ records: Gallery[]; pagination: BasePaginationResult }>;
+    pagination?: GalleryPagination,
+  ): Promise<{ records: Gallery[]; pagination: GalleryPaginationResult }>;
+
+  /** Find a gallery by ID */
+  findById(id: string): Promise<Gallery | null>;
 
   /** Find galleries by event */
   findByEvent(eventId: string): Promise<Gallery[]>;
@@ -37,22 +48,21 @@ export interface IGalleryRepository {
   findByCategory(categoryId: string): Promise<Gallery[]>;
 
   /** Create a new gallery */
-  create(data: CreateGalleryInput): Promise<Gallery>;
+  create(data: CreateGalleryInput, userId: string): Promise<Gallery>;
 
   /** Update an existing gallery */
-  update(id: string, data: UpdateGalleryInput): Promise<Gallery>;
+  update(
+    id: string,
+    data: UpdateGalleryInput,
+    userId: string,
+  ): Promise<Gallery>;
 
   /** Delete a gallery */
-  delete(id: string): Promise<void>;
+  delete(id: string, userId: string): Promise<void>;
 
   /** Count galleries with optional filter */
-  count(where?: BaseFilter): Promise<number>;
+  count(where?: GalleryFilter): Promise<number>;
+
+  /** Get aggregated gallery statistics */
+  getStats(where?: GalleryFilter): Promise<GalleryStats>;
 }
-
-// Re-export for convenience
-export type { GalleryFilter };
-
-// Re-export base types with Gallery-specific names for convenience
-export type { BasePagination as GalleryPagination };
-export type { BasePaginationResult as GalleryPaginationResult };
-export type { BaseStats as GalleryStats };

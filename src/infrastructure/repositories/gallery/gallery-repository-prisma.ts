@@ -1,207 +1,178 @@
 /**
- * Gallery Repository Prisma - Class-based repository implementation
+ * Gallery Repository Prisma Implementation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  *
- * This file contains the GalleryRepositoryPrisma class that implements
- * IGalleryRepository interface for use with the use case pattern.
+ * This repository implements the IGalleryRepository interface
+ * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
-import prisma from "@/presentation/lib/prisma";
 import type {
   IGalleryRepository,
   GalleryFilter,
   GalleryPagination,
   GalleryPaginationResult,
+  GalleryStats,
 } from "@/application/interface/gallery.repository.interface";
 import type {
   CreateGalleryInput,
   UpdateGalleryInput,
 } from "@/domain/entities/gallery.entity";
-import type { Prisma } from "@prisma/client";
 import type { Gallery } from "@/domain/entities/gallery.entity";
+import {
+  getGalleries as getAllGalleries,
+  getGalleryById,
+  createGallery,
+  updateGallery,
+  deleteGallery,
+} from "./index";
+import type { GetGalleriesFilter } from "./get-galleries.repository";
 
+// Type alias for user context
+type UserWithId = { id: string };
+
+// Helper to convert GalleryFilter to GetGalleriesFilter
+function toGetGalleriesFilter(filter?: GalleryFilter): GetGalleriesFilter {
+  if (!filter) return {} as GetGalleriesFilter;
+  return {
+    eventId: filter.eventId,
+    categoryId: filter.categoryId,
+    search: filter.search,
+  } as GetGalleriesFilter;
+}
+
+/**
+ * Gallery Repository Prisma Implementation
+ *
+ * This class implements the IGalleryRepository interface
+ * for Clean Architecture compliance.
+ */
 export class GalleryRepositoryPrisma implements IGalleryRepository {
-  private prisma = prisma;
+  /**
+   * Get all galleries
+   */
+  async findAll(): Promise<Gallery[]> {
+    return (await getAllGalleries({})) as unknown as Gallery[];
+  }
 
+  /**
+   * Get all galleries with optional filtering and pagination
+   */
   async findMany(
-    filters?: GalleryFilter,
+    filter?: GalleryFilter,
     pagination?: GalleryPagination,
-  ): Promise<{ galleries: Gallery[]; pagination: GalleryPaginationResult }> {
+  ): Promise<{ records: Gallery[]; pagination: GalleryPaginationResult }> {
+    const records = await getAllGalleries(toGetGalleriesFilter(filter));
+
+    // Get total count for pagination
+    const total = records.length;
+
+    // Apply default pagination if not provided
     const page = pagination?.page || 1;
     const limit = pagination?.limit || 10;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.GalleryWhereInput = {};
+    // Get paginated galleries
+    const paginatedRecords = records.slice(skip, skip + limit);
 
-    if (filters?.eventId) where.eventId = filters.eventId;
-    if (filters?.categoryId) where.categoryId = filters.categoryId;
-    if (filters?.periodId) where.periodId = filters.periodId;
-
-    const orConditions: Prisma.GalleryWhereInput[] = [];
-
-    if (filters?.search) {
-      orConditions.push(
-        { title: { contains: filters.search, mode: "insensitive" } },
-        { event: { name: { contains: filters.search, mode: "insensitive" } } },
-      );
-    }
-
-    if (orConditions.length > 0) {
-      where.OR = orConditions;
-    }
-
-    const [galleries, total] = await Promise.all([
-      this.prisma.gallery.findMany({
-        where,
-        include: {
-          event: true,
-          category: true,
-          period: true,
-        },
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
-      }),
-      this.prisma.gallery.count({ where }),
-    ]);
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
 
     return {
-      galleries: galleries as unknown as Gallery[],
+      records: paginatedRecords as unknown as Gallery[],
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages,
       },
     };
   }
 
-  async findByEvent(eventId: string): Promise<Gallery[]> {
-    const galleries = await this.prisma.gallery.findMany({
-      where: { eventId },
-      include: {
-        event: true,
-        category: true,
-        period: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return galleries as unknown as Gallery[];
-  }
-
-  async findByCategory(categoryId: string): Promise<Gallery[]> {
-    const galleries = await this.prisma.gallery.findMany({
-      where: { categoryId },
-      include: {
-        event: true,
-        category: true,
-        period: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return galleries as unknown as Gallery[];
-  }
-
-  async create(data: CreateGalleryInput): Promise<Gallery> {
-    const galleryData: Prisma.GalleryCreateInput = {
-      title: data.title,
-      event: { connect: { id: data.eventId } },
-      image: data.image,
-    };
-
-    if (data.categoryId) {
-      galleryData.category = { connect: { id: data.categoryId } };
-    }
-
-    if (data.periodId) {
-      galleryData.period = { connect: { id: data.periodId } };
-    }
-
-    const gallery = await this.prisma.gallery.create({
-      data: galleryData,
-      include: {
-        event: true,
-        category: true,
-        period: true,
-      },
-    });
-
-    return gallery as unknown as Gallery;
-  }
-
-  async update(id: string, data: UpdateGalleryInput): Promise<Gallery> {
-    const updateData: Prisma.GalleryUpdateInput = {
-      title: data.title,
-      image: data.image,
-    };
-
-    if (data.eventId) {
-      updateData.event = { connect: { id: data.eventId } };
-    }
-
-    if (data.categoryId !== undefined) {
-      if (data.categoryId) {
-        updateData.category = { connect: { id: data.categoryId } };
-      } else {
-        updateData.category = { disconnect: true };
-      }
-    }
-
-    if (data.periodId !== undefined) {
-      if (data.periodId) {
-        updateData.period = { connect: { id: data.periodId } };
-      } else {
-        updateData.period = { disconnect: true };
-      }
-    }
-
-    const gallery = await this.prisma.gallery.update({
-      where: { id },
-      data: updateData,
-      include: {
-        event: true,
-        category: true,
-        period: true,
-      },
-    });
-
-    return gallery as unknown as Gallery;
-  }
-
-  async delete(id: string): Promise<void> {
-    await this.prisma.gallery.delete({
-      where: { id },
-    });
-  }
-
-  // Base repository methods
-  async findAll(): Promise<Gallery[]> {
-    const galleries = await this.prisma.gallery.findMany({
-      include: {
-        event: true,
-        category: true,
-        period: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return galleries as unknown as Gallery[];
-  }
-
+  /**
+   * Get a single gallery by ID
+   */
   async findById(id: string): Promise<Gallery | null> {
-    const gallery = await this.prisma.gallery.findUnique({
-      where: { id },
-      include: {
-        event: true,
-        category: true,
-        period: true,
-      },
-    });
-    return gallery as unknown as Gallery | null;
+    return (await getGalleryById(id)) as Gallery | null;
   }
 
-  async count(where?: unknown): Promise<number> {
-    return await this.prisma.gallery.count({
-      where: where as Prisma.GalleryWhereInput,
-    });
+  /**
+   * Find galleries by event ID
+   */
+  async findByEvent(eventId: string): Promise<Gallery[]> {
+    const galleries = await getAllGalleries({ eventId });
+    return galleries as unknown as Gallery[];
+  }
+
+  /**
+   * Find galleries by category ID
+   */
+  async findByCategory(categoryId: string): Promise<Gallery[]> {
+    const galleries = await getAllGalleries({ categoryId });
+    return galleries as unknown as Gallery[];
+  }
+
+  /**
+   * Create a new gallery
+   */
+  async create(data: CreateGalleryInput, userId: string): Promise<Gallery> {
+    const user: UserWithId = { id: userId };
+    return (await createGallery(data, user)) as unknown as Gallery;
+  }
+
+  /**
+   * Update an existing gallery
+   */
+  async update(
+    id: string,
+    data: UpdateGalleryInput,
+    userId: string,
+  ): Promise<Gallery> {
+    const user: UserWithId = { id: userId };
+    return (await updateGallery(id, data, user)) as unknown as Gallery;
+  }
+
+  /**
+   * Delete a gallery
+   */
+  async delete(id: string, userId: string): Promise<void> {
+    const user: UserWithId = { id: userId };
+    await deleteGallery(id, user);
+  }
+
+  /**
+   * Count galleries with optional filter
+   */
+  async count(where?: GalleryFilter): Promise<number> {
+    const galleries = await getAllGalleries(toGetGalleriesFilter(where));
+    return galleries.length;
+  }
+
+  /**
+   * Get aggregated gallery statistics
+   */
+  async getStats(where?: GalleryFilter): Promise<GalleryStats> {
+    const galleries = await getAllGalleries(toGetGalleriesFilter(where));
+
+    // Calculate stats
+    const byCategory: Record<string, number> = {};
+    const byEvent: Record<string, number> = {};
+
+    // Count by category
+    for (const gallery of galleries) {
+      if (gallery.categoryId) {
+        byCategory[gallery.categoryId] =
+          (byCategory[gallery.categoryId] || 0) + 1;
+      }
+      if (gallery.eventId) {
+        byEvent[gallery.eventId] = (byEvent[gallery.eventId] || 0) + 1;
+      }
+    }
+
+    return {
+      total: galleries.length,
+      byCategory,
+      byEvent,
+    };
   }
 }

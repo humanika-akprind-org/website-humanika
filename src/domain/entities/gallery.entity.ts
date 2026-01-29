@@ -28,6 +28,7 @@ export interface UpdateGalleryInput extends Partial<CreateGalleryInput> {}
 
 export interface GalleryFilter {
   eventId?: string;
+  categoryId?: string;
   search?: string;
   periodId?: string;
 }
