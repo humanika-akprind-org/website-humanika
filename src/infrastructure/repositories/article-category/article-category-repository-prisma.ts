@@ -1,52 +1,107 @@
 /**
- * Article Category Repository Prisma - Class-based repository implementation
+ * Article Category Repository Prisma Implementation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  *
- * This file contains the ArticleCategoryRepositoryPrisma class that implements
- * IArticleCategoryRepository interface for use with the use case pattern.
+ * This repository implements the IArticleCategoryRepository interface
+ * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { IArticleCategoryRepository } from "@/application/interface/article-category.repository.interface";
+import type {
+  IArticleCategoryRepository,
+  ArticleCategoryFilter,
+} from "@/application/interface/article-category.repository.interface";
+import type { BaseFilter } from "@/application/interface/base.repository.interface";
 import type {
   ArticleCategory,
   CreateArticleCategoryInput,
 } from "@/domain/value-objects/article-category";
 
+/**
+ * Article Category Repository Prisma Implementation
+ *
+ * This class implements the IArticleCategoryRepository interface
+ * for Clean Architecture compliance.
+ */
 export class ArticleCategoryRepositoryPrisma implements IArticleCategoryRepository {
   private prisma = prisma;
 
   /**
    * Get all article categories
    */
-  async getArticleCategories(): Promise<ArticleCategory[]> {
+  async findAll(): Promise<ArticleCategory[]> {
     const categories = await this.prisma.articleCategory.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { name: "asc" },
     });
 
     return categories as unknown as ArticleCategory[];
   }
 
   /**
-   * Get all article categories with article count
+   * Get all article categories with optional filtering and pagination
    */
-  async getArticleCategoriesWithCount(): Promise<ArticleCategory[]> {
+  async findMany(
+    filters?: ArticleCategoryFilter,
+    pagination?: { page?: number; limit?: number },
+  ): Promise<{
+    records: ArticleCategory[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }> {
+    // Determine if we need to include article count
+    const includeCount = filters?.withCount;
+
     const categories = await this.prisma.articleCategory.findMany({
-      include: {
-        _count: {
-          select: { articles: true },
+      orderBy: { name: "asc" },
+      ...(includeCount && {
+        include: {
+          _count: {
+            select: {
+              articles: {
+                where: {
+                  status: "PUBLISH",
+                },
+              },
+            },
+          },
         },
-      },
-      orderBy: { createdAt: "desc" },
+      }),
     });
 
-    return categories as unknown as ArticleCategory[];
+    // Get total count for pagination
+    const total = categories.length;
+
+    // Apply default pagination if not provided
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Get paginated categories
+    const paginatedRecords = categories.slice(skip, skip + limit);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      records: paginatedRecords as ArticleCategory[],
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
   }
 
   /**
-   * Get a single category by ID
+   * Get a single article category by ID
    */
-  async getArticleCategoryById(id: string): Promise<ArticleCategory | null> {
+  async findById(id: string): Promise<ArticleCategory | null> {
     const category = await this.prisma.articleCategory.findUnique({
       where: { id },
     });
@@ -57,14 +112,14 @@ export class ArticleCategoryRepositoryPrisma implements IArticleCategoryReposito
   /**
    * Create a new article category
    */
-  async createArticleCategory(
+  async create(
     data: CreateArticleCategoryInput,
     _userId: string,
   ): Promise<ArticleCategory> {
     const category = await this.prisma.articleCategory.create({
       data: {
-        name: data.name,
-        description: data.description,
+        name: data.name.trim(),
+        description: data.description?.trim() || null,
       },
     });
 
@@ -72,29 +127,44 @@ export class ArticleCategoryRepositoryPrisma implements IArticleCategoryReposito
   }
 
   /**
-   * Update an existing category
+   * Update an existing article category
    */
-  async updateCategory(
+  async update(
     id: string,
     data: Partial<CreateArticleCategoryInput>,
   ): Promise<ArticleCategory> {
+    const updateData: Record<string, unknown> = {};
+
+    if (data.name && data.name.trim()) {
+      updateData.name = data.name.trim();
+    }
+
+    if (data.description !== undefined) {
+      updateData.description = data.description?.trim() || null;
+    }
+
     const category = await this.prisma.articleCategory.update({
       where: { id },
-      data: {
-        name: data.name,
-        description: data.description,
-      },
+      data: updateData,
     });
 
     return category as unknown as ArticleCategory;
   }
 
   /**
-   * Delete a category
+   * Delete an article category
    */
-  async deleteCategory(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.prisma.articleCategory.delete({
       where: { id },
     });
+  }
+
+  /**
+   * Count article categories with optional filter
+   */
+  async count(_where?: BaseFilter): Promise<number> {
+    const categories = await this.prisma.articleCategory.findMany();
+    return categories.length;
   }
 }
