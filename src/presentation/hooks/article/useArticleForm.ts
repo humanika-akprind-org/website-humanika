@@ -4,7 +4,8 @@ import type {
   CreateArticleInput,
   UpdateArticleInput,
 } from "@/domain/entities/article.entity";
-import { Status } from "@/domain/enums";
+import type { Status } from "@prisma/client";
+import { Status as PrismaStatus } from "@prisma/client";
 import { useFile } from "@/presentation/hooks/useFile";
 import { articleFolderId } from "@/presentation/lib/config/config";
 import type { Period } from "@/domain/entities/period.entity";
@@ -111,7 +112,7 @@ export const useArticleForm = (
     authorId: article?.author?.id || currentUser?.id || "",
     categoryId: article?.category?.id || "",
     periodId: article?.period?.id || "",
-    status: article?.status || Status.DRAFT,
+    status: (article?.status as Status) || PrismaStatus.DRAFT,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);

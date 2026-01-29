@@ -1,4 +1,4 @@
-import { type UserRole, type Department, type Position } from "../enums";
+import type { UserRole, Department, Position } from "@prisma/client";
 
 export interface User {
   id: string;
@@ -22,8 +22,8 @@ export interface CreateUserData {
   email: string;
   username: string;
   password: string;
-  role?: UserRole | string;
-  department?: Department | string;
+  role?: UserRole;
+  department?: Department;
   position?: Position;
   isActive?: boolean;
   verifiedAccount?: boolean;
@@ -34,10 +34,11 @@ export interface UpdateUserData {
   email?: string;
   username?: string;
   password?: string;
-  role?: UserRole | string;
-  department?: Department | string;
+  role?: UserRole;
+  department?: Department;
   position?: Position;
   isActive?: boolean;
+  verifiedAccount?: boolean;
 }
 
 export interface UsersResponse {

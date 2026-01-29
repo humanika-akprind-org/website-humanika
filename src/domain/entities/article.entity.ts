@@ -1,4 +1,4 @@
-import { type Status } from "../enums";
+import type { Status } from "@prisma/client";
 import { type Period } from "./period.entity";
 import { type ArticleCategory } from "../value-objects/article-category";
 

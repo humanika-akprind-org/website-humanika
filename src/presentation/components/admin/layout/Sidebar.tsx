@@ -38,9 +38,9 @@ export default function Sidebar() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await AuthApi.getCurrentUser();
-        if (data) {
-          setUserRole(data.role || null);
+        const { data: user, error } = await AuthApi.getCurrentUser();
+        if (!error && user) {
+          setUserRole(user.role as UserRole);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);

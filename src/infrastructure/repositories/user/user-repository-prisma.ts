@@ -29,7 +29,7 @@ import {
   bulkVerifyUsers,
   bulkSendVerificationEmails,
 } from "./index";
-import type { Department, Position, UserRole } from "@/domain/enums";
+import type { Department, Position, UserRole } from "@prisma/client";
 
 /**
  * User Repository Prisma Implementation

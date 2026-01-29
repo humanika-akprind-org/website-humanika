@@ -6,48 +6,51 @@ import {
   FiTrendingUp,
   FiX,
 } from "react-icons/fi";
-import { Position } from "@/domain/enums";
+import type { Position as PrismaPosition } from "@prisma/client";
+import { type Position as DomainPosition } from "@/domain/enums";
 import { formatEnumValue } from "@/presentation/services/user";
 
+type PositionType = PrismaPosition | DomainPosition;
+
 interface PositionProps {
-  position?: Position | null;
+  position?: PositionType | null;
 }
 
 export default function PositionChip({ position }: PositionProps) {
   // Get position badge class and icon
-  const getPositionInfo = (position: Position) => {
+  const getPositionInfo = (position: PositionType) => {
     switch (position) {
-      case Position.KETUA_UMUM:
+      case "KETUA_UMUM":
         return {
           class: "bg-red-100 text-red-800",
           icon: <FiStar className="mr-1" />,
           text: formatEnumValue(position),
         };
-      case Position.WAKIL_KETUA_UMUM:
+      case "WAKIL_KETUA_UMUM":
         return {
           class: "bg-pink-100 text-pink-800",
           icon: <FiSettings className="mr-1" />,
           text: formatEnumValue(position),
         };
-      case Position.SEKRETARIS:
+      case "SEKRETARIS":
         return {
           class: "bg-purple-100 text-purple-800",
           icon: <FiBriefcase className="mr-1" />,
           text: formatEnumValue(position),
         };
-      case Position.BENDAHARA:
+      case "BENDAHARA":
         return {
           class: "bg-indigo-100 text-indigo-800",
           icon: <FiTrendingUp className="mr-1" />,
           text: formatEnumValue(position),
         };
-      case Position.KEPALA_DEPARTEMEN:
+      case "KEPALA_DEPARTEMEN":
         return {
           class: "bg-green-100 text-green-800",
           icon: <FiUser className="mr-1" />,
           text: formatEnumValue(position),
         };
-      case Position.STAFF_DEPARTEMEN:
+      case "STAFF_DEPARTEMEN":
         return {
           class: "bg-yellow-100 text-yellow-800",
           icon: <FiUser className="mr-1" />,

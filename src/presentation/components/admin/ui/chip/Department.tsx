@@ -6,42 +6,45 @@ import {
   FiBriefcase,
   FiTrendingUp,
 } from "react-icons/fi";
-import { Department } from "@/domain/enums";
+import type { Department as PrismaDepartment } from "@prisma/client";
+import { type Department as DomainDepartment } from "@/domain/enums";
 import { formatEnumValue } from "@/presentation/services/user";
 
+type DepartmentType = PrismaDepartment | DomainDepartment;
+
 interface DepartmentProps {
-  department?: Department | null;
+  department?: DepartmentType | null;
 }
 
 export default function DepartmentChip({ department }: DepartmentProps) {
   // Get department badge class and icon
-  const getDepartmentInfo = (department: Department) => {
+  const getDepartmentInfo = (department: DepartmentType) => {
     switch (department) {
-      case Department.BPH:
+      case "BPH":
         return {
           class: "bg-red-100 text-red-800",
           icon: <FiSettings className="mr-1" />,
           text: formatEnumValue(department),
         };
-      case Department.INFOKOM:
+      case "INFOKOM":
         return {
           class: "bg-pink-100 text-pink-800",
           icon: <FiMonitor className="mr-1" />,
           text: formatEnumValue(department),
         };
-      case Department.PSDM:
+      case "PSDM":
         return {
           class: "bg-purple-100 text-purple-800",
           icon: <FiUsers className="mr-1" />,
           text: formatEnumValue(department),
         };
-      case Department.LITBANG:
+      case "LITBANG":
         return {
           class: "bg-indigo-100 text-indigo-800",
           icon: <FiBriefcase className="mr-1" />,
           text: formatEnumValue(department),
         };
-      case Department.KWU:
+      case "KWU":
         return {
           class: "bg-green-100 text-green-800",
           icon: <FiTrendingUp className="mr-1" />,

@@ -4,8 +4,8 @@
  */
 
 import prisma from "@/presentation/lib/prisma";
-import type { Status } from "@/domain/enums";
-import type { Prisma, Status as PrismaStatus } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import type { Status } from "@prisma/client";
 
 export type ArticleWithPartialAuthor = Prisma.ArticleGetPayload<{
   include: {
@@ -38,7 +38,7 @@ export async function getArticles(
   const where: Prisma.ArticleWhereInput = {};
 
   if (filter?.status) {
-    where.status = { equals: filter.status as unknown as PrismaStatus };
+    where.status = { equals: filter.status };
   }
   if (filter?.periodId) where.periodId = filter.periodId;
   if (filter?.categoryId) where.categoryId = filter.categoryId;
