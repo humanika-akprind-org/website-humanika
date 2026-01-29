@@ -4,233 +4,141 @@
  *
  * This repository implements the IFinanceCategoryRepository interface
  * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
-import type { IFinanceCategoryRepository } from "@/application/interface/finance-category.repository.interface";
 import type {
-  CreateFinanceCategoryInput,
-  FinanceCategory,
+  IFinanceCategoryRepository,
   FinanceCategoryFilter,
+  FinanceCategoryPagination,
+  FinanceCategoryPaginationResult,
+} from "@/application/interface/finance-category.repository.interface";
+import type {
+  FinanceCategory,
+  CreateFinanceCategoryInput,
+  UpdateFinanceCategoryInput,
 } from "@/domain/value-objects/finance-category";
-import type { Prisma } from "@prisma/client";
-import prisma from "@/presentation/lib/prisma";
+import type { FinanceType } from "@/domain/enums";
+import {
+  getFinanceCategories,
+  getFinanceCategoryById,
+  createFinanceCategory,
+  updateFinanceCategory,
+  deleteFinanceCategory,
+} from "./index";
 
-/**
- * Transform Prisma result to FinanceCategory type
- */
-function transformToFinanceCategory(
-  category: Prisma.FinanceCategoryGetPayload<{
-    include: { _count: { select: { finances: true } } };
-  }>,
-): FinanceCategory {
-  return {
-    id: category.id,
-    name: category.name,
-    description: category.description ?? undefined,
-    type: category.type as FinanceCategory["type"],
-    createdAt: category.createdAt,
-    updatedAt: category.updatedAt,
-    _count: category._count,
-  };
-}
+// Type alias for user context
+type UserWithId = { id: string };
+
+// Type alias for filter
+type GetFinanceCategoriesFilter = {
+  type?: FinanceType;
+  search?: string;
+};
 
 /**
  * Finance Category Repository Prisma Implementation
+ *
+ * This class implements the IFinanceCategoryRepository interface
+ * for Clean Architecture compliance.
  */
 export class FinanceCategoryRepositoryPrisma implements IFinanceCategoryRepository {
   /**
-   * Get all finance categories with optional filters
+   * Get all finance categories
    */
-  async getFinanceCategories(
+  async findAll(): Promise<FinanceCategory[]> {
+    return (await getFinanceCategories({})) as FinanceCategory[];
+  }
+
+  /**
+   * Get all finance categories with optional filtering and pagination
+   */
+  async findMany(
     filter?: FinanceCategoryFilter,
-  ): Promise<FinanceCategory[]> {
-    const where: Prisma.FinanceCategoryWhereInput = {};
-
-    if (filter?.type) where.type = { equals: filter.type };
-    if (filter?.search) {
-      where.OR = [
-        { name: { contains: filter.search, mode: "insensitive" } },
-        { description: { contains: filter.search, mode: "insensitive" } },
-      ];
+    pagination?: FinanceCategoryPagination,
+  ): Promise<{
+    records: FinanceCategory[];
+    pagination: FinanceCategoryPaginationResult;
+  }> {
+    const filterParam: GetFinanceCategoriesFilter = {};
+    if (filter?.type) {
+      filterParam.type = filter.type;
     }
+    if (filter?.search) {
+      filterParam.search = filter.search;
+    }
+    const records = await getFinanceCategories(filterParam);
 
-    const categories = await prisma.financeCategory.findMany({
-      where,
-      include: {
-        _count: {
-          select: {
-            finances: true,
-          },
-        },
+    // Get total count for pagination
+    const total = records.length;
+
+    // Apply default pagination if not provided
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Get paginated records
+    const paginatedRecords = records.slice(skip, skip + limit);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      records: paginatedRecords as FinanceCategory[],
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
       },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return categories.map(transformToFinanceCategory);
+    };
   }
 
   /**
    * Get a single finance category by ID
    */
-  async getFinanceCategoryById(id: string): Promise<FinanceCategory | null> {
-    const category = await prisma.financeCategory.findUnique({
-      where: { id },
-      include: {
-        _count: {
-          select: {
-            finances: true,
-          },
-        },
-      },
-    });
-
-    if (!category) return null;
-    return transformToFinanceCategory(category);
+  async findById(id: string): Promise<FinanceCategory | null> {
+    return (await getFinanceCategoryById(id)) as FinanceCategory | null;
   }
 
   /**
    * Create a new finance category
    */
-  async createFinanceCategory(
+  async create(
     data: CreateFinanceCategoryInput,
-    user: { id: string },
+    user: UserWithId,
   ): Promise<FinanceCategory> {
-    const category = await prisma.financeCategory.create({
-      data: {
-        name: data.name,
-        description: data.description,
-        type: data.type,
-      },
-      include: {
-        _count: {
-          select: {
-            finances: true,
-          },
-        },
-      },
-    });
-
-    // Log activity - import here to avoid circular dependency
-    const { logActivity } = await import("@/presentation/lib/activity-log");
-    const { ActivityType } = await import("@/domain/enums");
-
-    await logActivity({
-      userId: user.id,
-      activityType: ActivityType.CREATE,
-      entityType: "FinanceCategory",
-      entityId: category.id,
-      description: `Created finance category: ${category.name}`,
-      metadata: {
-        newData: {
-          name: category.name,
-          description: category.description,
-          type: category.type,
-        },
-      },
-    });
-
-    return transformToFinanceCategory(category);
+    return (await createFinanceCategory(data, user)) as FinanceCategory;
   }
 
   /**
    * Update an existing finance category
    */
-  async updateFinanceCategory(
+  async update(
     id: string,
-    data: Partial<CreateFinanceCategoryInput>,
-    user: { id: string },
+    data: UpdateFinanceCategoryInput,
   ): Promise<FinanceCategory> {
-    // Check if finance category exists
-    const existingFinanceCategory = await prisma.financeCategory.findUnique({
-      where: { id },
-    });
-
-    if (!existingFinanceCategory) {
-      throw new Error("Finance category not found");
-    }
-
-    const updateData: Prisma.FinanceCategoryUpdateInput = {};
-
-    if (data.name !== undefined) updateData.name = data.name;
-    if (data.description !== undefined) {
-      updateData.description = data.description;
-    }
-    if (data.type) updateData.type = data.type;
-
-    const category = await prisma.financeCategory.update({
-      where: { id },
-      data: updateData,
-      include: {
-        _count: {
-          select: {
-            finances: true,
-          },
-        },
-      },
-    });
-
-    // Log activity - import here to avoid circular dependency
-    const { logActivity } = await import("@/presentation/lib/activity-log");
-    const { ActivityType } = await import("@/domain/enums");
-
-    await logActivity({
-      userId: user.id,
-      activityType: ActivityType.UPDATE,
-      entityType: "FinanceCategory",
-      entityId: category.id,
-      description: `Updated finance category: ${category.name}`,
-      metadata: {
-        oldData: {
-          name: existingFinanceCategory.name,
-          description: existingFinanceCategory.description,
-          type: existingFinanceCategory.type,
-        },
-        newData: {
-          name: category.name,
-          description: category.description,
-          type: category.type,
-        },
-      },
-    });
-
-    return transformToFinanceCategory(category);
+    const user: UserWithId = { id: "" };
+    return (await updateFinanceCategory(id, data, user)) as FinanceCategory;
   }
 
   /**
    * Delete a finance category
    */
-  async deleteFinanceCategory(id: string, user: { id: string }): Promise<void> {
-    // Check if finance category exists
-    const existingFinanceCategory = await prisma.financeCategory.findUnique({
-      where: { id },
-    });
+  async delete(id: string): Promise<void> {
+    const user: UserWithId = { id: "" };
+    await deleteFinanceCategory(id, user);
+  }
 
-    if (!existingFinanceCategory) {
-      throw new Error("Finance category not found");
+  /**
+   * Count finance categories with optional filter
+   */
+  async count(where?: Record<string, unknown>): Promise<number> {
+    const filterParam: GetFinanceCategoriesFilter = {};
+    if (where?.type) {
+      filterParam.type = where.type as FinanceType;
     }
-
-    await prisma.financeCategory.delete({
-      where: { id },
-    });
-
-    // Log activity - import here to avoid circular dependency
-    const { logActivity } = await import("@/presentation/lib/activity-log");
-    const { ActivityType } = await import("@/domain/enums");
-
-    await logActivity({
-      userId: user.id,
-      activityType: ActivityType.DELETE,
-      entityType: "FinanceCategory",
-      entityId: id,
-      description: `Deleted finance category: ${existingFinanceCategory.name}`,
-      metadata: {
-        oldData: {
-          name: existingFinanceCategory.name,
-          description: existingFinanceCategory.description,
-          type: existingFinanceCategory.type,
-        },
-        newData: null,
-      },
-    });
+    const records = await getFinanceCategories(filterParam);
+    return records.length;
   }
 }

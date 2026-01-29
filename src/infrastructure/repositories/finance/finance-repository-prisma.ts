@@ -1,306 +1,169 @@
 /**
- * Finance Repository Prisma - Class-based repository implementation
+ * Finance Repository Prisma Implementation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  *
- * This file contains the FinanceRepositoryPrisma class that implements
- * IFinanceRepository interface for use with the use case pattern.
+ * This repository implements the IFinanceRepository interface
+ * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
-import prisma from "@/presentation/lib/prisma";
-import type { IFinanceRepository } from "@/application/interface/finance.repository.interface";
 import type {
-  CreateFinanceInput,
-  Finance,
+  IFinanceRepository,
   FinanceFilter,
+  FinancePagination,
+  FinancePaginationResult,
+} from "@/application/interface/finance.repository.interface";
+import type {
+  Finance,
+  CreateFinanceInput,
 } from "@/domain/entities/finance.entity";
-import type { Prisma } from "@prisma/client";
 import type { FinanceType, Status } from "@/domain/enums";
-import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums";
+import {
+  getFinances,
+  getFinance,
+  createFinance,
+  updateFinance,
+  deleteFinance,
+} from "./index";
 
+// Type alias for user context
+type UserWithId = { id: string };
+
+// Type alias for filter
+type GetFinancesFilter = {
+  type?: FinanceType;
+  status?: Status;
+  workProgramId?: string;
+  categoryId?: string;
+  userId?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+};
+
+/**
+ * Finance Repository Prisma Implementation
+ *
+ * This class implements the IFinanceRepository interface
+ * for Clean Architecture compliance.
+ */
 export class FinanceRepositoryPrisma implements IFinanceRepository {
-  private prisma = prisma;
+  /**
+   * Get all finances
+   */
+  async findAll(): Promise<Finance[]> {
+    return (await getFinances({})) as unknown as Finance[];
+  }
 
   /**
-   * Get all finances with optional filters
+   * Get all finances with optional filtering and pagination
    */
-  async getFinances(filter?: FinanceFilter): Promise<Finance[]> {
-    const where: Prisma.FinanceWhereInput = {};
-
+  async findMany(
+    filter?: FinanceFilter,
+    pagination?: FinancePagination,
+  ): Promise<{ records: Finance[]; pagination: FinancePaginationResult }> {
+    const filterParam: GetFinancesFilter = {};
     if (filter?.type) {
-      where.type = { equals: filter.type as unknown as FinanceType };
+      filterParam.type = filter.type;
     }
     if (filter?.status) {
-      where.status = { equals: filter.status as unknown as Status };
+      filterParam.status = filter.status;
     }
-    if (filter?.periodId) where.periodId = filter.periodId;
-    if (filter?.categoryId) where.categoryId = filter.categoryId;
-    if (filter?.workProgramId) where.workProgramId = filter.workProgramId;
+    if (filter?.workProgramId) {
+      filterParam.workProgramId = filter.workProgramId;
+    }
+    if (filter?.categoryId) {
+      filterParam.categoryId = filter.categoryId;
+    }
     if (filter?.search) {
-      where.OR = [
-        { name: { contains: filter.search, mode: "insensitive" } },
-        { description: { contains: filter.search, mode: "insensitive" } },
-      ];
+      filterParam.search = filter.search;
     }
-    if (filter?.startDate || filter?.endDate) {
-      where.date = {};
-      if (filter.startDate) where.date.gte = new Date(filter.startDate);
-      if (filter.endDate) where.date.lte = new Date(filter.endDate);
+    if (filter?.startDate) {
+      filterParam.startDate = filter.startDate;
     }
+    if (filter?.endDate) {
+      filterParam.endDate = filter.endDate;
+    }
+    const records = await getFinances(filterParam);
 
-    const finances = await this.prisma.finance.findMany({
-      where,
-      include: {
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                department: true,
-              },
-            },
-          },
-          orderBy: { updatedAt: "desc" },
-        },
+    // Get total count for pagination
+    const total = records.length;
+
+    // Apply default pagination if not provided
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Get paginated records
+    const paginatedRecords = records.slice(skip, skip + limit);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      records: paginatedRecords as unknown as Finance[],
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
       },
-      orderBy: { date: "desc" },
-    });
-
-    return finances as unknown as Finance[];
+    };
   }
 
   /**
    * Get a single finance by ID
    */
-  async getFinanceById(id: string): Promise<Finance | null> {
-    const finance = await this.prisma.finance.findUnique({
-      where: { id },
-      include: {
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                department: true,
-              },
-            },
-          },
-          orderBy: { updatedAt: "desc" },
-        },
-      },
-    });
-
-    return finance as unknown as Finance | null;
+  async findById(id: string): Promise<Finance | null> {
+    return (await getFinance(id)) as Finance | null;
   }
 
   /**
    * Create a new finance
    */
-  async createFinance(
-    data: CreateFinanceInput,
-    user: { id: string },
-  ): Promise<Finance> {
-    const financeData: Prisma.FinanceCreateInput = {
-      name: data.name,
-      amount: data.amount,
-      description: data.description || "",
-      date: new Date(data.date),
-      type: data.type,
-      user: { connect: { id: user.id } },
-      proof: data.proof,
-    };
-
-    if (data.categoryId) {
-      financeData.category = { connect: { id: data.categoryId } };
-    }
-
-    if (data.workProgramId) {
-      financeData.workProgram = { connect: { id: data.workProgramId } };
-    }
-
-    if (data.periodId) {
-      financeData.period = { connect: { id: data.periodId } };
-    }
-
-    const finance = await this.prisma.finance.create({
-      data: financeData,
-      include: {
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        period: true,
-        category: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                department: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Log activity
-    await logActivity({
-      userId: user.id,
-      activityType: ActivityType.CREATE,
-      entityType: "Finance",
-      entityId: finance.id,
-      description: `Created finance transaction: ${finance.name}`,
-      metadata: {
-        newData: {
-          name: finance.name,
-          amount: finance.amount,
-          description: finance.description,
-          date: finance.date,
-          categoryId: finance.categoryId,
-          type: finance.type,
-          workProgramId: finance.workProgramId,
-          userId: finance.userId,
-          proof: finance.proof,
-          status: finance.status,
-        },
-      },
-    });
-
-    // Create initial approval request for the finance if status is PENDING
-    if (financeData.status === "PENDING") {
-      await this.prisma.approval.create({
-        data: {
-          entityType: "FINANCE",
-          entityId: finance.id,
-          userId: user.id,
-          status: "PENDING",
-          note: "Finance transaction submitted for approval",
-        },
-      });
-    }
-
-    return finance as unknown as Finance;
+  async create(data: CreateFinanceInput, user: UserWithId): Promise<Finance> {
+    return (await createFinance(data, user)) as unknown as Finance;
   }
 
   /**
    * Update an existing finance
    */
-  async updateFinance(
+  async update(
     id: string,
     data: Partial<CreateFinanceInput>,
   ): Promise<Finance> {
-    const updateData: Prisma.FinanceUpdateInput = {
-      name: data.name,
-      amount: data.amount,
-      description: data.description,
-      date: data.date ? new Date(data.date) : undefined,
-      type: data.type,
-      proof: data.proof,
-    };
-
-    if (data.categoryId) {
-      updateData.category = { connect: { id: data.categoryId } };
-    }
-
-    if (data.workProgramId) {
-      updateData.workProgram = { connect: { id: data.workProgramId } };
-    }
-
-    if (data.periodId) {
-      updateData.period = { connect: { id: data.periodId } };
-    }
-
-    const finance = await this.prisma.finance.update({
-      where: { id },
-      data: updateData,
-      include: {
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                department: true,
-              },
-            },
-          },
-          orderBy: { updatedAt: "desc" },
-        },
-      },
-    });
-
-    return finance as unknown as Finance;
+    // Create a dummy user for backward compatibility with update function
+    const user: UserWithId = { id: "" };
+    return (await updateFinance(id, data, user)) as unknown as Finance;
   }
 
   /**
    * Delete a finance
    */
-  async deleteFinance(id: string): Promise<void> {
-    await this.prisma.finance.delete({
-      where: { id },
-    });
+  async delete(id: string): Promise<void> {
+    // Create a dummy user for backward compatibility with delete function
+    const user: UserWithId = { id: "" };
+    await deleteFinance(id, user);
+  }
+
+  /**
+   * Count finances with optional filter
+   */
+  async count(where?: Record<string, unknown>): Promise<number> {
+    const filterParam: GetFinancesFilter = {};
+    if (where?.categoryId) {
+      filterParam.categoryId = where.categoryId as string;
+    }
+    if (where?.workProgramId) {
+      filterParam.workProgramId = where.workProgramId as string;
+    }
+    if (where?.type) {
+      filterParam.type = where.type as FinanceType;
+    }
+    if (where?.status) {
+      filterParam.status = where.status as Status;
+    }
+    const records = await getFinances(filterParam);
+    return records.length;
   }
 }
