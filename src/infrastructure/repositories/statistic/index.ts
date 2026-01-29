@@ -20,3 +20,4 @@ export * from "./get-active-period-statistic.repository";
 export * from "./create-statistic.repository";
 export * from "./update-statistic.repository";
 export * from "./delete-statistic.repository";
+export * from "./get-statistic-stats.repository";

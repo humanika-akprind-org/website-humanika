@@ -9,7 +9,7 @@ import prisma from "@/presentation/lib/prisma";
 /**
  * Get a single statistic by ID
  */
-export async function getStatistic(id: string) {
+export async function getStatisticById(id: string) {
   const statistic = await prisma.statistic.findUnique({
     where: { id },
     include: {

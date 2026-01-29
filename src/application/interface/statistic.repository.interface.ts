@@ -40,13 +40,20 @@ export interface IStatisticRepository {
   create(data: CreateStatisticInput, userId: string): Promise<Statistic>;
 
   /** Update an existing statistic */
-  update(id: string, data: UpdateStatisticInput): Promise<Statistic>;
+  update(
+    id: string,
+    data: UpdateStatisticInput,
+    userId: string,
+  ): Promise<Statistic>;
 
   /** Delete a statistic */
   delete(id: string, userId: string): Promise<void>;
 
   /** Count statistics with optional filter */
   count(where?: BaseFilter): Promise<number>;
+
+  /** Get aggregated statistics */
+  getStats(where?: BaseFilter): Promise<BaseStats>;
 }
 
 // Re-export for convenience

@@ -8,7 +8,7 @@
 
 import type {
   IStatisticRepository,
-  StatisticPaginationInput,
+  StatisticPagination,
 } from "@/application/interface/statistic.repository.interface";
 import type {
   Statistic,
@@ -25,6 +25,14 @@ interface StatisticResult {
   };
 }
 
+/**
+ * Safely parse an integer from a string, returning a default value if invalid
+ */
+function parseIntSafe(value: string | null, defaultValue: number): number {
+  const parsed = parseInt(value || "", 10);
+  return Number.isNaN(parsed) ? defaultValue : parsed;
+}
+
 export class GetStatisticsUseCase {
   constructor(private statisticRepo: IStatisticRepository) {}
 
@@ -37,7 +45,7 @@ export class GetStatisticsUseCase {
    */
   async execute(
     filters?: StatisticFilter,
-    pagination?: StatisticPaginationInput,
+    pagination?: StatisticPagination,
   ): Promise<StatisticResult> {
     // Apply default pagination if not provided
     const page = pagination?.page || 1;
@@ -48,8 +56,11 @@ export class GetStatisticsUseCase {
     if (limit < 1) throw new Error("Limit must be greater than 0");
     if (limit > 100) throw new Error("Limit cannot exceed 100");
 
+    // Sanitize filters
+    const sanitizedFilters = this.sanitizeFilters(filters);
+
     // Handle special period=active query
-    if (filters?.period === "active") {
+    if (sanitizedFilters?.period === "active") {
       const activeStatistic = await this.statisticRepo.findActivePeriod();
       return {
         statistics: activeStatistic ? [activeStatistic] : [],
@@ -63,14 +74,28 @@ export class GetStatisticsUseCase {
     }
 
     // Execute the repository method
-    const result = await this.statisticRepo.findMany(filters, {
+    const result = await this.statisticRepo.findMany(sanitizedFilters, {
       page,
       limit,
     });
 
     return {
-      statistics: result.statistics,
+      statistics: result.records,
       pagination: result.pagination,
+    };
+  }
+
+  /**
+   * Sanitize and validate filter parameters
+   */
+  private sanitizeFilters(
+    filters?: StatisticFilter,
+  ): StatisticFilter | undefined {
+    if (!filters) return undefined;
+
+    return {
+      periodId: filters.periodId?.trim() || undefined,
+      period: filters.period?.trim() || undefined,
     };
   }
 
@@ -86,9 +111,9 @@ export class GetStatisticsUseCase {
       period: searchParams.get("period") || undefined,
     };
 
-    const pagination: StatisticPaginationInput = {
-      page: parseInt(searchParams.get("page") || "1", 10),
-      limit: parseInt(searchParams.get("limit") || "10", 10),
+    const pagination: StatisticPagination = {
+      page: parseIntSafe(searchParams.get("page"), 1),
+      limit: parseIntSafe(searchParams.get("limit"), 10),
     };
 
     return this.execute(filters, pagination);

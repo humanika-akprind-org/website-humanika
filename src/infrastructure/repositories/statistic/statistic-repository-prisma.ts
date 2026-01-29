@@ -2,63 +2,76 @@
  * Statistic Repository Prisma Implementation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  *
- * This repository wraps existing statistic functions
- * and implements the IStatisticRepository interface.
+ * This repository implements the IStatisticRepository interface
+ * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
 import type {
   IStatisticRepository,
+  StatisticFilter,
   StatisticPagination,
-  StatisticResult,
+  StatisticPaginationResult,
+  StatisticStats,
 } from "@/application/interface/statistic.repository.interface";
 import type {
   Statistic,
   CreateStatisticInput,
   UpdateStatisticInput,
-  StatisticFilter,
 } from "@/domain/entities/statistic.entity";
 import {
   getStatistics,
-  getStatistic,
+  getStatisticById,
   getStatisticByPeriod,
   getActivePeriodStatistic,
   createStatistic,
   updateStatistic,
   deleteStatistic,
+  getStatisticStats,
 } from "./index";
+
+// Type alias for user context
+type UserWithId = { id: string };
 
 /**
  * Statistic Repository Prisma Implementation
  *
- * This class wraps existing repository functions to implement
- * the standardized repository interface for Clean Architecture.
+ * This class implements the IStatisticRepository interface
+ * for Clean Architecture compliance.
  */
 export class StatisticRepositoryPrisma implements IStatisticRepository {
+  /**
+   * Get all statistics
+   */
+  async findAll(): Promise<Statistic[]> {
+    return (await getStatistics()) as Statistic[];
+  }
+
   /**
    * Get all statistics with optional filtering and pagination
    */
   async findMany(
     filter?: StatisticFilter,
     pagination?: StatisticPagination,
-  ): Promise<StatisticResult> {
+  ): Promise<{ records: Statistic[]; pagination: StatisticPaginationResult }> {
+    const records = await getStatistics(filter);
+
+    // Get total count for pagination
+    const total = records.length;
+
     // Apply default pagination if not provided
     const page = pagination?.page || 1;
     const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
 
-    // Get all statistics (the existing function doesn't support pagination)
-    const statistics = await getStatistics(filter);
+    // Get paginated statistics
+    const paginatedRecords = records.slice(skip, skip + limit);
 
     // Calculate pagination metadata
-    const total = statistics.length;
     const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-
-    // Apply pagination to results
-    const paginatedStatistics = statistics.slice(startIndex, endIndex);
 
     return {
-      statistics: paginatedStatistics,
+      records: paginatedRecords as Statistic[],
       pagination: {
         page,
         limit,
@@ -72,29 +85,29 @@ export class StatisticRepositoryPrisma implements IStatisticRepository {
    * Get a single statistic by ID
    */
   async findById(id: string): Promise<Statistic | null> {
-    return getStatistic(id);
+    return (await getStatisticById(id)) as Statistic | null;
   }
 
   /**
    * Get statistic by period ID
    */
   async findByPeriodId(periodId: string): Promise<Statistic | null> {
-    return getStatisticByPeriod(periodId);
+    return (await getStatisticByPeriod(periodId)) as Statistic | null;
   }
 
   /**
    * Get the active period statistic
    */
   async findActivePeriod(): Promise<Statistic | null> {
-    return getActivePeriodStatistic();
+    return (await getActivePeriodStatistic()) as Statistic | null;
   }
 
   /**
    * Create a new statistic
    */
   async create(data: CreateStatisticInput, userId: string): Promise<Statistic> {
-    // The existing create function expects a user object with id
-    return createStatistic(data, { id: userId } as { id: string });
+    const user: UserWithId = { id: userId };
+    return await createStatistic(data, user);
   }
 
   /**
@@ -105,15 +118,32 @@ export class StatisticRepositoryPrisma implements IStatisticRepository {
     data: UpdateStatisticInput,
     userId: string,
   ): Promise<Statistic> {
-    // The existing update function expects a user object with id
-    return updateStatistic(id, data, { id: userId } as { id: string });
+    const user: UserWithId = { id: userId };
+    return await updateStatistic(id, data, user);
   }
 
   /**
    * Delete a statistic
    */
   async delete(id: string, userId: string): Promise<void> {
-    // The existing delete function expects a user object with id
-    await deleteStatistic(id, { id: userId } as { id: string });
+    const user: UserWithId = { id: userId };
+    await deleteStatistic(id, user);
+  }
+
+  /**
+   * Count statistics with optional filter
+   */
+  async count(where?: Record<string, unknown>): Promise<number> {
+    const statistics = await getStatistics({
+      periodId: where?.periodId as string,
+    });
+    return statistics.length;
+  }
+
+  /**
+   * Get aggregated statistics
+   */
+  async getStats(where?: Record<string, unknown>): Promise<StatisticStats> {
+    return await getStatisticStats(where);
   }
 }
