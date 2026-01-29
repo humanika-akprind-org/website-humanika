@@ -30,6 +30,10 @@ export class GetStructureByIdUseCase {
     // Execute repository call
     const structure = await this.structureRepository.getStructureById(id);
 
+    if (!structure) {
+      throw new Error("Structure not found");
+    }
+
     return structure;
   }
 }

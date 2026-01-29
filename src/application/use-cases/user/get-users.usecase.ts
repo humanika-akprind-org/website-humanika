@@ -23,8 +23,14 @@ export class GetUsersUseCase {
   private sanitizeFilter(filter?: UserFilter): UserFilter | undefined {
     if (!filter) return undefined;
     return {
-      page: filter.page && filter.page > 0 ? filter.page : undefined,
-      limit: filter.limit && filter.limit > 0 ? filter.limit : undefined,
+      page:
+        typeof filter.page === "number" && filter.page > 0
+          ? filter.page
+          : undefined,
+      limit:
+        typeof filter.limit === "number" && filter.limit > 0
+          ? filter.limit
+          : undefined,
       search: filter.search?.trim() || undefined,
       role: filter.role,
       department: filter.department,

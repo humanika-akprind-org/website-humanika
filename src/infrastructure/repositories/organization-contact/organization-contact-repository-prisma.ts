@@ -213,11 +213,11 @@ export class OrganizationContactRepositoryPrisma implements IOrganizationContact
   }
 
   async updateOrganizationContact(
-    id: string,
+    _id: string,
     data: UpdateOrganizationContactInput,
-    userId: string,
+    _userId: string,
   ): Promise<OrganizationContact> {
-    return this.update(id, data, userId);
+    return this.update(_id, data);
   }
 
   async deleteOrganizationContact(id: string, userId: string): Promise<void> {

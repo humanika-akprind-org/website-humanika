@@ -200,7 +200,7 @@ export class DocumentRepositoryPrisma implements IDocumentRepository {
     data: CreateDocumentInput,
     user?: UserWithId,
   ): Promise<Document> {
-    return this.create(data, user);
+    return this.create(data, user || { id: "" });
   }
 
   async updateDocument(

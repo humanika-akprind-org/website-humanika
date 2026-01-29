@@ -60,7 +60,9 @@ export default function ArticleHeroSection({
           <div className="flex flex-wrap items-center gap-6 text-primary-100/90 mb-8">
             <div className="flex items-center gap-2">
               <User className="w-5 h-5" />
-              <span className="font-medium">{article.author.name}</span>
+              <span className="font-medium">
+                {article.author?.name || "Unknown"}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />

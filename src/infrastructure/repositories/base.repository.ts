@@ -9,6 +9,12 @@
 import prisma from "@/presentation/lib/prisma";
 import type { PrismaClient } from "@prisma/client";
 import type { IBaseRepository } from "@/application/interface/base.repository.interface";
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+  BaseStats,
+} from "@/application/interface/base.repository.interface";
 
 // Type for accessing any Prisma model dynamically
 type PrismaModelDelegate = {
@@ -50,6 +56,36 @@ export abstract class BaseRepository<
     })) as T | null;
   }
 
+  async findMany(
+    filters?: BaseFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: T[]; pagination: BasePaginationResult }> {
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const records = (await this.modelDelegate.findMany({
+      where: filters,
+      skip,
+      take: limit,
+    })) as T[];
+
+    const total = (await this.modelDelegate.count({
+      where: filters,
+    })) as number;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      records,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
+  }
+
   async create(data: TCreate): Promise<T> {
     return (await this.modelDelegate.create({
       data: data as object,
@@ -69,7 +105,14 @@ export abstract class BaseRepository<
     });
   }
 
-  async count(where?: unknown): Promise<number> {
-    return await this.modelDelegate.count({ where });
+  async count(where?: BaseFilter): Promise<number> {
+    return (await this.modelDelegate.count({ where })) as number;
+  }
+
+  async getStats(filters?: BaseFilter): Promise<BaseStats> {
+    const total = (await this.modelDelegate.count({
+      where: filters,
+    })) as number;
+    return { total };
   }
 }

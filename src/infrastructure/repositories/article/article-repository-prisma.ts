@@ -22,9 +22,6 @@ import {
   deleteArticle,
 } from "./index";
 
-// Type alias for user context
-type UserWithId = { id: string };
-
 /**
  * Article Repository Prisma Implementation
  *

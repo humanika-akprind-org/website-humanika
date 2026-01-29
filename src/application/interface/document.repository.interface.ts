@@ -22,6 +22,7 @@ export interface DocumentFilters extends BaseFilter {
   documentTypeId?: string;
   search?: string;
   periodId?: string;
+  [key: string]: unknown;
 }
 
 // Extend the base interface for Document entity

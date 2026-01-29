@@ -55,6 +55,7 @@ export interface IWorkProgramRepository {
   updateWorkProgram(
     id: string,
     data: UpdateWorkProgramInput,
+    user: { id: string },
   ): Promise<WorkProgram>;
   deleteWorkProgram(id: string, user: { id: string }): Promise<void>;
 }

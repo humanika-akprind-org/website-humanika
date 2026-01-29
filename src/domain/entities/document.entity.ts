@@ -46,4 +46,5 @@ export interface DocumentFilter {
   documentTypeId?: string;
   search?: string;
   periodId?: string;
+  [key: string]: unknown;
 }

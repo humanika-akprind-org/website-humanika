@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
     // 3. Response - consistent format
     return NextResponse.json({
       success: true,
-      data: result.organizationContacts,
+      data: result.records,
       pagination: result.pagination,
     });
   } catch (error) {

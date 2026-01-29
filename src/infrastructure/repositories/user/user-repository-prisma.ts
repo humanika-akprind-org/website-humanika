@@ -108,7 +108,7 @@ export class UserRepositoryPrisma implements IUserRepository {
     position: Position | null;
     isActive: boolean;
     verifiedAccount: boolean;
-    attemptLogin: number | null;
+    attemptLogin: number;
     blockExpires: Date | null;
     createdAt: Date;
     updatedAt: Date;

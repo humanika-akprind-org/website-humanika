@@ -22,6 +22,7 @@ export interface EventFilters extends BaseFilter {
   scheduleEndDate?: string;
   date?: string;
   location?: string;
+  [key: string]: unknown;
 }
 
 // Event-specific repository interface
@@ -72,19 +73,6 @@ export interface IEventRepository {
   createEvent(data: CreateEventInput): Promise<Event>;
   updateEvent(id: string, data: UpdateEventInput): Promise<Event>;
   deleteEvent(id: string): Promise<void>;
-}
-
-// Filter types for Event queries
-export interface EventFilters extends BaseFilter {
-  department?: Department;
-  status?: Status;
-  periodId?: string;
-  workProgramId?: string;
-  search?: string;
-  scheduleStartDate?: string;
-  scheduleEndDate?: string;
-  date?: string;
-  location?: string;
 }
 
 // Re-export base types with Event-specific names for convenience

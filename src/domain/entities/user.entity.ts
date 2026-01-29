@@ -22,8 +22,20 @@ export interface CreateUserData {
   email: string;
   username: string;
   password: string;
-  role?: UserRole;
-  department?: Department;
+  role?: UserRole | string;
+  department?: Department | string;
+  position?: Position;
+  isActive?: boolean;
+  verifiedAccount?: boolean;
+}
+
+export interface UpdateUserData {
+  name?: string;
+  email?: string;
+  username?: string;
+  password?: string;
+  role?: UserRole | string;
+  department?: Department | string;
   position?: Position;
   isActive?: boolean;
 }
@@ -51,43 +63,6 @@ export interface UserFilters {
 }
 
 export type UserFiltersType = UserFilters;
-
-export interface CreateUserData {
-  name: string;
-  email: string;
-  username: string;
-  password: string;
-  role?: UserRole;
-  department?: Department;
-  position?: Position;
-  isActive?: boolean;
-}
-
-export interface UpdateUserData {
-  name?: string;
-  email?: string;
-  username?: string;
-  password?: string;
-  role?: UserRole;
-  department?: Department;
-  position?: Position;
-  isActive?: boolean;
-}
-
-export interface UsersResponse {
-  users: User[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
-}
-
-export interface ApiResponse<T> {
-  data?: T;
-  error?: string;
-}
 
 export interface BulkOperationResponse {
   count: number;

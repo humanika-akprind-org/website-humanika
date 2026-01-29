@@ -1,22 +1,25 @@
 import { type Status } from "../enums";
-import { type User } from "./user.entity";
 import { type Period } from "./period.entity";
 import { type ArticleCategory } from "../value-objects/article-category";
 
 export interface Article {
-  viewCount: number;
+  viewCount?: number;
   id: string;
   title: string;
   slug: string;
   thumbnail?: string | null;
   content: string;
   authorId: string;
-  author: User;
-  categoryId: string;
-  category: ArticleCategory;
+  author?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  categoryId?: string | null;
+  category?: ArticleCategory | null;
   periodId?: string | null;
   period?: Period | null;
-  status: Status;
+  status: Status | string;
   createdAt: Date;
   updatedAt: Date;
   relatedArticles?: Article[];

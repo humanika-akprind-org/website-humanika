@@ -191,4 +191,5 @@ export interface EventFilter {
   date?: string;
   /** Filter events by location */
   location?: string;
+  [key: string]: unknown;
 }
