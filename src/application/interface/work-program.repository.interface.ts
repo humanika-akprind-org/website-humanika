@@ -1,11 +1,8 @@
-/**
- * Work Program Repository Interface
- * Part of Clean Architecture: Application Layer (Interface/Port)
- *
- * Defines the contract for work program data access operations.
- * Following Dependency Inversion Principle - high-level modules depend on abstractions.
- */
-
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type {
   WorkProgram,
   CreateWorkProgramInput,
@@ -13,50 +10,40 @@ import type {
   WorkProgramFilter,
 } from "@/domain/entities/work-program.entity";
 
-// ============================================================================
-// Interface Definition
-// ============================================================================
-
+/**
+ * Work Program Repository Interface - Entity-specific repository
+ * Part of Clean Architecture: Application Layer (Interface)
+ *
+ * This interface defines WorkProgram-specific operations.
+ */
 export interface IWorkProgramRepository {
-  /**
-   * Get all work programs with optional filters
-   */
-  getWorkPrograms(filter?: WorkProgramFilter): Promise<WorkProgram[]>;
+  /** Find all work programs */
+  findAll(): Promise<WorkProgram[]>;
 
-  /**
-   * Get a single work program by its ID
-   */
-  getWorkProgramById(id: string): Promise<WorkProgram | null>;
+  /** Find a work program by ID */
+  findById(id: string): Promise<WorkProgram | null>;
 
-  /**
-   * Create a new work program
-   */
-  createWorkProgram(
+  /** Find work programs with filters and pagination */
+  findMany(
+    filters?: WorkProgramFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: WorkProgram[]; pagination: BasePaginationResult }>;
+
+  /** Create a new work program */
+  create(
     data: CreateWorkProgramInput,
     user: { id: string },
   ): Promise<WorkProgram>;
 
-  /**
-   * Update an existing work program
-   */
-  updateWorkProgram(
-    id: string,
-    data: UpdateWorkProgramInput,
-    user: { id: string },
-  ): Promise<WorkProgram>;
+  /** Update an existing work program */
+  update(id: string, data: UpdateWorkProgramInput): Promise<WorkProgram>;
 
-  /**
-   * Delete a single work program by its ID
-   */
-  deleteWorkProgram(id: string, user: { id: string }): Promise<void>;
+  /** Delete a work program */
+  delete(id: string): Promise<void>;
+
+  /** Count work programs with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }
 
-// ============================================================================
-// Type Aliases for Use Cases (optional - for convenience)
-// ============================================================================
-
-export type { WorkProgramFilter } from "@/domain/entities/work-program.entity";
-export type {
-  CreateWorkProgramInput,
-  UpdateWorkProgramInput,
-} from "@/domain/entities/work-program.entity";
+// Re-export for convenience
+export type { WorkProgramFilter };

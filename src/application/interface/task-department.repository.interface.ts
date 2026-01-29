@@ -1,46 +1,51 @@
 import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
+import type {
   CreateDepartmentTaskInput,
   DepartmentTask,
   DepartmentTaskFilter,
 } from "@/domain/entities/task-department.entity";
 
 /**
- * Task Department Repository Interface
+ * Task Department Repository Interface - Entity-specific repository
  * Part of Clean Architecture: Application Layer (Interface)
  *
- * This interface defines the contract for task department data access operations.
- * Following Dependency Inversion Principle - depends on abstractions, not concretions.
+ * This interface defines TaskDepartment-specific operations.
  */
 export interface ITaskDepartmentRepository {
-  /**
-   * Get all department tasks with optional filters
-   */
-  getDepartmentTasks(filter?: DepartmentTaskFilter): Promise<DepartmentTask[]>;
+  /** Find all department tasks */
+  findAll(): Promise<DepartmentTask[]>;
 
-  /**
-   * Get a single department task by ID
-   */
-  getDepartmentTaskById(id: string): Promise<DepartmentTask | null>;
+  /** Find a department task by ID */
+  findById(id: string): Promise<DepartmentTask | null>;
 
-  /**
-   * Create a new department task
-   */
-  createDepartmentTask(
+  /** Find department tasks with filters and pagination */
+  findMany(
+    filters?: DepartmentTaskFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: DepartmentTask[]; pagination: BasePaginationResult }>;
+
+  /** Create a new department task */
+  create(
     data: CreateDepartmentTaskInput,
     user: { id: string },
   ): Promise<DepartmentTask>;
 
-  /**
-   * Update an existing department task
-   */
-  updateDepartmentTask(
+  /** Update an existing department task */
+  update(
     id: string,
     data: Partial<CreateDepartmentTaskInput>,
-    user: { id: string },
   ): Promise<DepartmentTask>;
 
-  /**
-   * Delete a department task
-   */
-  deleteDepartmentTask(id: string, user: { id: string }): Promise<void>;
+  /** Delete a department task */
+  delete(id: string): Promise<void>;
+
+  /** Count department tasks with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }
+
+// Re-export for convenience
+export type { DepartmentTaskFilter };

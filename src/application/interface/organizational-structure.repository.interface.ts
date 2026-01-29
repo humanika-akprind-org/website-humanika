@@ -1,4 +1,9 @@
 import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
+import type {
   OrganizationalStructure,
   OrganizationalStructureFilter,
   CreateOrganizationalStructureInput,
@@ -6,44 +11,45 @@ import type {
 } from "@/domain/entities/organizational-structure.entity";
 
 /**
- * Organizational Structure Repository Interface
+ * Organizational Structure Repository Interface - Entity-specific repository
  * Part of Clean Architecture: Application Layer (Interface)
  *
- * Defines the contract for organizational structure data access.
- * Following Dependency Inversion Principle - depends on abstractions, not concretions.
+ * This interface defines OrganizationalStructure-specific operations.
  */
 export interface IOrganizationalStructureRepository {
-  /**
-   * Get all organizational structures with optional filters
-   */
-  getStructures(
-    filter?: OrganizationalStructureFilter,
-  ): Promise<OrganizationalStructure[]>;
+  /** Find all organizational structures */
+  findAll(): Promise<OrganizationalStructure[]>;
 
-  /**
-   * Get a single organizational structure by ID
-   */
-  getStructureById(id: string): Promise<OrganizationalStructure>;
+  /** Find an organizational structure by ID */
+  findById(id: string): Promise<OrganizationalStructure | null>;
 
-  /**
-   * Create a new organizational structure
-   */
-  createStructure(
+  /** Find organizational structures with filters and pagination */
+  findMany(
+    filters?: OrganizationalStructureFilter,
+    pagination?: BasePagination,
+  ): Promise<{
+    records: OrganizationalStructure[];
+    pagination: BasePaginationResult;
+  }>;
+
+  /** Create a new organizational structure */
+  create(
     data: CreateOrganizationalStructureInput,
     user: { id: string },
   ): Promise<OrganizationalStructure>;
 
-  /**
-   * Update an existing organizational structure
-   */
-  updateStructure(
+  /** Update an existing organizational structure */
+  update(
     id: string,
     data: UpdateOrganizationalStructureInput,
-    user: { id: string },
   ): Promise<OrganizationalStructure>;
 
-  /**
-   * Delete an organizational structure
-   */
-  deleteStructure(id: string, user: { id: string }): Promise<void>;
+  /** Delete an organizational structure */
+  delete(id: string): Promise<void>;
+
+  /** Count organizational structures with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }
+
+// Re-export for convenience
+export type { OrganizationalStructureFilter };

@@ -5,6 +5,11 @@
  * This interface defines the contract for activity data access operations.
  */
 
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type { ActivityLog } from "@/domain/entities/activity-log.entity";
 import type { UserRole, Department } from "@/domain/enums";
 
@@ -28,28 +33,10 @@ export interface RadarChartResult {
 /**
  * Filters for querying activities
  */
-export interface ActivityFilters {
+export interface ActivityFilters extends BaseFilter {
   activityType?: string | "ALL";
   startDate?: string;
   endDate?: string;
-}
-
-/**
- * Pagination parameters
- */
-export interface ActivityPagination {
-  page: number;
-  limit: number;
-}
-
-/**
- * Pagination result
- */
-export interface ActivityPaginationResult {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }
 
 /**
@@ -64,10 +51,10 @@ export interface IActivityRepository {
    */
   findMany(
     filters?: ActivityFilters,
-    pagination?: ActivityPagination,
+    pagination?: BasePagination,
   ): Promise<{
     activities: ActivityLog[];
-    pagination: ActivityPaginationResult;
+    pagination: BasePaginationResult;
   }>;
 
   /**

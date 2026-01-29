@@ -1,10 +1,8 @@
-/**
- * User Repository Interface - Entity-specific repository
- * Part of Clean Architecture: Application Layer (Interface)
- *
- * This interface defines User-specific operations.
- */
-
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type {
   User,
   CreateUserData,
@@ -22,8 +20,8 @@ export interface IUserRepository {
   /** Find users with filters and pagination */
   findMany(
     filters?: UserFilter,
-    pagination?: UserPagination,
-  ): Promise<{ users: User[]; pagination: UserPaginationResult }>;
+    pagination?: BasePagination,
+  ): Promise<{ records: User[]; pagination: BasePaginationResult }>;
 
   /** Create a user */
   create(data: CreateUserData): Promise<User>;
@@ -35,7 +33,7 @@ export interface IUserRepository {
   delete(id: string): Promise<void>;
 
   /** Count users with optional filter */
-  count(where?: unknown): Promise<number>;
+  count(where?: BaseFilter): Promise<number>;
 
   /** Change user password */
   changePassword(
@@ -57,7 +55,7 @@ export interface IUserRepository {
 }
 
 // Filter types for User queries
-export interface UserFilter {
+export interface UserFilter extends BaseFilter {
   search?: string;
   role?: string;
   department?: string;
@@ -65,18 +63,4 @@ export interface UserFilter {
   verifiedAccount?: boolean;
   allUsers?: boolean;
   excludeUserId?: string;
-}
-
-// Pagination input
-export interface UserPagination {
-  page?: number;
-  limit?: number;
-}
-
-// Pagination result
-export interface UserPaginationResult {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }

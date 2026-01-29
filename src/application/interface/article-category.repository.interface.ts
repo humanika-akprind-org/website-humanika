@@ -1,56 +1,55 @@
 import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
+import type {
   ArticleCategory,
   CreateArticleCategoryInput,
 } from "@/domain/value-objects/article-category";
 
 /**
- * Article Category Repository Interface
+ * Article Category Filter
+ */
+export interface ArticleCategoryFilter extends BaseFilter {
+  search?: string;
+  withCount?: boolean;
+}
+
+/**
+ * Article Category Repository Interface - Entity-specific repository
  * Part of Clean Architecture: Application Layer (Interface)
  *
- * This interface defines the contract for article category data access operations.
- * Following Dependency Inversion Principle - depends on abstractions, not concretions.
+ * This interface defines ArticleCategory-specific operations.
  */
 export interface IArticleCategoryRepository {
-  /**
-   * Get all article categories
-   */
-  getArticleCategories(): Promise<ArticleCategory[]>;
+  /** Find all article categories */
+  findAll(): Promise<ArticleCategory[]>;
 
-  /**
-   * Get all article categories with article count
-   */
-  getArticleCategoriesWithCount(): Promise<ArticleCategory[]>;
+  /** Find an article category by ID */
+  findById(id: string): Promise<ArticleCategory | null>;
 
-  /**
-   * Get a single category by ID
-   */
-  getArticleCategoryById(id: string): Promise<ArticleCategory | null>;
+  /** Find article categories with pagination */
+  findMany(
+    filters?: ArticleCategoryFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: ArticleCategory[]; pagination: BasePaginationResult }>;
 
-  /**
-   * Create a new article category
-   */
-  createArticleCategory(
+  /** Create a new article category */
+  create(
     data: CreateArticleCategoryInput,
     userId: string,
   ): Promise<ArticleCategory>;
 
-  /**
-   * Update an existing category
-   */
-  updateCategory(
+  /** Update an existing article category */
+  update(
     id: string,
     data: Partial<CreateArticleCategoryInput>,
   ): Promise<ArticleCategory>;
 
-  /**
-   * Delete a category
-   */
-  deleteCategory(id: string): Promise<void>;
-}
+  /** Delete an article category */
+  delete(id: string): Promise<void>;
 
-/**
- * Category filter options
- */
-export interface CategoryFilter {
-  withCount?: boolean;
+  /** Count article categories with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }

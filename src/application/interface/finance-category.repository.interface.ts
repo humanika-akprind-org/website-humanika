@@ -1,11 +1,8 @@
-/**
- * Finance Category Repository Interface
- * Part of Clean Architecture: Application Layer (Interface)
- *
- * This interface defines the contract for finance category data access operations.
- * Following Dependency Inversion Principle - depends on abstractions, not concretions.
- */
-
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type {
   CreateFinanceCategoryInput,
   FinanceCategory,
@@ -13,40 +10,42 @@ import type {
 } from "@/domain/value-objects/finance-category";
 
 /**
- * Finance Category Repository Interface
+ * Finance Category Repository Interface - Entity-specific repository
+ * Part of Clean Architecture: Application Layer (Interface)
+ *
+ * This interface defines FinanceCategory-specific operations.
  */
 export interface IFinanceCategoryRepository {
-  /**
-   * Get all finance categories with optional filters
-   */
-  getFinanceCategories(
-    filter?: FinanceCategoryFilter,
-  ): Promise<FinanceCategory[]>;
+  /** Find all finance categories */
+  findAll(): Promise<FinanceCategory[]>;
 
-  /**
-   * Get a single finance category by ID
-   */
-  getFinanceCategoryById(id: string): Promise<FinanceCategory | null>;
+  /** Find a finance category by ID */
+  findById(id: string): Promise<FinanceCategory | null>;
 
-  /**
-   * Create a new finance category
-   */
-  createFinanceCategory(
+  /** Find finance categories with filters and pagination */
+  findMany(
+    filters?: FinanceCategoryFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: FinanceCategory[]; pagination: BasePaginationResult }>;
+
+  /** Create a new finance category */
+  create(
     data: CreateFinanceCategoryInput,
     user: { id: string },
   ): Promise<FinanceCategory>;
 
-  /**
-   * Update an existing finance category
-   */
-  updateFinanceCategory(
+  /** Update an existing finance category */
+  update(
     id: string,
     data: Partial<CreateFinanceCategoryInput>,
-    user: { id: string },
   ): Promise<FinanceCategory>;
 
-  /**
-   * Delete a finance category
-   */
-  deleteFinanceCategory(id: string, user: { id: string }): Promise<void>;
+  /** Delete a finance category */
+  delete(id: string): Promise<void>;
+
+  /** Count finance categories with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }
+
+// Re-export for convenience
+export type { FinanceCategoryFilter };

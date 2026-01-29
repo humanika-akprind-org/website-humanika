@@ -1,11 +1,8 @@
-/**
- * Organization Contact Repository Interface
- * Part of Clean Architecture: Application Layer (Interface)
- *
- * This interface defines the contract for organization contact data operations.
- * All repository implementations must implement these methods.
- */
-
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type {
   OrganizationContact,
   CreateOrganizationContactInput,
@@ -13,104 +10,52 @@ import type {
   OrganizationContactFilter,
 } from "@/domain/entities/organization-contact.entity";
 
-// ============================================================================
-// Pagination Types
-// ============================================================================
-
 /**
- * Pagination input parameters (only includes controllable fields)
+ * Organization Contact Repository Interface - Entity-specific repository
+ * Part of Clean Architecture: Application Layer (Interface)
+ *
+ * This interface defines OrganizationContact-specific operations.
  */
-export interface OrganizationContactPaginationInput {
-  page?: number;
-  limit?: number;
-}
-
-/**
- * Pagination output result (includes computed fields)
- */
-export interface OrganizationContactPaginationResult {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-export interface OrganizationContactResult {
-  organizationContacts: OrganizationContact[];
-  pagination: OrganizationContactPaginationResult;
-}
-
-// ============================================================================
-// Repository Interface
-// ============================================================================
-
 export interface IOrganizationContactRepository {
-  /**
-   * Get all organization contacts with optional filtering
-   *
-   * @param filter - Optional filter criteria
-   * @param pagination - Optional pagination parameters
-   * @returns Paginated organization contacts
-   */
-  findMany(
-    filter?: OrganizationContactFilter,
-    pagination?: OrganizationContactPaginationInput,
-  ): Promise<OrganizationContactResult>;
+  /** Find all organization contacts */
+  findAll(): Promise<OrganizationContact[]>;
 
-  /**
-   * Get a single organization contact by ID
-   *
-   * @param id - Organization contact ID
-   * @returns The organization contact or null if not found
-   */
+  /** Find an organization contact by ID */
   findById(id: string): Promise<OrganizationContact | null>;
 
-  /**
-   * Get organization contact by period ID
-   *
-   * @param periodId - Period ID
-   * @returns The organization contact or null if not found
-   */
+  /** Find organization contacts with filters and pagination */
+  findMany(
+    filters?: OrganizationContactFilter,
+    pagination?: BasePagination,
+  ): Promise<{
+    records: OrganizationContact[];
+    pagination: BasePaginationResult;
+  }>;
+
+  /** Find organization contact by period ID */
   findByPeriodId(periodId: string): Promise<OrganizationContact | null>;
 
-  /**
-   * Get the active period organization contact
-   *
-   * @returns The active period organization contact or null if not found
-   */
+  /** Find the active period organization contact */
   findActivePeriod(): Promise<OrganizationContact | null>;
 
-  /**
-   * Create a new organization contact
-   *
-   * @param data - Organization contact data
-   * @param userId - ID of the user creating the contact
-   * @returns The created organization contact
-   */
+  /** Create a new organization contact */
   create(
     data: CreateOrganizationContactInput,
     userId: string,
   ): Promise<OrganizationContact>;
 
-  /**
-   * Update an existing organization contact
-   *
-   * @param id - Organization contact ID
-   * @param data - Update data
-   * @param userId - ID of the user updating the contact
-   * @returns The updated organization contact
-   */
+  /** Update an existing organization contact */
   update(
     id: string,
     data: UpdateOrganizationContactInput,
-    userId: string,
   ): Promise<OrganizationContact>;
 
-  /**
-   * Delete an organization contact
-   *
-   * @param id - Organization contact ID
-   * @param userId - ID of the user deleting the contact
-   */
+  /** Delete an organization contact */
   delete(id: string, userId: string): Promise<void>;
+
+  /** Count organization contacts with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }
+
+// Re-export for convenience
+export type { OrganizationContactFilter };

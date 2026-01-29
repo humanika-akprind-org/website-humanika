@@ -1,17 +1,21 @@
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
+import type {
+  Gallery,
+  CreateGalleryInput,
+  UpdateGalleryInput,
+} from "@/domain/entities/gallery.entity";
+import type { GalleryFilter } from "@/domain/entities/gallery.entity";
+
 /**
  * Gallery Repository Interface - Entity-specific repository
  * Part of Clean Architecture: Application Layer (Interface)
  *
  * This interface defines Gallery-specific operations.
  */
-
-import type {
-  Gallery,
-  CreateGalleryInput,
-  UpdateGalleryInput,
-} from "@/domain/entities/gallery.entity";
-
-// Gallery-specific repository interface
 export interface IGalleryRepository {
   /** Find all galleries */
   findAll(): Promise<Gallery[]>;
@@ -22,8 +26,8 @@ export interface IGalleryRepository {
   /** Find galleries with filters and pagination */
   findMany(
     filters?: GalleryFilter,
-    pagination?: GalleryPagination,
-  ): Promise<{ galleries: Gallery[]; pagination: GalleryPaginationResult }>;
+    pagination?: BasePagination,
+  ): Promise<{ records: Gallery[]; pagination: BasePaginationResult }>;
 
   /** Find galleries by event */
   findByEvent(eventId: string): Promise<Gallery[]>;
@@ -31,7 +35,7 @@ export interface IGalleryRepository {
   /** Find galleries by category */
   findByCategory(categoryId: string): Promise<Gallery[]>;
 
-  /** Create a gallery */
+  /** Create a new gallery */
   create(data: CreateGalleryInput): Promise<Gallery>;
 
   /** Update an existing gallery */
@@ -41,27 +45,8 @@ export interface IGalleryRepository {
   delete(id: string): Promise<void>;
 
   /** Count galleries with optional filter */
-  count(where?: unknown): Promise<number>;
+  count(where?: BaseFilter): Promise<number>;
 }
 
-// Filter types for Gallery queries
-export interface GalleryFilter {
-  eventId?: string;
-  categoryId?: string;
-  periodId?: string;
-  search?: string;
-}
-
-// Pagination input
-export interface GalleryPagination {
-  page?: number;
-  limit?: number;
-}
-
-// Pagination result
-export interface GalleryPaginationResult {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
+// Re-export for convenience
+export type { GalleryFilter };

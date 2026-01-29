@@ -1,50 +1,48 @@
 import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
+import type {
   CreateArticleInput,
   Article,
   ArticleFilter,
 } from "@/domain/entities/article.entity";
 
 /**
- * Article Repository Interface
+ * Article Repository Interface - Entity-specific repository
  * Part of Clean Architecture: Application Layer (Interface)
  *
- * This interface defines the contract for article data access operations.
- * Following Dependency Inversion Principle - depends on abstractions, not concretions.
+ * This interface defines Article-specific operations.
  */
 export interface IArticleRepository {
-  /**
-   * Get all articles with optional filters
-   */
-  getArticles(filter?: ArticleFilter): Promise<Article[]>;
+  /** Find all articles */
+  findAll(): Promise<Article[]>;
 
-  /**
-   * Get a single article by ID
-   */
-  getArticleById(id: string): Promise<Article | null>;
+  /** Find an article by ID */
+  findById(id: string): Promise<Article | null>;
 
-  /**
-   * Get a single article by slug
-   */
-  getArticleBySlug(slug: string): Promise<Article | null>;
+  /** Find an article by slug */
+  findBySlug(slug: string): Promise<Article | null>;
 
-  /**
-   * Create a new article
-   */
-  createArticle(
-    data: CreateArticleInput,
-    user: { id: string },
-  ): Promise<Article>;
+  /** Find articles with filters and pagination */
+  findMany(
+    filters?: ArticleFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: Article[]; pagination: BasePaginationResult }>;
 
-  /**
-   * Update an existing article
-   */
-  updateArticle(
-    id: string,
-    data: Partial<CreateArticleInput>,
-  ): Promise<Article>;
+  /** Create a new article */
+  create(data: CreateArticleInput, user: { id: string }): Promise<Article>;
 
-  /**
-   * Delete an article
-   */
-  deleteArticle(id: string): Promise<void>;
+  /** Update an existing article */
+  update(id: string, data: Partial<CreateArticleInput>): Promise<Article>;
+
+  /** Delete an article */
+  delete(id: string): Promise<void>;
+
+  /** Count articles with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }
+
+// Re-export ArticleFilter for convenience
+export type { ArticleFilter };

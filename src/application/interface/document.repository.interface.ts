@@ -1,11 +1,8 @@
-/**
- * Document Repository Interface - Entity-specific repository
- * Part of Clean Architecture: Application Layer (Interface)
- *
- * This interface extends IBaseRepository with Document-specific operations.
- */
-
-import type { IBaseRepository } from "./base.repository.interface";
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type {
   Document,
   CreateDocumentInput,
@@ -17,19 +14,18 @@ import type { User } from "@/domain/entities/user.entity";
 type UserWithId = Pick<User, "id">;
 
 // Extend the base interface for Document entity
-export interface IDocumentRepository extends IBaseRepository<
-  Document,
-  string,
-  CreateDocumentInput,
-  UpdateDocumentInput
-> {
-  // Document-specific methods
+export interface IDocumentRepository {
+  /** Find all documents */
+  findAll(): Promise<Document[]>;
+
+  /** Find a document by ID */
+  findById(id: string): Promise<Document | null>;
 
   /** Find documents with filters and pagination */
   findMany(
     filters?: DocumentFilters,
-    pagination?: DocumentPagination,
-  ): Promise<{ documents: Document[]; pagination: DocumentPaginationResult }>;
+    pagination?: BasePagination,
+  ): Promise<{ records: Document[]; pagination: BasePaginationResult }>;
 
   /** Find document by letter ID */
   findByLetterId(letterId: string): Promise<Document[]>;
@@ -47,6 +43,15 @@ export interface IDocumentRepository extends IBaseRepository<
   create(data: CreateDocumentInput): Promise<Document>;
   create(data: CreateDocumentInput, user: UserWithId): Promise<Document>;
 
+  /** Update an existing document */
+  update(id: string, data: UpdateDocumentInput): Promise<Document>;
+
+  /** Delete a document */
+  delete(id: string): Promise<void>;
+
+  /** Count documents with optional filter */
+  count(where?: BaseFilter): Promise<number>;
+
   /** Create approval record for a document */
   createApproval(
     documentId: string,
@@ -57,25 +62,11 @@ export interface IDocumentRepository extends IBaseRepository<
 }
 
 // Filter types for Document queries
-export interface DocumentFilters {
+export interface DocumentFilters extends BaseFilter {
   status?: Status;
   userId?: string;
   letterId?: string;
   documentTypeId?: string;
   search?: string;
   periodId?: string;
-}
-
-// Pagination input
-export interface DocumentPagination {
-  page?: number;
-  limit?: number;
-}
-
-// Pagination result
-export interface DocumentPaginationResult {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }

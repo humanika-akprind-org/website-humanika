@@ -1,45 +1,45 @@
 import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
+import type {
   CreateFinanceInput,
   Finance,
   FinanceFilter,
 } from "@/domain/entities/finance.entity";
 
 /**
- * Finance Repository Interface
+ * Finance Repository Interface - Entity-specific repository
  * Part of Clean Architecture: Application Layer (Interface)
  *
- * This interface defines the contract for finance data access operations.
- * Following Dependency Inversion Principle - depends on abstractions, not concretions.
+ * This interface defines Finance-specific operations.
  */
 export interface IFinanceRepository {
-  /**
-   * Get all finances with optional filters
-   */
-  getFinances(filter?: FinanceFilter): Promise<Finance[]>;
+  /** Find all finances */
+  findAll(): Promise<Finance[]>;
 
-  /**
-   * Get a single finance by ID
-   */
-  getFinanceById(id: string): Promise<Finance | null>;
+  /** Find a finance by ID */
+  findById(id: string): Promise<Finance | null>;
 
-  /**
-   * Create a new finance
-   */
-  createFinance(
-    data: CreateFinanceInput,
-    user: { id: string },
-  ): Promise<Finance>;
+  /** Find finances with filters and pagination */
+  findMany(
+    filters?: FinanceFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: Finance[]; pagination: BasePaginationResult }>;
 
-  /**
-   * Update an existing finance
-   */
-  updateFinance(
-    id: string,
-    data: Partial<CreateFinanceInput>,
-  ): Promise<Finance>;
+  /** Create a new finance */
+  create(data: CreateFinanceInput, user: { id: string }): Promise<Finance>;
 
-  /**
-   * Delete a finance
-   */
-  deleteFinance(id: string): Promise<void>;
+  /** Update an existing finance */
+  update(id: string, data: Partial<CreateFinanceInput>): Promise<Finance>;
+
+  /** Delete a finance */
+  delete(id: string): Promise<void>;
+
+  /** Count finances with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }
+
+// Re-export for convenience
+export type { FinanceFilter };

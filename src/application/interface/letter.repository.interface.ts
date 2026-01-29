@@ -1,10 +1,8 @@
-/**
- * Letter Repository Interface - Entity-specific repository
- * Part of Clean Architecture: Application Layer (Interface)
- *
- * This interface defines Letter-specific operations.
- */
-
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type {
   Letter,
   CreateLetterInput,
@@ -28,8 +26,8 @@ export interface ILetterRepository {
   /** Find letters with filters and pagination */
   findMany(
     filters?: LetterFilter,
-    pagination?: LetterPagination,
-  ): Promise<{ letters: Letter[]; pagination: LetterPaginationResult }>;
+    pagination?: BasePagination,
+  ): Promise<{ records: Letter[]; pagination: BasePaginationResult }>;
 
   /** Find letter by number */
   findByNumber(number: string): Promise<Letter | null>;
@@ -59,14 +57,14 @@ export interface ILetterRepository {
   delete(id: string): Promise<void>;
 
   /** Count letters with optional filter */
-  count(where?: unknown): Promise<number>;
+  count(where?: BaseFilter): Promise<number>;
 
   /** Create approval record for a letter */
   createApproval(letterId: string, userId: string, note: string): Promise<void>;
 }
 
 // Filter types for Letter queries
-export interface LetterFilter {
+export interface LetterFilter extends BaseFilter {
   type?: LetterType;
   priority?: LetterPriority;
   classification?: LetterClassification;
@@ -74,18 +72,4 @@ export interface LetterFilter {
   periodId?: string;
   eventId?: string;
   search?: string;
-}
-
-// Pagination input
-export interface LetterPagination {
-  page?: number;
-  limit?: number;
-}
-
-// Pagination result
-export interface LetterPaginationResult {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }

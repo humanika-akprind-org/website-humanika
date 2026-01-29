@@ -1,54 +1,46 @@
-/**
- * Period Repository Interface
- * Part of Clean Architecture: Application Layer (Interface)
- *
- * This interface defines the contract for period data operations.
- * All repository implementations must implement these methods.
- */
-
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type { Period, PeriodFormData } from "@/domain/entities/period.entity";
 
-// ============================================================================
-// Repository Interface
-// ============================================================================
+/**
+ * Period Filter
+ */
+export interface PeriodFilter extends BaseFilter {
+  search?: string;
+  isActive?: boolean;
+}
 
+/**
+ * Period Repository Interface - Entity-specific repository
+ * Part of Clean Architecture: Application Layer (Interface)
+ *
+ * This interface defines Period-specific operations.
+ */
 export interface IPeriodRepository {
-  /**
-   * Get all periods
-   *
-   * @returns Array of all periods
-   */
+  /** Find all periods */
   findAll(): Promise<Period[]>;
 
-  /**
-   * Get a single period by ID
-   *
-   * @param id - Period ID
-   * @returns The period or null if not found
-   */
+  /** Find a period by ID */
   findById(id: string): Promise<Period | null>;
 
-  /**
-   * Create a new period
-   *
-   * @param data - Period data
-   * @returns The created period
-   */
+  /** Find periods with filters and pagination */
+  findMany(
+    filters?: PeriodFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: Period[]; pagination: BasePaginationResult }>;
+
+  /** Create a new period */
   create(data: PeriodFormData): Promise<Period>;
 
-  /**
-   * Update an existing period
-   *
-   * @param id - Period ID
-   * @param data - Update data
-   * @returns The updated period
-   */
+  /** Update an existing period */
   update(id: string, data: Partial<PeriodFormData>): Promise<Period>;
 
-  /**
-   * Delete a period
-   *
-   * @param id - Period ID
-   */
+  /** Delete a period */
   delete(id: string): Promise<void>;
+
+  /** Count periods with optional filter */
+  count(where?: BaseFilter): Promise<number>;
 }

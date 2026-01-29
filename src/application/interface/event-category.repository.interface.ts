@@ -1,10 +1,8 @@
-/**
- * Event Category Repository Interface - Entity-specific repository
- * Part of Clean Architecture: Application Layer (Interface)
- *
- * This interface defines the contract for Event Category repository operations.
- */
-
+import type {
+  BaseFilter,
+  BasePagination,
+  BasePaginationResult,
+} from "./base.repository.interface";
 import type { EventCategory } from "@/domain/value-objects/event-category";
 import type {
   CreateEventCategoryInput,
@@ -12,43 +10,46 @@ import type {
 } from "@/domain/value-objects/event-category";
 
 /**
- * Read-only interface for Event Category repository
- * Used by read operations (GET)
+ * Event Category Repository Interface - Entity-specific repository
+ * Part of Clean Architecture: Application Layer (Interface)
+ *
+ * This interface defines EventCategory-specific operations.
  */
 export interface IEventCategoryRepository {
-  /** Find all categories ordered by name */
+  /** Find all event categories ordered by name */
   findAll(): Promise<EventCategory[]>;
 
-  /** Find a single category by ID */
+  /** Find a single event category by ID */
   findById(id: string): Promise<EventCategory | null>;
 
-  /** Find category by name (for duplicate checking) */
+  /** Find event category by name (for duplicate checking) */
   findByName(name: string): Promise<EventCategory | null>;
 
-  /** Count categories */
-  count(): Promise<number>;
-}
+  /** Find event categories with pagination */
+  findMany(
+    filters?: BaseFilter,
+    pagination?: BasePagination,
+  ): Promise<{ records: EventCategory[]; pagination: BasePaginationResult }>;
 
-/**
- * Extended interface for Event Category repository with write operations
- * Used by write operations (POST, PUT, DELETE) with activity logging
- */
-export interface IEventCategoryRepositoryExtended {
-  // Read operations
-  findAll(): Promise<EventCategory[]>;
-  findById(id: string): Promise<EventCategory | null>;
-  findByName(name: string): Promise<EventCategory | null>;
-  count(): Promise<number>;
-
-  // Write operations with userId for activity logging
+  /** Create a new event category */
   create(
     data: CreateEventCategoryInput,
     userId: string,
   ): Promise<EventCategory>;
-  update(
-    id: string,
-    data: UpdateEventCategoryInput,
-    userId: string,
-  ): Promise<EventCategory>;
+
+  /** Update an existing event category */
+  update(id: string, data: UpdateEventCategoryInput): Promise<EventCategory>;
+
+  /** Delete an event category */
   delete(id: string, userId: string): Promise<void>;
+
+  /** Count event categories */
+  count(where?: BaseFilter): Promise<number>;
+}
+
+/**
+ * Event Category Filter
+ */
+export interface EventCategoryFilter extends BaseFilter {
+  search?: string;
 }
