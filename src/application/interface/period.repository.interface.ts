@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type { Period, PeriodFormData } from "@/domain/entities/period.entity";
 
@@ -12,6 +13,11 @@ export interface PeriodFilter extends BaseFilter {
   search?: string;
   isActive?: boolean;
 }
+
+// Re-export base types with Period-specific names for convenience
+export type { BasePagination as PeriodPagination };
+export type { BasePaginationResult as PeriodPaginationResult };
+export type { BaseStats as PeriodStats };
 
 /**
  * Period Repository Interface - Entity-specific repository

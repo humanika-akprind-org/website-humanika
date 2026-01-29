@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   Gallery,
@@ -50,3 +51,8 @@ export interface IGalleryRepository {
 
 // Re-export for convenience
 export type { GalleryFilter };
+
+// Re-export base types with Gallery-specific names for convenience
+export type { BasePagination as GalleryPagination };
+export type { BasePaginationResult as GalleryPaginationResult };
+export type { BaseStats as GalleryStats };

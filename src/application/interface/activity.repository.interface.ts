@@ -9,6 +9,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type { ActivityLog } from "@/domain/entities/activity-log.entity";
 import type { UserRole, Department } from "@/domain/enums";
@@ -38,6 +39,11 @@ export interface ActivityFilters extends BaseFilter {
   startDate?: string;
   endDate?: string;
 }
+
+// Re-export base types with Activity-specific names for convenience
+export type { BasePagination as ActivityPagination };
+export type { BasePaginationResult as ActivityPaginationResult };
+export type { BaseStats as ActivityStats };
 
 /**
  * Activity Repository Interface

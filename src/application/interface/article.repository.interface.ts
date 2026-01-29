@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   CreateArticleInput,
@@ -46,3 +47,8 @@ export interface IArticleRepository {
 
 // Re-export ArticleFilter for convenience
 export type { ArticleFilter };
+
+// Re-export base types with Article-specific names for convenience
+export type { BasePagination as ArticlePagination };
+export type { BasePaginationResult as ArticlePaginationResult };
+export type { BaseStats as ArticleStats };

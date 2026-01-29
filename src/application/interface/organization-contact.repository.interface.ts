@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   OrganizationContact,
@@ -59,3 +60,8 @@ export interface IOrganizationContactRepository {
 
 // Re-export for convenience
 export type { OrganizationContactFilter };
+
+// Re-export base types with OrganizationContact-specific names for convenience
+export type { BasePagination as OrganizationContactPagination };
+export type { BasePaginationResult as OrganizationContactPaginationResult };
+export type { BaseStats as OrganizationContactStats };

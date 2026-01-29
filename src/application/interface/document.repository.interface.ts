@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   Document,
@@ -12,6 +13,21 @@ import type { Status, ApprovalType } from "@/domain/enums";
 import type { User } from "@/domain/entities/user.entity";
 
 type UserWithId = Pick<User, "id">;
+
+// Filter types for Document queries
+export interface DocumentFilters extends BaseFilter {
+  status?: Status;
+  userId?: string;
+  letterId?: string;
+  documentTypeId?: string;
+  search?: string;
+  periodId?: string;
+}
+
+// Re-export base types with Document-specific names for convenience
+export type { BasePagination as DocumentPagination };
+export type { BasePaginationResult as DocumentPaginationResult };
+export type { BaseStats as DocumentStats };
 
 // Extend the base interface for Document entity
 export interface IDocumentRepository {

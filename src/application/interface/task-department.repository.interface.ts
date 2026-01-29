@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   CreateDepartmentTaskInput,
@@ -49,3 +50,8 @@ export interface ITaskDepartmentRepository {
 
 // Re-export for convenience
 export type { DepartmentTaskFilter };
+
+// Re-export base types with DepartmentTask-specific names for convenience
+export type { BasePagination as DepartmentTaskPagination };
+export type { BasePaginationResult as DepartmentTaskPaginationResult };
+export type { BaseStats as DepartmentTaskStats };

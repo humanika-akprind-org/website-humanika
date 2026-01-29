@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   User,
@@ -64,3 +65,8 @@ export interface UserFilter extends BaseFilter {
   allUsers?: boolean;
   excludeUserId?: string;
 }
+
+// Re-export base types with User-specific names for convenience
+export type { BasePagination as UserPagination };
+export type { BasePaginationResult as UserPaginationResult };
+export type { BaseStats as UserStats };

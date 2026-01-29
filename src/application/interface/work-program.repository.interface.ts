@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   WorkProgram,
@@ -47,3 +48,8 @@ export interface IWorkProgramRepository {
 
 // Re-export for convenience
 export type { WorkProgramFilter };
+
+// Re-export base types with WorkProgram-specific names for convenience
+export type { BasePagination as WorkProgramPagination };
+export type { BasePaginationResult as WorkProgramPaginationResult };
+export type { BaseStats as WorkProgramStats };

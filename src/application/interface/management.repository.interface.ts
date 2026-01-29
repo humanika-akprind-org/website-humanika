@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   Management,
@@ -60,3 +61,8 @@ export interface ManagementFilters extends BaseFilter {
   search?: string;
   userId?: string;
 }
+
+// Re-export base types with Management-specific names for convenience
+export type { BasePagination as ManagementPagination };
+export type { BasePaginationResult as ManagementPaginationResult };
+export type { BaseStats as ManagementStats };

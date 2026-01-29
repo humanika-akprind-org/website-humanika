@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   Statistic,
@@ -50,3 +51,8 @@ export interface IStatisticRepository {
 
 // Re-export for convenience
 export type { StatisticFilter };
+
+// Re-export base types with Statistic-specific names for convenience
+export type { BasePagination as StatisticPagination };
+export type { BasePaginationResult as StatisticPaginationResult };
+export type { BaseStats as StatisticStats };

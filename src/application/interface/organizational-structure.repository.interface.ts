@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   OrganizationalStructure,
@@ -53,3 +54,8 @@ export interface IOrganizationalStructureRepository {
 
 // Re-export for convenience
 export type { OrganizationalStructureFilter };
+
+// Re-export base types with OrganizationalStructure-specific names for convenience
+export type { BasePagination as OrganizationalStructurePagination };
+export type { BasePaginationResult as OrganizationalStructurePaginationResult };
+export type { BaseStats as OrganizationalStructureStats };

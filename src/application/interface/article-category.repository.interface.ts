@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   ArticleCategory,
@@ -15,6 +16,11 @@ export interface ArticleCategoryFilter extends BaseFilter {
   search?: string;
   withCount?: boolean;
 }
+
+// Re-export base types with ArticleCategory-specific names for convenience
+export type { BasePagination as ArticleCategoryPagination };
+export type { BasePaginationResult as ArticleCategoryPaginationResult };
+export type { BaseStats as ArticleCategoryStats };
 
 /**
  * Article Category Repository Interface - Entity-specific repository

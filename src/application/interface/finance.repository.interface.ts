@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   CreateFinanceInput,
@@ -43,3 +44,8 @@ export interface IFinanceRepository {
 
 // Re-export for convenience
 export type { FinanceFilter };
+
+// Re-export base types with Finance-specific names for convenience
+export type { BasePagination as FinancePagination };
+export type { BasePaginationResult as FinancePaginationResult };
+export type { BaseStats as FinanceStats };

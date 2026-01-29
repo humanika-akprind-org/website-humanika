@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   Letter,
@@ -73,3 +74,8 @@ export interface LetterFilter extends BaseFilter {
   eventId?: string;
   search?: string;
 }
+
+// Re-export base types with Letter-specific names for convenience
+export type { BasePagination as LetterPagination };
+export type { BasePaginationResult as LetterPaginationResult };
+export type { BaseStats as LetterStats };

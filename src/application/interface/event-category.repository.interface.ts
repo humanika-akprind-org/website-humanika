@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type { EventCategory } from "@/domain/value-objects/event-category";
 import type {
@@ -53,3 +54,8 @@ export interface IEventCategoryRepository {
 export interface EventCategoryFilter extends BaseFilter {
   search?: string;
 }
+
+// Re-export base types with EventCategory-specific names for convenience
+export type { BasePagination as EventCategoryPagination };
+export type { BasePaginationResult as EventCategoryPaginationResult };
+export type { BaseStats as EventCategoryStats };

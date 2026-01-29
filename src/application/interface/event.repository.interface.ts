@@ -2,6 +2,7 @@ import type {
   BaseFilter,
   BasePagination,
   BasePaginationResult,
+  BaseStats,
 } from "./base.repository.interface";
 import type {
   Event,
@@ -9,6 +10,24 @@ import type {
   UpdateEventInput,
 } from "@/domain/entities/event.entity";
 import type { Department, Status } from "@/domain/enums";
+
+// Filter types for Event queries
+export interface EventFilters extends BaseFilter {
+  department?: Department;
+  status?: Status;
+  periodId?: string;
+  workProgramId?: string;
+  search?: string;
+  scheduleStartDate?: string;
+  scheduleEndDate?: string;
+  date?: string;
+  location?: string;
+}
+
+// Re-export base types with Event-specific names for convenience
+export type { BasePagination as EventPagination };
+export type { BasePaginationResult as EventPaginationResult };
+export type { BaseStats as EventStats };
 
 // Event-specific repository interface
 export interface IEventRepository {
