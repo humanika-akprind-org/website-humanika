@@ -1,179 +1,148 @@
 /**
- * Event Category Repository Prisma - Class-based repository implementation
+ * Event Category Repository Prisma Implementation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  *
- * This file contains the EventCategoryRepositoryPrisma class that implements
- * IEventCategoryRepository interface for use with the use case pattern.
+ * This repository implements the IEventCategoryRepository interface
+ * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
-import prisma from "@/presentation/lib/prisma";
-import type { IEventCategoryRepositoryExtended } from "@/application/interface/event-category.repository.interface";
+import type {
+  IEventCategoryRepository,
+  EventCategoryFilter,
+  EventCategoryPagination,
+  EventCategoryPaginationResult,
+} from "@/application/interface/event-category.repository.interface";
 import type {
   EventCategory,
   CreateEventCategoryInput,
   UpdateEventCategoryInput,
 } from "@/domain/value-objects/event-category";
-import { logActivity } from "@/presentation/lib/activity-log";
-import { ActivityType } from "@/domain/enums";
+import {
+  getEventCategories,
+  getEventCategoryById,
+  createEventCategory,
+  updateEventCategory,
+  deleteEventCategory,
+} from "./index";
 
-export class EventCategoryRepositoryPrisma implements IEventCategoryRepositoryExtended {
-  private prisma = prisma;
+// Type alias for user context
+type UserWithId = { id: string };
 
+// Type alias for filter
+type GetEventCategoriesFilter = {
+  search?: string;
+};
+
+/**
+ * Event Category Repository Prisma Implementation
+ *
+ * This class implements the IEventCategoryRepository interface
+ * for Clean Architecture compliance.
+ */
+export class EventCategoryRepositoryPrisma implements IEventCategoryRepository {
   /**
-   * Find all event categories ordered by name
+   * Get all event categories
    */
   async findAll(): Promise<EventCategory[]> {
-    const categories = await this.prisma.eventCategory.findMany({
-      orderBy: { name: "asc" },
-    });
-
-    return categories as unknown as EventCategory[];
+    return (await getEventCategories({})) as EventCategory[];
   }
 
   /**
-   * Find a single event category by ID
+   * Get all event categories with optional filtering and pagination
+   */
+  async findMany(
+    filter?: EventCategoryFilter,
+    pagination?: EventCategoryPagination,
+  ): Promise<{
+    records: EventCategory[];
+    pagination: EventCategoryPaginationResult;
+  }> {
+    const filterParam: GetEventCategoriesFilter = {};
+    if (filter?.search) {
+      filterParam.search = filter.search;
+    }
+    const records = await getEventCategories(filterParam);
+
+    // Get total count for pagination
+    const total = records.length;
+
+    // Apply default pagination if not provided
+    const page = pagination?.page || 1;
+    const limit = pagination?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    // Get paginated records
+    const paginatedRecords = records.slice(skip, skip + limit);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      records: paginatedRecords as EventCategory[],
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
+  }
+
+  /**
+   * Get a single event category by ID
    */
   async findById(id: string): Promise<EventCategory | null> {
-    const category = await this.prisma.eventCategory.findUnique({
-      where: { id },
-    });
-
-    return category as unknown as EventCategory | null;
+    return (await getEventCategoryById(id)) as EventCategory | null;
   }
 
   /**
    * Find event category by name (for duplicate checking)
    */
   async findByName(name: string): Promise<EventCategory | null> {
-    const category = await this.prisma.eventCategory.findFirst({
-      where: {
-        name: {
-          equals: name,
-          mode: "insensitive",
-        },
-      },
-    });
-
-    return category as unknown as EventCategory | null;
+    const records = await getEventCategories({ search: name });
+    const category = records.find(
+      (cat) => cat.name.toLowerCase() === name.toLowerCase(),
+    );
+    return (category as EventCategory | null) || null;
   }
 
   /**
-   * Create a new event category with activity logging
+   * Create a new event category
    */
   async create(
     data: CreateEventCategoryInput,
     userId: string,
   ): Promise<EventCategory> {
-    const category = await this.prisma.eventCategory.create({
-      data: {
-        name: data.name,
-        description: data.description || null,
-      },
-    });
-
-    // Log activity
-    await logActivity({
-      userId,
-      activityType: ActivityType.CREATE,
-      entityType: "EventCategory",
-      entityId: category.id,
-      description: `Created event category: ${category.name}`,
-      metadata: {
-        newData: {
-          name: category.name,
-          description: category.description,
-        },
-      },
-    });
-
-    return category as unknown as EventCategory;
+    const user: UserWithId = { id: userId };
+    return (await createEventCategory(data, user)) as EventCategory;
   }
 
   /**
-   * Update an existing event category with activity logging
+   * Update an existing event category
    */
   async update(
     id: string,
     data: UpdateEventCategoryInput,
-    userId: string,
   ): Promise<EventCategory> {
-    // Get existing category for logging
-    const existingCategory = await this.prisma.eventCategory.findUnique({
-      where: { id },
-    });
-
-    if (!existingCategory) {
-      throw new Error("Event category not found");
-    }
-
-    const category = await this.prisma.eventCategory.update({
-      where: { id },
-      data: {
-        name: data.name,
-        description: data.description ?? null,
-      },
-    });
-
-    // Log activity
-    await logActivity({
-      userId,
-      activityType: ActivityType.UPDATE,
-      entityType: "EventCategory",
-      entityId: category.id,
-      description: `Updated event category: ${category.name}`,
-      metadata: {
-        oldData: {
-          name: existingCategory.name,
-          description: existingCategory.description,
-        },
-        newData: {
-          name: category.name,
-          description: category.description,
-        },
-      },
-    });
-
-    return category as unknown as EventCategory;
+    const user: UserWithId = { id: "" };
+    return (await updateEventCategory(id, data, user)) as EventCategory;
   }
 
   /**
-   * Delete an event category with activity logging
+   * Delete an event category
    */
   async delete(id: string, userId: string): Promise<void> {
-    // Check if category exists
-    const existingCategory = await this.prisma.eventCategory.findUnique({
-      where: { id },
-    });
-
-    if (!existingCategory) {
-      throw new Error("Event category not found");
-    }
-
-    await this.prisma.eventCategory.delete({
-      where: { id },
-    });
-
-    // Log activity
-    await logActivity({
-      userId,
-      activityType: ActivityType.DELETE,
-      entityType: "EventCategory",
-      entityId: id,
-      description: `Deleted event category: ${existingCategory.name}`,
-      metadata: {
-        oldData: {
-          name: existingCategory.name,
-          description: existingCategory.description,
-        },
-        newData: null,
-      },
-    });
+    const user: UserWithId = { id: userId };
+    await deleteEventCategory(id, user);
   }
 
   /**
-   * Count event categories
+   * Count event categories with optional filter
    */
-  async count(): Promise<number> {
-    return await this.prisma.eventCategory.count();
+  async count(_where?: Record<string, unknown>): Promise<number> {
+    const filterParam: GetEventCategoriesFilter = {};
+    const records = await getEventCategories(filterParam);
+    return records.length;
   }
 }

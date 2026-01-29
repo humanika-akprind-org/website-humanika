@@ -1,576 +1,183 @@
 /**
- * Event Repository Prisma - Class-based repository implementation
+ * Event Repository Prisma Implementation
  * Part of Clean Architecture: Infrastructure Layer (Repository)
  *
- * This file contains the EventRepositoryPrisma class that implements
- * IEventRepository interface for use with the use case pattern.
+ * This repository implements the IEventRepository interface
+ * using Prisma ORM for database operations.
+ * Following Dependency Inversion Principle - depends on abstraction.
  */
 
-import prisma from "@/presentation/lib/prisma";
+import type {
+  Event,
+  CreateEventInput,
+  UpdateEventInput,
+} from "@/domain/entities/event.entity";
+import type { User } from "@/domain/entities/user.entity";
 import type {
   IEventRepository,
   EventFilters,
   EventPagination,
   EventPaginationResult,
 } from "@/application/interface/event.repository.interface";
-import type {
-  CreateEventInput,
-  UpdateEventInput,
-} from "@/domain/entities/event.entity";
-import type { Prisma, Status as PrismaStatus } from "@prisma/client";
-import type { Department, Status } from "@/domain/enums";
-import type { Event } from "@/domain/entities/event.entity";
+import {
+  getEvents,
+  getEvent,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+} from "./index";
+import { getEventBySlug } from "./get-event-by-slug.repository";
+import { type Department, type Status } from "@/domain/enums";
+import { getCurrentUser } from "@/presentation/lib/auth-server";
 
-// Type for schedule filter conditions (used for JSON array filtering)
-type ScheduleFilterCondition = {
-  date?: {
-    gte?: string;
-    lte?: string;
-  };
-  location?: {
-    contains: string;
-    mode: "insensitive";
-  };
-};
+// Type alias for user context matching the repository function signatures
+type UserWithId = Pick<User, "id">;
 
-// Helper function to create JSON array filter for schedules
-function buildSchedulesFilter(condition: ScheduleFilterCondition) {
-  return {
-    path: "",
-    array_contains: condition,
-  } as Record<string, unknown>;
+/**
+ * Helper function to get current user from auth context
+ */
+async function getCurrentUserFromContext(): Promise<UserWithId | null> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return null;
+    return { id: user.id };
+  } catch {
+    return null;
+  }
 }
 
+/**
+ * Event Repository Prisma Implementation
+ *
+ * This class implements the IEventRepository interface
+ * for Clean Architecture compliance.
+ */
 export class EventRepositoryPrisma implements IEventRepository {
-  private prisma = prisma;
+  /**
+   * Get all events
+   */
+  async findAll(): Promise<Event[]> {
+    return (await getEvents({})) as unknown as Event[];
+  }
 
+  /**
+   * Get all events with optional filtering and pagination
+   */
   async findMany(
     filters?: EventFilters,
     pagination?: EventPagination,
-  ): Promise<{ events: Event[]; pagination: EventPaginationResult }> {
+  ): Promise<{ records: Event[]; pagination: EventPaginationResult }> {
+    const events = await getEvents(filters ?? {});
+
+    // Get total count for pagination
+    const total = events.length;
+
+    // Apply default pagination if not provided
     const page = pagination?.page || 1;
     const limit = pagination?.limit || 10;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.EventWhereInput = {};
+    // Get paginated events
+    const paginatedEvents = events.slice(skip, skip + limit);
 
-    if (filters?.department) where.department = { equals: filters.department };
-    if (filters?.status) {
-      where.status = { equals: filters.status as unknown as PrismaStatus };
-    }
-    if (filters?.periodId) where.periodId = filters.periodId;
-    if (filters?.workProgramId) where.workProgramId = filters.workProgramId;
-
-    const orConditions: Prisma.EventWhereInput[] = [];
-
-    if (filters?.search) {
-      orConditions.push(
-        { name: { contains: filters.search, mode: "insensitive" } },
-        { description: { contains: filters.search, mode: "insensitive" } },
-        { goal: { contains: filters.search, mode: "insensitive" } },
-      );
-    }
-
-    // Handle date range filtering based on schedules
-    if (filters?.scheduleStartDate || filters?.scheduleEndDate) {
-      const rangeStart = filters.scheduleStartDate
-        ? new Date(filters.scheduleStartDate)
-        : undefined;
-      const rangeEnd = filters.scheduleEndDate
-        ? new Date(filters.scheduleEndDate)
-        : undefined;
-
-      const dateFilter: ScheduleFilterCondition = {};
-
-      if (rangeStart && rangeEnd) {
-        dateFilter.date = {
-          gte: rangeStart.toISOString(),
-          lte: rangeEnd.toISOString(),
-        };
-      } else if (rangeStart) {
-        dateFilter.date = {
-          gte: rangeStart.toISOString(),
-        };
-      } else if (rangeEnd) {
-        dateFilter.date = {
-          lte: rangeEnd.toISOString(),
-        };
-      }
-
-      orConditions.push({
-        schedules: buildSchedulesFilter(dateFilter),
-      });
-    }
-
-    // Handle specific date filtering
-    if (filters?.date) {
-      const targetDate = new Date(filters.date);
-      const startOfDay = new Date(targetDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(targetDate);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      orConditions.push({
-        schedules: buildSchedulesFilter({
-          date: {
-            gte: startOfDay.toISOString(),
-            lte: endOfDay.toISOString(),
-          },
-        }),
-      });
-    }
-
-    // Handle location filtering
-    if (filters?.location) {
-      orConditions.push({
-        schedules: buildSchedulesFilter({
-          location: {
-            contains: filters.location,
-            mode: "insensitive",
-          },
-        }),
-      });
-    }
-
-    if (orConditions.length > 0) {
-      where.OR = orConditions;
-    }
-
-    const [events, total] = await Promise.all([
-      this.prisma.event.findMany({
-        where,
-        include: {
-          period: true,
-          responsible: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              department: true,
-            },
-          },
-          workProgram: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          category: true,
-          approvals: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                },
-              },
-            },
-          },
-          galleries: true,
-          letters: true,
-        },
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
-      }),
-      this.prisma.event.count({ where }),
-    ]);
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
 
     return {
-      events: events as unknown as Event[],
+      records: paginatedEvents as unknown as Event[],
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages,
       },
     };
   }
 
-  async findBySlug(slug: string): Promise<Event | null> {
-    const event = await this.prisma.event.findUnique({
-      where: { slug },
-      include: {
-        period: true,
-        responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        galleries: true,
-        letters: true,
-      },
-    });
-    return event as unknown as Event | null;
-  }
-
-  async findByDepartment(department: Department): Promise<Event[]> {
-    const events = await this.prisma.event.findMany({
-      where: { department },
-      include: {
-        period: true,
-        responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        galleries: true,
-        letters: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return events as unknown as Event[];
-  }
-
-  async findByStatus(status: Status): Promise<Event[]> {
-    const events = await this.prisma.event.findMany({
-      where: { status },
-      include: {
-        period: true,
-        responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        galleries: true,
-        letters: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return events as unknown as Event[];
-  }
-
-  async findByPeriod(periodId: string): Promise<Event[]> {
-    const events = await this.prisma.event.findMany({
-      where: { periodId },
-      include: {
-        period: true,
-        responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        galleries: true,
-        letters: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return events as unknown as Event[];
-  }
-
-  async create(data: CreateEventInput): Promise<Event> {
-    const slug = data.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-
-    const schedules = Array.isArray(data.schedules) ? data.schedules : [];
-
-    const eventData: Prisma.EventCreateInput = {
-      name: data.name,
-      slug,
-      thumbnail: data.thumbnail,
-      description: data.description || "",
-      goal: data.goal || "",
-      department: data.department,
-      schedules: schedules as unknown as Prisma.InputJsonValue,
-      period: { connect: { id: data.periodId } },
-      responsible: { connect: { id: data.responsibleId } },
-    };
-
-    if (data.workProgramId && data.workProgramId.trim() !== "") {
-      eventData.workProgram = { connect: { id: data.workProgramId } };
-    }
-
-    if (data.categoryId && data.categoryId.trim() !== "") {
-      eventData.category = { connect: { id: data.categoryId } };
-    }
-
-    const event = await this.prisma.event.create({
-      data: eventData,
-      include: {
-        period: true,
-        responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        galleries: true,
-        letters: true,
-      },
-    });
-
-    return event as unknown as Event;
-  }
-
-  async update(id: string, data: UpdateEventInput): Promise<Event> {
-    const updateData: Prisma.EventUpdateInput = {
-      name: data.name,
-      slug: data.name
-        ? data.name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "")
-        : undefined,
-      thumbnail: data.thumbnail,
-      description: data.description,
-      goal: data.goal,
-      department: data.department,
-      schedules: data.schedules as unknown as Prisma.InputJsonValue | undefined,
-      period: data.periodId ? { connect: { id: data.periodId } } : undefined,
-      responsible: data.responsibleId
-        ? { connect: { id: data.responsibleId } }
-        : undefined,
-      workProgram: data.workProgramId
-        ? { connect: { id: data.workProgramId } }
-        : undefined,
-      category: data.categoryId
-        ? { connect: { id: data.categoryId } }
-        : undefined,
-      status: data.status,
-    };
-
-    const event = await this.prisma.event.update({
-      where: { id },
-      data: updateData,
-      include: {
-        period: true,
-        responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        galleries: true,
-        letters: true,
-      },
-    });
-
-    return event as unknown as Event;
-  }
-
-  async delete(id: string): Promise<void> {
-    await this.prisma.event.delete({
-      where: { id },
-    });
-  }
-
-  // Base repository methods
-  async findAll(): Promise<Event[]> {
-    const events = await this.prisma.event.findMany({
-      include: {
-        period: true,
-        responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        galleries: true,
-        letters: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return events as unknown as Event[];
-  }
-
+  /**
+   * Get a single event by ID
+   */
   async findById(id: string): Promise<Event | null> {
-    const event = await this.prisma.event.findUnique({
-      where: { id },
-      include: {
-        period: true,
-        responsible: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            department: true,
-          },
-        },
-        workProgram: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        category: true,
-        approvals: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        galleries: true,
-        letters: true,
-      },
-    });
-    return event as unknown as Event | null;
+    return (await getEvent(id)) as unknown as Event | null;
   }
 
-  async count(where?: unknown): Promise<number> {
-    return await this.prisma.event.count({
-      where: where as Prisma.EventWhereInput,
-    });
+  /**
+   * Get event by slug
+   */
+  async findBySlug(slug: string): Promise<Event | null> {
+    return (await getEventBySlug(slug)) as unknown as Event | null;
   }
 
-  // Additional helper method for creating approval
+  /**
+   * Get events by department
+   */
+  async findByDepartment(department: Department): Promise<Event[]> {
+    return (await getEvents({ department })) as unknown as Event[];
+  }
+
+  /**
+   * Get events by status
+   */
+  async findByStatus(status: Status): Promise<Event[]> {
+    return (await getEvents({ status })) as unknown as Event[];
+  }
+
+  /**
+   * Get events by period
+   */
+  async findByPeriod(periodId: string): Promise<Event[]> {
+    return (await getEvents({ periodId })) as unknown as Event[];
+  }
+
+  /**
+   * Create a new event
+   */
+  async create(data: CreateEventInput): Promise<Event> {
+    const user = await getCurrentUserFromContext();
+    return (await createEvent(
+      data,
+      user ?? { id: "system" },
+    )) as unknown as Event;
+  }
+
+  /**
+   * Update an existing event
+   */
+  async update(id: string, data: UpdateEventInput): Promise<Event> {
+    const user = await getCurrentUserFromContext();
+    return (await updateEvent(
+      id,
+      data,
+      user ?? { id: "system" },
+    )) as unknown as Event;
+  }
+
+  /**
+   * Delete an event
+   */
+  async delete(id: string): Promise<void> {
+    const user = await getCurrentUserFromContext();
+    await deleteEvent(id, user ?? { id: "system" });
+  }
+
+  /**
+   * Count events with optional filter
+   */
+  async count(where?: EventFilters): Promise<number> {
+    const events = await getEvents(where ?? {});
+    return events.length;
+  }
+
+  /**
+   * Create approval record for an event
+   */
   async createApproval(
     eventId: string,
     userId: string,
     note: string,
   ): Promise<void> {
-    await this.prisma.approval.create({
+    const { prisma } = await import("@/presentation/lib/prisma");
+    await prisma.approval.create({
       data: {
         entityType: "EVENT",
         entityId: eventId,
