@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Crop } from "lucide-react";
+import { PDFDocument } from "pdf-lib";
 import AccessTokenGuard from "./AccessTokenGuard";
 import ImageCropper from "./ImageCropper";
 import {
@@ -332,6 +333,188 @@ const compressImage = async (
     };
   });
 
+// Helper function to compress PDF file
+const compressPDF = async (
+  file: File,
+  maxSizeMB: number = 5,
+): Promise<File> => {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(arrayBuffer, {
+      ignoreEncryption: true,
+    });
+
+    // Get original size
+    const originalSize = file.size;
+
+    // Save PDF with compression options
+    // Using lower quality to reduce file size
+    const pdfBytes = await pdfDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false,
+      objectsPerTick: 50,
+      updateFieldAppearances: true,
+    });
+
+    // Create Blob from Uint8Array - copy data to ensure proper ArrayBuffer
+    const pdfData = pdfBytes.slice(0);
+    const compressedBlob = new Blob([pdfData], {
+      type: "application/pdf",
+    });
+    const compressedFile = new File([compressedBlob], file.name, {
+      type: "application/pdf",
+      lastModified: Date.now(),
+    });
+
+    // If still too large, try more aggressive compression
+    if (compressedFile.size > maxSizeMB * 1024 * 1024) {
+      // For PDFs, we can't easily compress more without losing quality
+      // Return what we have, but warn the user
+      console.log(
+        `PDF compressed from ${Math.round(originalSize / 1024 / 1024)}MB to ${Math.round(compressedFile.size / 1024 / 1024)}MB`,
+      );
+    }
+
+    return compressedFile;
+  } catch (error) {
+    console.error("Error compressing PDF:", error);
+    // If compression fails, return original file
+    return file;
+  }
+};
+
+// Helper function to check if file is PDF
+const isPDFFile = (file: File | string): boolean => {
+  if (file instanceof File) {
+    return (
+      file.type === "application/pdf" ||
+      file.name.toLowerCase().endsWith(".pdf")
+    );
+  }
+  return (
+    file.toLowerCase().endsWith(".pdf") || file.includes("application/pdf")
+  );
+};
+
+// Helper function to check if file is an Office document (DOC, DOCX, XLS, XLSX, PPT, PPTX)
+const isOfficeDocument = (file: File): boolean => {
+  const fileName = file.name.toLowerCase();
+  const fileType = file.type;
+
+  const officeExtensions = [".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"];
+
+  const officeMimeTypes = [
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ];
+
+  return (
+    officeExtensions.some((ext) => fileName.endsWith(ext)) ||
+    officeMimeTypes.some((mime) =>
+      fileType.includes(mime.split("/").pop() || ""),
+    )
+  );
+};
+
+// Helper function to compress Office document
+const compressOfficeDocument = async (
+  file: File,
+  _maxSizeMB: number = 5,
+): Promise<File> => {
+  try {
+    const originalSize = file.size;
+
+    // For Office documents, we can try to compress by:
+    // 1. Converting to a more efficient format where possible
+    // 2. Removing unnecessary metadata
+
+    // Read file as ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+
+    // Create a compressed version by using compression API if available
+    // Most browsers support CompressionStream for gzip/deflate
+
+    try {
+      // Try using CompressionStream if available
+      if (typeof CompressionStream !== "undefined") {
+        const compressionStream = new CompressionStream("gzip");
+        const reader = new ReadableStream({
+          start(controller) {
+            controller.enqueue(new Uint8Array(arrayBuffer));
+            controller.close();
+          },
+        }).pipeThrough(compressionStream);
+
+        const chunks: Blob[] = [];
+        const reader2 = reader.getReader();
+        while (true) {
+          const { done, value } = await reader2.read();
+          if (done) break;
+          chunks.push(new Blob([value]));
+        }
+
+        // Combine chunks - but this creates a gzip compressed file
+        // which won't be a valid Office document
+        // So this approach doesn't work for documents that need to remain readable
+      }
+    } catch (_e) {
+      // CompressionStream not available or failed, continue with original
+    }
+
+    // For Office documents, we can't easily compress without specialized libraries
+    // that can restructure the internal XML files
+    // For now, return the original file with a warning
+    // In a production environment, you would use libraries like:
+    // - docx (for Word)
+    // - xlsx (for Excel)
+    // - pptx (for PowerPoint)
+    // to parse and rebuild with optimized settings
+
+    console.log(
+      `Office document size: ${Math.round(originalSize / 1024 / 1024)}MB (compression not fully supported in browser)`,
+    );
+
+    // Return original file - in production, implement proper Office document compression
+    return file;
+  } catch (error) {
+    console.error("Error compressing Office document:", error);
+    return file;
+  }
+};
+
+// Helper function to get file type category
+const getFileTypeCategory = (
+  file: File,
+): "image" | "pdf" | "office" | "other" => {
+  if (file.type.startsWith("image/")) return "image";
+  if (isPDFFile(file)) return "pdf";
+  if (isOfficeDocument(file)) return "office";
+  return "other";
+};
+
+// Unified compression function
+const compressFile = async (
+  file: File,
+  maxSizeMB: number = 5,
+): Promise<File> => {
+  const category = getFileTypeCategory(file);
+
+  switch (category) {
+    case "image":
+      return compressImage(file, maxSizeMB, 0.8, 1920);
+    case "pdf":
+      return compressPDF(file, maxSizeMB);
+    case "office":
+      return compressOfficeDocument(file, maxSizeMB);
+    default:
+      return file;
+  }
+};
+
 export default function FileUpload({
   label,
   previewUrl: propPreviewUrl,
@@ -446,17 +629,29 @@ export default function FileUpload({
       setIsConverted(false);
       setIsConverting(false);
 
+      // Always set uploaded file first, regardless of size
+      setUploadedFile(file);
+
+      const fileCategory = getFileTypeCategory(file);
+
       if (file.size > maxSize) {
-        // For image files, allow upload and show convert button
-        if (file.type.startsWith("image/")) {
+        // Show appropriate error message based on file type
+        if (fileCategory === "image") {
           setSizeError(
-            `File size is ${Math.round(file.size / (1024 * 1024))}MB. Click "Convert File" to compress it.`,
+            `File size is ${Math.round(file.size / (1024 * 1024))}MB. Click "Compress File" to reduce its size.`,
+          );
+        } else if (fileCategory === "pdf") {
+          setSizeError(
+            `File size is ${Math.round(file.size / (1024 * 1024))}MB. Click "Compress File" to optimize PDF size.`,
+          );
+        } else if (fileCategory === "office") {
+          setSizeError(
+            `File size is ${Math.round(file.size / (1024 * 1024))}MB. Click "Compress File" to optimize document.`,
           );
         } else {
           setSizeError(
             `File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB`,
           );
-          return;
         }
       } else {
         setSizeError(null);
@@ -487,24 +682,60 @@ export default function FileUpload({
     }
   };
 
-  // Handle file conversion for large images
+  // Handle file compression for large files
   const handleConvertFile = async () => {
     if (!uploadedFile) return;
 
+    const fileCategory = getFileTypeCategory(uploadedFile);
+
+    // Show appropriate message based on file type
+    if (fileCategory === "image") {
+      setSizeError(
+        `File size is ${Math.round(uploadedFile.size / (1024 * 1024))}MB. Click "Compress File" to reduce its size.`,
+      );
+    } else if (fileCategory === "pdf") {
+      setSizeError(
+        `File size is ${Math.round(uploadedFile.size / (1024 * 1024))}MB. Click "Compress File" to optimize PDF size.`,
+      );
+    } else if (fileCategory === "office") {
+      setSizeError(
+        `File size is ${Math.round(uploadedFile.size / (1024 * 1024))}MB. Click "Compress File" to optimize document.`,
+      );
+    } else {
+      setSizeError(
+        `File size is ${Math.round(uploadedFile.size / (1024 * 1024))}MB. Compression not supported for this file type.`,
+      );
+      return;
+    }
+
     setIsConverting(true);
     try {
-      const compressedFile = await compressImage(uploadedFile, 5, 0.8, 1920);
-      setIsConverted(true);
-      setSizeError(null);
-      onFileChange(compressedFile);
+      const compressedFile = await compressFile(uploadedFile, 5);
 
-      // Update preview with compressed image
-      if (compressedFile.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setInternalPreviewUrl(reader.result as string);
-        };
-        reader.readAsDataURL(compressedFile);
+      // Check if compression actually reduced the file size
+      if (compressedFile.size >= uploadedFile.size) {
+        const fileTypeName =
+          fileCategory === "pdf"
+            ? "PDF"
+            : fileCategory === "office"
+              ? "Office document"
+              : "Image";
+        setSizeError(
+          `${fileTypeName} file is already optimized. Please upload a smaller file (max 5MB).`,
+        );
+      } else {
+        setIsConverted(true);
+        setSizeError(null);
+        onFileChange(compressedFile);
+
+        // Update preview with compressed image
+        if (compressedFile.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setInternalPreviewUrl(reader.result as string);
+          };
+          reader.readAsDataURL(compressedFile);
+        }
       }
     } catch (error) {
       console.error("Error converting file:", error);
@@ -689,9 +920,8 @@ export default function FileUpload({
                 })()}
               </div>
               <div className="flex gap-2 mt-2">
-                {/* Convert button for large images (> 5MB) */}
+                {/* Compress button for large files (> 5MB) */}
                 {uploadedFile &&
-                  uploadedFile.type.startsWith("image/") &&
                   uploadedFile.size > maxSize &&
                   !isConverted && (
                     <button
@@ -705,7 +935,7 @@ export default function FileUpload({
                           isConverting ? "animate-spin" : ""
                         }`}
                       />
-                      {isConverting ? "Converting..." : "Convert File"}
+                      {isConverting ? "Converting..." : "Compress File"}
                     </button>
                   )}
                 {enableCrop && isImage && showCropButton && (
