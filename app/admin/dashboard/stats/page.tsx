@@ -373,7 +373,7 @@ export default function DashboardPage() {
           color="green"
           value={`RP ${totalBalance.toLocaleString("id-ID")}`}
           title="Total Balance"
-          statusIcon="trendingUp"
+          statusIcon="wallet"
           statusColor="green-500"
           statusText="Net balance"
           valueSize="lg"
@@ -389,11 +389,11 @@ export default function DashboardPage() {
           valueSize="lg"
         />
         <MetricCard
-          icon="wallet"
+          icon="trendingDown"
           color="red"
           value={`RP ${totalExpense.toLocaleString("id-ID")}`}
           title="Total Expense"
-          statusIcon="close"
+          statusIcon="trendingDown"
           statusColor="red-500"
           statusText="Total expense"
           valueSize="lg"

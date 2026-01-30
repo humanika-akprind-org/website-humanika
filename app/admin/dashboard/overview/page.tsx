@@ -8,6 +8,7 @@ import { EventApi } from "@/presentation/services/event";
 import { LetterApi } from "@/presentation/services/letter";
 import { WorkApi } from "@/presentation/services/work";
 import { FinanceApi } from "@/presentation/services/finance";
+import { GalleryApi } from "@/presentation/services/gallery";
 
 import { ApprovalApi } from "@/presentation/services/approval";
 import { PeriodApi } from "@/presentation/services/period";
@@ -21,9 +22,9 @@ import type { WorkProgram } from "@/domain/entities/work-program.entity";
 import type { Finance } from "@/domain/entities/finance.entity";
 import type { Event, ScheduleItem } from "@/domain/entities/event.entity";
 import type { Article } from "@/domain/entities/article.entity";
-
 import type { ActivityLog } from "@/domain/entities/activity-log.entity";
 import type { Period } from "@/domain/entities/period.entity";
+import type { User } from "@/domain/entities/user.entity";
 import { Status } from "@/domain/enums";
 import {
   TrendingUp,
@@ -68,6 +69,28 @@ interface OverviewData {
   totalAccountabilityReports: number;
 }
 
+// Helper function to extract users array from API response
+function extractUsersFromResponse(
+  response: { data?: { users?: User[] } } | undefined,
+): User[] {
+  if (!response?.data) return [];
+  if (Array.isArray(response.data.users)) {
+    return response.data.users;
+  }
+  return [];
+}
+
+// Helper function to extract activities array from API response
+function extractActivitiesFromResponse(
+  response: { activities?: ActivityLog[] } | undefined,
+): ActivityLog[] {
+  if (!response) return [];
+  if (Array.isArray(response.activities)) {
+    return response.activities;
+  }
+  return [];
+}
+
 export default function OverviewPage() {
   const [overview, setOverview] = useState<OverviewData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,7 +122,7 @@ export default function OverviewPage() {
           LetterApi.getLetters(),
           WorkApi.getWorkPrograms(),
           FinanceApi.getFinances(),
-          [],
+          GalleryApi.getGalleries(),
           ApprovalApi.getApprovals({ status: "PENDING" }),
           PeriodApi.getPeriods(),
           ActivityApi.getActivities(),
@@ -108,33 +131,38 @@ export default function OverviewPage() {
           StructureApi.getStructures(),
         ]);
 
-        // Extract users from API response - UserApi returns { data: { users: [], pagination: {} } }
-        const users = usersResponse.data?.users || [];
+        // Extract users from API response
+        const users = extractUsersFromResponse(usersResponse);
+        const totalUsers = users.length;
 
-        // Extract activities from API response - ActivityApi returns { activities: [], pagination: {} }
-        const activities =
-          activitiesResponse.activities || activitiesResponse || [];
+        // Extract activities from API response
+        const activities = extractActivitiesFromResponse(activitiesResponse);
+        const recentActivities = activities
+          .sort(
+            (a: ActivityLog, b: ActivityLog) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          )
+          .slice(0, 3);
 
-        // Extract approvals from API response - ApprovalApi returns { data?: ApprovalsResponse, error?: string }
-        const approvalsData = approvalsResponse.data;
+        // Extract approvals from API response
+        const approvalsData = approvalsResponse?.data;
         const pendingApprovals = approvalsData?.pagination?.total || 0;
 
-        // Calculate metrics
-        const totalUsers = users.length;
-        const totalWorkPrograms = workPrograms.length;
-        const totalDocuments = documents.length;
-        const processedLetters = letters.length;
-        const galleryItems = galleries.length;
+        // Calculate metrics - ensure all arrays are defined
+        const totalWorkPrograms = (workPrograms || []).length;
+        const totalDocuments = (documents || []).length;
+        const processedLetters = (letters || []).length;
+        const galleryItems = (galleries || []).length;
 
         // Calculate upcoming events (events with future dates)
         const now = new Date();
-        const upcomingEvents = events.filter((event: Event) => {
+        const upcomingEvents = (events || []).filter((event: Event) => {
           const eventDate = getEarliestScheduleDate(event.schedules);
           return eventDate && eventDate > now;
         }).length;
 
         // Find next upcoming event
-        const nextEvent = events
+        const nextEvent = (events || [])
           .filter((event: Event) => {
             const eventDate = getEarliestScheduleDate(event.schedules);
             return eventDate && eventDate > now;
@@ -148,13 +176,13 @@ export default function OverviewPage() {
           })[0];
 
         // Calculate total budget (net balance: income - expense)
-        const totalIncome = finances
+        const totalIncome = (finances || [])
           .filter((finance: Finance) => finance.type === "INCOME")
           .reduce(
             (sum: number, finance: Finance) => sum + (finance.amount || 0),
             0,
           );
-        const totalExpense = finances
+        const totalExpense = (finances || [])
           .filter((finance: Finance) => finance.type === "EXPENSE")
           .reduce(
             (sum: number, finance: Finance) => sum + (finance.amount || 0),
@@ -163,44 +191,36 @@ export default function OverviewPage() {
         const totalBudget = totalIncome - totalExpense;
 
         // Calculate published articles
-        const publishedArticles = articles.filter(
+        const publishedArticles = (articles || []).filter(
           (article: Article) => article.status === Status.PUBLISH,
         ).length;
 
         // Calculate active programs
-        const activePrograms = workPrograms.filter(
+        const activePrograms = (workPrograms || []).filter(
           (wp: WorkProgram) => wp.status === Status.PUBLISH,
         ).length;
 
         // Calculate pending documents (documents with pending status)
-        const pendingDocuments = documents.filter(
+        const pendingDocuments = (documents || []).filter(
           (doc: Document) => doc.status === Status.PENDING,
         ).length;
 
         // Get active period
         const activePeriod =
-          periods.find((period: Period) => period.isActive)?.name ||
+          (periods || []).find((period: Period) => period.isActive)?.name ||
           "No active period";
 
-        // Get recent activities (last 3) - activities is now an array
-        const recentActivities = (activities as ActivityLog[])
-          .sort(
-            (a: ActivityLog, b: ActivityLog) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-          )
-          .slice(0, 3);
-
         // Calculate new metrics
-        const totalPeriods = periods.length;
-        const totalManagements = managements.length;
-        const totalStructures = structures.length;
-        const totalTasks = tasks.length;
+        const totalPeriods = (periods || []).length;
+        const totalManagements = (managements || []).length;
+        const totalStructures = (structures || []).length;
+        const totalTasks = (tasks || []).length;
 
         // Calculate proposals and accountability reports from documents
-        const totalProposals = documents.filter(
+        const totalProposals = (documents || []).filter(
           (doc: Document) => doc.documentType?.name === "PROPOSAL",
         ).length;
-        const totalAccountabilityReports = documents.filter(
+        const totalAccountabilityReports = (documents || []).filter(
           (doc: Document) => doc.documentType?.name === "LPJ",
         ).length;
 

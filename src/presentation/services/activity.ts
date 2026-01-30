@@ -37,7 +37,8 @@ export const getActivities = async (
   if (params?.limit) queryParams.append("limit", params.limit.toString());
 
   const queryString = queryParams.toString();
-  const endpoint = `/activity${queryString ? `?${queryString}` : ""}`;
+  // Use /api/system/activity for activity logs (not /api/activity which is for radar chart stats)
+  const endpoint = `/system/activity${queryString ? `?${queryString}` : ""}`;
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: "GET",
@@ -53,18 +54,92 @@ export const getActivities = async (
   }
 
   const responseData = await response.json();
-  // API returns { success, data: {...}} format, extract the data object
-  const data = responseData?.data || responseData;
+
+  // Handle API response format: { success: true, data: {...} } or direct {...}
+  if (responseData.success === false) {
+    console.error("Activity API error:", responseData.error);
+    return {
+      activities: [],
+      pagination: {
+        page: params?.page || 1,
+        limit: params?.limit || 10,
+        total: 0,
+        totalPages: 0,
+      },
+    };
+  }
+
+  // Handle both wrapped { data: {...} } and direct {...} formats
+  const data = responseData.data || responseData;
+
+  // Extract activities from various possible formats
+  let activities: ActivityLog[] = [];
+  if (Array.isArray(data?.activities)) {
+    activities = data.activities;
+  } else if (Array.isArray(data)) {
+    activities = data;
+  }
+
+  // Extract pagination from various possible formats
+  const pagination = data?.pagination || {
+    page: params?.page || 1,
+    limit: params?.limit || 10,
+    total: 0,
+    totalPages: 0,
+  };
 
   return {
-    activities: data?.activities || [],
-    pagination: data?.pagination || {
-      page: params?.page || 1,
-      limit: params?.limit || 10,
-      total: 0,
-      totalPages: 0,
-    },
+    activities,
+    pagination,
   };
+};
+
+/**
+ * Radar chart data structure for department activity visualization
+ */
+export interface RadarChartResult {
+  subject: string;
+  A: number;
+  fullMark: number;
+}
+
+/**
+ * Fetch activities for radar chart visualization
+ * Returns aggregated activity counts per department
+ */
+export const getActivitiesRadarChart = async (): Promise<
+  RadarChartResult[]
+> => {
+  const response = await fetch(`${API_URL}/activity`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch activity radar chart data");
+  }
+
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...] } or direct [...]
+  if (responseData.success === false) {
+    console.error("Activity Radar Chart API error:", responseData.error);
+    return [];
+  }
+
+  // Handle both wrapped { data: {...} } and direct {...} formats
+  const data = responseData.data || responseData;
+
+  // Extract radar chart data array
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  return [];
 };
 
 export const logActivity = async (data: {
@@ -74,7 +149,7 @@ export const logActivity = async (data: {
   description: string;
   metadata?: ActivityMetadata;
 }): Promise<ActivityLog> => {
-  const response = await fetch(`${API_URL}/activity`, {
+  const response = await fetch(`${API_URL}/system/activity`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -92,5 +167,6 @@ export const logActivity = async (data: {
 
 export const ActivityApi = {
   getActivities,
+  getActivitiesRadarChart,
   logActivity,
 };

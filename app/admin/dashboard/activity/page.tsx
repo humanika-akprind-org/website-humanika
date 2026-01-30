@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import type { ActivityLog } from "@/domain/entities/activity-log.entity";
+import { getActivities } from "@/presentation/services/activity";
 import SelectFilter from "@/presentation/components/admin/ui/input/SelectFilter";
 import ExportButtons from "@/presentation/components/admin/pages/activity/export-button/ExportButtons";
 import LoadingActivityDashboard from "@/presentation/components/admin/pages/activity/LoadingActivityDashboard";
@@ -40,23 +41,8 @@ export default function ActivityPage() {
 
   const fetchActivities = async (page = 1, append = false) => {
     try {
-      const response = await fetch(
-        `/api/system/activity?page=${page}&limit=20`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch activities");
-      }
-
-      const result = await response.json();
-      const newActivities = result.activities || [];
+      const result = await getActivities({ page, limit: 20 });
+      const newActivities = result.activities;
 
       if (append) {
         setActivities((prev) => [...prev, ...newActivities]);
@@ -73,6 +59,8 @@ export default function ActivityPage() {
     } catch (err) {
       setError("Failed to load activities");
       console.error("Error fetching activities:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -378,43 +366,59 @@ export default function ActivityPage() {
           </h2>
           <div className="text-sm text-gray-500">Last 30 days</div>
         </div>
-        <ul className="divide-y divide-gray-200">
-          {filteredActivities.map((activity) => (
-            <li
-              key={activity.id}
-              className="p-6 hover:bg-gray-50 transition-colors duration-150"
-            >
-              <div className="flex items-start">
-                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-lg">
-                  {getActivityIcon(activity.activityType)}
-                </div>
-                <div className="ml-4 flex-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {activity.user?.name || "Unknown User"}
-                        <span className="ml-2 text-xs font-normal px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                          {getServiceName(activity.entityType)}
-                        </span>
-                        {getPriority(activity.activityType) === "high" && (
-                          <span className="ml-2 text-xs font-normal px-2 py-0.5 bg-red-100 text-red-600 rounded-full">
-                            Important
+        {filteredActivities.length === 0 ? (
+          <div className="p-12 text-center">
+            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+              <FileText className="h-12 w-12" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No activities found
+            </h3>
+            <p className="text-gray-500">
+              {activities.length === 0
+                ? "There are no activities recorded yet."
+                : "No activities match your current filters."}
+            </p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-gray-200">
+            {filteredActivities.map((activity) => (
+              <li
+                key={activity.id}
+                className="p-6 hover:bg-gray-50 transition-colors duration-150"
+              >
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-lg">
+                    {getActivityIcon(activity.activityType)}
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {activity.user?.name || "Unknown User"}
+                          <span className="ml-2 text-xs font-normal px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+                            {getServiceName(activity.entityType)}
                           </span>
-                        )}
-                      </p>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {activity.description}
-                      </p>
+                          {getPriority(activity.activityType) === "high" && (
+                            <span className="ml-2 text-xs font-normal px-2 py-0.5 bg-red-100 text-red-600 rounded-full">
+                              Important
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {activity.description}
+                        </p>
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {formatTimeAgo(activity.createdAt)}
+                      </span>
                     </div>
-                    <span className="text-sm text-gray-500">
-                      {formatTimeAgo(activity.createdAt)}
-                    </span>
                   </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        )}
         <div className="p-4 border-t border-gray-200 bg-gray-50 text-center">
           {hasMore ? (
             <button

@@ -33,13 +33,20 @@ export const getDocuments = async (
 
   const responseData = await response.json();
 
-  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  // Handle API response format: { success: true, data: [...] } or direct array [...]
   if (responseData.success === false) {
     console.error("Document API error:", responseData.error);
     return [];
   }
 
-  return responseData?.data || responseData || [];
+  // Handle both wrapped { data: [...] } and direct [...] formats
+  if (Array.isArray(responseData)) {
+    return responseData;
+  }
+  if (Array.isArray(responseData.data)) {
+    return responseData.data;
+  }
+  return responseData || [];
 };
 
 export const getDocument = async (id: string): Promise<Document> => {

@@ -76,7 +76,30 @@ export async function getUsers(params?: {
       };
     }
 
-    return { data: responseData.data || responseData };
+    // Handle both wrapped { data: {...} } and direct {...} formats
+    const data = responseData.data || responseData;
+
+    // Ensure data has proper structure
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      return { data };
+    }
+
+    // If data is an array, wrap it
+    if (Array.isArray(data)) {
+      return {
+        data: {
+          users: data,
+          pagination: {
+            page: 1,
+            limit: data.length,
+            total: data.length,
+            pages: 1,
+          },
+        },
+      };
+    }
+
+    return { data: responseData };
   } catch (err) {
     return {
       error: err instanceof Error ? err.message : "Failed to fetch users",
