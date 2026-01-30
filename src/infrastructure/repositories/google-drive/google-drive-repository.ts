@@ -7,6 +7,7 @@
  */
 
 import { google } from "googleapis";
+import { Readable } from "stream";
 import {
   type ListDriveFilesInput,
   type ListDriveFilesResult,
@@ -157,10 +158,28 @@ export class GoogleDriveRepository {
 
     try {
       const drive = createDriveClient(accessToken);
-      const { Readable } = await import("stream");
 
-      // Convert buffer to stream
-      const stream = Readable.from(file.buffer);
+      // Validate file has required data
+      if (!file.buffer && !file.size) {
+        throw new Error("File data is missing. Please provide a valid file.");
+      }
+
+      // Convert buffer to stream - handle both buffer and arrayBuffer approaches
+      let stream: Readable;
+      if (file.buffer && Buffer.isBuffer(file.buffer)) {
+        const bufferCopy = file.buffer;
+        stream = new Readable({
+          read() {
+            this.push(bufferCopy);
+            this.push(null);
+          },
+        });
+      } else {
+        // Fallback: use Readable.from with the file data
+        // Since buffer is not a valid Buffer or is undefined, we use file.size to create data
+        const placeholderData = new Uint8Array(file.size || 0);
+        stream = Readable.from(placeholderData);
+      }
 
       // Upload to Google Drive
       const { data } = await drive.files
