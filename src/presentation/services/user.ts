@@ -4,36 +4,10 @@ import type {
   CreateUserData,
   UpdateUserData,
   UsersResponse,
-  ApiResponse,
 } from "@/domain/entities/user.entity";
 import { apiUrl } from "@/presentation/lib/config/config";
 
 const API_URL = apiUrl;
-
-async function fetchApi<T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<ApiResponse<T>> {
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
-      ...options,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { error: data.error || "An error occurred" };
-    }
-
-    return { data };
-  } catch (_error) {
-    return { error: "Network error occurred" };
-  }
-}
 
 // Get all users with pagination and filters
 export async function getUsers(params?: {
@@ -46,7 +20,7 @@ export async function getUsers(params?: {
   isActive?: boolean;
   verifiedAccount?: boolean;
   allUsers?: boolean;
-}): Promise<ApiResponse<UsersResponse>> {
+}): Promise<UsersResponse> {
   const queryParams = new URLSearchParams();
 
   if (params?.page) queryParams.append("page", params.page.toString());
@@ -68,108 +42,230 @@ export async function getUsers(params?: {
   const queryString = queryParams.toString();
   const endpoint = `/user${queryString ? `?${queryString}` : ""}`;
 
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      cache: "no-store",
-    });
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
 
-    const responseData = await response.json();
-
-    // Handle API response format: { success: true, data: {...} } or { success: false, error: "..." }
-    if (responseData.success === false) {
-      console.error("User API error:", responseData.error);
-      return {
-        data: {
-          users: [],
-          pagination: { page: 1, limit: 10, total: 0, pages: 0 },
-        },
-        error: responseData.error,
-      };
+  if (!response.ok) {
+    let errorMessage = "Failed to fetch users";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
     }
+    throw new Error(errorMessage);
+  }
 
-    return { data: responseData.data || responseData };
-  } catch (error) {
-    console.error("Error fetching users:", error);
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: {...} } or { success: false, error: "..." }
+  if (responseData.success === false) {
+    console.error("User API error:", responseData.error);
     return {
-      error: "Network error occurred",
-      data: {
-        users: [],
-        pagination: { page: 1, limit: 10, total: 0, pages: 0 },
-      },
+      users: [],
+      pagination: { page: 1, limit: 10, total: 0, pages: 0 },
     };
   }
+
+  return responseData.data || responseData;
 }
 
 // Get user by ID
-export async function getUserById(id: string): Promise<ApiResponse<User>> {
-  return fetchApi<User>(`/user/${id}`);
+export async function getUserById(id: string): Promise<User> {
+  const response = await fetch(`${API_URL}/user/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to fetch user";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Create new user
-export async function createUser(
-  userData: CreateUserData,
-): Promise<ApiResponse<User>> {
-  return fetchApi<User>("/user", {
+export async function createUser(userData: CreateUserData): Promise<User> {
+  const response = await fetch(`${API_URL}/user`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
     body: JSON.stringify(userData),
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to create user";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    console.error(
+      "User creation failed:",
+      "status:",
+      response.status,
+      "statusText:",
+      response.statusText,
+      "errorMessage:",
+      errorMessage,
+      "data:",
+      userData,
+    );
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Update user
 export async function updateUser(
   id: string,
   userData: UpdateUserData | Partial<CreateUserData>,
-): Promise<ApiResponse<User>> {
-  return fetchApi<User>(`/user/${id}`, {
+): Promise<User> {
+  const response = await fetch(`${API_URL}/user/${id}`, {
     method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
     body: JSON.stringify(userData),
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to update user";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Delete user
-export async function deleteUser(
-  id: string,
-): Promise<ApiResponse<{ message: string }>> {
-  return fetchApi<{ message: string }>(`/user/${id}`, {
+export async function deleteUser(id: string): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/user/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to delete user";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Toggle user active status
 export async function toggleUserStatus(
   id: string,
   isActive: boolean,
-): Promise<ApiResponse<User>> {
+): Promise<User> {
   return updateUser(id, { isActive });
 }
 
 // Get current authenticated user
-export async function getCurrentUser(): Promise<ApiResponse<User>> {
-  return fetchApi<User>("/auth/me");
+export async function getCurrentUser(): Promise<User> {
+  const response = await fetch(`${API_URL}/auth/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to fetch current user";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Change current user's password
 export async function changePassword(data: {
   currentPassword: string;
   newPassword: string;
-}): Promise<ApiResponse<{ message: string }>> {
-  return fetchApi<{ message: string }>("/user/change-password", {
+}): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/user/change-password`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
     body: JSON.stringify(data),
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to change password";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Delete current user's account
-export async function deleteCurrentAccount(): Promise<
-  ApiResponse<{ message: string }>
-> {
-  return fetchApi<{ message: string }>("/user/delete-account", {
+export async function deleteCurrentAccount(): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/user/delete-account`, {
     method: "DELETE",
+    credentials: "include",
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to delete account";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Get unverified users
@@ -181,7 +277,7 @@ export async function getUnverifiedUsers(params?: {
   page?: number;
   limit?: number;
   allUsers?: boolean;
-}): Promise<ApiResponse<UsersResponse>> {
+}): Promise<UsersResponse> {
   return getUsers({
     ...params,
     verifiedAccount: false,
@@ -189,39 +285,107 @@ export async function getUnverifiedUsers(params?: {
 }
 
 // Verify a user account
-export async function verifyUser(id: string): Promise<ApiResponse<User>> {
-  return fetchApi<User>(`/user/${id}/verify`, {
+export async function verifyUser(id: string): Promise<User> {
+  const response = await fetch(`${API_URL}/user/${id}/verify`, {
     method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to verify user";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Send verification email to a user
 export async function sendVerificationEmail(
   id: string,
-): Promise<ApiResponse<{ message: string }>> {
-  return fetchApi<{ message: string }>(`/user/${id}/send-verification`, {
+): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/user/${id}/send-verification`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to send verification email";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Bulk verify users
 export async function bulkVerifyUsers(
   ids: string[],
-): Promise<ApiResponse<{ count: number }>> {
-  return fetchApi<{ count: number }>("/user/bulk-verify", {
+): Promise<{ count: number }> {
+  const response = await fetch(`${API_URL}/user/bulk-verify`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
     body: JSON.stringify({ userIds: ids }),
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to bulk verify users";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Bulk send verification emails
 export async function bulkSendVerification(
   ids: string[],
-): Promise<ApiResponse<{ count: number }>> {
-  return fetchApi<{ count: number }>("/user/bulk-send-verification", {
+): Promise<{ count: number }> {
+  const response = await fetch(`${API_URL}/user/bulk-send-verification`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
     body: JSON.stringify({ userIds: ids }),
   });
+
+  if (!response.ok) {
+    let errorMessage = "Failed to bulk send verification emails";
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch (_e) {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
 }
 
 // Helper function to format enum values for display
@@ -242,19 +406,15 @@ export const departmentOptions = Object.values(Department).map((dept) => ({
   label: formatEnumValue(dept),
 }));
 
-export const positionOptions = Object.values(Position).map((position) => ({
-  value: position as string,
-  label: formatEnumValue(position as string),
-}));
+export const positionOptions = (Object.values(Position) as string[]).map(
+  (position) => ({
+    value: position,
+    label: formatEnumValue(position),
+  }),
+);
 
 // Export types for convenience
-export type {
-  User,
-  CreateUserData,
-  UpdateUserData,
-  UsersResponse,
-  ApiResponse,
-};
+export type { User, CreateUserData, UpdateUserData, UsersResponse };
 
 // Ekspor objek dengan semua fungsi untuk kemudahan impor
 export const UserApi = {
