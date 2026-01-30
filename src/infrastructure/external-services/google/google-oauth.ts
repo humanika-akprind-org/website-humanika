@@ -50,13 +50,24 @@ export async function getGoogleRefreshToken(): Promise<string> {
 /**
  * Get Google user email from OAuth API
  * @param accessToken The Google access token
- * @returns The user's email address
+ * @returns The user's email address, or empty string if authentication fails
  */
 export async function getGoogleUserEmail(accessToken: string): Promise<string> {
-  oauth2Client.setCredentials({ access_token: accessToken });
-  const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
-  const { data } = await oauth2.userinfo.get();
-  return data.email || "";
+  // Return empty string if no access token provided
+  if (!accessToken || accessToken.trim() === "") {
+    return "";
+  }
+
+  try {
+    oauth2Client.setCredentials({ access_token: accessToken });
+    const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
+    const { data } = await oauth2.userinfo.get();
+    return data.email || "";
+  } catch (error: any) {
+    // Handle authentication errors gracefully
+    console.warn("Failed to get Google user email:", error.message || error);
+    return "";
+  }
 }
 
 /**

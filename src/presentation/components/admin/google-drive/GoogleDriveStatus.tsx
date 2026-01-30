@@ -60,8 +60,9 @@ export default function GoogleDriveStatus({
     };
   }, []);
 
-  // If already connected, show checklist with dropdown
-  if (accessToken) {
+  // If access token and user email are both present, show connected state
+  // If access token exists but user email is empty, treat as disconnected (token may be invalid)
+  if (accessToken && userEmail) {
     return (
       <div className="relative" ref={dropdownRef}>
         <button
