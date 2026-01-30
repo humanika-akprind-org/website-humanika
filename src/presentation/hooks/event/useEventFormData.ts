@@ -19,7 +19,7 @@ export function useEventFormData() {
         ]);
 
         setUsers(usersResponse.data?.users || []);
-        setPeriods(periodsResponse || []);
+        setPeriods(periodsResponse);
       } catch (err) {
         console.error("Error loading form data:", err);
         setError(

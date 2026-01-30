@@ -35,14 +35,9 @@ export function useUnverifiedUserManagement() {
       const response = await UserApi.getUnverifiedUsers({
         allUsers: true, // Fetch all unverified users for client-side filtering
       });
-
-      if (response.error) {
-        setError(response.error);
-      } else if (response.data) {
-        setAllUsers(response.data.users);
-      }
-    } catch (_error) {
-      setError("Failed to fetch users");
+      setAllUsers(response.data?.users || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -161,44 +156,32 @@ export function useUnverifiedUserManagement() {
 
   const handleLockAccount = async (userId: string) => {
     try {
-      const response = await UserApi.toggleUserStatus(userId, false);
-      if (response.error) {
-        setError(response.error);
-      } else {
-        setSuccess("Account locked successfully");
-        fetchAllUsers();
-        setTimeout(() => setSuccess(""), 3000);
-      }
-    } catch (_error) {
-      setError("Failed to lock account");
+      await UserApi.toggleUserStatus(userId, false);
+      setSuccess("Account locked successfully");
+      fetchAllUsers();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to lock account");
     }
   };
 
   const handleUnlockAccount = async (userId: string) => {
     try {
-      const response = await UserApi.toggleUserStatus(userId, true);
-      if (response.error) {
-        setError(response.error);
-      } else {
-        setSuccess("Account unlocked successfully");
-        fetchAllUsers();
-        setTimeout(() => setSuccess(""), 3000);
-      }
-    } catch (_error) {
-      setError("Failed to unlock account");
+      await UserApi.toggleUserStatus(userId, true);
+      setSuccess("Account unlocked successfully");
+      fetchAllUsers();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to unlock account");
     }
   };
 
   const confirmDelete = async () => {
     try {
       if (currentUser) {
-        const response = await UserApi.deleteUser(currentUser.id);
-        if (response.error) {
-          setError(response.error);
-        } else {
-          setSuccess("User deleted successfully");
-          fetchAllUsers();
-        }
+        await UserApi.deleteUser(currentUser.id);
+        setSuccess("User deleted successfully");
+        fetchAllUsers();
       } else if (selectedUsers.length > 0) {
         for (const userId of selectedUsers) {
           await UserApi.deleteUser(userId);
@@ -207,8 +190,8 @@ export function useUnverifiedUserManagement() {
         setSelectedUsers([]);
         fetchAllUsers();
       }
-    } catch (_error) {
-      setError("Failed to delete user(s)");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete user(s)");
     } finally {
       setShowDeleteModal(false);
       setCurrentUser(null);
@@ -227,23 +210,19 @@ export function useUnverifiedUserManagement() {
         fetchAllUsers();
         setTimeout(() => setSuccess(""), 3000);
       }
-    } catch (_error) {
-      setError("Failed to verify user(s)");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to verify user(s)");
     }
   };
 
   const handleVerifyUser = async (userId: string) => {
     try {
-      const response = await UserApi.verifyUser(userId);
-      if (response.error) {
-        setError(response.error);
-      } else {
-        setSuccess("User verified successfully");
-        fetchAllUsers();
-        setTimeout(() => setSuccess(""), 3000);
-      }
-    } catch (_error) {
-      setError("Failed to verify user");
+      await UserApi.verifyUser(userId);
+      setSuccess("User verified successfully");
+      fetchAllUsers();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to verify user");
     }
   };
 

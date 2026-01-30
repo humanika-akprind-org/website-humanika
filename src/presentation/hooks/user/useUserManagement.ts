@@ -41,14 +41,13 @@ export function useUserManagement(options?: UseUserManagementOptions) {
       const response = await UserApi.getUsers({
         allUsers: true, // Fetch all users for client-side filtering
       });
-
-      if (response.error) {
-        setError(response.error);
-      } else if (response.data) {
-        setAllUsers(response.data.users.filter((user) => user.verifiedAccount));
-      }
-    } catch (_error) {
-      setError("Failed to fetch users");
+      setAllUsers(
+        (response.data?.users || []).filter(
+          (user: User) => user.verifiedAccount,
+        ),
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -175,44 +174,32 @@ export function useUserManagement(options?: UseUserManagementOptions) {
 
   const handleLockAccount = async (userId: string) => {
     try {
-      const response = await UserApi.toggleUserStatus(userId, false);
-      if (response.error) {
-        setError(response.error);
-      } else {
-        setSuccess("Account locked successfully");
-        fetchAllUsers();
-        setTimeout(() => setSuccess(""), 3000);
-      }
-    } catch (_error) {
-      setError("Failed to lock account");
+      await UserApi.toggleUserStatus(userId, false);
+      setSuccess("Account locked successfully");
+      fetchAllUsers();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to lock account");
     }
   };
 
   const handleUnlockAccount = async (userId: string) => {
     try {
-      const response = await UserApi.toggleUserStatus(userId, true);
-      if (response.error) {
-        setError(response.error);
-      } else {
-        setSuccess("Account unlocked successfully");
-        fetchAllUsers();
-        setTimeout(() => setSuccess(""), 3000);
-      }
-    } catch (_error) {
-      setError("Failed to unlock account");
+      await UserApi.toggleUserStatus(userId, true);
+      setSuccess("Account unlocked successfully");
+      fetchAllUsers();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to unlock account");
     }
   };
 
   const confirmDelete = async () => {
     try {
       if (currentUser) {
-        const response = await UserApi.deleteUser(currentUser.id);
-        if (response.error) {
-          setError(response.error);
-        } else {
-          setSuccess("User deleted successfully");
-          fetchAllUsers();
-        }
+        await UserApi.deleteUser(currentUser.id);
+        setSuccess("User deleted successfully");
+        fetchAllUsers();
       } else if (selectedUsers.length > 0) {
         for (const userId of selectedUsers) {
           await UserApi.deleteUser(userId);
@@ -221,8 +208,8 @@ export function useUserManagement(options?: UseUserManagementOptions) {
         setSelectedUsers([]);
         fetchAllUsers();
       }
-    } catch (_error) {
-      setError("Failed to delete user(s)");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete user(s)");
     } finally {
       setShowDeleteModal(false);
       setCurrentUser(null);
@@ -241,8 +228,8 @@ export function useUserManagement(options?: UseUserManagementOptions) {
         fetchAllUsers();
         setTimeout(() => setSuccess(""), 3000);
       }
-    } catch (_error) {
-      setError("Failed to verify user(s)");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to verify user(s)");
     }
   };
 

@@ -13,16 +13,11 @@ export function useCreateUser() {
     setError("");
 
     try {
-      const response = await UserApi.createUser(formData);
-
-      if (response.error) {
-        setError(response.error);
-      } else {
-        router.push("/admin/people/users");
-      }
+      await UserApi.createUser(formData);
+      router.push("/admin/people/users");
     } catch (err) {
       console.error("Submission error:", err);
-      setError("Failed to create user. Please try again.");
+      setError(err instanceof Error ? err.message : "Failed to create user");
     } finally {
       setIsSubmitting(false);
     }

@@ -20,7 +20,7 @@ export async function getUsers(params?: {
   isActive?: boolean;
   verifiedAccount?: boolean;
   allUsers?: boolean;
-}): Promise<UsersResponse> {
+}): Promise<{ data?: UsersResponse; error?: string }> {
   const queryParams = new URLSearchParams();
 
   if (params?.page) queryParams.append("page", params.page.toString());
@@ -42,38 +42,46 @@ export async function getUsers(params?: {
   const queryString = queryParams.toString();
   const endpoint = `/user${queryString ? `?${queryString}` : ""}`;
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    cache: "no-store",
-  });
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      cache: "no-store",
+    });
 
-  if (!response.ok) {
-    let errorMessage = "Failed to fetch users";
-    try {
-      const errorData = await response.json();
-      errorMessage = errorData.error || errorMessage;
-    } catch (_e) {
-      errorMessage = response.statusText || errorMessage;
+    if (!response.ok) {
+      let errorMessage = "Failed to fetch users";
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (_e) {
+        errorMessage = response.statusText || errorMessage;
+      }
+      return { error: errorMessage };
     }
-    throw new Error(errorMessage);
-  }
 
-  const responseData = await response.json();
+    const responseData = await response.json();
 
-  // Handle API response format: { success: true, data: {...} } or { success: false, error: "..." }
-  if (responseData.success === false) {
-    console.error("User API error:", responseData.error);
+    // Handle API response format: { success: true, data: {...} } or { success: false, error: "..." }
+    if (responseData.success === false) {
+      console.error("User API error:", responseData.error);
+      return {
+        data: {
+          users: [],
+          pagination: { page: 1, limit: 10, total: 0, pages: 0 },
+        },
+      };
+    }
+
+    return { data: responseData.data || responseData };
+  } catch (err) {
     return {
-      users: [],
-      pagination: { page: 1, limit: 10, total: 0, pages: 0 },
+      error: err instanceof Error ? err.message : "Failed to fetch users",
     };
   }
-
-  return responseData.data || responseData;
 }
 
 // Get user by ID
@@ -277,7 +285,7 @@ export async function getUnverifiedUsers(params?: {
   page?: number;
   limit?: number;
   allUsers?: boolean;
-}): Promise<UsersResponse> {
+}): Promise<{ data?: UsersResponse; error?: string }> {
   return getUsers({
     ...params,
     verifiedAccount: false,

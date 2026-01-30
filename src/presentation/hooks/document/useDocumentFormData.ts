@@ -27,7 +27,6 @@ export function useDocumentFormData() {
             LetterApi.getLetters(),
             getPeriods(),
           ]);
-        // Unwrap ApiResponse for users
         setUsers(usersResponse.data?.users || []);
         setEvents(eventsData);
         setLetters(lettersData);

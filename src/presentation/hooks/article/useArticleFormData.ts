@@ -29,7 +29,7 @@ export function useArticleFormData(): {
           ]);
 
         setUsers(usersResponse.data?.users || []);
-        setPeriods(periodsResponse || []);
+        setPeriods(periodsResponse);
         setCurrentUser(currentUserResponse.data || null);
       } catch (err) {
         console.error("Error loading form data:", err);

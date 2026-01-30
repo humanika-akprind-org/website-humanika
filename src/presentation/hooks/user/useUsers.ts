@@ -7,24 +7,24 @@ export function useUsers() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await UserApi.getUsers({ allUsers: true });
-        if (response.error) {
-          setError(response.error);
-        } else if (response.data) {
-          setUsers(response.data.users.filter((user) => user.verifiedAccount));
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch users");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await UserApi.getUsers({ allUsers: true });
+      setUsers(
+        (response.data?.users || []).filter(
+          (user: User) => user.verifiedAccount,
+        ),
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch users");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUsers();
   }, []);
 
@@ -32,28 +32,6 @@ export function useUsers() {
     users,
     isLoading,
     error,
-    refetch: () => {
-      const fetchUsers = async () => {
-        try {
-          setIsLoading(true);
-          setError(null);
-          const response = await UserApi.getUsers({ allUsers: true });
-          if (response.error) {
-            setError(response.error);
-          } else if (response.data) {
-            setUsers(
-              response.data.users.filter((user) => user.verifiedAccount),
-            );
-          }
-        } catch (err) {
-          setError(
-            err instanceof Error ? err.message : "Failed to fetch users",
-          );
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchUsers();
-    },
+    refetch: fetchUsers,
   };
 }

@@ -13,22 +13,6 @@ export interface RegisterData {
   confirmPassword: string;
 }
 
-export interface AuthResponse {
-  success: boolean;
-  data?: User;
-  message?: string;
-  error?: string;
-}
-
-export interface TokenResponse {
-  success: boolean;
-  data?: {
-    accessToken: string;
-    refreshToken: string;
-  };
-  message?: string;
-}
-
 class AuthApi {
   private static API_URL = apiUrl;
 
@@ -54,93 +38,71 @@ class AuthApi {
     return data;
   }
 
-  static async login(
-    credentials: LoginCredentials,
-  ): Promise<{ data?: User; error?: string }> {
-    try {
-      const response = await this.fetchApi<AuthResponse>("/auth/login", {
-        method: "POST",
-        body: JSON.stringify(credentials),
-      });
-      return { data: response.data };
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error.message : "Login failed",
-      };
+  static async login(credentials: LoginCredentials): Promise<User> {
+    const response = await this.fetchApi<{ data?: User }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+    if (!response.data) {
+      throw new Error("Login failed");
     }
+    return response.data;
   }
 
-  static async adminLogin(
-    credentials: LoginCredentials,
-  ): Promise<{ data?: User; error?: string }> {
-    try {
-      const response = await this.fetchApi<AuthResponse>("/auth/admin/login", {
-        method: "POST",
-        body: JSON.stringify(credentials),
-      });
-      return { data: response.data };
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error.message : "Admin login failed",
-      };
+  static async adminLogin(credentials: LoginCredentials): Promise<User> {
+    const response = await this.fetchApi<{ data?: User }>("/auth/admin/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+    if (!response.data) {
+      throw new Error("Admin login failed");
     }
+    return response.data;
   }
 
-  static async register(
-    data: RegisterData,
-  ): Promise<{ data?: User; error?: string }> {
-    try {
-      const response = await this.fetchApi<AuthResponse>("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      return { data: response.data };
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error.message : "Registration failed",
-      };
+  static async register(data: RegisterData): Promise<User> {
+    const response = await this.fetchApi<{ data?: User }>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (!response.data) {
+      throw new Error("Registration failed");
     }
+    return response.data;
   }
 
   static async getCurrentUser(): Promise<{ data?: User; error?: string }> {
     try {
-      const response = await this.fetchApi<AuthResponse>("/auth/me");
+      const response = await this.fetchApi<{ data?: User }>("/auth/me");
+      if (!response.data) {
+        return { error: "Failed to get current user" };
+      }
       return { data: response.data };
-    } catch (error) {
+    } catch (err) {
       return {
         error:
-          error instanceof Error ? error.message : "Failed to get current user",
+          err instanceof Error ? err.message : "Failed to get current user",
       };
     }
   }
 
-  static async logout(): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.fetchApi<{ success: boolean }>("/auth/logout", {
-        method: "POST",
-      });
-      return { success: true };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Logout failed",
-      };
-    }
+  static async logout(): Promise<void> {
+    await this.fetchApi<{ success: boolean }>("/auth/logout", {
+      method: "POST",
+    });
   }
 
   static async refreshToken(): Promise<{
-    data?: { accessToken: string; refreshToken: string };
-    error?: string;
+    accessToken: string;
+    refreshToken: string;
   }> {
-    try {
-      const response = await this.fetchApi<TokenResponse>("/auth/token");
-      return { data: response.data };
-    } catch (error) {
-      return {
-        error:
-          error instanceof Error ? error.message : "Failed to refresh token",
-      };
+    const response = await this.fetchApi<{
+      data?: { accessToken: string; refreshToken: string };
+    }>("/auth/token");
+    if (!response.data) {
+      throw new Error("Failed to refresh token");
     }
+    return response.data;
   }
 }
 

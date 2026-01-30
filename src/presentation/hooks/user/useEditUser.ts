@@ -20,14 +20,13 @@ export function useEditUser(userId: string) {
         setLoading(true);
         setAlert(null);
         const response = await UserApi.getUserById(userId);
-
-        if (response.error) {
-          setAlert({ type: "error", message: response.error });
-        } else if (response.data) {
-          setUser(response.data);
-        }
-      } catch (_error) {
-        setAlert({ type: "error", message: "Failed to fetch user data" });
+        setUser(response);
+      } catch (err) {
+        setAlert({
+          type: "error",
+          message:
+            err instanceof Error ? err.message : "Failed to fetch user data",
+        });
       } finally {
         setLoading(false);
       }

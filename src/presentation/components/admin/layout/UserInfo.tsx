@@ -15,8 +15,8 @@ export default function UserInfo() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await AuthApi.getCurrentUser();
-        setUser(data || null);
+        const response = await AuthApi.getCurrentUser();
+        setUser(response.data || null);
       } catch (error) {
         console.error("Failed to fetch user:", error);
       } finally {

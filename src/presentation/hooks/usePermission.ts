@@ -25,9 +25,9 @@ export function usePermission(): UsePermissionReturn {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await AuthApi.getCurrentUser();
-        if (data) {
-          setUserRole(data.role);
+        const response = await AuthApi.getCurrentUser();
+        if (response.data) {
+          setUserRole(response.data.role);
         }
       } catch (error) {
         console.error("Failed to fetch user role:", error);

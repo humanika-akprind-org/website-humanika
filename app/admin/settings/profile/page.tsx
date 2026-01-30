@@ -99,26 +99,18 @@ export default function ProfilePage() {
     setIsSubmitting(true);
 
     try {
-      const response = await UserApi.updateUser(user.id, formData);
-
-      if (response.error) {
-        toast({
-          title: "Error",
-          description: response.error,
-          variant: "destructive",
-        });
-      } else if (response.data) {
-        setUser(response.data);
-        setIsEditing(false);
-        toast({
-          title: "Success",
-          description: "Profile updated successfully",
-        });
-      }
-    } catch (_error) {
+      const updatedUser = await UserApi.updateUser(user.id, formData);
+      setUser(updatedUser);
+      setIsEditing(false);
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (err) {
       toast({
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description:
+          err instanceof Error ? err.message : "Failed to update profile",
         variant: "destructive",
       });
     } finally {

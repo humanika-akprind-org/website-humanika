@@ -449,8 +449,10 @@ export const useEventForm = (
       const newUsers = response.data?.users || [];
       setSearchedUsers((prev) => {
         // Prevent duplicates
-        const existingIds = new Set(prev.map((u) => u.id));
-        const uniqueNewUsers = newUsers.filter((u) => !existingIds.has(u.id));
+        const existingIds = new Set(prev.map((u: User) => u.id));
+        const uniqueNewUsers = newUsers.filter(
+          (u: User) => !existingIds.has(u.id),
+        );
         return [...prev, ...uniqueNewUsers];
       });
       setUserPage(nextPage);

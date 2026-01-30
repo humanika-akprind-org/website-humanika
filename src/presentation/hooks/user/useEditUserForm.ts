@@ -46,26 +46,24 @@ export function useEditUserForm(
     } else {
       const fetchUser = async () => {
         try {
-          const response = await UserApi.getUserById(userId);
-
-          if (response.error) {
-            setAlert({ type: "error", message: response.error });
-          } else if (response.data) {
-            const userData = response.data;
-            setUser(userData);
-            setFormData({
-              name: userData.name,
-              email: userData.email,
-              username: userData.username,
-              password: "",
-              role: userData.role,
-              department: userData.department ?? undefined,
-              position: userData.position ?? undefined,
-              isActive: userData.isActive,
-            });
-          }
-        } catch (_error) {
-          setAlert({ type: "error", message: "Failed to fetch user data" });
+          const userData = await UserApi.getUserById(userId);
+          setUser(userData);
+          setFormData({
+            name: userData.name,
+            email: userData.email,
+            username: userData.username,
+            password: "",
+            role: userData.role,
+            department: userData.department ?? undefined,
+            position: userData.position ?? undefined,
+            isActive: userData.isActive,
+          });
+        } catch (err) {
+          setAlert({
+            type: "error",
+            message:
+              err instanceof Error ? err.message : "Failed to fetch user data",
+          });
         }
       };
 
@@ -136,20 +134,15 @@ export function useEditUserForm(
     setAlert(null);
 
     try {
-      const response = await UserApi.updateUser(userId, formData);
-
-      if (response.error) {
-        setAlert({ type: "error", message: response.error });
-      } else {
-        setAlert({ type: "success", message: "User updated successfully!" });
-        setTimeout(() => {
-          onSuccess?.();
-        }, 1000);
-      }
-    } catch (_error) {
+      await UserApi.updateUser(userId, formData);
+      setAlert({ type: "success", message: "User updated successfully!" });
+      setTimeout(() => {
+        onSuccess?.();
+      }, 1000);
+    } catch (err) {
       setAlert({
         type: "error",
-        message: "Failed to update user. Please try again.",
+        message: err instanceof Error ? err.message : "Failed to update user",
       });
     } finally {
       setIsSubmitting(false);
@@ -161,20 +154,15 @@ export function useEditUserForm(
     setAlert(null);
 
     try {
-      const response = await UserApi.deleteUser(userId);
-
-      if (response.error) {
-        setAlert({ type: "error", message: response.error });
-      } else {
-        setAlert({ type: "success", message: "User deleted successfully!" });
-        setTimeout(() => {
-          onDelete?.();
-        }, 1000);
-      }
-    } catch (_error) {
+      await UserApi.deleteUser(userId);
+      setAlert({ type: "success", message: "User deleted successfully!" });
+      setTimeout(() => {
+        onDelete?.();
+      }, 1000);
+    } catch (err) {
       setAlert({
         type: "error",
-        message: "Failed to delete user. Please try again.",
+        message: err instanceof Error ? err.message : "Failed to delete user",
       });
     } finally {
       setIsDeleting(false);

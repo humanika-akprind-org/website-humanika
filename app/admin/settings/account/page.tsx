@@ -42,24 +42,19 @@ export default function AccountPage() {
   useEffect(() => {
     const fetchAccountStatus = async () => {
       try {
-        const response = await UserApi.getCurrentUser();
-        if (response.data) {
-          setAccountStatus({
-            isActive: response.data.isActive,
-            verifiedAccount: response.data.verifiedAccount,
-            email: response.data.email,
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: response.error || "Failed to load account status",
-            variant: "destructive",
-          });
-        }
-      } catch (_error) {
+        const user = await UserApi.getCurrentUser();
+        setAccountStatus({
+          isActive: user.isActive,
+          verifiedAccount: user.verifiedAccount,
+          email: user.email,
+        });
+      } catch (err) {
         toast({
           title: "Error",
-          description: "Network error occurred while loading account status",
+          description:
+            err instanceof Error
+              ? err.message
+              : "Failed to load account status",
           variant: "destructive",
         });
       } finally {
@@ -114,25 +109,25 @@ export default function AccountPage() {
         newPassword: passwordData.newPassword,
       });
 
-      if (response.error) {
-        let errorMessage = "Failed to change password";
-        switch (response.error) {
-          case "Current password and new password are required":
-            errorMessage = "Please fill in all password fields";
-            break;
-          case "Current password is incorrect":
-            errorMessage = "Current password is incorrect";
-            break;
-          case "User not found or password not set":
-            errorMessage =
-              "Account password not found. Please contact support.";
-            break;
-          case "Unauthorized":
-            errorMessage = "You are not authorized to perform this action";
-            break;
-          default:
-            errorMessage = response.error;
-        }
+      let errorMessage = "Failed to change password";
+      switch (response.message) {
+        case "Current password and new password are required":
+          errorMessage = "Please fill in all password fields";
+          break;
+        case "Current password is incorrect":
+          errorMessage = "Current password is incorrect";
+          break;
+        case "User not found or password not set":
+          errorMessage = "Account password not found. Please contact support.";
+          break;
+        case "Unauthorized":
+          errorMessage = "You are not authorized to perform this action";
+          break;
+        default:
+          errorMessage = response.message;
+      }
+
+      if (errorMessage !== "Password changed successfully") {
         setError(errorMessage);
       } else {
         setSuccess(
@@ -146,8 +141,12 @@ export default function AccountPage() {
         });
         setIsChangingPassword(false);
       }
-    } catch (_error) {
-      setError("Network error occurred while changing password");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Network error occurred while changing password",
+      );
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setSuccess(""), 3000);
