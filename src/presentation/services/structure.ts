@@ -28,7 +28,15 @@ export const getStructures = async (
     throw new Error("Failed to fetch organizational structures");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Structure API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getStructure = async (
@@ -47,7 +55,8 @@ export const getStructure = async (
     throw new Error("Failed to fetch organizational structure");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createStructure = async (
@@ -116,7 +125,8 @@ export const getPublishedStructures = async (): Promise<
     throw new Error("Failed to fetch published structures");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData || [];
 };
 
 export const StructureApi = {

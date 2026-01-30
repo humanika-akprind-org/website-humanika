@@ -37,7 +37,7 @@ export const getActivities = async (
   if (params?.limit) queryParams.append("limit", params.limit.toString());
 
   const queryString = queryParams.toString();
-  const endpoint = `/system/activity${queryString ? `?${queryString}` : ""}`;
+  const endpoint = `/activity${queryString ? `?${queryString}` : ""}`;
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: "GET",
@@ -52,10 +52,13 @@ export const getActivities = async (
     throw new Error("Failed to fetch activities");
   }
 
-  const result = await response.json();
+  const responseData = await response.json();
+  // API returns { success, data: {...}} format, extract the data object
+  const data = responseData?.data || responseData;
+
   return {
-    activities: result.activities || [],
-    pagination: result.pagination || {
+    activities: data?.activities || [],
+    pagination: data?.pagination || {
       page: params?.page || 1,
       limit: params?.limit || 10,
       total: 0,
@@ -71,7 +74,7 @@ export const logActivity = async (data: {
   description: string;
   metadata?: ActivityMetadata;
 }): Promise<ActivityLog> => {
-  const response = await fetch(`${API_URL}/system/activity`, {
+  const response = await fetch(`${API_URL}/activity`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

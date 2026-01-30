@@ -68,7 +68,40 @@ export async function getUsers(params?: {
   const queryString = queryParams.toString();
   const endpoint = `/user${queryString ? `?${queryString}` : ""}`;
 
-  return fetchApi<UsersResponse>(endpoint);
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      cache: "no-store",
+    });
+
+    const responseData = await response.json();
+
+    // Handle API response format: { success: true, data: {...} } or { success: false, error: "..." }
+    if (responseData.success === false) {
+      console.error("User API error:", responseData.error);
+      return {
+        data: {
+          users: [],
+          pagination: { page: 1, limit: 10, total: 0, pages: 0 },
+        },
+        error: responseData.error,
+      };
+    }
+
+    return { data: responseData.data || responseData };
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return {
+      error: "Network error occurred",
+      data: {
+        users: [],
+        pagination: { page: 1, limit: 10, total: 0, pages: 0 },
+      },
+    };
+  }
 }
 
 // Get user by ID

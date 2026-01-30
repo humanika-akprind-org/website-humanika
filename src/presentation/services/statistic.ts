@@ -28,7 +28,15 @@ export const getStatistics = async (
     throw new Error("Failed to fetch statistics");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Statistic API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getStatistic = async (id: string): Promise<Statistic> => {
@@ -45,7 +53,8 @@ export const getStatistic = async (id: string): Promise<Statistic> => {
     throw new Error("Failed to fetch statistic");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const getStatisticByPeriod = async (
@@ -64,7 +73,8 @@ export const getStatisticByPeriod = async (
     throw new Error("Failed to fetch statistic by period");
   }
 
-  const data = await response.json();
+  const responseData = await response.json();
+  const data = responseData?.data || responseData || [];
   return data.length > 0 ? data[0] : null;
 };
 
@@ -85,7 +95,8 @@ export const getActivePeriodStatistic = async (): Promise<Statistic | null> => {
     throw new Error("Failed to fetch active period statistic");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData || null;
 };
 
 export const createStatistic = async (

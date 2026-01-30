@@ -31,7 +31,15 @@ export const getOrganizationContacts = async (
     throw new Error("Failed to fetch organization contacts");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Organization Contact API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getOrganizationContact = async (
@@ -50,7 +58,8 @@ export const getOrganizationContact = async (
     throw new Error("Failed to fetch organization contact");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const getActivePeriodOrganizationContact =
@@ -74,7 +83,8 @@ export const getActivePeriodOrganizationContact =
       throw new Error("Failed to fetch active period organization contact");
     }
 
-    return response.json();
+    const responseData = await response.json();
+    return responseData?.data || responseData || null;
   };
 
 export const createOrganizationContact = async (

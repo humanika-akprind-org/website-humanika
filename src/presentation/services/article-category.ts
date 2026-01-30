@@ -26,6 +26,13 @@ export const getArticleCategories = async (): Promise<ArticleCategory[]> => {
   }
 
   const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Article Category API error:", responseData.error);
+    return [];
+  }
+
   // API returns { success, data: [...] } format, extract the data array
   return responseData?.data || responseData || [];
 };
@@ -46,7 +53,8 @@ export const getArticleCategory = async (
     throw new Error("Failed to fetch article category");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createArticleCategory = async (

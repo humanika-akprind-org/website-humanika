@@ -14,7 +14,15 @@ export const getGalleryCategories = async (): Promise<GalleryCategory[]> => {
   if (!response.ok) {
     throw new Error("Failed to fetch gallery categories");
   }
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Gallery Category API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getGalleryCategory = async (
@@ -26,7 +34,8 @@ export const getGalleryCategory = async (
   if (!response.ok) {
     throw new Error("Failed to fetch gallery category");
   }
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createGalleryCategory = async (

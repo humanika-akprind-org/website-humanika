@@ -87,7 +87,7 @@ export default function OverviewPage() {
           galleries,
           approvalsResponse,
           periods,
-          activities,
+          activitiesResponse,
           managements,
           tasks,
           structures,
@@ -108,8 +108,16 @@ export default function OverviewPage() {
           StructureApi.getStructures(),
         ]);
 
-        // Extract users from API response
+        // Extract users from API response - UserApi returns { data: { users: [], pagination: {} } }
         const users = usersResponse.data?.users || [];
+
+        // Extract activities from API response - ActivityApi returns { activities: [], pagination: {} }
+        const activities =
+          activitiesResponse.activities || activitiesResponse || [];
+
+        // Extract approvals from API response - ApprovalApi returns { data?: ApprovalsResponse, error?: string }
+        const approvalsData = approvalsResponse.data;
+        const pendingApprovals = approvalsData?.pagination?.total || 0;
 
         // Calculate metrics
         const totalUsers = users.length;
@@ -169,16 +177,13 @@ export default function OverviewPage() {
           (doc: Document) => doc.status === Status.PENDING,
         ).length;
 
-        // Get pending approvals count
-        const pendingApprovals = approvalsResponse.data?.pagination?.total || 0;
-
         // Get active period
         const activePeriod =
           periods.find((period: Period) => period.isActive)?.name ||
           "No active period";
 
-        // Get recent activities (last 3)
-        const recentActivities = activities.activities
+        // Get recent activities (last 3) - activities is now an array
+        const recentActivities = (activities as ActivityLog[])
           .sort(
             (a: ActivityLog, b: ActivityLog) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),

@@ -30,7 +30,15 @@ export const getLetters = async (filter?: LetterFilter): Promise<Letter[]> => {
     throw new Error("Failed to fetch letters");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Letter API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getLetter = async (id: string): Promise<Letter> => {
@@ -47,7 +55,8 @@ export const getLetter = async (id: string): Promise<Letter> => {
     throw new Error("Failed to fetch letter");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createLetter = async (

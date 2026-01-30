@@ -12,7 +12,7 @@ export function truncateDescription(
 }
 
 export function generateCategories(
-  eventCategories: EventCategory[],
+  eventCategories: EventCategory[] | null | undefined,
   allEvents: Event[],
 ) {
   const colors = [
@@ -28,6 +28,9 @@ export function generateCategories(
     "from-teal-500 to-teal-600",
   ];
 
+  // Safely handle null/undefined/empty eventCategories - ensure it's always an array
+  const categories = Array.isArray(eventCategories) ? eventCategories : [];
+
   return [
     {
       id: "all",
@@ -35,7 +38,7 @@ export function generateCategories(
       count: allEvents.length,
       color: "from-grey-500 to-grey-600",
     },
-    ...eventCategories.map((category, index) => ({
+    ...categories.map((category, index) => ({
       id: category.name.toLowerCase().replace(/\s+/g, "-"),
       name: category.name,
       count: allEvents.filter((e) => e.category?.id === category.id).length,

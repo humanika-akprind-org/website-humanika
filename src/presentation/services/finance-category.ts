@@ -32,7 +32,15 @@ export const getFinanceCategories = async (
     throw new Error("Failed to fetch finance categories");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Finance Category API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getFinanceCategory = async (
@@ -51,7 +59,8 @@ export const getFinanceCategory = async (
     throw new Error("Failed to fetch finance category");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createFinanceCategory = async (

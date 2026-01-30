@@ -14,7 +14,15 @@ export const getEventCategories = async (): Promise<EventCategory[]> => {
   if (!response.ok) {
     throw new Error("Failed to fetch event categories");
   }
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Event Category API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getEventCategory = async (id: string): Promise<EventCategory> => {
@@ -24,7 +32,8 @@ export const getEventCategory = async (id: string): Promise<EventCategory> => {
   if (!response.ok) {
     throw new Error("Failed to fetch event category");
   }
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createEventCategory = async (

@@ -34,6 +34,13 @@ export const getArticles = async (
   }
 
   const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Article API error:", responseData.error);
+    return [];
+  }
+
   // API returns { success, data: [...] } format, extract the data array
   return responseData?.data || responseData || [];
 };

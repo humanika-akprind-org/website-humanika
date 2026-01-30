@@ -14,7 +14,15 @@ export async function getDocumentTypes(): Promise<DocumentType[]> {
     throw new Error("Failed to fetch document types");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Document Type API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 }
 
 export async function getDocumentType(id: string): Promise<DocumentType> {
@@ -27,7 +35,8 @@ export async function getDocumentType(id: string): Promise<DocumentType> {
     throw new Error("Failed to fetch document type");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 }
 
 export async function createDocumentType(

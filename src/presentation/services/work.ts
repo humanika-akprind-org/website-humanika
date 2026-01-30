@@ -31,7 +31,15 @@ export const getWorkPrograms = async (
     throw new Error("Failed to fetch work programs");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Work API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getWorkProgram = async (id: string): Promise<WorkProgram> => {
@@ -47,7 +55,8 @@ export const getWorkProgram = async (id: string): Promise<WorkProgram> => {
     throw new Error("Failed to fetch work program");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createWorkProgram = async (

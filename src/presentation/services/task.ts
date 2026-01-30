@@ -32,7 +32,15 @@ export const getDepartmentTasks = async (
     throw new Error("Failed to fetch department tasks");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Task API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getDepartmentTask = async (
@@ -51,7 +59,8 @@ export const getDepartmentTask = async (
     throw new Error("Failed to fetch department task");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createDepartmentTask = async (

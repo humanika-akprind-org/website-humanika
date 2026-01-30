@@ -38,7 +38,15 @@ export const getFinances = async (
     throw new Error("Failed to fetch finances");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Finance API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getFinance = async (id: string): Promise<Finance> => {
@@ -55,7 +63,8 @@ export const getFinance = async (id: string): Promise<Finance> => {
     throw new Error("Failed to fetch finance");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createFinance = async (

@@ -33,7 +33,14 @@ export const getEvents = async (filter?: EventFilter): Promise<Event[]> => {
   }
 
   const responseData = await response.json();
-  return responseData.data;
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Event API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getEvent = async (id: string): Promise<Event> => {
@@ -50,7 +57,8 @@ export const getEvent = async (id: string): Promise<Event> => {
     throw new Error("Failed to fetch event");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const getEventBySlug = async (slug: string): Promise<Event> => {
@@ -67,7 +75,8 @@ export const getEventBySlug = async (slug: string): Promise<Event> => {
     throw new Error("Failed to fetch event by slug");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createEvent = async (data: CreateEventInput): Promise<Event> => {
@@ -147,7 +156,7 @@ export const getPublishedEvents = async (): Promise<Event[]> => {
   }
 
   const responseData = await response.json();
-  return responseData.data || [];
+  return responseData?.data || responseData || [];
 };
 
 export const EventApi = {

@@ -31,7 +31,15 @@ export const getDocuments = async (
     throw new Error("Failed to fetch documents");
   }
 
-  return response.json();
+  const responseData = await response.json();
+
+  // Handle API response format: { success: true, data: [...], pagination: {...} }
+  if (responseData.success === false) {
+    console.error("Document API error:", responseData.error);
+    return [];
+  }
+
+  return responseData?.data || responseData || [];
 };
 
 export const getDocument = async (id: string): Promise<Document> => {
@@ -48,7 +56,8 @@ export const getDocument = async (id: string): Promise<Document> => {
     throw new Error("Failed to fetch document");
   }
 
-  return response.json();
+  const responseData = await response.json();
+  return responseData?.data || responseData;
 };
 
 export const createDocument = async (
