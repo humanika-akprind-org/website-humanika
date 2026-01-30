@@ -25,6 +25,10 @@ const getPreviewUrl = (photo: string | null | undefined): string => {
   }
 };
 
+// Helper function to check if file is PDF
+const isPDFFile = (file: File): boolean =>
+  file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
 interface PhotoUploadProps {
   label: string;
   previewUrl: string | null;
@@ -190,12 +194,37 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   const handleConvertFile = async () => {
     if (!uploadedFile) return;
 
+    const fileCategory = isPDFFile(uploadedFile) ? "pdf" : "image";
+
+    // Show appropriate message based on file type
+    if (fileCategory === "pdf") {
+      setSizeError(
+        `PDF files cannot be compressed. Please upload a smaller file (max 5MB).`,
+      );
+      return;
+    }
+
     setIsConverting(true);
     try {
       const compressedFile = await compressImage(uploadedFile, 5, 0.8, 1920);
-      setIsConverted(true);
-      setSizeError(null);
-      onFileChange(compressedFile);
+
+      // Check if compression actually reduced the file size
+      if (compressedFile.size >= uploadedFile.size) {
+        setSizeError(
+          `Image file is already optimized. Please upload a smaller file (max 5MB).`,
+        );
+      } else {
+        setIsConverted(true);
+        setSizeError(null);
+        onFileChange(compressedFile);
+
+        // Update preview with compressed image
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setCroppedImage(reader.result as string);
+        };
+        reader.readAsDataURL(compressedFile);
+      }
     } catch (error) {
       console.error("Error converting file:", error);
       setSizeError("Failed to convert file. Please try a different file.");
@@ -212,11 +241,20 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
       setIsConverting(false);
       setUploadedFile(file);
 
+      const fileCategory = isPDFFile(file) ? "pdf" : "image";
+
       // Validate file size
       if (file.size > maxSize) {
-        setSizeError(
-          `File size is ${Math.round(file.size / (1024 * 1024))}MB. Click "Convert File" to compress it.`,
-        );
+        // Show appropriate error message based on file type
+        if (fileCategory === "pdf") {
+          setSizeError(
+            `File size is ${Math.round(file.size / (1024 * 1024))}MB. PDF compression is not supported. Please upload a smaller file.`,
+          );
+        } else {
+          setSizeError(
+            `File size is ${Math.round(file.size / (1024 * 1024))}MB. Click "Compress File" to reduce its size.`,
+          );
+        }
       } else {
         setSizeError(null);
 
@@ -232,6 +270,15 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
       // Reset crop-related state when new file is selected
       setCroppedImage(null);
       setCropModalOpen(false);
+
+      // Set preview for images
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setCroppedImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -308,22 +355,25 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
           </div>
           {(previewUrl || existingPhoto || croppedImage) && (
             <div className="flex gap-2 mt-2">
-              {/* Convert button for large images (> 5MB) */}
-              {uploadedFile && uploadedFile.size > maxSize && !isConverted && (
-                <button
-                  type="button"
-                  onClick={handleConvertFile}
-                  className="text-sm text-green-600 hover:text-green-800 flex items-center"
-                  disabled={isLoading || isConverting}
-                >
-                  <FiRefreshCw
-                    className={`w-4 h-4 inline mr-1 ${
-                      isConverting ? "animate-spin" : ""
-                    }`}
-                  />
-                  {isConverting ? "Converting..." : "Convert File"}
-                </button>
-              )}
+              {/* Compress button for large images (> 5MB) - skip for PDF */}
+              {uploadedFile &&
+                uploadedFile.size > maxSize &&
+                !isConverted &&
+                !isPDFFile(uploadedFile) && (
+                  <button
+                    type="button"
+                    onClick={handleConvertFile}
+                    className="text-sm text-green-600 hover:text-green-800 flex items-center"
+                    disabled={isLoading || isConverting}
+                  >
+                    <FiRefreshCw
+                      className={`w-4 h-4 inline mr-1 ${
+                        isConverting ? "animate-spin" : ""
+                      }`}
+                    />
+                    {isConverting ? "Converting..." : "Compress File"}
+                  </button>
+                )}
               {(previewUrl || existingPhoto) && (
                 <button
                   type="button"

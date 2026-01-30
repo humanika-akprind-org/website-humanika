@@ -165,8 +165,7 @@ export const useArticleForm = (
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileChange = (file: File) => {
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({

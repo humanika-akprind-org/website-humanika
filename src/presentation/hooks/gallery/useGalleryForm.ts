@@ -189,8 +189,7 @@ export const useGalleryForm = (
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleFileChange = (file: File) => {
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         setError("File size must be less than 5MB");

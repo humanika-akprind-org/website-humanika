@@ -135,10 +135,7 @@ export default function StructureForm({
           label="Structure Image"
           previewUrl={previewUrl}
           existingPhoto={existingStructureImage}
-          onFileChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleStructureImageChange(file);
-          }}
+          onFileChange={handleStructureImageChange}
           onRemovePhoto={removeStructureImage}
           isLoading={isLoading}
           photoLoading={fileLoading}
